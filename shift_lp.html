@@ -1,159 +1,112 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZETCCQQ8M3"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-ZETCCQQ8M3');
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>シフトメモ — バイト・パートの給与管理ツール</title>
+<title>ShiftMemo — バイト・パートの給与管理ツール</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZETCCQQ8M3"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-ZETCCQQ8M3');</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;--border:#2e2e2e;
-  --accent:#c8f060;--accent2:#60f0c8;--text:#f0f0f0;--muted:#888;
-}
+:root{--bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;--border:#2e2e2e;--accent:#c8f060;--text:#f0f0f0;--muted:#888;}
 body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;overflow-x:hidden}
-
-/* NAV */
-nav{display:flex;justify-content:space-between;align-items:center;padding:20px 40px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(15,15,15,.9);backdrop-filter:blur(12px);z-index:100}
-.nav-logo{font-size:20px;font-weight:800;letter-spacing:-0.5px}
-.nav-logo span{color:var(--accent)}
-.nav-cta{background:var(--accent);color:#0f0f0f;padding:10px 24px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;transition:.2s}
-.nav-cta:hover{opacity:.85}
-
-/* HERO */
-.hero{padding:100px 40px 80px;max-width:900px;margin:0 auto;text-align:center}
-.hero-badge{display:inline-block;background:var(--surface);border:1px solid var(--border);color:var(--accent);font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;letter-spacing:1px;margin-bottom:32px}
-.hero h1{font-size:clamp(42px,8vw,80px);font-weight:800;line-height:1.0;letter-spacing:-3px;margin-bottom:24px}
+nav{display:flex;justify-content:space-between;align-items:center;padding:20px 40px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(15,15,15,.95);backdrop-filter:blur(12px);z-index:100}
+.nav-logo{font-size:20px;font-weight:800}.nav-logo span{color:var(--accent)}
+.nav-cta{background:var(--accent);color:#0f0f0f;padding:10px 24px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none}
+.hero{padding:100px 40px 60px;max-width:900px;margin:0 auto;text-align:center}
+.badge{display:inline-block;background:var(--surface);border:1px solid var(--border);color:var(--accent);font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;letter-spacing:1px;margin-bottom:32px}
+.hero h1{font-size:clamp(40px,8vw,76px);font-weight:800;line-height:1.0;letter-spacing:-3px;margin-bottom:24px}
 .hero h1 em{color:var(--accent);font-style:normal}
-.hero p{font-size:18px;color:var(--muted);line-height:1.7;max-width:560px;margin:0 auto 40px}
-.hero-btn{display:inline-block;background:var(--accent);color:#0f0f0f;padding:18px 48px;border-radius:12px;font-weight:800;font-size:18px;text-decoration:none;letter-spacing:-0.5px;transition:.2s}
-.hero-btn:hover{opacity:.85;transform:translateY(-2px)}
-.hero-sub{margin-top:16px;font-size:13px;color:var(--muted)}
-
-/* DEMO SCREEN */
-.demo-wrap{max-width:400px;margin:60px auto;background:var(--surface);border:1px solid var(--border);border-radius:24px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.6)}
-.demo-header{background:var(--surface2);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
-.demo-logo{font-size:16px;font-weight:800}
-.demo-logo span{color:var(--accent)}
-.demo-tabs{display:flex;gap:4px}
-.demo-tab{font-size:11px;color:var(--muted);padding:4px 10px;border-radius:6px;background:var(--surface)}
-.demo-tab.a{color:var(--text);background:var(--bg)}
-.demo-body{padding:20px}
-.demo-card{background:var(--bg);border-radius:12px;padding:16px;margin-bottom:12px}
-.demo-label{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
-.demo-timer{font-family:'DM Mono',monospace;font-size:40px;color:var(--accent);letter-spacing:-2px}
-.demo-btn-out{width:100%;background:#ff6b6b;color:#fff;border:none;border-radius:10px;padding:16px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:12px}
-.demo-result{background:linear-gradient(135deg,#1a2a0a,#0a2a1a);border:1px solid var(--accent);border-radius:12px;padding:16px}
-.demo-amount{font-family:'DM Mono',monospace;font-size:36px;color:var(--accent)}
-.demo-break{font-size:12px;color:var(--muted);margin-top:8px;line-height:2;font-family:'DM Mono',monospace}
-
-/* FEATURES */
+.hero p{font-size:17px;color:var(--muted);line-height:1.7;max-width:540px;margin:0 auto 40px}
+.hero-btn{display:inline-block;background:var(--accent);color:#0f0f0f;padding:18px 48px;border-radius:12px;font-weight:800;font-size:18px;text-decoration:none;letter-spacing:-0.5px}
+.hero-sub{margin-top:14px;font-size:12px;color:var(--muted)}
 .section{padding:80px 40px;max-width:1000px;margin:0 auto}
-.section-label{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
-.section h2{font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:-1.5px;margin-bottom:48px;line-height:1.1}
-.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
-.feature{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px}
-.feature-icon{font-size:28px;margin-bottom:16px}
-.feature h3{font-size:18px;font-weight:700;margin-bottom:8px;letter-spacing:-0.5px}
-.feature p{font-size:14px;color:var(--muted);line-height:1.7}
-
-/* TOOLS SECTION */
-.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.tool-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;transition:.2s}
-.tool-card:hover{border-color:var(--accent);background:var(--surface2)}
-.tool-card-icon{font-size:24px;margin-bottom:10px}
-.tool-card h4{font-size:15px;font-weight:700;margin-bottom:4px}
-.tool-card p{font-size:12px;color:var(--muted)}
-
-/* DIVIDER */
+.section-label{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+.section h2{font-size:clamp(26px,5vw,44px);font-weight:800;letter-spacing:-1.5px;margin-bottom:40px;line-height:1.1}
+.section h2 em{color:var(--accent);font-style:normal}
 .divider{border:none;border-top:1px solid var(--border);margin:0 40px}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.feature{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px}
+.feature-icon{font-size:26px;margin-bottom:14px}
+.feature h3{font-size:17px;font-weight:700;margin-bottom:7px;letter-spacing:-0.5px}
+.feature p{font-size:13px;color:var(--muted);line-height:1.7}
 
-/* FREE */
-.free-section{padding:80px 40px;text-align:center;max-width:700px;margin:0 auto}
-.free-section h2{font-size:clamp(32px,6vw,56px);font-weight:800;letter-spacing:-2px;margin-bottom:20px;line-height:1.1}
-.free-section h2 em{color:var(--accent);font-style:normal}
-.free-section p{font-size:16px;color:var(--muted);line-height:1.7;margin-bottom:36px}
-.free-points{display:flex;flex-direction:column;gap:10px;text-align:left;max-width:400px;margin:0 auto 40px}
-.free-point{display:flex;align-items:center;gap:12px;font-size:15px}
-.free-point::before{content:'✓';color:var(--accent);font-weight:800;font-size:18px}
+/* JOKE SECTION */
+.joke-section{padding:80px 40px;max-width:900px;margin:0 auto;text-align:center}
+.joke-preview{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:40px;text-align:left}
+.joke-card-lp{border-radius:14px;padding:18px;position:relative}
+.joke-card-lp.r1{background:#1a1a1a;border:1px solid #333}
+.joke-card-lp.r5{background:#1f1a2a;border:1px solid #5a2a8a}
+.joke-card-lp.r9{background:linear-gradient(135deg,#1a0030,#002a1a);border:2px solid #aa00ff}
+.joke-card-lp.r10{background:linear-gradient(135deg,#2a1500,#1a0a00);border:2px solid #FFD700}
+.joke-stars-lp{font-size:10px;margin-bottom:6px;letter-spacing:1px;color:#aaa}
+.joke-stars-lp.gold{color:#FFD700}
+.joke-text-lp{font-size:12px;line-height:1.6}
+.joke-rarity-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-bottom:8px;letter-spacing:0.5px}
+.rb-normal{background:#333;color:#aaa}
+.rb-rare{background:#2a1a4a;color:#daf}
+.rb-legend{background:#FFD700;color:#2a1a00}
+.locked-card{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:120px}
+.locked-card .lock{font-size:28px;margin-bottom:6px}
+.locked-card p{font-size:11px;color:var(--muted);text-align:center}
+
+/* ENCYCLOPEDIA SECTION */
+.enc-section{padding:80px 40px;max-width:900px;margin:0 auto}
+.enc-visual{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px;justify-content:center}
+.enc-mini{width:52px;height:52px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.enc-mini.unlocked{background:var(--surface);border:1px solid var(--accent)}
+.enc-mini.locked{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:16px}
+
+/* TITLE SECTION */
+.titles-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:30px}
+.title-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.title-icon{font-size:28px;margin-bottom:8px}
+.title-name{font-size:14px;font-weight:700}
+.title-req{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* DONATE SECTION */
+.donate-section{padding:80px 40px;max-width:700px;margin:0 auto;text-align:center}
+.donate-big{background:linear-gradient(135deg,#FFD700,#FFA500,#FF6B35,#FFD700);background-size:300% 300%;animation:goldShine 3s ease infinite;border:none;border-radius:20px;padding:32px;cursor:pointer;width:100%;position:relative;overflow:hidden;margin-top:30px;text-decoration:none;display:block}
+@keyframes goldShine{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.donate-big::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent,rgba(255,255,255,0.15),transparent);animation:shimmer 2s infinite}
+@keyframes shimmer{0%{transform:translateX(-100%) rotate(45deg)}100%{transform:translateX(100%) rotate(45deg)}}
+.donate-crown{font-size:40px;display:block;margin-bottom:10px}
+.donate-title-lp{font-size:22px;font-weight:800;color:#2a1a00;display:block;margin-bottom:6px}
+.donate-sub-lp{font-size:13px;color:#5a3a00;display:block;font-weight:600}
 
 /* PRO */
-.pro-section{padding:80px 40px;max-width:700px;margin:0 auto;text-align:center}
-.pro-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;position:relative;overflow:hidden}
-.pro-card::before{content:'PRO';position:absolute;top:20px;right:20px;background:var(--accent);color:#0f0f0f;font-size:11px;font-weight:800;padding:4px 10px;border-radius:6px;letter-spacing:1px}
-.pro-card h3{font-size:28px;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
-.pro-card p{color:var(--muted);font-size:14px;margin-bottom:28px}
-.pro-features{list-style:none;text-align:left;margin-bottom:32px}
-.pro-features li{padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;display:flex;align-items:center;gap:10px}
+.pro-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px;position:relative;overflow:hidden;max-width:600px;margin:0 auto}
+.pro-card::before{content:'PRO';position:absolute;top:18px;right:18px;background:var(--accent);color:#0f0f0f;font-size:10px;font-weight:800;padding:3px 8px;border-radius:5px;letter-spacing:1px}
+.pro-features{list-style:none;text-align:left;margin:20px 0 28px}
+.pro-features li{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;display:flex;align-items:center;gap:10px}
 .pro-features li:last-child{border:none}
 .pro-features li::before{content:'→';color:var(--accent);font-weight:700}
-.pro-price{font-family:'DM Mono',monospace;font-size:36px;color:var(--accent);margin-bottom:4px}
-.pro-price-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
-.pro-btn{display:block;background:var(--accent);color:#0f0f0f;padding:16px;border-radius:10px;font-weight:800;font-size:16px;text-decoration:none}
+.pro-price{font-family:'DM Mono',monospace;font-size:32px;color:var(--accent)}
 
-/* FOOTER */
-footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px}
-.footer-logo{font-size:16px;font-weight:800;color:var(--text)}
-.footer-logo span{color:var(--accent)}
+/* FREE POINTS */
+.free-points{display:flex;flex-direction:column;gap:10px;text-align:left;max-width:380px;margin:0 auto 36px}
+.free-point{display:flex;align-items:center;gap:12px;font-size:14px}
+.free-point::before{content:'✓';color:var(--accent);font-weight:800;font-size:17px}
 
-@media(max-width:600px){
-  nav{padding:16px 20px}
-  .hero{padding:60px 20px 40px}
-  .section{padding:60px 20px}
-  .free-section,.pro-section{padding:60px 20px}
-  footer{padding:24px 20px;flex-direction:column;gap:12px;text-align:center}
-}
+footer{border-top:1px solid var(--border);padding:28px 40px;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px}
+.footer-logo{font-size:15px;font-weight:800;color:var(--text)}.footer-logo span{color:var(--accent)}
+@media(max-width:600px){nav{padding:14px 18px}.hero{padding:60px 18px 40px}.section,.joke-section,.enc-section,.donate-section{padding:60px 18px}footer{padding:20px 18px;flex-direction:column;gap:10px;text-align:center}}
 </style>
 </head>
 <body>
-
 <nav>
-  <div class="nav-logo">シフト<span>メモ</span></div>
+  <div class="nav-logo">Shift<span>Memo</span></div>
   <a href="https://mexastarted.github.io/sihuto/" class="nav-cta">無料で使う</a>
 </nav>
 
 <section class="hero">
-  <div class="hero-badge">完全無料 · 登録不要 · 広告あり</div>
+  <div class="badge">完全無料 · 登録不要 · 広告あり</div>
   <h1>バイトの給与を<br><em>ボタン一つ</em>で<br>管理する</h1>
-  <p>出勤・退勤ボタンを押すだけ。深夜割増・交通費も自動計算。難しい操作は一切なし。</p>
+  <p>出勤・退勤ボタンを押すだけ。深夜割増・交通費も自動計算。毎日開くたびに、レアなジョークが図鑑に追加されていく。</p>
   <a href="https://mexastarted.github.io/sihuto/" class="hero-btn">今すぐ使う（無料）</a>
-  <div class="hero-sub">インストール不要 · ブラウザで動く</div>
+  <div class="hero-sub">インストール不要 · ブラウザで動く · スマホ対応</div>
 </section>
-
-<div class="demo-wrap">
-  <div class="demo-header">
-    <div class="demo-logo">シフト<span>メモ</span></div>
-    <div class="demo-tabs">
-      <div class="demo-tab a">打刻</div>
-      <div class="demo-tab">ツール</div>
-      <div class="demo-tab">履歴</div>
-    </div>
-  </div>
-  <div class="demo-body">
-    <div class="demo-card">
-      <div class="demo-label">経過時間</div>
-      <div class="demo-timer">06:32:14</div>
-    </div>
-    <button class="demo-btn-out">退勤する</button>
-    <div class="demo-result">
-      <div class="demo-label">本日の日給</div>
-      <div class="demo-amount">¥8,240</div>
-      <div class="demo-break">
-        通常 5h32m　¥6,640<br>
-        深夜割増 1h00m (+25%)　¥1,500<br>
-        交通費　-¥320
-      </div>
-    </div>
-  </div>
-</div>
 
 <hr class="divider">
 
@@ -161,107 +114,130 @@ footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;justify
   <div class="section-label">機能</div>
   <h2>必要なものだけ、<br>シンプルに。</h2>
   <div class="features">
-    <div class="feature">
-      <div class="feature-icon">⏱</div>
-      <h3>ワンタップ打刻</h3>
-      <p>出勤・退勤ボタンを押すだけ。時刻は自動で記録されるので入力ミスゼロ。</p>
+    <div class="feature"><div class="feature-icon">⏱</div><h3>ワンタップ打刻</h3><p>出勤・退勤ボタンを押すだけ。時刻は自動記録。入力ミスゼロ。</p></div>
+    <div class="feature"><div class="feature-icon">🌙</div><h3>深夜割増を自動計算</h3><p>割増開始時間と割増率を自分で設定。割増なしの職場は0%でOK。</p></div>
+    <div class="feature"><div class="feature-icon">🚃</div><h3>交通費も記録</h3><p>交通費を入力すれば日給から自動差引。月の累計も確認できる。</p></div>
+    <div class="feature"><div class="feature-icon">🔧</div><h3>便利ツール6種</h3><p>時給換算・日給シミュ・深夜計算・実質時給など、バイトに役立つツールを搭載。</p></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- JOKE ENCYCLOPEDIA SECTION -->
+<section class="joke-section">
+  <div class="section-label">毎日開く理由</div>
+  <h2>毎日ジョークが変わる。<br><em>図鑑を埋めよう。</em></h2>
+  <p style="color:var(--muted);font-size:14px;line-height:1.8;max-width:560px;margin:0 auto">アプリを開くたびに、その日だけのジョークが出現。☆1〜☆10のレア度があり、☆10はソシャゲ並みの確率0.3%。毎日コレクションを増やしていこう。</p>
+  <div class="joke-preview">
+    <div class="joke-card-lp r1">
+      <div class="joke-rarity-badge rb-normal">NORMAL ☆1</div>
+      <div class="joke-text-lp">バイトの給料日、財布が一瞬だけ膨らむ。<br>一瞬だけ。</div>
     </div>
-    <div class="feature">
-      <div class="feature-icon">🌙</div>
-      <h3>深夜割増を自動計算</h3>
-      <p>割増開始時間と割増率を自分で設定できる。割増なしの職場は0%に設定するだけ。</p>
+    <div class="joke-card-lp r5">
+      <div class="joke-rarity-badge rb-rare">SUPER RARE ☆5</div>
+      <div class="joke-text-lp" style="color:#daf">人生の深夜割増は<br>誰も払ってくれない。</div>
     </div>
-    <div class="feature">
-      <div class="feature-icon">🚃</div>
-      <h3>交通費も記録</h3>
-      <p>その日の交通費を入力すれば日給から自動で差し引き。月の交通費合計も確認できる。</p>
+    <div class="locked-card">
+      <div class="lock">？</div>
+      <p>毎日開いて<br>図鑑を埋めよう！</p>
     </div>
-    <div class="feature">
-      <div class="feature-icon">📋</div>
-      <h3>履歴・月合計</h3>
-      <p>過去の勤務履歴と今月の合計給与をいつでも確認。データはスマホに自動保存。</p>
+    <div class="joke-card-lp r10">
+      <div class="joke-rarity-badge rb-legend">👑 LEGEND ☆10</div>
+      <div class="joke-text-lp" style="color:#FFD700">確率0.3%の超激レア。<br>王宮演出で登場する。</div>
     </div>
   </div>
 </section>
 
 <hr class="divider">
 
+<section class="enc-section">
+  <div class="section-label">図鑑システム</div>
+  <h2>100種類を<em>コンプリート</em>せよ。</h2>
+  <p style="color:var(--muted);font-size:14px;line-height:1.8">まだ集めていないジョークは「？」で表示。毎日1つずつ解放されていく。7日連続ログインでレア率がアップ。コレクター心をくすぐる仕組みが満載。</p>
+  <div class="enc-visual">
+    <div class="enc-mini unlocked">😄</div>
+    <div class="enc-mini unlocked">😂</div>
+    <div class="enc-mini unlocked">🌙</div>
+    <div class="enc-mini locked">？</div>
+    <div class="enc-mini locked">？</div>
+    <div class="enc-mini locked">？</div>
+    <div class="enc-mini locked">？</div>
+    <div class="enc-mini locked">？</div>
+    <div class="enc-mini locked">？</div>
+    <div class="enc-mini locked">？</div>
+  </div>
+  <div style="margin-top:20px;font-size:13px;color:var(--muted);text-align:center">残り97種類！毎日開いて図鑑を埋めよう 🎯</div>
+</section>
+
+<hr class="divider">
+
+<!-- TITLE SECTION -->
 <section class="section">
-  <div class="section-label">便利ツール</div>
-  <h2>働く前も、働いた後も<br>使えるツール集。</h2>
-  <div class="tools-grid">
-    <div class="tool-card">
-      <div class="tool-card-icon">💴</div>
-      <h4>時給換算電卓</h4>
-      <p>この商品は何時間分？金額を入れると即計算</p>
-    </div>
-    <div class="tool-card">
-      <div class="tool-card-icon">📊</div>
-      <h4>日給シミュレーター</h4>
-      <p>今日の予定時間を入れると日給を事前確認</p>
-    </div>
-    <div class="tool-card">
-      <div class="tool-card-icon">🎯</div>
-      <h4>目標達成時間</h4>
-      <p>目標金額まであと何時間働けばいいか計算</p>
-    </div>
-    <div class="tool-card">
-      <div class="tool-card-icon">🌙</div>
-      <h4>深夜時間チェッカー</h4>
-      <p>時間帯を入力すると深夜分と通常分に自動振り分け</p>
-    </div>
-    <div class="tool-card">
-      <div class="tool-card-icon">🏠</div>
-      <h4>実質時給計算</h4>
-      <p>交通費を引いた「本当の時給」を表示</p>
-    </div>
-    <div class="tool-card">
-      <div class="tool-card-icon">🚃</div>
-      <h4>月の交通費合計</h4>
-      <p>今月の交通費累計をワンタップで確認</p>
-    </div>
+  <div class="section-label">称号システム</div>
+  <h2>寄付するたびに<br><em>称号が進化する。</em></h2>
+  <p style="color:var(--muted);font-size:14px;line-height:1.8;margin-bottom:30px">開発者を応援するごとに、アプリ内の称号がランクアップ。最高称号「開発者の推し」を目指せ。</p>
+  <div class="titles-grid">
+    <div class="title-card"><div class="title-icon">🥉</div><div class="title-name">善人</div><div class="title-req">1回から</div></div>
+    <div class="title-card"><div class="title-icon">🥈</div><div class="title-name">恩人</div><div class="title-req">3回から</div></div>
+    <div class="title-card"><div class="title-icon">🥇</div><div class="title-name">大恩人</div><div class="title-req">5回から</div></div>
+    <div class="title-card"><div class="title-icon">💎</div><div class="title-name">伝説の支援者</div><div class="title-req">10回から</div></div>
+    <div class="title-card"><div class="title-icon">👑</div><div class="title-name">神</div><div class="title-req">20回から</div></div>
+    <div class="title-card"><div class="title-icon">🌟</div><div class="title-name">開発者の推し</div><div class="title-req">50回から</div></div>
   </div>
 </section>
 
 <hr class="divider">
 
-<section class="free-section">
+<section style="padding:80px 40px;max-width:700px;margin:0 auto;text-align:center">
   <div class="section-label">完全無料</div>
-  <h2>ずっと<em>無料</em>で<br>使えます。</h2>
-  <p>登録不要、インストール不要。ブラウザで開くだけで今日から使えます。広告収入で運営しているので、基本機能はすべて永久無料です。</p>
+  <h2 style="font-size:clamp(28px,5vw,44px);font-weight:800;letter-spacing:-1.5px;margin-bottom:20px;line-height:1.1">ずっと<em style="color:var(--accent);font-style:normal">無料</em>で使えます。</h2>
+  <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:30px">登録不要。インストール不要。ブラウザで開くだけ。</p>
   <div class="free-points">
     <div class="free-point">登録・ログイン不要</div>
-    <div class="free-point">インストール不要（ブラウザで動く）</div>
     <div class="free-point">打刻・計算・履歴・ツール全て無料</div>
+    <div class="free-point">ジョーク図鑑・称号も無料</div>
     <div class="free-point">データはスマホに保存（外部送信なし）</div>
   </div>
-  <a href="https://mexastarted.github.io/sihuto/" class="hero-btn">無料で使い始める</a>
+  <a href="https://mexastarted.github.io/sihuto/" class="hero-btn" style="display:inline-block;background:var(--accent);color:#0f0f0f;padding:18px 48px;border-radius:12px;font-weight:800;font-size:18px;text-decoration:none">無料で使い始める</a>
 </section>
 
 <hr class="divider">
 
-<section class="pro-section">
-  <div class="section-label">プロ版</div>
+<!-- DONATE -->
+<section class="donate-section">
+  <div class="section-label">開発者を応援</div>
+  <h2 style="font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:-1px;margin-bottom:16px;line-height:1.1">このアプリが<em style="color:var(--accent);font-style:normal">役に立ったら</em>、<br>応援してください。</h2>
+  <p style="font-size:14px;color:var(--muted);line-height:1.8">開発者は今日もラーメンが食べたいです（真剣）。寄付してくれた方には、アプリ内で称号と隠しジョークをプレゼント。</p>
+  <a href="https://qr.paypay.ne.jp/p2p01_Y5Cewz1d5N7liTB2" target="_blank" class="donate-big">
+    <span class="donate-crown">👑</span>
+    <span class="donate-title-lp">開発者を応援する</span>
+    <span class="donate-sub-lp">PayPayで寄付する ✨ 任意・金額自由</span>
+  </a>
+</section>
+
+<hr class="divider">
+
+<section style="padding:80px 40px;max-width:700px;margin:0 auto;text-align:center">
+  <div class="section-label">プロ版（準備中）</div>
   <div class="pro-card">
-    <h3>掛け持ちしてる人へ</h3>
-    <p>複数の職場をまとめて管理したい方向けのプロ版</p>
+    <h3 style="font-size:24px;font-weight:800;letter-spacing:-1px;margin-bottom:8px">掛け持ちしてる人へ</h3>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:20px">複数の職場をまとめて管理したい方向けのプロ版</p>
     <ul class="pro-features">
       <li>複数職場の登録・色分け管理</li>
       <li>職場ごとの月収・時間を集計</li>
       <li>103万・130万円の壁アラート</li>
-      <li>月収シミュレーター（予定シフトから試算）</li>
+      <li>月収シミュレーター</li>
       <li>給与明細との照合機能</li>
     </ul>
-    <div class="pro-price">¥300<span style="font-size:16px">/月</span></div>
-    <div class="pro-price-sub">いつでもキャンセル可能</div>
-    <a href="https://mexastarted.github.io/sihuto/" class="pro-btn">プロ版を試す（準備中）</a>
+    <div class="pro-price">¥300<span style="font-size:14px">/月</span></div>
+    <div style="font-size:12px;color:var(--muted);margin:6px 0 20px">準備中 — 近日公開予定</div>
+    <div style="background:var(--surface2);border-radius:10px;padding:14px;font-size:13px;color:var(--muted)">公開通知を受け取りたい方は、アプリ内の応援ボタンから開発者にメッセージをどうぞ</div>
   </div>
 </section>
 
 <footer>
-  <div class="footer-logo">シフト<span>メモ</span></div>
-  <div>© 2026 シフトメモ · プライバシーポリシー · お問い合わせ</div>
+  <div class="footer-logo">Shift<span>Memo</span></div>
+  <div>© 2026 ShiftMemo · <a href="https://mexastarted.github.io/sihuto/" style="color:var(--muted)">アプリを開く</a></div>
 </footer>
-
 </body>
 </html>

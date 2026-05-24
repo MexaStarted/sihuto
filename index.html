@@ -1,128 +1,208 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZETCCQQ8M3"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-ZETCCQQ8M3');
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>シフトメモ</title>
+<title>ShiftMemo</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZETCCQQ8M3"></script>
+<script>
+window.dataLayer=window.dataLayer||[];
+function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','G-ZETCCQQ8M3');
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;--border:#2e2e2e;
-  --accent:#c8f060;--text:#f0f0f0;--muted:#888;
-  --danger:#ff6b6b;
-}
+:root{--bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;--border:#2e2e2e;--accent:#c8f060;--text:#f0f0f0;--muted:#888;--danger:#ff6b6b;}
 body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;padding-bottom:40px}
-.app{max-width:420px;margin:0 auto;padding:16px}
-
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.logo{font-size:18px;font-weight:800;letter-spacing:-0.5px}
-.logo span{color:var(--accent)}
-.tab-bar{display:flex;gap:4px;background:var(--surface);border-radius:10px;padding:4px}
-.tab{padding:6px 12px;border-radius:7px;border:none;background:none;color:var(--muted);font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:.2s}
+.app{max-width:420px;margin:0 auto;padding:12px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.logo{font-size:16px;font-weight:800;letter-spacing:-0.5px}.logo span{color:var(--accent)}
+.header-right{display:flex;gap:6px;align-items:center}
+.icon-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:12px;font-weight:700;color:var(--text);font-family:'Syne',sans-serif;white-space:nowrap}
+.icon-btn.gold{background:linear-gradient(135deg,#FFD700,#FFA500);color:#2a1a00;border:none;animation:goldPulse 2s ease infinite}
+@keyframes goldPulse{0%,100%{box-shadow:0 0 6px #FFD700}50%{box-shadow:0 0 14px #FFD700}}
+.tab-bar{display:flex;gap:3px;background:var(--surface);border-radius:10px;padding:3px}
+.tab{padding:5px 8px;border-radius:7px;border:none;background:none;color:var(--muted);font-family:'Syne',sans-serif;font-size:10px;font-weight:600;cursor:pointer;transition:.2s}
 .tab.active{background:var(--surface2);color:var(--text)}
-
 .page{display:none}.page.active{display:block}
-
-.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px}
-.card-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
-
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px}
+.card-label{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
 .status-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;margin-right:8px;transition:.3s}
 .status-dot.active{background:var(--accent);box-shadow:0 0 8px var(--accent)}
-.status-text{font-size:13px;color:var(--muted)}
-.status-row{display:flex;align-items:center;margin-bottom:16px}
-
-.timer{font-family:'DM Mono',monospace;font-size:48px;font-weight:500;color:var(--accent);letter-spacing:-2px;line-height:1;margin:8px 0 4px;transition:.3s}
-.timer.inactive{color:var(--muted);font-size:36px}
-.timer-sub{font-family:'DM Mono',monospace;font-size:13px;color:var(--muted)}
-
-.btn-primary{width:100%;padding:18px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:.15s;letter-spacing:0.5px}
-.btn-clock-in{background:var(--accent);color:#0f0f0f}
-.btn-clock-in:active{transform:scale(0.98)}
-.btn-clock-out{background:var(--danger);color:#fff}
-.btn-clock-out:active{transform:scale(0.98)}
-
-.result-card{background:linear-gradient(135deg,#1a2a0a,#0a2a1a);border:1px solid var(--accent);border-radius:16px;padding:20px;margin-bottom:12px;display:none}
+.status-row{display:flex;align-items:center;margin-bottom:12px}
+.timer{font-family:'DM Mono',monospace;font-size:44px;font-weight:500;color:var(--accent);letter-spacing:-2px;line-height:1;margin:6px 0 3px}
+.timer.inactive{color:var(--muted);font-size:32px}
+.timer-sub{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)}
+.btn-primary{width:100%;padding:16px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:.15s}
+.btn-clock-in{background:var(--accent);color:#0f0f0f}.btn-clock-out{background:var(--danger);color:#fff}
+.result-card{background:linear-gradient(135deg,#1a2a0a,#0a2a1a);border:1px solid var(--accent);border-radius:16px;padding:16px;margin-bottom:10px;display:none}
 .result-card.show{display:block}
-.result-amount{font-family:'DM Mono',monospace;font-size:42px;font-weight:500;color:var(--accent);letter-spacing:-1px}
-.result-breakdown{margin-top:12px;display:flex;flex-direction:column;gap:4px}
-.breakdown-row{display:flex;justify-content:space-between;font-size:13px}
-.breakdown-label{color:var(--muted)}
-.breakdown-val{font-family:'DM Mono',monospace;color:var(--text)}
-
-.field{margin-bottom:14px}
-.field label{display:block;font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
-.field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;outline:none;-webkit-appearance:none}
+.result-amount{font-family:'DM Mono',monospace;font-size:38px;color:var(--accent);letter-spacing:-1px}
+.breakdown-row{display:flex;justify-content:space-between;font-size:12px;margin-top:4px}
+.breakdown-label{color:var(--muted)}.breakdown-val{font-family:'DM Mono',monospace}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
+.field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:14px;outline:none}
 .field input:focus{border-color:var(--accent)}
-.save-btn{width:100%;padding:14px;background:var(--accent);color:#0f0f0f;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
-
-.history-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
-.history-item:last-child{border-bottom:none}
-.history-date{font-size:13px;color:var(--muted)}
-.history-time{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px}
-.history-right{text-align:right}
-.history-pay{font-family:'DM Mono',monospace;font-size:16px;color:var(--accent)}
-.history-fare{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
-.month-total{display:flex;justify-content:space-between;align-items:center;padding:14px;background:var(--surface2);border-radius:10px;margin-bottom:12px}
-.month-total-label{font-size:12px;color:var(--muted);font-weight:600}
-.month-total-val{font-family:'DM Mono',monospace;font-size:20px;color:var(--accent)}
-
-.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.tool-btn{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 12px;cursor:pointer;text-align:left;transition:.15s;width:100%}
-.tool-btn:hover{border-color:var(--accent);background:var(--surface2)}
-.tool-btn.active{border-color:var(--accent);background:#1a2a0a}
-.tool-icon{font-size:20px;margin-bottom:6px}
-.tool-name{font-size:12px;font-weight:700;color:var(--text)}
-.tool-desc{font-size:10px;color:var(--muted);margin-top:2px}
-.tool-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;display:none}
-.tool-panel.show{display:block}
-.tool-result{font-family:'DM Mono',monospace;font-size:28px;color:var(--accent);margin:12px 0 4px}
-.tool-result-sub{font-size:12px;color:var(--muted)}
-.input-row{display:flex;gap:8px;margin-bottom:8px}
-.input-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:14px;outline:none;-webkit-appearance:none;min-width:0}
+.save-btn{width:100%;padding:13px;background:var(--accent);color:#0f0f0f;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+.input-row{display:flex;gap:6px;margin-bottom:8px}
+.input-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;min-width:0}
 .input-row input:focus{border-color:var(--accent)}
-.calc-btn{background:var(--accent);color:#0f0f0f;border:none;border-radius:8px;padding:10px 16px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.calc-btn{background:var(--accent);color:#0f0f0f;border:none;border-radius:8px;padding:9px 14px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}
+.tool-btn{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 10px;cursor:pointer;text-align:left;transition:.15s;width:100%}
+.tool-btn:hover,.tool-btn.active{border-color:var(--accent);background:var(--surface2)}
+.tool-btn.active{background:#1a2a0a}
+.tool-icon{font-size:18px;margin-bottom:4px}.tool-name{font-size:11px;font-weight:700;color:var(--text)}.tool-desc{font-size:9px;color:var(--muted);margin-top:1px}
+.tool-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;display:none}
+.tool-panel.show{display:block}
+.tool-result{font-family:'DM Mono',monospace;font-size:26px;color:var(--accent);margin:10px 0 3px}
+.tool-result-sub{font-size:11px;color:var(--muted)}
+.history-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.history-item:last-child{border-bottom:none}
+.history-date{font-size:12px;color:var(--muted)}.history-time{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px}
+.history-pay{font-family:'DM Mono',monospace;font-size:15px;color:var(--accent)}
+.month-total{display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--surface2);border-radius:10px;margin-bottom:10px}
+.month-total-val{font-family:'DM Mono',monospace;font-size:18px;color:var(--accent)}
+.fare-input-row{display:flex;gap:6px}
+.fare-input-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;outline:none}
+.fare-save-btn{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.empty{text-align:center;padding:28px;color:var(--muted);font-size:12px}
 
-.fare-section{margin-top:12px}
-.fare-input-row{display:flex;gap:8px}
-.fare-input-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;outline:none;-webkit-appearance:none}
-.fare-input-row input:focus{border-color:var(--accent)}
-.fare-save-btn{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
-.fare-hint{font-size:11px;color:var(--muted);margin-top:6px}
+/* STREAK */
+.streak-bar{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.streak-left{display:flex;align-items:center;gap:8px}
+.streak-flame{font-size:20px}
+.streak-count{font-family:'DM Mono',monospace;font-size:22px;color:var(--accent);font-weight:500}
+.streak-label{font-size:11px;color:var(--muted)}
+.streak-bonus{font-size:10px;color:var(--accent);background:#1a2a0a;padding:3px 8px;border-radius:6px;border:1px solid var(--accent)}
 
-.empty{text-align:center;padding:32px;color:var(--muted);font-size:13px}
-.settings-current{font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);line-height:2}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--accent);color:#0f0f0f;padding:10px 24px;border-radius:8px;font-weight:700;font-size:14px;transition:.3s;z-index:999;opacity:0}
+/* JOKE CARD */
+.joke-card{border-radius:16px;padding:20px;margin-bottom:10px;position:relative;overflow:hidden;cursor:pointer}
+.joke-stars{font-size:13px;margin-bottom:8px;letter-spacing:1px}
+.joke-rarity{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.joke-text-ja{font-size:15px;font-weight:700;line-height:1.6;margin-bottom:8px}
+.joke-text-en{font-size:12px;color:rgba(255,255,255,0.7);line-height:1.6;font-style:italic}
+.joke-number{position:absolute;top:12px;right:14px;font-family:'DM Mono',monospace;font-size:11px;opacity:0.6}
+.joke-new-badge{position:absolute;top:12px;left:14px;background:#ff6b6b;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px}
+
+/* RARITY THEMES */
+.rarity-1{background:#1a1a1a;border:1px solid #333;color:#ccc}
+.rarity-2{background:#1a1a20;border:1px solid #444;color:#ddd}
+.rarity-3{background:#1a1f1a;border:1px solid #2a5a2a;color:#8f8}
+.rarity-4{background:#1a1a2a;border:1px solid #2a2a6a;color:#aaf}
+.rarity-5{background:#1f1a2a;border:1px solid #5a2a8a;color:#daf}
+.rarity-6{background:#2a1a1a;border:1px solid #8a2a2a;color:#faa}
+.rarity-7{background:#2a2000;border:1px solid #aa6600;color:#fda}
+.rarity-8{background:#002020;border:1px solid #00aaaa;color:#aff}
+.rarity-9{background:linear-gradient(135deg,#1a0030,#002a1a);border:2px solid #aa00ff;color:#daf}
+.rarity-10{background:linear-gradient(135deg,#2a1500,#1a0a00,#2a1500);border:2px solid #FFD700;color:#FFD700}
+
+/* ☆10 PALACE */
+.palace-overlay{position:fixed;inset:0;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#2a1500 0%,#0a0500 70%)}
+.palace-overlay.show{display:flex}
+.palace-particles{position:absolute;inset:0;pointer-events:none}
+.particle{position:absolute;width:4px;height:4px;border-radius:50%;background:#FFD700;animation:particleFly 3s ease-in-out infinite}
+@keyframes particleFly{0%{transform:translateY(100vh) rotate(0deg);opacity:0}50%{opacity:1}100%{transform:translateY(-20px) rotate(720deg);opacity:0}}
+.palace-crown{font-size:60px;animation:crownFloat 2s ease-in-out infinite;margin-bottom:16px}
+@keyframes crownFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}}
+.palace-title{font-size:28px;font-weight:800;color:#FFD700;letter-spacing:-1px;text-align:center;margin-bottom:8px;text-shadow:0 0 20px #FFD700}
+.palace-subtitle{font-size:13px;color:#c8a000;margin-bottom:24px;text-align:center}
+.palace-joke-ja{font-size:16px;font-weight:700;color:#FFD700;text-align:center;line-height:1.7;margin-bottom:8px;padding:0 20px}
+.palace-joke-en{font-size:12px;color:#c8a000;text-align:center;line-height:1.6;font-style:italic;padding:0 20px;margin-bottom:24px}
+.palace-donate-btn{background:linear-gradient(135deg,#FFD700,#FFA500,#FF6B35,#FFD700);background-size:300% 300%;animation:goldShine 3s ease infinite;border:none;border-radius:16px;padding:18px 40px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#2a1a00;cursor:pointer;margin-bottom:12px;width:80%}
+@keyframes goldShine{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.palace-close{background:none;border:1px solid #664400;color:#c8a000;padding:10px 24px;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;cursor:pointer}
+
+/* DONATE MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:8888;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);padding:20px}
+.modal-overlay.show{display:flex}
+.modal-box{width:100%;max-width:380px;border-radius:20px;padding:24px;position:relative}
+.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
+.donate-msg{font-size:14px;line-height:1.7;margin-bottom:16px;text-align:center}
+.donate-big-btn{display:block;width:100%;padding:18px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:10px}
+.did-donate-btn{width:100%;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--text);cursor:pointer}
+
+/* TITLE BADGE */
+.title-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:12px}
+.title-1{background:#cd7f32;color:#fff}.title-2{background:#aaa;color:#fff}.title-3{background:#FFD700;color:#2a1a00}
+.title-4{background:linear-gradient(135deg,#4aa8ff,#0055aa);color:#fff}
+.title-5{background:linear-gradient(135deg,#FFD700,#FF6B00);color:#2a1a00;animation:goldPulse 2s infinite}
+.title-6{background:linear-gradient(135deg,#ff00ff,#FFD700,#00ffff);background-size:200%;animation:rainbowShift 2s linear infinite;color:#fff}
+@keyframes rainbowShift{0%{background-position:0%}100%{background-position:200%}}
+
+/* ENCYCLOPEDIA */
+.enc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.enc-progress{font-size:12px;color:var(--muted)}
+.enc-count{font-family:'DM Mono',monospace;font-size:18px;color:var(--accent)}
+.enc-remaining{font-size:11px;color:var(--muted);margin-bottom:14px;text-align:center}
+.enc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.enc-card{border-radius:12px;padding:12px;cursor:pointer;transition:.2s;position:relative;min-height:90px;display:flex;flex-direction:column;justify-content:center}
+.enc-card.locked{background:var(--surface2);border:1px solid var(--border);cursor:not-allowed;align-items:center}
+.enc-card-lock{font-size:24px;margin-bottom:4px}
+.enc-card-num{font-size:10px;color:var(--muted)}
+.enc-card-stars{font-size:10px;margin-bottom:4px}
+.enc-card-ja{font-size:11px;font-weight:700;line-height:1.4}
+.enc-card-new{position:absolute;top:6px;right:6px;background:#ff6b6b;color:#fff;font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px}
+
+/* PREVIEW MODAL */
+.preview-modal{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);padding:20px}
+.preview-modal.show{display:flex}
+.preview-box{width:100%;max-width:360px;border-radius:20px;padding:24px;position:relative}
+.preview-label{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.preview-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)}
+
+/* DEV STATUS */
+.dev-status{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.dev-status-title{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.dev-status-msg{font-size:13px;line-height:1.6}
+
+/* GOOGLE TRANSLATE */
+#google_translate_element{margin-bottom:10px}
+#google_translate_element select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:6px 10px;font-family:'Syne',sans-serif;font-size:12px;outline:none;width:100%}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--accent);color:#0f0f0f;padding:10px 24px;border-radius:8px;font-weight:700;font-size:13px;transition:.3s;z-index:9999;opacity:0}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 </style>
 </head>
 <body>
-
 <div class="app">
   <div class="header">
-    <div class="logo">シフト<span>メモ</span></div>
-    <div class="tab-bar">
-      <button class="tab active" onclick="showPage('main')">打刻</button>
-      <button class="tab" onclick="showPage('tools')">ツール</button>
-      <button class="tab" onclick="showPage('history')">履歴</button>
-      <button class="tab" onclick="showPage('settings')">設定</button>
+    <div class="logo">Shift<span>Memo</span></div>
+    <div class="header-right">
+      <button class="icon-btn" onclick="showPage('encyclopedia')">📖 図鑑</button>
+      <button class="icon-btn gold" onclick="openDonate()">💛 応援</button>
+      <div class="tab-bar">
+        <button class="tab active" onclick="showPage('main')">打刻</button>
+        <button class="tab" onclick="showPage('tools')">ツール</button>
+        <button class="tab" onclick="showPage('history')">履歴</button>
+        <button class="tab" onclick="showPage('settings')">設定</button>
+      </div>
     </div>
   </div>
 
   <!-- MAIN -->
   <div class="page active" id="page-main">
+    <div class="streak-bar" id="streak-bar">
+      <div class="streak-left">
+        <span class="streak-flame">🔥</span>
+        <div>
+          <div class="streak-count" id="streak-count">0</div>
+          <div class="streak-label">日連続ログイン</div>
+        </div>
+      </div>
+      <div id="streak-bonus"></div>
+    </div>
+
+    <div id="title-display"></div>
+
+    <div id="today-joke-area"></div>
+
     <div class="card">
       <div class="status-row">
         <span class="status-dot" id="status-dot"></span>
-        <span class="status-text" id="status-text">未出勤</span>
+        <span style="font-size:13px;color:var(--muted)" id="status-text">未出勤</span>
       </div>
       <div class="card-label">経過時間</div>
       <div class="timer inactive" id="timer-display">-- : -- : --</div>
@@ -132,219 +212,494 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     <div class="result-card" id="result-card">
       <div class="card-label">本日の日給</div>
       <div class="result-amount" id="result-amount">¥0</div>
-      <div class="result-breakdown" id="result-breakdown"></div>
+      <div id="result-breakdown"></div>
     </div>
 
     <button class="btn-primary btn-clock-in" id="main-btn" onclick="toggleClock()">出勤する</button>
 
-    <div class="fare-section">
-      <div class="card-label" style="margin-bottom:8px">交通費（本日）</div>
+    <div style="margin-top:10px">
+      <div class="card-label" style="margin-bottom:6px">交通費（本日）</div>
       <div class="fare-input-row">
         <input type="number" id="fare-input" placeholder="0円" inputmode="numeric">
         <button class="fare-save-btn" onclick="saveFare()">保存</button>
       </div>
-      <div class="fare-hint">退勤時に日給から差し引かれます</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px">退勤時に日給から差し引かれます</div>
     </div>
   </div>
 
   <!-- TOOLS -->
   <div class="page" id="page-tools">
     <div class="tool-grid">
-      <button class="tool-btn" onclick="selectTool('converter',this)">
-        <div class="tool-icon">💴</div>
-        <div class="tool-name">時給換算</div>
-        <div class="tool-desc">何時間分？</div>
-      </button>
-      <button class="tool-btn" onclick="selectTool('simulate',this)">
-        <div class="tool-icon">📊</div>
-        <div class="tool-name">日給シミュ</div>
-        <div class="tool-desc">今日いくら？</div>
-      </button>
-      <button class="tool-btn" onclick="selectTool('goal',this)">
-        <div class="tool-icon">🎯</div>
-        <div class="tool-name">目標時間</div>
-        <div class="tool-desc">あと何時間？</div>
-      </button>
-      <button class="tool-btn" onclick="selectTool('night',this)">
-        <div class="tool-icon">🌙</div>
-        <div class="tool-name">深夜計算</div>
-        <div class="tool-desc">割増を計算</div>
-      </button>
-      <button class="tool-btn" onclick="selectTool('takehome',this)">
-        <div class="tool-icon">🏠</div>
-        <div class="tool-name">実質時給</div>
-        <div class="tool-desc">交通費引き後</div>
-      </button>
-      <button class="tool-btn" onclick="selectTool('fare',this)">
-        <div class="tool-icon">🚃</div>
-        <div class="tool-name">月交通費</div>
-        <div class="tool-desc">累計を確認</div>
-      </button>
+      <button class="tool-btn" onclick="selectTool('converter',this)"><div class="tool-icon">💴</div><div class="tool-name">時給換算</div><div class="tool-desc">何時間分？</div></button>
+      <button class="tool-btn" onclick="selectTool('simulate',this)"><div class="tool-icon">📊</div><div class="tool-name">日給シミュ</div><div class="tool-desc">今日いくら？</div></button>
+      <button class="tool-btn" onclick="selectTool('goal',this)"><div class="tool-icon">🎯</div><div class="tool-name">目標時間</div><div class="tool-desc">あと何時間？</div></button>
+      <button class="tool-btn" onclick="selectTool('night',this)"><div class="tool-icon">🌙</div><div class="tool-name">深夜計算</div><div class="tool-desc">割増を計算</div></button>
+      <button class="tool-btn" onclick="selectTool('takehome',this)"><div class="tool-icon">🏠</div><div class="tool-name">実質時給</div><div class="tool-desc">交通費引き後</div></button>
+      <button class="tool-btn" onclick="selectTool('fare',this)"><div class="tool-icon">🚃</div><div class="tool-name">月交通費</div><div class="tool-desc">累計を確認</div></button>
     </div>
-
-    <div class="tool-panel" id="tool-converter">
-      <div class="card-label">金額 → 何時間分？</div>
-      <div class="input-row">
-        <input type="number" id="conv-amount" placeholder="金額（円）" inputmode="numeric">
-        <button class="calc-btn" onclick="calcConverter()">計算</button>
-      </div>
-      <div class="tool-result" id="conv-result">--</div>
-      <div class="tool-result-sub" id="conv-sub"></div>
-    </div>
-
-    <div class="tool-panel" id="tool-simulate">
-      <div class="card-label">勤務予定時間を入力</div>
-      <div class="input-row">
-        <input type="time" id="sim-start" value="09:00">
-        <input type="time" id="sim-end" value="18:00">
-        <button class="calc-btn" onclick="calcSimulate()">計算</button>
-      </div>
-      <div class="tool-result" id="sim-result">--</div>
-      <div class="tool-result-sub" id="sim-sub"></div>
-    </div>
-
-    <div class="tool-panel" id="tool-goal">
-      <div class="card-label">目標金額を入力</div>
-      <div class="input-row">
-        <input type="number" id="goal-amount" placeholder="目標額（円）" inputmode="numeric">
-        <button class="calc-btn" onclick="calcGoal()">計算</button>
-      </div>
-      <div class="tool-result" id="goal-result">--</div>
-      <div class="tool-result-sub" id="goal-sub"></div>
-    </div>
-
-    <div class="tool-panel" id="tool-night">
-      <div class="card-label">勤務時間を入力</div>
-      <div class="input-row">
-        <input type="time" id="night-start" value="20:00">
-        <input type="time" id="night-end" value="02:00">
-        <button class="calc-btn" onclick="calcNight()">計算</button>
-      </div>
-      <div class="tool-result" id="night-result">--</div>
-      <div class="tool-result-sub" id="night-sub"></div>
-    </div>
-
-    <div class="tool-panel" id="tool-takehome">
-      <div class="card-label">交通費と勤務時間を入力</div>
-      <div class="input-row">
-        <input type="number" id="th-fare" placeholder="交通費（円）" inputmode="numeric">
-        <input type="number" id="th-hours" placeholder="時間（h）" inputmode="decimal">
-        <button class="calc-btn" onclick="calcTakehome()">計算</button>
-      </div>
-      <div class="tool-result" id="th-result">--</div>
-      <div class="tool-result-sub" id="th-sub"></div>
-    </div>
-
-    <div class="tool-panel" id="tool-fare">
-      <div class="card-label">今月の交通費合計</div>
-      <div class="tool-result" id="fare-month-result">--</div>
-      <div class="tool-result-sub" id="fare-month-sub"></div>
-    </div>
+    <div class="tool-panel" id="tool-converter"><div class="card-label">金額 → 何時間分？</div><div class="input-row"><input type="number" id="conv-amount" placeholder="金額（円）" inputmode="numeric"><button class="calc-btn" onclick="calcConverter()">計算</button></div><div class="tool-result" id="conv-result">--</div><div class="tool-result-sub" id="conv-sub"></div></div>
+    <div class="tool-panel" id="tool-simulate"><div class="card-label">勤務予定時間を入力</div><div class="input-row"><input type="time" id="sim-start" value="09:00"><input type="time" id="sim-end" value="18:00"><button class="calc-btn" onclick="calcSimulate()">計算</button></div><div class="tool-result" id="sim-result">--</div><div class="tool-result-sub" id="sim-sub"></div></div>
+    <div class="tool-panel" id="tool-goal"><div class="card-label">目標金額を入力</div><div class="input-row"><input type="number" id="goal-amount" inputmode="numeric"><button class="calc-btn" onclick="calcGoal()">計算</button></div><div class="tool-result" id="goal-result">--</div><div class="tool-result-sub" id="goal-sub"></div></div>
+    <div class="tool-panel" id="tool-night"><div class="card-label">勤務時間を入力</div><div class="input-row"><input type="time" id="night-start" value="20:00"><input type="time" id="night-end" value="02:00"><button class="calc-btn" onclick="calcNight()">計算</button></div><div class="tool-result" id="night-result">--</div><div class="tool-result-sub" id="night-sub"></div></div>
+    <div class="tool-panel" id="tool-takehome"><div class="card-label">交通費と勤務時間を入力</div><div class="input-row"><input type="number" id="th-fare" inputmode="numeric"><input type="number" id="th-hours" inputmode="decimal"><button class="calc-btn" onclick="calcTakehome()">計算</button></div><div class="tool-result" id="th-result">--</div><div class="tool-result-sub" id="th-sub"></div></div>
+    <div class="tool-panel" id="tool-fare"><div class="card-label">今月の交通費合計</div><div class="tool-result" id="fare-month-result">--</div><div class="tool-result-sub" id="fare-month-sub"></div></div>
   </div>
 
   <!-- HISTORY -->
   <div class="page" id="page-history">
     <div class="month-total">
-      <div>
-        <div class="month-total-label">今月の合計給与</div>
-        <div style="font-size:11px;color:var(--muted)" id="history-month-label"></div>
-      </div>
+      <div><div style="font-size:11px;color:var(--muted);font-weight:600">今月の合計給与</div><div style="font-size:10px;color:var(--muted)" id="history-month-label"></div></div>
       <div class="month-total-val" id="month-total-val">¥0</div>
     </div>
-    <div class="card" id="history-list">
-      <div class="empty">まだ記録がありません</div>
-    </div>
+    <div class="card" id="history-list"><div class="empty">まだ記録がありません</div></div>
   </div>
 
   <!-- SETTINGS -->
   <div class="page" id="page-settings">
+    <div style="margin-bottom:10px">
+      <div id="google_translate_element"></div>
+    </div>
     <div class="card">
-      <div class="card-label" style="margin-bottom:16px">基本設定</div>
-      <div class="field">
-        <label>時給（円）</label>
-        <input type="number" id="set-wage" placeholder="例：1200" inputmode="numeric">
-      </div>
-      <div class="field">
-        <label>深夜割増 開始時間</label>
-        <input type="time" id="set-night-start" value="22:00">
-      </div>
-      <div class="field">
-        <label>深夜割増率（%）　割増なし→0</label>
-        <input type="number" id="set-night-rate" placeholder="例：25" inputmode="numeric">
-      </div>
-      <div class="field">
-        <label>給料日（日）</label>
-        <input type="number" id="set-payday" placeholder="例：25" min="1" max="31" inputmode="numeric">
-      </div>
+      <div class="card-label" style="margin-bottom:14px">基本設定</div>
+      <div class="field"><label>時給（円）</label><input type="number" id="set-wage" inputmode="numeric"></div>
+      <div class="field"><label>深夜割増 開始時間</label><input type="time" id="set-night-start" value="22:00"></div>
+      <div class="field"><label>深夜割増率（%）　割増なし→0</label><input type="number" id="set-night-rate" inputmode="numeric"></div>
+      <div class="field"><label>給料日（日）</label><input type="number" id="set-payday" min="1" max="31" inputmode="numeric"></div>
       <button class="save-btn" onclick="saveSettings()">保存する</button>
     </div>
-    <div class="card">
-      <div class="card-label">現在の設定</div>
-      <div class="settings-current" id="current-settings"></div>
+    <div class="card"><div class="card-label">現在の設定</div><div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);line-height:2" id="current-settings"></div></div>
+    <div class="card" id="title-card">
+      <div class="card-label">あなたの称号</div>
+      <div id="settings-title-display"></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px">寄付するごとに称号が進化します 👑</div>
     </div>
+    <div class="dev-status">
+      <div class="dev-status-title">開発者の今月の状況</div>
+      <div class="dev-status-msg" id="dev-status-msg"></div>
+    </div>
+    <div style="margin-top:4px">
+      <button class="save-btn" style="background:linear-gradient(135deg,#FFD700,#FFA500);color:#2a1a00" onclick="openDonate()">👑 開発者を応援する（寄付）</button>
+    </div>
+  </div>
+
+  <!-- ENCYCLOPEDIA -->
+  <div class="page" id="page-encyclopedia">
+    <div class="enc-header">
+      <div>
+        <div style="font-size:16px;font-weight:800">📖 ジョーク図鑑</div>
+        <div style="font-size:11px;color:var(--muted)">毎日開いて図鑑を埋めよう！</div>
+      </div>
+      <div style="text-align:right">
+        <div class="enc-count"><span id="enc-collected">0</span>/100</div>
+        <div class="enc-progress">コンプリート</div>
+      </div>
+    </div>
+    <div class="enc-remaining" id="enc-remaining">残り100種類！毎日1つずつ集めよう</div>
+    <div class="enc-grid" id="enc-grid"></div>
+  </div>
+</div>
+
+<!-- PALACE OVERLAY (☆10) -->
+<div class="palace-overlay" id="palace-overlay">
+  <div class="palace-particles" id="palace-particles"></div>
+  <div class="palace-crown">👑</div>
+  <div class="palace-title">伝説のジョーク</div>
+  <div class="palace-subtitle">★★★★★★★★★★ 超激レア</div>
+  <div class="palace-joke-ja" id="palace-joke-ja"></div>
+  <div class="palace-joke-en" id="palace-joke-en"></div>
+  <button class="palace-donate-btn" onclick="openDonateFromPalace()">👑 この感動を開発者に伝える</button>
+  <button class="palace-close" onclick="closePalace()">閉じる</button>
+</div>
+
+<!-- DONATE MODAL -->
+<div class="modal-overlay" id="donate-modal">
+  <div class="modal-box" id="donate-modal-box">
+    <button class="modal-close" onclick="closeDonate()">✕</button>
+    <div style="text-align:center;font-size:32px;margin-bottom:8px" id="donate-icon">💛</div>
+    <div style="font-size:18px;font-weight:800;text-align:center;margin-bottom:4px" id="donate-modal-title">開発者を応援する</div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:16px" id="donate-stars-display"></div>
+    <div class="donate-msg" id="donate-funny-msg"></div>
+    <a href="https://qr.paypay.ne.jp/p2p01_Y5Cewz1d5N7liTB2" target="_blank" class="donate-big-btn" id="donate-big-btn">PayPayで寄付する 💛</a>
+    <button class="did-donate-btn" onclick="didDonate()">✅ 寄付しました！（称号をもらう）</button>
+    <div id="secret-joke-area" style="margin-top:12px;display:none"></div>
+  </div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="preview-modal" id="preview-modal">
+  <div class="preview-box" id="preview-box">
+    <div class="preview-label">📖 プレビュー（寄付はできません）</div>
+    <button class="preview-close" onclick="closePreview()">✕</button>
+    <div id="preview-content"></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+// ========== JOKES DATA ==========
+const JOKES = [
+  // ☆1 (20種) - 40%
+  {id:1,r:1,ja:"開発者はお金がないので、このアプリは無料です。\nあなたの善意で動いています。",en:"The developer is broke, so this app is free.\nIt runs on your kindness."},
+  {id:2,r:1,ja:"バイトの給料日、財布が一瞬だけ膨らむ。\n一瞬だけ。",en:"Payday makes your wallet fat for a moment.\nJust a moment."},
+  {id:3,r:1,ja:"時給計算してみたら、\n移動時間込みだと最低賃金を下回った。",en:"Calculated hourly wage including commute time.\nWent below minimum wage."},
+  {id:4,r:1,ja:"退勤ボタンを押した瞬間だけ、\n人生に希望が持てる。",en:"The moment you press clock-out,\nlife feels worth living again."},
+  {id:5,r:1,ja:"「今日も頑張った」と思ったら、\nまだ半分しか経ってなかった。",en:"Thought 'I worked hard today'\nbut it was only halfway through."},
+  {id:6,r:1,ja:"深夜バイトの唯一のメリット：\n電車が空いている。",en:"The only perk of night shifts:\nthe trains are empty."},
+  {id:7,r:1,ja:"店長「少しお願いがあるんだけど」\n私「（給料上げてください）」",en:"Manager: 'Can I ask a small favor?'\nMe internally: 'Raise my wage please'"},
+  {id:8,r:1,ja:"シフト希望を出したら、\n全部却下された。民主主義はどこへ。",en:"Submitted all my shift requests.\nAll rejected. So much for democracy."},
+  {id:9,r:1,ja:"交通費が時給より高い日がある。\n働きに行ってるのか、払いに行ってるのか。",en:"Some days commute costs more than hourly wage.\nAm I going to work or to pay?"},
+  {id:10,r:1,ja:"このアプリを使う時間も\n時給換算したい人生だった。",en:"I want to calculate hourly wage\neven for the time I use this app."},
+  {id:11,r:1,ja:"「やりがい」という名の\n見えない給料をもらっている。",en:"I'm paid with 'fulfillment'\nan invisible salary."},
+  {id:12,r:1,ja:"バイト終わりのご飯が\n一番うまい。これだけは本当。",en:"Food after a shift\ntastes the best. This is simply true."},
+  {id:13,r:1,ja:"今月の交通費を計算したら\n泣きそうになった。",en:"Calculated this month's commute costs.\nAlmost cried."},
+  {id:14,r:1,ja:"深夜割増25%のために\n命を削っている。",en:"Sacrificing my life\nfor that 25% night shift bonus."},
+  {id:15,r:1,ja:"「残業お願いできる？」\n断れない日本人が今日も誕生する。",en:"'Can you work overtime?'\nAnother Japanese person unable to say no is born today."},
+  {id:16,r:1,ja:"給料日の翌日には\nもう残高が不安になっている。",en:"The day after payday\nI'm already anxious about my balance."},
+  {id:17,r:1,ja:"このアプリを作った人も\nバイトしながら作ったかもしれない。",en:"The person who made this app\nmight have been working part-time while making it."},
+  {id:18,r:1,ja:"時給1000円の壁を越えた日、\n人は少し大人になる。",en:"The day you cross the ¥1000/hour barrier,\nyou become a little more adult."},
+  {id:19,r:1,ja:"「楽なバイト」は\n存在しない都市伝説。",en:"'Easy part-time job'\nis an urban legend that doesn't exist."},
+  {id:20,r:1,ja:"今日も社会の歯車として\n精一杯回りました。",en:"Today I spun as hard as I could\nas a cog in society's machine."},
+  // ☆2 (20種) - 25%
+  {id:21,r:2,ja:"103万の壁を意識しながら働く。\n壁、壊していいですか？",en:"Working while conscious of the ¥1.03M wall.\nCan I just break the wall?"},
+  {id:22,r:2,ja:"掛け持ちバイトをしている人へ：\nあなたは二つの会社に搾取されています。おめでとう。",en:"To those juggling multiple jobs:\nCongratulations, you're being exploited by two companies."},
+  {id:23,r:2,ja:"有給休暇を取ると\nなぜか罪悪感がある国に生まれた。",en:"Born in a country where taking paid leave\nsomehow feels like a crime."},
+  {id:24,r:2,ja:"シフトを見て「あ、これ無理」と思っても\n何も言えなかった春。",en:"I saw the shift and thought 'this is impossible'\nbut said nothing. That was spring."},
+  {id:25,r:2,ja:"バイトリーダーという\n給料の上がらない出世。",en:"Getting promoted to 'part-time leader'\nwhere only the responsibility increases, not the pay."},
+  {id:26,r:2,ja:"「経験が積める」\n= お金を払いたくない",en:"'You'll gain valuable experience'\n= We don't want to pay you properly"},
+  {id:27,r:2,ja:"閉店作業が終わった瞬間、\n全人類で一番自由な気持ちになる。",en:"The moment closing work is done,\nyou feel like the freest person in the world."},
+  {id:28,r:2,ja:"お客様は神様という言葉を\n作った人を恨んでいる。",en:"I hold a grudge against whoever said\n'the customer is god.'"},
+  {id:29,r:2,ja:"深夜0時を過ぎた瞬間、\n時給が上がる音がする（気がする）。",en:"Past midnight, you can almost hear\nyour hourly rate go up (or so it feels)."},
+  {id:30,r:2,ja:"このアプリで給料計算するたびに、\n開発者に感謝してほしい（切実）。",en:"Every time you calculate your pay with this app,\nplease spare a thought for the developer (seriously)."},
+  {id:31,r:2,ja:"バイトを「経験」と呼ぶ人と\n「生活費」と呼ぶ人がいる。",en:"Some call part-time work 'experience.'\nOthers call it 'survival money.'"},
+  {id:32,r:2,ja:"手取りを見て、\n税金って何に使われてるんだろうと毎月思う。",en:"Every month I look at my take-home pay and wonder:\nwhere does all that tax actually go?"},
+  {id:33,r:2,ja:"「少し早めに来てもらえる？」\n= 無給で来い",en:"'Can you come in a little early?'\n= Come for free"},
+  {id:34,r:2,ja:"給料日前の財布は\nブラックホールより軽い。",en:"My wallet before payday\nis lighter than a black hole."},
+  {id:35,r:2,ja:"実質時給を計算すると\n現実から目を背けたくなる。",en:"When you calculate your actual hourly rate,\nyou want to look away from reality."},
+  {id:36,r:2,ja:"このアプリを開くたびに、\n開発者がご飯を食べられます（嘘）。",en:"Every time you open this app,\nthe developer can eat (not true)."},
+  {id:37,r:2,ja:"バイトの面接で「長所は何ですか」\nと聞かれ「時間通りに来ることです」と答えた。",en:"At a job interview, asked 'what's your strength?'\nI answered 'showing up on time.'"},
+  {id:38,r:2,ja:"社員「もっと主体的に動いて」\n私「時給上がってから考えます」",en:"Staff: 'Show more initiative'\nMe: 'I'll consider that after a raise'"},
+  {id:39,r:2,ja:"バイト終わりに見る星が\n一番きれいに見える科学的理由は不明。",en:"Stars look most beautiful after a shift.\nScience has no explanation for this."},
+  {id:40,r:2,ja:"開発者はラーメンが食べたいです。\n真剣に。",en:"The developer wants ramen.\nSeriously."},
+  // ☆3 (15種) - 15%
+  {id:41,r:3,ja:"人生で一番真剣に時計を見る場所：\nバイト中。",en:"The place where I stare at the clock most intently in life:\nduring my shift."},
+  {id:42,r:3,ja:"「好きなことで生きていく」\n私「好きなことは寝ることです」",en:"'Make a living doing what you love'\nMe: 'I love sleeping'"},
+  {id:43,r:3,ja:"深夜バイクで配達するたびに\n自分の命の時給換算が気になる。",en:"Every midnight delivery by bike,\nI wonder what my life is worth per hour."},
+  {id:44,r:3,ja:"休憩10分で人類のすべてを理解できる。\nそれはとても短いということ。",en:"In 10 minutes of break, you understand everything about humanity.\nThat it's painfully short."},
+  {id:45,r:3,ja:"このアプリに寄付した人は\n天国に行けます（保証はしません）。",en:"Those who donate to this app\nwill go to heaven (not guaranteed)."},
+  {id:46,r:3,ja:"バイトを「アルバイト」と呼ぶのは\nドイツ語で「労働」の意味。\n本質を突いている。",en:"'Arubaito' comes from German 'Arbeit' meaning 'labor.'\nCuts straight to the point."},
+  {id:47,r:3,ja:"社会保険の壁を越えた瞬間、\n大人になった気がした。\nでも給料は変わらない。",en:"Crossing the social insurance threshold,\nI felt like I became an adult.\nBut my pay didn't change."},
+  {id:48,r:3,ja:"「頑張れば報われる」\nを信じていた頃の自分に会いたい。",en:"I'd like to meet my past self\nwho believed 'hard work pays off.'"},
+  {id:49,r:3,ja:"時給換算すると、\n映画を見る時間すら惜しくなる。\nそれが現代人。",en:"Once you start thinking in hourly rates,\neven watching a movie feels wasteful.\nThat's modern life."},
+  {id:50,r:3,ja:"開発者へのご支援は\n彼の精神的健康に直結します。",en:"Your support for the developer\ndirectly impacts their mental health."},
+  {id:51,r:3,ja:"バイトの制服を着た瞬間、\nもう一人の自分になれる。\nその自分も疲れているけど。",en:"The moment you put on your work uniform,\nyou become another version of yourself.\nThat version is also tired."},
+  {id:52,r:3,ja:"「次の人に引き継ぎお願いします」\n= 私の仕事が終わらなかった証拠。",en:"'Please hand this off to the next person'\n= proof that I couldn't finish my work."},
+  {id:53,r:3,ja:"このアプリを作るのに\n何時間かかったか計算したくない。\n時給換算したら泣く。",en:"I don't want to calculate how long making this app took.\nIf I convert to hourly wage, I'll cry."},
+  {id:54,r:3,ja:"バイト仲間との絆は\n戦友のそれに近い。",en:"The bond with your coworkers\nis close to that of wartime comrades."},
+  {id:55,r:3,ja:"閉店後の静かな店内で\n人生について考える時間が好きだった。\n給料は出ないけど。",en:"I used to love the quiet in the store after closing,\nthinking about life.\nUnpaid, of course."},
+  // ☆4 (15種) - 8%
+  {id:56,r:4,ja:"時給1円上がるために\nどれだけの魂を売ればいいのか。",en:"How much of your soul must you sell\nfor a ¥1 raise?"},
+  {id:57,r:4,ja:"開発者の夢：\nこのアプリの収益で\n新幹線のグリーン車に乗ること。",en:"Developer's dream:\nusing this app's revenue\nto ride the Shinkansen's Green Car."},
+  {id:58,r:4,ja:"「向いていないかも」と思い始めたら\n三年経っていた。",en:"By the time I started thinking\n'maybe this isn't for me,' three years had passed."},
+  {id:59,r:4,ja:"深夜の仕事帰り、\nコンビニのおでんの匂いが\n人生で最も優しい瞬間。",en:"Coming home from a late night shift,\nthe smell of convenience store oden\nis life's most gentle moment."},
+  {id:60,r:4,ja:"「給料上がったら貯金しよう」\nを5年言い続けている。",en:"'I'll start saving when my pay goes up'\nI've been saying this for 5 years."},
+  {id:61,r:4,ja:"このアプリに100円寄付したら\n開発者が全力で喜びます。\n100円で買える幸福がここに。",en:"Donate ¥100 to this app\nand the developer will be overjoyed.\nHere is happiness that costs ¥100."},
+  {id:62,r:4,ja:"労働とは、\n時間をお金に変える錬金術である。\nただし、効率は悪い。",en:"Labor is alchemy,\ntransforming time into money.\nThe conversion rate, however, is poor."},
+  {id:63,r:4,ja:"バイト先の常連客のことを\n知らない間にすごく詳しくなっている。",en:"Without realizing it,\nI've learned a lot about the regulars at work."},
+  {id:64,r:4,ja:"「また来るね」と言うお客さんの\n8割は二度と来ない統計がある（個人調べ）。",en:"Statistics show 80% of customers who say 'I'll be back'\nnever return. (Personal research)"},
+  {id:65,r:4,ja:"手取り額を見て\n「これが私の1ヶ月か」と思う儀式。",en:"The ritual of looking at take-home pay\nand thinking 'this is my entire month.'"},
+  {id:66,r:4,ja:"開発者は今、\nあなたがこれを読んでいることを\n知りません。でも感謝しています。",en:"The developer doesn't know\nyou're reading this right now.\nBut they're grateful."},
+  {id:67,r:4,ja:"「正社員になれば安泰」\nという神話を信じていた時代が懐かしい。",en:"I miss the era when we believed\n'full-time employment means security.'"},
+  {id:68,r:4,ja:"バイトを辞める時の解放感は\n人類が経験できる最高の自由の一つ。",en:"The liberation of quitting a part-time job\nis one of the greatest freedoms a human can experience."},
+  {id:69,r:4,ja:"時給を分単位で計算し始めたら\n本物のバイト戦士になった証拠。",en:"When you start calculating wages per minute,\nyou've become a true part-time warrior."},
+  {id:70,r:4,ja:"このアプリへの寄付は\n文化的な行為です。\nアートを支援するようなもの。",en:"Donating to this app\nis a cultural act.\nLike supporting art."},
+  // ☆5 (10種) - 5%
+  {id:71,r:5,ja:"人生の深夜割増は\n誰も払ってくれない。",en:"Nobody pays a night premium\nfor the overtime of life."},
+  {id:72,r:5,ja:"このアプリを作った人は、\nある夜「バイトの給料計算めんどくさい」と思い、\n気づいたらアプリを作っていた。",en:"The person who made this app,\none night thought 'calculating my wage is such a pain'\nand somehow ended up building an app."},
+  {id:73,r:5,ja:"103万の壁、130万の壁、\nこの国は壁が多い。\nベルリンより多い。",en:"The ¥1.03M wall, the ¥1.3M wall...\nThis country has more walls than Berlin."},
+  {id:74,r:5,ja:"開発者へのファンレターはPayPayで受け付けています。\n文字は不要です。",en:"Fan letters to the developer accepted via PayPay.\nNo words necessary."},
+  {id:75,r:5,ja:"社会に出て最初に学ぶのは\nスキルでも知識でもなく、\n「理不尽さへの耐性」。",en:"The first thing you learn entering society\nis not skills or knowledge,\nbut 'tolerance for unreasonableness.'"},
+  {id:76,r:5,ja:"時給という概念が存在する限り、\n人間は時間と戦い続ける。\nそれが資本主義。",en:"As long as hourly wages exist,\nhumans will wage war with time.\nThat is capitalism."},
+  {id:77,r:5,ja:"深夜の帰り道、\n財布は軽くなっているが\n心は不思議と軽い。",en:"Walking home late at night,\nmy wallet is lighter\nbut somehow so is my heart."},
+  {id:78,r:5,ja:"このジョークを読んでいるあなたは\n今日も働いているか、\n働くための準備をしているか、\n働いた後で休んでいる。\nお疲れ様です。",en:"You reading this joke\nare either working right now,\npreparing to work,\nor resting after work.\nThank you for your hard work."},
+  {id:79,r:5,ja:"「夢を持て」と言う大人は\n大体、夢を叶えていない。",en:"Adults who say 'have a dream'\nusually haven't achieved their own."},
+  {id:80,r:5,ja:"給料日前の1週間は\n人類最高の節約術を学べる期間。",en:"The week before payday\nis humanity's greatest masterclass in frugality."},
+  // ☆6 (8種) - 3%
+  {id:81,r:6,ja:"資本主義の皮肉：\n一番お金が必要な人ほど\n時間をお金で買えない。",en:"Capitalism's irony:\nthose who need money most\ncan't afford to buy time with money."},
+  {id:82,r:6,ja:"このアプリへの寄付は\n因果応報の法則で\nあなたに良いことが起きます（根拠なし）。",en:"Donating to this app,\nby the law of karma,\nwill bring good things to you (no basis)."},
+  {id:83,r:6,ja:"人生で最も正直な瞬間：\n給料明細を見た直後。",en:"Life's most honest moment:\nright after seeing your pay stub."},
+  {id:84,r:6,ja:"「好きなことを仕事に」の理想と\n「家賃を払う」の現実の間で\n人は生きている。",en:"People live in the space between\nthe ideal of 'do what you love'\nand the reality of 'pay the rent.'"},
+  {id:85,r:6,ja:"深夜手当をもらうたびに、\n国家が認める「夜の価値」について考える。",en:"Every time I receive night pay,\nI contemplate the state-recognized 'value of the night.'"},
+  {id:86,r:6,ja:"開発者も最初は\n「このアプリで一儲けしよう」と思っていた。\n現実は甘くなかった。\nだから寄付してください。",en:"The developer also started out thinking\n'I'll make a fortune with this app.'\nReality was not so sweet.\nSo please donate."},
+  {id:87,r:6,ja:"労働の対価としての賃金と、\nそれを計算するアプリ。\n哲学的に言えば、我々は数字に還元された存在だ。",en:"Wages as compensation for labor,\nand an app to calculate them.\nPhilosophically speaking, we are beings reduced to numbers."},
+  {id:88,r:6,ja:"バイトを「やりがい搾取」と呼ぶ言葉が生まれた年、\n誰かが泣きながら残業していた。",en:"The year the phrase 'passion exploitation' was coined,\nsomeone was crying through overtime."},
+  // ☆7 (4種) - 2%
+  {id:89,r:7,ja:"時給という単位で測られる人生において、\n測れないものの価値を問う。\n友情、愛情、休息——\nこれらの時給は無限大か、それともゼロか。",en:"In a life measured in hourly wages,\nwe must ask the value of what can't be measured.\nFriendship, love, rest—\nare their hourly rates infinite, or zero?"},
+  {id:90,r:7,ja:"開発者は、あなたがこのアプリを開くたびに\n小さな喜びを感じています。\nたとえ会ったことがなくても、\n画面の向こうに、感謝している人間がいます。",en:"Every time you open this app,\nthe developer feels a small joy.\nEven though we've never met,\nthere's a human on the other side of the screen, grateful for you."},
+  {id:91,r:7,ja:"深夜3時に働く人へ。\n世界のほとんどが眠っている中で、\nあなたは社会を支えている。\nその事実を、誰かに伝えてほしかった。",en:"To those working at 3am.\nWhile most of the world sleeps,\nyou are holding up society.\nI wanted someone to tell you that."},
+  {id:92,r:7,ja:"このアプリは、誰かの「めんどくさい」から生まれた。\nすべての発明はそうして生まれる。\nあなたの「めんどくさい」も、\nいつか誰かを助けるかもしれない。",en:"This app was born from someone's 'what a hassle.'\nAll inventions are born that way.\nYour own 'what a hassle'\nmight one day help someone."},
+  // ☆8 (3種) - 1%
+  {id:93,r:8,ja:"労働とは何か。\n時間を売ること？　否。\n時間の一部を、誰かの夢のために貸すこと。\nそして今夜も、あなたは貸し続ける。\n返ってこない時間とともに。",en:"What is labor?\nSelling time? No.\nLending a portion of your time for someone else's dream.\nAnd tonight again, you keep lending.\nAlongside time that never returns."},
+  {id:94,r:8,ja:"開発者はこのジョークを書きながら、\n自分が何者なのかを考えた。\nプログラマーか。哲学者か。\n答えは出なかった。\nでも、あなたに届いたことは、少し嬉しかった。",en:"While writing this joke, the developer wondered\nwho they really are.\nA programmer? A philosopher?\nNo answer came.\nBut the fact that it reached you\nbrought a small happiness."},
+  {id:95,r:8,ja:"給料日は、社会との約束が守られた日。\n月に一度、世界が少しだけ\n「ちゃんとしている」と感じる日。\nそれだけで、また来月も働ける気がする。",en:"Payday is the day society keeps its promise.\nOnce a month, the world feels\njust a little bit 'okay.'\nAnd somehow, that's enough to work another month."},
+  // ☆9 (5種) - 0.7%
+  {id:96,r:9,ja:"あなたが今日ここを開いたのは偶然ではない。\n今日という日、このアプリを選んだことに\n小さな意味があると信じたい。\n少なくとも開発者は、あなたに出会えて光栄です。",en:"It's no coincidence you opened this today.\nI want to believe there's a small meaning\nin choosing this app on this particular day.\nAt least the developer is honored to have met you."},
+  {id:97,r:9,ja:"深夜に働く人の背中は、\n誰にも見えない場所で光っている。\nスポットライトのない舞台で、\n毎晩、主役を演じている。",en:"The backs of those working late at night\nshine in a place no one can see.\nOn a stage with no spotlight,\nthey play the lead every night."},
+  {id:98,r:9,ja:"このアプリへの寄付は、\nデジタルの海に投げた一粒の石。\n波紋は見えないかもしれないけれど、\n開発者の胸には必ず届いています。",en:"A donation to this app\nis a stone thrown into the digital sea.\nYou may not see the ripples,\nbut they always reach the developer's heart."},
+  {id:99,r:9,ja:"時給を計算するたびに思う——\n本当に価値のあるものに\n値段はつけられない。\n友の笑顔も、夕焼けも、\nそして今夜の、あなたの帰り道も。",en:"Every time I calculate hourly wages, I think—\nthe things truly worth valuing\nhave no price tag.\nA friend's smile, a sunset,\nand your walk home tonight."},
+  {id:100,r:9,ja:"開発者はあなたに言いたいことがある。\n毎日お疲れ様。\n給料が少なくても、\nシフトがきつくても、\nあなたが今日もここにいることを、\n誰かがちゃんと見ています。",en:"The developer has something to say to you.\nThank you for working every day.\nEven if the pay is low,\neven if the shifts are hard,\nsomeone is properly watching\nthe fact that you're here today."},
+  // ☆10 (5種) - 0.3% LEGENDARY
+  {id:101,r:10,ja:"🏆 伝説のジョーク 🏆\n\nこの宇宙で最も尊い行為は何か。\n科学者は「愛」と言い、\n哲学者は「思索」と言い、\n開発者は「PayPayで寄付すること」と言う。\n\nあなたが今日このメッセージを見たのは、\n宇宙の意志かもしれない。",en:"🏆 LEGENDARY JOKE 🏆\n\nWhat is the most noble act in this universe?\nScientists say 'love,'\nphilosophers say 'contemplation,'\nand the developer says 'donating via PayPay.'\n\nYou seeing this message today\nmight be the will of the universe."},
+  {id:102,r:10,ja:"🏆 王者の言葉 🏆\n\nかつて、ある王が言った。\n「民よ、余に金を捧げよ」\n\n現代に生まれ変わった王（開発者）も言う。\n「ユーザーよ、余にPayPayを捧げよ」\n\nこれが歴史の繰り返しである。",en:"🏆 WORDS OF A KING 🏆\n\nOnce, a king said:\n'People, offer me gold.'\n\nThe king reborn in modern times (the developer) also says:\n'Users, offer me PayPay.'\n\nThis is the repetition of history."},
+  {id:103,r:10,ja:"🏆 黄金の真実 🏆\n\nこの地球上で最も希少なもの：\n1位：あなたという存在（代替不可能）\n2位：この☆10ジョーク（確率0.3%）\n3位：開発者の銀行残高（存在が確認できていない）\n\n今日のあなたはラッキーです。",en:"🏆 THE GOLDEN TRUTH 🏆\n\nThe rarest things on Earth:\n1st: You as a person (irreplaceable)\n2nd: This ☆10 joke (0.3% chance)\n3rd: The developer's bank balance (existence unconfirmed)\n\nToday is your lucky day."},
+  {id:104,r:10,ja:"🏆 宮殿からの手紙 🏆\n\n拝啓、勇敢なるユーザー様。\nあなたは今、0.3%の奇跡の中にいます。\n宝くじで言えば当選に近い確率。\nこの幸運を、PayPayで開発者に分けてください。\n\n敬具、\n宮殿の主（開発者）より",en:"🏆 LETTER FROM THE PALACE 🏆\n\nDear brave user,\nYou are now inside a 0.3% miracle.\nIn lottery terms, this is close to winning.\nPlease share this luck with the developer via PayPay.\n\nSincerely,\nThe Master of the Palace (the developer)"},
+  {id:105,r:10,ja:"🏆 最終奥義 🏆\n\n開発者が長年の修行の末に悟った真理：\n「アプリを無料で作っても、\n 家賃は無料にならない」\n\nこの哲学的矛盾を解決できるのは、\n宇宙でただ一つ——\nあなたのPayPayだけである。",en:"🏆 THE FINAL SECRET 🏆\n\nThe truth the developer realized after years of training:\n'Even if you make an app for free,\nthe rent is not free.'\n\nThe only thing in the universe\nthat can resolve this philosophical contradiction—\nis your PayPay."}
+];
+
+const FUNNY_MSGS = [
+  "あなたのおかげで開発者が今日もご飯を食べられます🍜",
+  "寄付してくれたら開発者が泣いて喜びます（マジで）😭",
+  "このアプリ、無料ですが開発者の夢は有料です💸",
+  "ラーメン一杯分でいいんです。それだけで十分です🍜",
+  "開発者の銀行口座が砂漠です。オアシスになってください🏜️",
+  "あなたが寄付する姿、神様が見ています👁️（開発者も見ています）",
+  "PayPayで送ると、開発者の部屋に光が差し込みます（比喩）☀️",
+  "100円から受け付けています。プライドは捨てました💪",
+  "このボタンを押した瞬間、あなたは英雄になります🦸",
+  "開発者：家賃 > 収入 = このメッセージが生まれた理由📊"
+];
+
+const DEV_STATUS_MSGS = [
+  "今月の寄付：¥0 / ラーメン代には全く足りていません🍜",
+  "今月の収益：感謝の気持ちのみ。家賃には使えません🏠",
+  "現在の開発者の状態：元気です。財布は元気ではありません💀",
+  "目標：寄付でコーヒー1杯。現在の進捗：0%☕",
+  "開発者は今も新機能を考えています。お腹を空かせながら。"
+];
+
+const TITLES = [
+  {min:0,icon:'',name:''},
+  {min:1,icon:'🥉',name:'善人',cls:'title-1'},
+  {min:3,icon:'🥈',name:'恩人',cls:'title-2'},
+  {min:5,icon:'🥇',name:'大恩人',cls:'title-3'},
+  {min:10,icon:'💎',name:'伝説の支援者',cls:'title-4'},
+  {min:20,icon:'👑',name:'神',cls:'title-5'},
+  {min:50,icon:'🌟',name:'開発者の推し',cls:'title-6'}
+];
+
+// ========== STATE ==========
 let clockedIn=false,clockInTime=null,timerInterval=null,todayFare=0;
 
-function getSettings(){
-  return{
-    wage:parseInt(localStorage.getItem('wage')||'1000'),
-    nightStart:localStorage.getItem('nightStart')||'22:00',
-    nightRate:parseInt(localStorage.getItem('nightRate')||'25'),
-    payday:parseInt(localStorage.getItem('payday')||'25')
-  };
+function getSettings(){return{wage:parseInt(localStorage.getItem('wage')||'1000'),nightStart:localStorage.getItem('nightStart')||'22:00',nightRate:parseInt(localStorage.getItem('nightRate')||'25'),payday:parseInt(localStorage.getItem('payday')||'25')};}
+function getCollected(){return JSON.parse(localStorage.getItem('collected')||'[]');}
+function getDonateCount(){return parseInt(localStorage.getItem('donateCount')||'0');}
+function getStreak(){return JSON.parse(localStorage.getItem('streak')||'{"count":0,"lastDate":""}');}
+
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
+
+// ========== STREAK ==========
+function updateStreak(){
+  const today=new Date().toDateString();
+  let s=getStreak();
+  if(s.lastDate===today)return s;
+  const yesterday=new Date(Date.now()-86400000).toDateString();
+  if(s.lastDate===yesterday){s.count++;}else{s.count=1;}
+  s.lastDate=today;
+  localStorage.setItem('streak',JSON.stringify(s));
+  return s;
 }
 
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2000);
+function renderStreak(){
+  const s=updateStreak();
+  document.getElementById('streak-count').textContent=s.count;
+  const bonus=document.getElementById('streak-bonus');
+  if(s.count>=7){bonus.innerHTML='<div class="streak-bonus">🎰 レア率UP!</div>';}
+  else{bonus.innerHTML=`<div style="font-size:10px;color:var(--muted)">7日連続でレア率UP<br>あと${7-s.count}日</div>`;}
 }
 
-function saveSettings(){
-  const w=document.getElementById('set-wage').value;
-  const ns=document.getElementById('set-night-start').value;
-  const nr=document.getElementById('set-night-rate').value;
-  const pd=document.getElementById('set-payday').value;
-  if(!w){showToast('時給を入力してください');return;}
-  localStorage.setItem('wage',w);
-  localStorage.setItem('nightStart',ns||'22:00');
-  localStorage.setItem('nightRate',nr||'0');
-  localStorage.setItem('payday',pd||'25');
-  updateSettingsDisplay();
-  showToast('保存しました！');
+// ========== JOKE GACHA ==========
+function getRarityWeights(){
+  const s=getStreak();
+  const boost=s.count>=7;
+  return boost?
+    [{r:1,w:25},{r:2,w:20},{r:3,w:18},{r:4,w:15},{r:5,w:10},{r:6,w:6},{r:7,w:3},{r:8,w:1.5},{r:9,w:1},{r:10,w:0.5}]:
+    [{r:1,w:40},{r:2,w:25},{r:3,w:15},{r:4,w:8},{r:5,w:5},{r:6,w:3},{r:7,w:2},{r:8,w:1},{r:9,w:0.7},{r:10,w:0.3}];
 }
 
-function updateSettingsDisplay(){
-  const s=getSettings();
-  document.getElementById('set-wage').value=s.wage;
-  document.getElementById('set-night-start').value=s.nightStart;
-  document.getElementById('set-night-rate').value=s.nightRate;
-  document.getElementById('set-payday').value=s.payday;
-  document.getElementById('current-settings').innerHTML=
-    `時給: ¥${s.wage.toLocaleString()}<br>深夜割増開始: ${s.nightStart}<br>割増率: ${s.nightRate}%<br>給料日: ${s.payday}日`;
+function drawJoke(){
+  const today=new Date().toDateString();
+  const saved=localStorage.getItem('todayJoke');
+  if(saved){const p=JSON.parse(saved);if(p.date===today)return JOKES.find(j=>j.id===p.id)||JOKES[0];}
+  const weights=getRarityWeights();
+  const total=weights.reduce((s,w)=>s+w.w,0);
+  let rand=Math.random()*total;
+  let chosenR=1;
+  for(const w of weights){rand-=w.w;if(rand<=0){chosenR=w.r;break;}}
+  const pool=JOKES.filter(j=>j.r===chosenR);
+  const joke=pool[Math.floor(Math.random()*pool.length)];
+  localStorage.setItem('todayJoke',JSON.stringify({date:today,id:joke.id}));
+  addToCollected(joke.id);
+  return joke;
 }
 
-function showPage(p){
-  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
-  document.getElementById('page-'+p).classList.add('active');
-  const tabs=['main','tools','history','settings'];
-  document.querySelectorAll('.tab')[tabs.indexOf(p)].classList.add('active');
-  if(p==='history')renderHistory();
-  if(p==='settings')updateSettingsDisplay();
+function addToCollected(id){
+  const col=getCollected();
+  if(!col.includes(id)){
+    col.push(id);
+    localStorage.setItem('collected',JSON.stringify(col));
+    const newIds=JSON.parse(localStorage.getItem('newIds')||'[]');
+    newIds.push(id);
+    localStorage.setItem('newIds',JSON.stringify(newIds));
+  }
 }
 
-function pad(n){return String(n).padStart(2,'0')}
-function formatTime(ms){
-  const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);
-  return`${pad(h)}:${pad(m)}:${pad(s)}`;
+function getRarityLabel(r){const labels=['','ノーマル','ノーマル+','レア','レア+','スーパーレア','スーパーレア+','ウルトラレア','ウルトラレア+','レジェンド','🏆 超レジェンド'];return labels[r]||'';}
+function getStars(r){return '★'.repeat(r)+'☆'.repeat(10-r);}
+
+function renderTodayJoke(){
+  const joke=drawJoke();
+  const area=document.getElementById('today-joke-area');
+  if(joke.r===10){
+    showPalace(joke);
+    area.innerHTML='';
+    return;
+  }
+  const rarityClass=`rarity-${joke.r}`;
+  const newIds=JSON.parse(localStorage.getItem('newIds')||'[]');
+  const isNew=newIds.includes(joke.id);
+  area.innerHTML=`
+    <div class="joke-card ${rarityClass}" onclick="openDonate()">
+      <div class="joke-number">No.${joke.id}</div>
+      ${isNew?'<div class="joke-new-badge">NEW!</div>':''}
+      <div class="joke-stars">${getStars(joke.r)}</div>
+      <div class="joke-rarity">${getRarityLabel(joke.r)}</div>
+      <div class="joke-text-ja">${joke.ja.replace(/\n/g,'<br>')}</div>
+      <div class="joke-text-en">${joke.en.replace(/\n/g,'<br>')}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:10px">タップして開発者を応援 💛</div>
+    </div>`;
+  if(isNew){const ids=JSON.parse(localStorage.getItem('newIds')||'[]');localStorage.setItem('newIds',JSON.stringify(ids.filter(i=>i!==joke.id)));}
 }
 
+// ========== PALACE ==========
+function showPalace(joke){
+  document.getElementById('palace-joke-ja').innerHTML=joke.ja.replace(/\n/g,'<br>');
+  document.getElementById('palace-joke-en').innerHTML=joke.en.replace(/\n/g,'<br>');
+  const overlay=document.getElementById('palace-overlay');
+  overlay.classList.add('show');
+  createParticles();
+}
+function closePalace(){document.getElementById('palace-overlay').classList.remove('show');}
+function openDonateFromPalace(){closePalace();openDonate();}
+function createParticles(){
+  const container=document.getElementById('palace-particles');
+  container.innerHTML='';
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.cssText=`left:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*2}s;background:${['#FFD700','#FFA500','#fff','#FFE066'][Math.floor(Math.random()*4)]}`;
+    container.appendChild(p);
+  }
+}
+
+// ========== DONATE ==========
+function openDonate(){
+  const joke=drawJoke();
+  const r=joke.r;
+  const box=document.getElementById('donate-modal-box');
+  const btn=document.getElementById('donate-big-btn');
+  box.style.cssText='';
+  btn.style.cssText='';
+  if(r<=3){box.style.background='var(--surface)';box.style.border='1px solid var(--border)';btn.style.background='linear-gradient(135deg,#FFD700,#FFA500)';btn.style.color='#2a1a00';}
+  else if(r<=5){box.style.background='linear-gradient(135deg,#1a1a2a,#0a0a1a)';box.style.border='2px solid #5a2a8a';btn.style.background='linear-gradient(135deg,#8a2aff,#5a00aa)';btn.style.color='#fff';}
+  else if(r<=7){box.style.background='linear-gradient(135deg,#2a1a00,#1a0a00)';box.style.border='2px solid #FFD700';btn.style.background='linear-gradient(135deg,#FFD700,#FFA500,#FF6B35,#FFD700)';btn.style.backgroundSize='300% 300%';btn.style.color='#2a1a00';}
+  else{box.style.background='linear-gradient(135deg,#000020,#200000,#002000)';box.style.border='3px solid #FFD700';btn.style.background='linear-gradient(135deg,#FFD700,#FFA500,#FF6B35,#FFD700)';btn.style.backgroundSize='300% 300%';btn.style.color='#2a1a00';btn.style.animation='goldShine 2s infinite';}
+  document.getElementById('donate-icon').textContent=r>=9?'👑':r>=7?'💎':r>=5?'🌟':'💛';
+  document.getElementById('donate-modal-title').textContent=r>=10?'🏆 伝説の応援':r>=8?'✨ 特別な応援':'開発者を応援する';
+  document.getElementById('donate-stars-display').textContent=`今日のジョーク: ${getStars(r)} ${getRarityLabel(r)}`;
+  document.getElementById('donate-funny-msg').textContent=FUNNY_MSGS[Math.floor(Math.random()*FUNNY_MSGS.length)];
+  document.getElementById('donate-modal').classList.add('show');
+  const secret=document.getElementById('secret-joke-area');
+  const donated=getDonateCount()>0;
+  if(donated){
+    const secretJokes=JOKES.filter(j=>j.id>100);
+    const sj=secretJokes[Math.floor(Math.random()*secretJokes.length)];
+    secret.style.display='block';
+    secret.innerHTML=`<div style="background:#1a2a0a;border:1px solid var(--accent);border-radius:10px;padding:12px;font-size:12px"><div style="color:var(--accent);font-weight:700;margin-bottom:6px">🎁 寄付者限定ジョーク</div><div style="line-height:1.6">${sj.ja.replace(/\n/g,'<br>')}</div></div>`;
+  }else{secret.style.display='none';}
+  document.getElementById('dev-status-msg').textContent=DEV_STATUS_MSGS[Math.floor(Math.random()*DEV_STATUS_MSGS.length)];
+}
+function closeDonate(){document.getElementById('donate-modal').classList.remove('show');}
+function didDonate(){
+  const count=getDonateCount()+1;
+  localStorage.setItem('donateCount',count);
+  closeDonate();
+  renderTitle();
+  showToast('ありがとうございます！称号が更新されました👑');
+  const unlocked=JOKES.filter(j=>j.id>100);
+  if(unlocked.length>0)addToCollected(unlocked[0].id);
+}
+
+// ========== TITLE ==========
+function getCurrentTitle(){
+  const count=getDonateCount();
+  let current=TITLES[0];
+  for(const t of TITLES){if(count>=t.min&&t.min>0)current=t;}
+  return current;
+}
+function renderTitle(){
+  const t=getCurrentTitle();
+  const disp=document.getElementById('title-display');
+  const sDisp=document.getElementById('settings-title-display');
+  if(t.icon){
+    const html=`<div class="title-badge ${t.cls}">${t.icon} ${t.name}</div>`;
+    disp.innerHTML=html;
+    sDisp.innerHTML=html+`<div style="font-size:11px;color:var(--muted);margin-top:6px">寄付回数: ${getDonateCount()}回</div>`;
+  }else{
+    disp.innerHTML='';
+    sDisp.innerHTML=`<div style="font-size:12px;color:var(--muted)">まだ称号がありません。最初の寄付で称号ゲット！</div>`;
+  }
+}
+
+// ========== ENCYCLOPEDIA ==========
+function renderEncyclopedia(){
+  const collected=getCollected();
+  const newIds=JSON.parse(localStorage.getItem('newIds')||'[]');
+  const count=collected.length;
+  const remaining=100-(count>100?100:count);
+  document.getElementById('enc-collected').textContent=count>100?100:count;
+  document.getElementById('enc-remaining').textContent=remaining>0?`残り${remaining}種類！毎日1つずつ集めよう🎯`:'🎉 コンプリート！あなたは伝説です！';
+  const grid=document.getElementById('enc-grid');
+  grid.innerHTML=JOKES.map(j=>{
+    const isCollected=collected.includes(j.id);
+    const isNew=newIds.includes(j.id);
+    if(!isCollected){
+      return`<div class="enc-card locked"><div class="enc-card-lock">？</div><div class="enc-card-num">No.${j.id}</div></div>`;
+    }
+    return`<div class="enc-card rarity-${j.r}" onclick="previewJoke(${j.id})">
+      ${isNew?'<div class="enc-card-new">NEW</div>':''}
+      <div class="enc-card-stars">${getStars(j.r)}</div>
+      <div class="enc-card-ja">${j.ja.split('\n')[0].substring(0,30)}${j.ja.length>30?'…':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function previewJoke(id){
+  const joke=JOKES.find(j=>j.id===id);
+  if(!joke)return;
+  const box=document.getElementById('preview-box');
+  box.className=`preview-box rarity-${joke.r}`;
+  document.getElementById('preview-content').innerHTML=`
+    <div style="font-size:12px;margin-bottom:6px">${getStars(joke.r)} ${getRarityLabel(joke.r)} | No.${joke.id}</div>
+    <div style="font-size:15px;font-weight:700;line-height:1.7;margin-bottom:10px">${joke.ja.replace(/\n/g,'<br>')}</div>
+    <div style="font-size:12px;opacity:0.7;font-style:italic;line-height:1.6">${joke.en.replace(/\n/g,'<br>')}</div>
+    <div style="font-size:10px;margin-top:12px;opacity:0.5">※ここからは寄付できません。応援ボタンからどうぞ💛</div>`;
+  document.getElementById('preview-modal').classList.add('show');
+}
+function closePreview(){document.getElementById('preview-modal').classList.remove('show');}
+
+// ========== CLOCK ==========
+function pad(n){return String(n).padStart(2,'0');}
+function formatTime(ms){const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);return`${pad(h)}:${pad(m)}:${pad(s)}`;}
 function toggleClock(){
   const s=getSettings();
   if(s.wage<=0){showToast('先に設定で時給を入力してください');showPage('settings');return;}
@@ -358,9 +713,7 @@ function toggleClock(){
     document.getElementById('timer-display').classList.remove('inactive');
     document.getElementById('clock-in-time').textContent='出勤: '+clockInTime.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
     document.getElementById('result-card').classList.remove('show');
-    timerInterval=setInterval(()=>{
-      document.getElementById('timer-display').textContent=formatTime(new Date()-clockInTime);
-    },1000);
+    timerInterval=setInterval(()=>{document.getElementById('timer-display').textContent=formatTime(new Date()-clockInTime);},1000);
     showToast('出勤を記録しました');
   }else{
     clockedIn=false;clearInterval(timerInterval);
@@ -378,30 +731,23 @@ function toggleClock(){
     showToast('お疲れさまでした！');
   }
 }
-
 function calcPay(inTime,outTime){
   const s=getSettings();
-  const nightH=parseInt(s.nightStart.split(':')[0]);
-  const nightM=parseInt(s.nightStart.split(':')[1]);
+  const nightH=parseInt(s.nightStart.split(':')[0]),nightM=parseInt(s.nightStart.split(':')[1]);
   let normalMins=0,nightMins=0;
   const totalMins=Math.round((outTime-inTime)/60000);
   let cur=new Date(inTime);
   for(let i=0;i<totalMins;i++){
     const h=cur.getHours(),m=cur.getMinutes();
-    const afterNightStart=(h>nightH)||(h===nightH&&m>=nightM);
+    const afterNight=(h>nightH)||(h===nightH&&m>=nightM);
     const beforeDawn=(h>=0&&h<5);
-    if(s.nightRate>0&&(afterNightStart||beforeDawn))nightMins++;else normalMins++;
+    if(s.nightRate>0&&(afterNight||beforeDawn))nightMins++;else normalMins++;
     cur=new Date(cur.getTime()+60000);
   }
   const normalPay=(normalMins/60)*s.wage;
   const nightPay=(nightMins/60)*s.wage*(1+s.nightRate/100);
-  return{
-    normal:Math.round(normalPay),night:Math.round(nightPay),
-    total:Math.round(normalPay+nightPay-todayFare),
-    fare:todayFare,normalMins,nightMins,wage:s.wage,rate:s.nightRate
-  };
+  return{normal:Math.round(normalPay),night:Math.round(nightPay),total:Math.round(normalPay+nightPay-todayFare),fare:todayFare,normalMins,nightMins,rate:s.nightRate};
 }
-
 function showResult(pay){
   document.getElementById('result-card').classList.add('show');
   document.getElementById('result-amount').textContent='¥'+pay.total.toLocaleString();
@@ -410,138 +756,78 @@ function showResult(pay){
   if(pay.fare>0)html+=`<div class="breakdown-row"><span class="breakdown-label">交通費</span><span class="breakdown-val" style="color:var(--danger)">-¥${pay.fare.toLocaleString()}</span></div>`;
   document.getElementById('result-breakdown').innerHTML=html;
 }
-
-function saveFare(){
-  todayFare=parseInt(document.getElementById('fare-input').value)||0;
-  showToast('交通費 ¥'+todayFare.toLocaleString()+' を保存しました');
-}
-
+function saveFare(){todayFare=parseInt(document.getElementById('fare-input').value)||0;showToast('交通費 ¥'+todayFare.toLocaleString()+' を保存しました');}
 function saveHistory(inTime,outTime,pay){
   const records=JSON.parse(localStorage.getItem('records')||'[]');
-  records.unshift({
-    date:inTime.toLocaleDateString('ja-JP'),
-    inTime:inTime.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}),
-    outTime:outTime.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}),
-    pay:pay.total,fare:pay.fare,
-    ts:inTime.getTime()
-  });
+  records.unshift({date:inTime.toLocaleDateString('ja-JP'),inTime:inTime.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}),outTime:outTime.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}),pay:pay.total,fare:pay.fare,ts:inTime.getTime()});
   localStorage.setItem('records',JSON.stringify(records.slice(0,200)));
 }
-
 function renderHistory(){
   const records=JSON.parse(localStorage.getItem('records')||'[]');
   const now=new Date();
-  const monthStr=`${now.getFullYear()}年${now.getMonth()+1}月`;
-  document.getElementById('history-month-label').textContent=monthStr;
-  const monthRecords=records.filter(r=>{
-    const d=new Date(r.ts||r.date);
-    return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();
-  });
-  const total=monthRecords.reduce((s,r)=>s+r.pay,0);
-  document.getElementById('month-total-val').textContent='¥'+total.toLocaleString();
-  if(records.length===0){
-    document.getElementById('history-list').innerHTML='<div class="empty">まだ記録がありません</div>';
-    return;
-  }
-  document.getElementById('history-list').innerHTML=records.map(r=>`
-    <div class="history-item">
-      <div>
-        <div class="history-date">${r.date}</div>
-        <div class="history-time">${r.inTime} → ${r.outTime}</div>
-      </div>
-      <div class="history-right">
-        <div class="history-pay">¥${r.pay.toLocaleString()}</div>
-        ${r.fare>0?`<div class="history-fare">交通費 -¥${r.fare.toLocaleString()}</div>`:''}
-      </div>
-    </div>`).join('');
+  document.getElementById('history-month-label').textContent=`${now.getFullYear()}年${now.getMonth()+1}月`;
+  const monthRec=records.filter(r=>{const d=new Date(r.ts||r.date);return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();});
+  document.getElementById('month-total-val').textContent='¥'+monthRec.reduce((s,r)=>s+r.pay,0).toLocaleString();
+  if(records.length===0){document.getElementById('history-list').innerHTML='<div class="empty">まだ記録がありません</div>';return;}
+  document.getElementById('history-list').innerHTML=records.map(r=>`<div class="history-item"><div><div class="history-date">${r.date}</div><div class="history-time">${r.inTime} → ${r.outTime}</div></div><div style="text-align:right"><div class="history-pay">¥${r.pay.toLocaleString()}</div>${r.fare>0?`<div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace">交通費 -¥${r.fare.toLocaleString()}</div>`:''}</div></div>`).join('');
 }
 
-function selectTool(id,btn){
-  document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('show'));
-  btn.classList.add('active');
-  document.getElementById('tool-'+id).classList.add('show');
-  if(id==='fare')calcMonthFare();
+// ========== SETTINGS ==========
+function saveSettings(){
+  const w=document.getElementById('set-wage').value;
+  if(!w){showToast('時給を入力してください');return;}
+  localStorage.setItem('wage',w);
+  localStorage.setItem('nightStart',document.getElementById('set-night-start').value||'22:00');
+  localStorage.setItem('nightRate',document.getElementById('set-night-rate').value||'0');
+  localStorage.setItem('payday',document.getElementById('set-payday').value||'25');
+  updateSettingsDisplay();
+  showToast('保存しました！');
 }
-
-function calcConverter(){
+function updateSettingsDisplay(){
   const s=getSettings();
-  const amt=parseFloat(document.getElementById('conv-amount').value)||0;
-  if(!amt){showToast('金額を入力してください');return;}
-  const h=amt/s.wage;
-  document.getElementById('conv-result').textContent=h.toFixed(1)+'時間分';
-  document.getElementById('conv-sub').textContent=`時給¥${s.wage.toLocaleString()}で計算`;
+  document.getElementById('set-wage').value=s.wage;
+  document.getElementById('set-night-start').value=s.nightStart;
+  document.getElementById('set-night-rate').value=s.nightRate;
+  document.getElementById('set-payday').value=s.payday;
+  document.getElementById('current-settings').innerHTML=`時給: ¥${s.wage.toLocaleString()}<br>深夜割増開始: ${s.nightStart}<br>割増率: ${s.nightRate}%<br>給料日: ${s.payday}日`;
 }
 
-function calcSimulate(){
-  const start=document.getElementById('sim-start').value;
-  const end=document.getElementById('sim-end').value;
-  const inT=new Date();const outT=new Date();
-  const[sh,sm]=start.split(':').map(Number);
-  const[eh,em]=end.split(':').map(Number);
-  inT.setHours(sh,sm,0);outT.setHours(eh,em,0);
-  if(outT<=inT)outT.setDate(outT.getDate()+1);
-  const pay=calcPay(inT,outT);
-  document.getElementById('sim-result').textContent='¥'+pay.total.toLocaleString();
-  document.getElementById('sim-sub').textContent=`通常¥${pay.normal.toLocaleString()} + 深夜¥${pay.night.toLocaleString()}`;
+// ========== TOOLS ==========
+function selectTool(id,btn){document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('show'));btn.classList.add('active');document.getElementById('tool-'+id).classList.add('show');if(id==='fare')calcMonthFare();}
+function calcConverter(){const s=getSettings();const amt=parseFloat(document.getElementById('conv-amount').value)||0;if(!amt)return;document.getElementById('conv-result').textContent=(amt/s.wage).toFixed(1)+'時間分';document.getElementById('conv-sub').textContent=`時給¥${s.wage.toLocaleString()}で計算`;}
+function calcSimulate(){const inT=new Date(),outT=new Date();const[sh,sm]=document.getElementById('sim-start').value.split(':').map(Number);const[eh,em]=document.getElementById('sim-end').value.split(':').map(Number);inT.setHours(sh,sm,0);outT.setHours(eh,em,0);if(outT<=inT)outT.setDate(outT.getDate()+1);const pay=calcPay(inT,outT);document.getElementById('sim-result').textContent='¥'+pay.total.toLocaleString();document.getElementById('sim-sub').textContent=`通常¥${pay.normal.toLocaleString()} + 深夜¥${pay.night.toLocaleString()}`;}
+function calcGoal(){const s=getSettings();const goal=parseFloat(document.getElementById('goal-amount').value)||0;if(!goal)return;const records=JSON.parse(localStorage.getItem('records')||'[]');const now=new Date();const monthPay=records.filter(r=>{const d=new Date(r.ts||r.date);return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();}).reduce((s,r)=>s+r.pay,0);const remaining=Math.max(0,goal-monthPay);document.getElementById('goal-result').textContent=(remaining/s.wage).toFixed(1)+'時間';document.getElementById('goal-sub').textContent=`目標まであと¥${remaining.toLocaleString()}（今月¥${monthPay.toLocaleString()}）`;}
+function calcNight(){const inT=new Date(),outT=new Date();const[sh,sm]=document.getElementById('night-start').value.split(':').map(Number);const[eh,em]=document.getElementById('night-end').value.split(':').map(Number);inT.setHours(sh,sm,0);outT.setHours(eh,em,0);if(outT<=inT)outT.setDate(outT.getDate()+1);const pay=calcPay(inT,outT);const s=getSettings();document.getElementById('night-result').textContent='¥'+pay.total.toLocaleString();document.getElementById('night-sub').textContent=`通常¥${pay.normal.toLocaleString()} / 深夜¥${pay.night.toLocaleString()} (+${s.nightRate}%)`;}
+function calcTakehome(){const s=getSettings();const fare=parseFloat(document.getElementById('th-fare').value)||0;const hours=parseFloat(document.getElementById('th-hours').value)||0;if(!hours)return;const gross=hours*s.wage;const net=gross-fare;document.getElementById('th-result').textContent='¥'+Math.round(net/hours).toLocaleString()+'/h';document.getElementById('th-sub').textContent=`¥${Math.round(gross).toLocaleString()} - ¥${fare.toLocaleString()} = ¥${Math.round(net).toLocaleString()}`;}
+function calcMonthFare(){const records=JSON.parse(localStorage.getItem('records')||'[]');const now=new Date();const month=records.filter(r=>{const d=new Date(r.ts||r.date);return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();});const total=month.reduce((s,r)=>s+(r.fare||0),0);document.getElementById('fare-month-result').textContent='¥'+total.toLocaleString();document.getElementById('fare-month-sub').textContent=`${now.getMonth()+1}月の累計（${month.filter(r=>r.fare>0).length}日分）`;}
+
+// ========== PAGE ==========
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  const tabs=['main','tools','history','settings','encyclopedia'];
+  const idx=tabs.indexOf(p);
+  if(idx<4)document.querySelectorAll('.tab')[idx].classList.add('active');
+  if(p==='history')renderHistory();
+  if(p==='settings'){updateSettingsDisplay();renderTitle();}
+  if(p==='encyclopedia')renderEncyclopedia();
 }
 
-function calcGoal(){
-  const s=getSettings();
-  const goal=parseFloat(document.getElementById('goal-amount').value)||0;
-  if(!goal){showToast('目標額を入力してください');return;}
-  const records=JSON.parse(localStorage.getItem('records')||'[]');
-  const now=new Date();
-  const monthPay=records.filter(r=>{
-    const d=new Date(r.ts||r.date);
-    return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();
-  }).reduce((s,r)=>s+r.pay,0);
-  const remaining=Math.max(0,goal-monthPay);
-  const hours=remaining/s.wage;
-  document.getElementById('goal-result').textContent=hours.toFixed(1)+'時間';
-  document.getElementById('goal-sub').textContent=`目標まであと¥${remaining.toLocaleString()}（今月¥${monthPay.toLocaleString()}）`;
+// ========== GOOGLE TRANSLATE ==========
+function googleTranslateElementInit(){
+  new google.translate.TranslateElement({pageLanguage:'ja',includedLanguages:'en,zh-CN,zh-TW,ko,es,pt,fr,de,th,vi',layout:google.translate.TranslateElement.InlineLayout.SIMPLE},'google_translate_element');
 }
 
-function calcNight(){
-  const s=getSettings();
-  const start=document.getElementById('night-start').value;
-  const end=document.getElementById('night-end').value;
-  const inT=new Date();const outT=new Date();
-  const[sh,sm]=start.split(':').map(Number);
-  const[eh,em]=end.split(':').map(Number);
-  inT.setHours(sh,sm,0);outT.setHours(eh,em,0);
-  if(outT<=inT)outT.setDate(outT.getDate()+1);
-  const pay=calcPay(inT,outT);
-  document.getElementById('night-result').textContent='¥'+pay.total.toLocaleString();
-  document.getElementById('night-sub').textContent=`通常¥${pay.normal.toLocaleString()} 深夜¥${pay.night.toLocaleString()}（+${s.nightRate}%）`;
-}
-
-function calcTakehome(){
-  const s=getSettings();
-  const fare=parseFloat(document.getElementById('th-fare').value)||0;
-  const hours=parseFloat(document.getElementById('th-hours').value)||0;
-  if(!hours){showToast('勤務時間を入力してください');return;}
-  const gross=hours*s.wage;
-  const net=gross-fare;
-  const realWage=net/hours;
-  document.getElementById('th-result').textContent='¥'+Math.round(realWage).toLocaleString()+'/h';
-  document.getElementById('th-sub').textContent=`日給¥${Math.round(gross).toLocaleString()} - 交通費¥${fare.toLocaleString()} = 実質¥${Math.round(net).toLocaleString()}`;
-}
-
-function calcMonthFare(){
-  const records=JSON.parse(localStorage.getItem('records')||'[]');
-  const now=new Date();
-  const month=records.filter(r=>{
-    const d=new Date(r.ts||r.date);
-    return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();
-  });
-  const total=month.reduce((s,r)=>s+(r.fare||0),0);
-  const count=month.filter(r=>r.fare>0).length;
-  document.getElementById('fare-month-result').textContent='¥'+total.toLocaleString();
-  document.getElementById('fare-month-sub').textContent=`${now.getMonth()+1}月の累計（${count}日分）`;
-}
-
-updateSettingsDisplay();
+// ========== INIT ==========
+window.onload=function(){
+  renderStreak();
+  renderTodayJoke();
+  renderTitle();
+  updateSettingsDisplay();
+  document.getElementById('dev-status-msg').textContent=DEV_STATUS_MSGS[Math.floor(Math.random()*DEV_STATUS_MSGS.length)];
+};
 </script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
