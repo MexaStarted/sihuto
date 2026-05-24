@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>シフトメモ</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;--border:#2e2e2e;
+  --accent:#c8f060;--text:#f0f0f0;--muted:#888;
+  --danger:#ff6b6b;
+}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;padding-bottom:40px}
+.app{max-width:420px;margin:0 auto;padding:16px}
+
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.logo{font-size:18px;font-weight:800;letter-spacing:-0.5px}
+.logo span{color:var(--accent)}
+.tab-bar{display:flex;gap:4px;background:var(--surface);border-radius:10px;padding:4px}
+.tab{padding:6px 12px;border-radius:7px;border:none;background:none;color:var(--muted);font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:.2s}
+.tab.active{background:var(--surface2);color:var(--text)}
+
+.page{display:none}.page.active{display:block}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px}
+.card-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;margin-right:8px;transition:.3s}
+.status-dot.active{background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.status-text{font-size:13px;color:var(--muted)}
+.status-row{display:flex;align-items:center;margin-bottom:16px}
+
+.timer{font-family:'DM Mono',monospace;font-size:48px;font-weight:500;color:var(--accent);letter-spacing:-2px;line-height:1;margin:8px 0 4px;transition:.3s}
+.timer.inactive{color:var(--muted);font-size:36px}
+.timer-sub{font-family:'DM Mono',monospace;font-size:13px;color:var(--muted)}
+
+.btn-primary{width:100%;padding:18px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:.15s;letter-spacing:0.5px}
+.btn-clock-in{background:var(--accent);color:#0f0f0f}
+.btn-clock-in:active{transform:scale(0.98)}
+.btn-clock-out{background:var(--danger);color:#fff}
+.btn-clock-out:active{transform:scale(0.98)}
+
+.result-card{background:linear-gradient(135deg,#1a2a0a,#0a2a1a);border:1px solid var(--accent);border-radius:16px;padding:20px;margin-bottom:12px;display:none}
+.result-card.show{display:block}
+.result-amount{font-family:'DM Mono',monospace;font-size:42px;font-weight:500;color:var(--accent);letter-spacing:-1px}
+.result-breakdown{margin-top:12px;display:flex;flex-direction:column;gap:4px}
+.breakdown-row{display:flex;justify-content:space-between;font-size:13px}
+.breakdown-label{color:var(--muted)}
+.breakdown-val{font-family:'DM Mono',monospace;color:var(--text)}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;outline:none;-webkit-appearance:none}
+.field input:focus{border-color:var(--accent)}
+.save-btn{width:100%;padding:14px;background:var(--accent);color:#0f0f0f;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
+
+.history-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.history-item:last-child{border-bottom:none}
+.history-date{font-size:13px;color:var(--muted)}
+.history-time{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px}
+.history-right{text-align:right}
+.history-pay{font-family:'DM Mono',monospace;font-size:16px;color:var(--accent)}
+.history-fare{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
+.month-total{display:flex;justify-content:space-between;align-items:center;padding:14px;background:var(--surface2);border-radius:10px;margin-bottom:12px}
+.month-total-label{font-size:12px;color:var(--muted);font-weight:600}
+.month-total-val{font-family:'DM Mono',monospace;font-size:20px;color:var(--accent)}
+
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.tool-btn{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 12px;cursor:pointer;text-align:left;transition:.15s;width:100%}
+.tool-btn:hover{border-color:var(--accent);background:var(--surface2)}
+.tool-btn.active{border-color:var(--accent);background:#1a2a0a}
+.tool-icon{font-size:20px;margin-bottom:6px}
+.tool-name{font-size:12px;font-weight:700;color:var(--text)}
+.tool-desc{font-size:10px;color:var(--muted);margin-top:2px}
+.tool-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;display:none}
+.tool-panel.show{display:block}
+.tool-result{font-family:'DM Mono',monospace;font-size:28px;color:var(--accent);margin:12px 0 4px}
+.tool-result-sub{font-size:12px;color:var(--muted)}
+.input-row{display:flex;gap:8px;margin-bottom:8px}
+.input-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:14px;outline:none;-webkit-appearance:none;min-width:0}
+.input-row input:focus{border-color:var(--accent)}
+.calc-btn{background:var(--accent);color:#0f0f0f;border:none;border-radius:8px;padding:10px 16px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+
+.fare-section{margin-top:12px}
+.fare-input-row{display:flex;gap:8px}
+.fare-input-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;outline:none;-webkit-appearance:none}
+.fare-input-row input:focus{border-color:var(--accent)}
+.fare-save-btn{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.fare-hint{font-size:11px;color:var(--muted);margin-top:6px}
+
+.empty{text-align:center;padding:32px;color:var(--muted);font-size:13px}
+.settings-current{font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);line-height:2}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--accent);color:#0f0f0f;padding:10px 24px;border-radius:8px;font-weight:700;font-size:14px;transition:.3s;z-index:999;opacity:0}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <div class="logo">シフト<span>メモ</span></div>
+    <div class="tab-bar">
+      <button class="tab active" onclick="showPage('main')">打刻</button>
+      <button class="tab" onclick="showPage('tools')">ツール</button>
+      <button class="tab" onclick="showPage('history')">履歴</button>
+      <button class="tab" onclick="showPage('settings')">設定</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="page active" id="page-main">
+    <div class="card">
+      <div class="status-row">
+        <span class="status-dot" id="status-dot"></span>
+        <span class="status-text" id="status-text">未出勤</span>
+      </div>
+      <div class="card-label">経過時間</div>
+      <div class="timer inactive" id="timer-display">-- : -- : --</div>
+      <div class="timer-sub" id="clock-in-time"></div>
+    </div>
+
+    <div class="result-card" id="result-card">
+      <div class="card-label">本日の日給</div>
+      <div class="result-amount" id="result-amount">¥0</div>
+      <div class="result-breakdown" id="result-breakdown"></div>
+    </div>
+
+    <button class="btn-primary btn-clock-in" id="main-btn" onclick="toggleClock()">出勤する</button>
+
+    <div class="fare-section">
+      <div class="card-label" style="margin-bottom:8px">交通費（本日）</div>
+      <div class="fare-input-row">
+        <input type="number" id="fare-input" placeholder="0円" inputmode="numeric">
+        <button class="fare-save-btn" onclick="saveFare()">保存</button>
+      </div>
+      <div class="fare-hint">退勤時に日給から差し引かれます</div>
+    </div>
+  </div>
+
+  <!-- TOOLS -->
+  <div class="page" id="page-tools">
+    <div class="tool-grid">
+      <button class="tool-btn" onclick="selectTool('converter',this)">
+        <div class="tool-icon">💴</div>
+        <div class="tool-name">時給換算</div>
+        <div class="tool-desc">何時間分？</div>
+      </button>
+      <button class="tool-btn" onclick="selectTool('simulate',this)">
+        <div class="tool-icon">📊</div>
+        <div class="tool-name">日給シミュ</div>
+        <div class="tool-desc">今日いくら？</div>
+      </button>
+      <button class="tool-btn" onclick="selectTool('goal',this)">
+        <div class="tool-icon">🎯</div>
+        <div class="tool-name">目標時間</div>
+        <div class="tool-desc">あと何時間？</div>
+      </button>
+      <button class="tool-btn" onclick="selectTool('night',this)">
+        <div class="tool-icon">🌙</div>
+        <div class="tool-name">深夜計算</div>
+        <div class="tool-desc">割増を計算</div>
+      </button>
+      <button class="tool-btn" onclick="selectTool('takehome',this)">
+        <div class="tool-icon">🏠</div>
+        <div class="tool-name">実質時給</div>
+        <div class="tool-desc">交通費引き後</div>
+      </button>
+      <button class="tool-btn" onclick="selectTool('fare',this)">
+        <div class="tool-icon">🚃</div>
+        <div class="tool-name">月交通費</div>
+        <div class="tool-desc">累計を確認</div>
+      </button>
+    </div>
+
+    <div class="tool-panel" id="tool-converter">
+      <div class="card-label">金額 → 何時間分？</div>
+      <div class="input-row">
+        <input type="number" id="conv-amount" placeholder="金額（円）" inputmode="numeric">
+        <button class="calc-btn" onclick="calcConverter()">計算</button>
+      </div>
+      <div class="tool-result" id="conv-result">--</div>
+      <div class="tool-result-sub" id="conv-sub"></div>
+    </div>
+
+    <div class="tool-panel" id="tool-simulate">
+      <div class="card-label">勤務予定時間を入力</div>
+      <div class="input-row">
+        <input type="time" id="sim-start" value="09:00">
+        <input type="time" id="sim-end" value="18:00">
+        <button class="calc-btn" onclick="calcSimulate()">計算</button>
+      </div>
+      <div class="tool-result" id="sim-result">--</div>
+      <div class="tool-result-sub" id="sim-sub"></div>
+    </div>
+
+    <div class="tool-panel" id="tool-goal">
+      <div class="card-label">目標金額を入力</div>
+      <div class="input-row">
+        <input type="number" id="goal-amount" placeholder="目標額（円）" inputmode="numeric">
+        <button class="calc-btn" onclick="calcGoal()">計算</button>
+      </div>
+      <div class="tool-result" id="goal-result">--</div>
+      <div class="tool-result-sub" id="goal-sub"></div>
+    </div>
+
+    <div class="tool-panel" id="tool-night">
+      <div class="card-label">勤務時間を入力</div>
+      <div class="input-row">
+        <input type="time" id="night-start" value="20:00">
+        <input type="time" id="night-end" value="02:00">
+        <button class="calc-btn" onclick="calcNight()">計算</button>
+      </div>
+      <div class="tool-result" id="night-result">--</div>
+      <div class="tool-result-sub" id="night-sub"></div>
+    </div>
+
+    <div class="tool-panel" id="tool-takehome">
+      <div class="card-label">交通費と勤務時間を入力</div>
+      <div class="input-row">
+        <input type="number" id="th-fare" placeholder="交通費（円）" inputmode="numeric">
+        <input type="number" id="th-hours" placeholder="時間（h）" inputmode="decimal">
+        <button class="calc-btn" onclick="calcTakehome()">計算</button>
+      </div>
+      <div class="tool-result" id="th-result">--</div>
+      <div class="tool-result-sub" id="th-sub"></div>
+    </div>
+
+    <div class="tool-panel" id="tool-fare">
+      <div class="card-label">今月の交通費合計</div>
+      <div class="tool-result" id="fare-month-result">--</div>
+      <div class="tool-result-sub" id="fare-month-sub"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="page" id="page-history">
+    <div class="month-total">
+      <div>
+        <div class="month-total-label">今月の合計給与</div>
+        <div style="font-size:11px;color:var(--muted)" id="history-month-label"></div>
+      </div>
+      <div class="month-total-val" id="month-total-val">¥0</div>
+    </div>
+    <div class="card" id="history-list">
+      <div class="empty">まだ記録がありません</div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="card">
+      <div class="card-label" style="margin-bottom:16px">基本設定</div>
+      <div class="field">
+        <label>時給（円）</label>
+        <input type="number" id="set-wage" placeholder="例：1200" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label>深夜割増 開始時間</label>
+        <input type="time" id="set-night-start" value="22:00">
+      </div>
+      <div class="field">
+        <label>深夜割増率（%）　割増なし→0</label>
+        <input type="number" id="set-night-rate" placeholder="例：25" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label>給料日（日）</label>
+        <input type="number" id="set-payday" placeholder="例：25" min="1" max="31" inputmode="numeric">
+      </div>
+      <button class="save-btn" onclick="saveSettings()">保存する</button>
+    </div>
+    <div class="card">
+      <div class="card-label">現在の設定</div>
+      <div class="settings-current" id="current-settings"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let clockedIn=false,clockInTime=null,timerInterval=null,todayFare=0;
+
+function getSettings(){
+  return{
+    wage:parseInt(localStorage.getItem('wage')||'1000'),
+    nightStart:localStorage.getItem('nightStart')||'22:00',
+    nightRate:parseInt(localStorage.getItem('nightRate')||'25'),
+    payday:parseInt(localStorage.getItem('payday')||'25')
+  };
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+function saveSettings(){
+  const w=document.getElementById('set-wage').value;
+  const ns=document.getElementById('set-night-start').value;
+  const nr=document.getElementById('set-night-rate').value;
+  const pd=document.getElementById('set-payday').value;
+  if(!w){showToast('時給を入力してください');return;}
+  localStorage.setItem('wage',w);
+  localStorage.setItem('nightStart',ns||'22:00');
+  localStorage.setItem('nightRate',nr||'0');
+  localStorage.setItem('payday',pd||'25');
+  updateSettingsDisplay();
+  showToast('保存しました！');
+}
+
+function updateSettingsDisplay(){
+  const s=getSettings();
+  document.getElementById('set-wage').value=s.wage;
+  document.getElementById('set-night-start').value=s.nightStart;
+  document.getElementById('set-night-rate').value=s.nightRate;
+  document.getElementById('set-payday').value=s.payday;
+  document.getElementById('current-settings').innerHTML=
+    `時給: ¥${s.wage.toLocaleString()}<br>深夜割増開始: ${s.nightStart}<br>割増率: ${s.nightRate}%<br>給料日: ${s.payday}日`;
+}
+
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  const tabs=['main','tools','history','settings'];
+  document.querySelectorAll('.tab')[tabs.indexOf(p)].classList.add('active');
+  if(p==='history')renderHistory();
+  if(p==='settings')updateSettingsDisplay();
+}
+
+function pad(n){return String(n).padStart(2,'0')}
+function formatTime(ms){
+  const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);
+  return`${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+
+function toggleClock(){
+  const s=getSettings();
+  if(s.wage<=0){showToast('先に設定で時給を入力してください');showPage('settings');return;}
+  if(!clockedIn){
+    clockedIn=true;clockInTime=new Date();todayFare=0;
+    document.getElementById('fare-input').value='';
+    document.getElementById('status-dot').classList.add('active');
+    document.getElementById('status-text').textContent='出勤中';
+    document.getElementById('main-btn').textContent='退勤する';
+    document.getElementById('main-btn').className='btn-primary btn-clock-out';
+    document.getElementById('timer-display').classList.remove('inactive');
+    document.getElementById('clock-in-time').textContent='出勤: '+clockInTime.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('result-card').classList.remove('show');
+    timerInterval=setInterval(()=>{
+      document.getElementById('timer-display').textContent=formatTime(new Date()-clockInTime);
+    },1000);
+    showToast('出勤を記録しました');
+  }else{
+    clockedIn=false;clearInterval(timerInterval);
+    const out=new Date();
+    const pay=calcPay(clockInTime,out);
+    showResult(pay);
+    saveHistory(clockInTime,out,pay);
+    document.getElementById('status-dot').classList.remove('active');
+    document.getElementById('status-text').textContent='退勤済み';
+    document.getElementById('main-btn').textContent='出勤する';
+    document.getElementById('main-btn').className='btn-primary btn-clock-in';
+    document.getElementById('clock-in-time').textContent='';
+    document.getElementById('timer-display').textContent='-- : -- : --';
+    document.getElementById('timer-display').classList.add('inactive');
+    showToast('お疲れさまでした！');
+  }
+}
+
+function calcPay(inTime,outTime){
+  const s=getSettings();
+  const nightH=parseInt(s.nightStart.split(':')[0]);
+  const nightM=parseInt(s.nightStart.split(':')[1]);
+  let normalMins=0,nightMins=0;
+  const totalMins=Math.round((outTime-inTime)/60000);
+  let cur=new Date(inTime);
+  for(let i=0;i<totalMins;i++){
+    const h=cur.getHours(),m=cur.getMinutes();
+    const afterNightStart=(h>nightH)||(h===nightH&&m>=nightM);
+    const beforeDawn=(h>=0&&h<5);
+    if(s.nightRate>0&&(afterNightStart||beforeDawn))nightMins++;else normalMins++;
+    cur=new Date(cur.getTime()+60000);
+  }
+  const normalPay=(normalMins/60)*s.wage;
+  const nightPay=(nightMins/60)*s.wage*(1+s.nightRate/100);
+  return{
+    normal:Math.round(normalPay),night:Math.round(nightPay),
+    total:Math.round(normalPay+nightPay-todayFare),
+    fare:todayFare,normalMins,nightMins,wage:s.wage,rate:s.nightRate
+  };
+}
+
+function showResult(pay){
+  document.getElementById('result-card').classList.add('show');
+  document.getElementById('result-amount').textContent='¥'+pay.total.toLocaleString();
+  let html=`<div class="breakdown-row"><span class="breakdown-label">通常 ${Math.floor(pay.normalMins/60)}h${pay.normalMins%60}m</span><span class="breakdown-val">¥${pay.normal.toLocaleString()}</span></div>`;
+  if(pay.nightMins>0)html+=`<div class="breakdown-row"><span class="breakdown-label">深夜割増 ${Math.floor(pay.nightMins/60)}h${pay.nightMins%60}m (+${pay.rate}%)</span><span class="breakdown-val">¥${pay.night.toLocaleString()}</span></div>`;
+  if(pay.fare>0)html+=`<div class="breakdown-row"><span class="breakdown-label">交通費</span><span class="breakdown-val" style="color:var(--danger)">-¥${pay.fare.toLocaleString()}</span></div>`;
+  document.getElementById('result-breakdown').innerHTML=html;
+}
+
+function saveFare(){
+  todayFare=parseInt(document.getElementById('fare-input').value)||0;
+  showToast('交通費 ¥'+todayFare.toLocaleString()+' を保存しました');
+}
+
+function saveHistory(inTime,outTime,pay){
+  const records=JSON.parse(localStorage.getItem('records')||'[]');
+  records.unshift({
+    date:inTime.toLocaleDateString('ja-JP'),
+    inTime:inTime.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}),
+    outTime:outTime.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}),
+    pay:pay.total,fare:pay.fare,
+    ts:inTime.getTime()
+  });
+  localStorage.setItem('records',JSON.stringify(records.slice(0,200)));
+}
+
+function renderHistory(){
+  const records=JSON.parse(localStorage.getItem('records')||'[]');
+  const now=new Date();
+  const monthStr=`${now.getFullYear()}年${now.getMonth()+1}月`;
+  document.getElementById('history-month-label').textContent=monthStr;
+  const monthRecords=records.filter(r=>{
+    const d=new Date(r.ts||r.date);
+    return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();
+  });
+  const total=monthRecords.reduce((s,r)=>s+r.pay,0);
+  document.getElementById('month-total-val').textContent='¥'+total.toLocaleString();
+  if(records.length===0){
+    document.getElementById('history-list').innerHTML='<div class="empty">まだ記録がありません</div>';
+    return;
+  }
+  document.getElementById('history-list').innerHTML=records.map(r=>`
+    <div class="history-item">
+      <div>
+        <div class="history-date">${r.date}</div>
+        <div class="history-time">${r.inTime} → ${r.outTime}</div>
+      </div>
+      <div class="history-right">
+        <div class="history-pay">¥${r.pay.toLocaleString()}</div>
+        ${r.fare>0?`<div class="history-fare">交通費 -¥${r.fare.toLocaleString()}</div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function selectTool(id,btn){
+  document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('show'));
+  btn.classList.add('active');
+  document.getElementById('tool-'+id).classList.add('show');
+  if(id==='fare')calcMonthFare();
+}
+
+function calcConverter(){
+  const s=getSettings();
+  const amt=parseFloat(document.getElementById('conv-amount').value)||0;
+  if(!amt){showToast('金額を入力してください');return;}
+  const h=amt/s.wage;
+  document.getElementById('conv-result').textContent=h.toFixed(1)+'時間分';
+  document.getElementById('conv-sub').textContent=`時給¥${s.wage.toLocaleString()}で計算`;
+}
+
+function calcSimulate(){
+  const start=document.getElementById('sim-start').value;
+  const end=document.getElementById('sim-end').value;
+  const inT=new Date();const outT=new Date();
+  const[sh,sm]=start.split(':').map(Number);
+  const[eh,em]=end.split(':').map(Number);
+  inT.setHours(sh,sm,0);outT.setHours(eh,em,0);
+  if(outT<=inT)outT.setDate(outT.getDate()+1);
+  const pay=calcPay(inT,outT);
+  document.getElementById('sim-result').textContent='¥'+pay.total.toLocaleString();
+  document.getElementById('sim-sub').textContent=`通常¥${pay.normal.toLocaleString()} + 深夜¥${pay.night.toLocaleString()}`;
+}
+
+function calcGoal(){
+  const s=getSettings();
+  const goal=parseFloat(document.getElementById('goal-amount').value)||0;
+  if(!goal){showToast('目標額を入力してください');return;}
+  const records=JSON.parse(localStorage.getItem('records')||'[]');
+  const now=new Date();
+  const monthPay=records.filter(r=>{
+    const d=new Date(r.ts||r.date);
+    return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();
+  }).reduce((s,r)=>s+r.pay,0);
+  const remaining=Math.max(0,goal-monthPay);
+  const hours=remaining/s.wage;
+  document.getElementById('goal-result').textContent=hours.toFixed(1)+'時間';
+  document.getElementById('goal-sub').textContent=`目標まであと¥${remaining.toLocaleString()}（今月¥${monthPay.toLocaleString()}）`;
+}
+
+function calcNight(){
+  const s=getSettings();
+  const start=document.getElementById('night-start').value;
+  const end=document.getElementById('night-end').value;
+  const inT=new Date();const outT=new Date();
+  const[sh,sm]=start.split(':').map(Number);
+  const[eh,em]=end.split(':').map(Number);
+  inT.setHours(sh,sm,0);outT.setHours(eh,em,0);
+  if(outT<=inT)outT.setDate(outT.getDate()+1);
+  const pay=calcPay(inT,outT);
+  document.getElementById('night-result').textContent='¥'+pay.total.toLocaleString();
+  document.getElementById('night-sub').textContent=`通常¥${pay.normal.toLocaleString()} 深夜¥${pay.night.toLocaleString()}（+${s.nightRate}%）`;
+}
+
+function calcTakehome(){
+  const s=getSettings();
+  const fare=parseFloat(document.getElementById('th-fare').value)||0;
+  const hours=parseFloat(document.getElementById('th-hours').value)||0;
+  if(!hours){showToast('勤務時間を入力してください');return;}
+  const gross=hours*s.wage;
+  const net=gross-fare;
+  const realWage=net/hours;
+  document.getElementById('th-result').textContent='¥'+Math.round(realWage).toLocaleString()+'/h';
+  document.getElementById('th-sub').textContent=`日給¥${Math.round(gross).toLocaleString()} - 交通費¥${fare.toLocaleString()} = 実質¥${Math.round(net).toLocaleString()}`;
+}
+
+function calcMonthFare(){
+  const records=JSON.parse(localStorage.getItem('records')||'[]');
+  const now=new Date();
+  const month=records.filter(r=>{
+    const d=new Date(r.ts||r.date);
+    return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();
+  });
+  const total=month.reduce((s,r)=>s+(r.fare||0),0);
+  const count=month.filter(r=>r.fare>0).length;
+  document.getElementById('fare-month-result').textContent='¥'+total.toLocaleString();
+  document.getElementById('fare-month-sub').textContent=`${now.getMonth()+1}月の累計（${count}日分）`;
+}
+
+updateSettingsDisplay();
+</script>
+</body>
+</html>
