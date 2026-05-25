@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>開発者の現在</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZETCCQQ8M3"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-ZETCCQQ8M3');</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a12;--surface:#15161a;--surface2:#1a1a26;--border:#2e2e3e;--accent:#c8f060;--text:#f0f0f0;--muted:#888;--danger:#ff6b6b;--dev:#c8f060;--ufo:#5dca8a;--cat:#ffd97a;--frog:#7ad5ff;}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
+.game{max-width:480px;margin:0 auto;min-height:100vh;position:relative}
+.pixel{image-rendering:pixelated;image-rendering:crisp-edges}
+
+/* ===== ANIMATIONS ===== */
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes bobS{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes knockback{0%{transform:translateX(0)}25%{transform:translateX(16px) rotate(4deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes knockbackE{0%{transform:translateX(0)}25%{transform:translateX(-18px) rotate(-4deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes dmgFloat{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-40px);opacity:0}}
+@keyframes flashW{0%,100%{opacity:0}50%{opacity:0.85}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes partBurst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
+@keyframes glow{0%,100%{text-shadow:0 0 6px currentColor}50%{text-shadow:0 0 16px currentColor}}
+@keyframes zoomBurst{0%{transform:scale(0.3);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+
+/* ===== SCREENS ===== */
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex;animation:fadeIn 0.4s}
+
+/* TITLE */
+#screen-title{align-items:center;justify-content:center;text-align:center;padding:30px 20px;position:relative}
+.title-bg{position:absolute;inset:0;background:#0a0a14;display:flex;align-items:center;justify-content:center;color:#444;font-size:11px;z-index:0}
+.title-content{position:relative;z-index:1}
+.title-logo{font-size:34px;font-weight:800;letter-spacing:-1px;margin-bottom:6px;color:var(--accent);animation:glow 3s infinite}
+.title-sub{font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:40px}
+.title-btn{display:block;width:220px;padding:14px;margin:8px auto;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
+.title-btn.new{background:var(--accent);color:#0a0a12}
+.title-btn.cont{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.title-btn.link{background:none;color:var(--muted);font-size:12px;border:1px solid var(--border)}
+.title-foot{position:absolute;bottom:14px;font-size:9px;color:#555;font-family:'DM Mono',monospace}
+
+/* NEWS (章あらすじ) */
+#screen-news{align-items:center;justify-content:center;padding:24px}
+.news-box{background:var(--surface);border:0.5px solid var(--border);border-radius:14px;padding:22px;width:100%;animation:slideUp 0.5s}
+.news-tag{display:inline-block;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:5px;margin-bottom:12px;letter-spacing:1px}
+.news-headline{font-size:18px;font-weight:800;line-height:1.5;margin-bottom:14px}
+.news-body{font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:20px}
+.news-chapter{font-size:10px;color:var(--accent);font-family:'DM Mono',monospace;letter-spacing:1px;margin-bottom:8px}
+
+/* ENEMY INTRO (図鑑風) */
+.enemy-intro{background:var(--surface);border:2px solid var(--danger);border-radius:14px;padding:18px;width:100%;animation:zoomBurst 0.5s}
+.enemy-intro-img{width:90px;height:90px;margin:0 auto 12px;border:1px dashed #5a3a3a;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#a66;text-align:center;background:#1a0a0a}
+.enemy-intro-name{font-size:18px;font-weight:800;text-align:center;color:var(--danger);margin-bottom:10px}
+.enemy-profile{font-size:11px;line-height:2;color:var(--text)}
+.enemy-profile .lbl{color:var(--muted);display:inline-block;width:75px}
+
+/* BATTLE */
+#screen-battle{padding:0}
+.battle-field{position:relative;min-height:230px;background:#0a0a14;overflow:hidden}
+.battle-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#444;font-size:10px;z-index:0}
+.enemy-zone{position:absolute;top:16px;right:20px;text-align:center;z-index:2}
+.enemy-sprite{width:84px;height:84px;border:1px dashed #6a4a4a;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#a66;text-align:center;background:rgba(40,20,20,0.6);line-height:1.3}
+.enemy-sprite.hit{animation:knockbackE 0.5s}
+.enemy-name-tag{font-size:10px;color:var(--danger);margin-top:4px;font-weight:700}
+.enemy-hp-track{width:90px;height:6px;background:#2e2e2e;border-radius:3px;margin-top:3px;overflow:hidden}
+.enemy-hp-fill{height:100%;background:var(--danger);transition:width 0.4s}
+.party-zone{position:absolute;bottom:12px;left:10px;right:10px;display:flex;justify-content:space-around;align-items:flex-end;z-index:2}
+.char{text-align:center;position:relative}
+.char-sprite{width:46px;height:54px;border:1px dashed #4a4a5a;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:8px;text-align:center;background:rgba(20,20,40,0.6);line-height:1.2}
+.char.bobbing .char-sprite{animation:bob 1.6s ease-in-out infinite}
+.char.bobbing2 .char-sprite{animation:bobS 2s ease-in-out infinite}
+.char.hit .char-sprite{animation:knockback 0.5s}
+.char.active-turn::after{content:'▲';position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);color:var(--accent);font-size:10px;animation:blink 0.8s infinite}
+.char.dead .char-sprite{opacity:0.3;filter:grayscale(1)}
+.char-name{font-size:8px;margin-top:3px}
+.dmg-num{position:absolute;font-size:22px;font-weight:800;font-family:'DM Mono',monospace;z-index:5;pointer-events:none;animation:dmgFloat 1s forwards}
+.dmg-num.crit{font-size:30px;color:#FFD700}
+.dmg-num.normal{color:#fff}
+.dmg-num.miss{color:#5de5ff;font-size:16px}
+
+/* battle ui */
+.battle-ui{background:var(--surface);border-top:2px solid var(--border)}
+.party-hp-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:8px}
+.php{background:var(--surface2);border-radius:6px;padding:5px 8px}
+.php-top{display:flex;justify-content:space-between;font-size:9px;margin-bottom:3px}
+.php-name{font-weight:700}
+.php-val{color:var(--muted);font-family:'DM Mono',monospace}
+.php-track{height:4px;background:#2e2e2e;border-radius:2px;overflow:hidden}
+.php-fill{height:100%;transition:width 0.4s}
+.tension-wrap{padding:5px 10px;background:var(--surface2);margin:0 8px 8px;border-radius:6px}
+.tension-top{display:flex;justify-content:space-between;font-size:8px;color:#ff9dc0;margin-bottom:2px}
+.tension-track{height:5px;background:#2e2e2e;border-radius:3px;overflow:hidden}
+.tension-fill{height:100%;background:linear-gradient(90deg,#ff6b9d,#FFD700);transition:width 0.3s}
+
+/* message log */
+.battle-msg{padding:10px 14px;min-height:46px;font-size:12px;line-height:1.6;background:#12121c;border-top:1px solid var(--border);display:flex;align-items:center}
+.battle-msg .speaker{font-weight:700;margin-right:4px}
+
+/* command */
+.cmd-zone{padding:10px;background:var(--surface)}
+.cmd-label{font-size:9px;color:var(--muted);margin-bottom:6px}
+.cmd-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cmd-btn{padding:11px;border:0.5px solid var(--border);border-radius:8px;background:var(--surface2);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;text-align:center;color:var(--text)}
+.cmd-btn:active{transform:scale(0.97)}
+.cmd-btn.atk{border-color:var(--accent);color:var(--accent)}
+.cmd-btn.def{border-color:#5de5ff;color:#5de5ff}
+.cmd-btn.ult{border-color:#ff9dc0;color:#ff9dc0}
+.cmd-btn.run{color:var(--muted)}
+.cmd-btn:disabled{opacity:0.4;cursor:not-allowed}
+
+/* joke pick list */
+.joke-pick{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.joke-pick.show{display:flex}
+.joke-pick-box{width:100%;max-width:480px;background:var(--surface);border-top:2px solid var(--accent);border-radius:16px 16px 0 0;padding:16px;max-height:70vh;overflow-y:auto}
+.joke-pick-title{font-size:13px;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.joke-opt{background:var(--surface2);border:0.5px solid var(--border);border-radius:9px;padding:11px;margin-bottom:7px;cursor:pointer}
+.joke-opt:active{transform:scale(0.99)}
+.joke-opt-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.joke-opt-stars{font-size:10px}
+.joke-opt-attr{font-size:9px;padding:1px 7px;border-radius:4px;font-weight:700}
+.joke-opt-text{font-size:11px;color:var(--text);line-height:1.5}
+.joke-opt-pow{font-size:9px;color:var(--accent);font-family:'DM Mono',monospace;margin-top:3px}
+
+/* generic panel screens (status / notebook) */
+.panel{padding:16px;flex:1;overflow-y:auto}
+.panel-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.panel-back{background:var(--surface2);border:0.5px solid var(--border);border-radius:8px;padding:7px 12px;font-size:12px;color:var(--text);cursor:pointer;font-family:'Syne',sans-serif}
+.panel-title{font-size:18px;font-weight:800}
+.char-card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.char-card-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.char-card-img{width:48px;height:54px;border:1px dashed #4a4a5a;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#888;text-align:center;flex-shrink:0}
+.char-card-name{font-size:15px;font-weight:800}
+.char-card-role{font-size:10px;color:var(--muted)}
+.stat-row{display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:0.5px solid var(--border)}
+.stat-row .sv{font-family:'DM Mono',monospace;color:var(--accent)}
+.equip-jokes{margin-top:10px}
+.equip-slot{display:flex;justify-content:space-between;align-items:center;background:var(--surface2);border-radius:7px;padding:8px 10px;margin-bottom:5px;cursor:pointer}
+.equip-slot-info{font-size:10px;line-height:1.4}
+.equip-change{font-size:9px;color:var(--accent)}
+
+/* result */
+#screen-result{align-items:center;justify-content:center;padding:24px;text-align:center}
+.result-box{background:var(--surface);border:1px solid var(--accent);border-radius:16px;padding:24px;width:100%;animation:zoomBurst 0.5s}
+
+/* next preview */
+.next-box{background:var(--surface);border:0.5px solid var(--border);border-radius:14px;padding:20px;width:100%;text-align:center;animation:slideUp 0.5s}
+
+/* fx */
+#fx-flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:200}
+#fx-particles{position:fixed;inset:0;pointer-events:none;z-index:201}
+
+/* ADVENTURE */
+#screen-adv{padding:0}
+.adv-field{position:relative;flex:1;min-height:62vh;overflow:hidden}
+.adv-bg{position:absolute;inset:0;z-index:0}
+.adv-counter{position:absolute;top:10px;right:12px;font-size:9px;color:#ccc;background:rgba(0,0,0,0.45);padding:3px 10px;border-radius:10px;z-index:3}
+.adv-chars{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:space-around;align-items:flex-end;z-index:2}
+.adv-char{text-align:center;transition:.3s}
+.adv-char .em{font-size:30px;line-height:1;transition:.3s}
+.adv-char.speaking .em{font-size:46px}
+.adv-char.dim{opacity:0.45}
+.adv-char-name{font-size:8px;margin-top:2px}
+.adv-textbox{background:#12121c;border-top:2px solid var(--accent);padding:14px 16px;min-height:96px;position:relative;cursor:pointer}
+.adv-speaker{font-size:12px;font-weight:700;margin-bottom:6px}
+.adv-text{font-size:14px;line-height:1.7;color:var(--text)}
+.adv-tap{position:absolute;bottom:8px;right:14px;font-size:12px;color:var(--accent);animation:blink 1s infinite}
+
+/* battle bg types (絵文字アクセント用ベース) */
+.bg-town{background:linear-gradient(180deg,#1a1a3e,#2a1a4e 60%,#1a0a2e)}
+.bg-sns{background:linear-gradient(180deg,#0a2a3e,#1a3a4e 60%,#0a1a2e)}
+.bg-server{background:linear-gradient(180deg,#0a1a2e,#0a2e2e 60%,#001a1a)}
+.bg-mystic{background:radial-gradient(ellipse at 50% 40%,#2a3a1e,#1a2a1e 60%,#0a1a0a)}
+.bg-void{background:radial-gradient(ellipse at 50% 40%,#3a0a4e,#1a0a2e 70%,#0a0014)}
+.bg-cosmos{background:radial-gradient(ellipse at center,#2a0a5e,#10002e 60%,#000010)}
+.bg-acc{position:absolute;pointer-events:none}
+.bg-twinkle{animation:blink 2s infinite}
+
+.btn-primary{display:block;width:100%;max-width:260px;margin:14px auto 0;padding:14px;border:none;border-radius:10px;background:var(--accent);color:#0a0a12;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--accent);color:#0a0a12;padding:10px 22px;border-radius:8px;font-weight:700;font-size:13px;transition:.3s;z-index:300;opacity:0;text-align:center;max-width:90%}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+</style>
+</head>
+<body>
+<div class="game">
+
+<!-- ===== TITLE ===== -->
+<div class="screen active" id="screen-title">
+  <div class="title-bg">［背景01：主人公の家 — あなたが用意］</div>
+  <div class="title-content">
+    <div class="title-logo">開発者の現在</div>
+    <div class="title-sub">DEVELOPER'S PRESENT</div>
+    <button class="title-btn new" onclick="startNewGame()">▶ はじめから</button>
+    <button class="title-btn cont" id="continue-btn" onclick="continueGame()" style="display:none">つづきから</button>
+    <button class="title-btn link" onclick="openNotebookFromTitle()">📓 ネタ帳（技の付け替え）</button>
+    <button class="title-btn link" onclick="openStatusFromTitle()">📊 パーティ状況</button>
+    <button class="title-btn link" onclick="backToShiftMemo()">← ShiftMemoに戻る</button>
+  </div>
+  <div class="title-foot" id="title-foot">v1.0.0 — ShiftMemo連携</div>
+</div>
+
+<!-- ===== ADVENTURE (会話ラリー) ===== -->
+<div class="screen" id="screen-adv">
+  <div class="adv-field" id="adv-field">
+    <div class="adv-bg" id="adv-bg"></div>
+    <div class="adv-counter" id="adv-counter">会話 1 / 20</div>
+    <div class="adv-chars" id="adv-chars"></div>
+  </div>
+  <div class="adv-textbox" id="adv-textbox" onclick="advNext()">
+    <div class="adv-speaker" id="adv-speaker">開発者</div>
+    <div class="adv-text" id="adv-text"></div>
+    <div class="adv-tap" id="adv-tap">▼ タップ</div>
+  </div>
+</div>
+
+<!-- ===== ENEMY INTRO ===== -->
+<div class="screen" id="screen-enemy-intro">
+  <div style="padding:24px;display:flex;align-items:center;justify-content:center;flex:1">
+    <div class="enemy-intro">
+      <div class="enemy-intro-img" id="ei-img">［敵立ち絵］</div>
+      <div class="enemy-intro-name" id="ei-name"></div>
+      <div class="enemy-profile" id="ei-profile"></div>
+      <button class="btn-primary" onclick="startBattle()">▶ レスバ開始</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BATTLE ===== -->
+<div class="screen" id="screen-battle">
+  <div class="battle-field" id="battle-field">
+    <div class="battle-bg" id="battle-bg">［背景：あなたが用意］</div>
+    <div class="enemy-zone">
+      <div class="enemy-sprite" id="enemy-sprite">［敵立ち絵］</div>
+      <div class="enemy-name-tag" id="enemy-name-tag">-</div>
+      <div class="enemy-hp-track"><div class="enemy-hp-fill" id="enemy-hp-fill" style="width:100%"></div></div>
+    </div>
+    <div class="party-zone" id="party-zone"></div>
+  </div>
+  <div class="battle-ui">
+    <div class="party-hp-grid" id="party-hp-grid"></div>
+    <div class="tension-wrap">
+      <div class="tension-top"><span>テンション（場の空気）🔥</span><span id="tension-pct">0%</span></div>
+      <div class="tension-track"><div class="tension-fill" id="tension-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="battle-msg" id="battle-msg"><span>レスバが始まった…！</span></div>
+  <div class="cmd-zone" id="cmd-zone">
+    <div class="cmd-label" id="cmd-label">- のターン ▶ コマンドを選べ</div>
+    <div class="cmd-grid">
+      <button class="cmd-btn atk" onclick="cmdAttack()">💬 レスバ</button>
+      <button class="cmd-btn def" onclick="cmdDefend()">🛡 言い訳</button>
+      <button class="cmd-btn ult" id="ult-btn" onclick="cmdUltimate()">✨ 神ジョーク</button>
+      <button class="cmd-btn run" onclick="cmdRun()">🏃 逃げる</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STATUS ===== -->
+<div class="screen" id="screen-status">
+  <div class="panel">
+    <div class="panel-head">
+      <button class="panel-back" onclick="closePanel()">← 戻る</button>
+      <div class="panel-title">パーティ状況</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.6">ステータスはShiftMemoのプレイヤーレベルで決まります。仲間はHP・防御以外は開発者の半分。</div>
+    <div id="status-cards"></div>
+  </div>
+</div>
+
+<!-- ===== NOTEBOOK (技付け替え) ===== -->
+<div class="screen" id="screen-notebook">
+  <div class="panel">
+    <div class="panel-head">
+      <button class="panel-back" onclick="closePanel()">← 戻る</button>
+      <div class="panel-title">ネタ帳（技の付け替え）</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.6">ShiftMemoで集めたジョークが技になります。各キャラに4つまで装備。タップで付け替え。</div>
+    <div id="notebook-content"></div>
+  </div>
+</div>
+
+<!-- ===== RESULT ===== -->
+<div class="screen" id="screen-result">
+  <div class="result-box" id="result-box"></div>
+</div>
+
+<!-- ===== NEXT PREVIEW ===== -->
+<div class="screen" id="screen-next">
+  <div style="padding:24px;display:flex;align-items:center;justify-content:center;flex:1">
+    <div class="next-box">
+      <div style="font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:10px">NEXT — 次回予告</div>
+      <div style="font-size:14px;line-height:1.8;margin-bottom:20px" id="next-text"></div>
+      <button class="btn-primary" onclick="afterNext()">▶ 次の章へ</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- JOKE PICK -->
+<div class="joke-pick" id="joke-pick">
+  <div class="joke-pick-box">
+    <div class="joke-pick-title"><span id="joke-pick-name">技を選ぶ</span><span onclick="closeJokePick()" style="cursor:pointer;color:var(--muted)">✕</span></div>
+    <div id="joke-pick-list"></div>
+  </div>
+</div>
+
+<div id="fx-flash"></div>
+<div id="fx-particles"></div>
+<div class="toast" id="toast"></div>
+<script>
+// ============ SHIFTMEMO 連携 ============
+// 同一ドメインなのでlocalStorageを共有。ShiftMemoのキーを読む
+function smGetLevel(){
+  // ShiftMemoのexpからレベルを再計算（同じロジック）
+  const exp=parseInt(localStorage.getItem('exp')||'0');
+  let lv=1;const tot=l=>{let t=0;for(let i=1;i<l;i++)t+=i*100;return t;};
+  while(lv<100&&exp>=tot(lv+1))lv++;
+  return lv;
+}
+function smGetCollected(){try{return JSON.parse(localStorage.getItem('collected')||'[]');}catch(e){return [];}}
+
+// RPG側のジョーク図鑑（ShiftMemoと共有のcollectedを使う）＋RPG初期付与
+const RPG_PROGRESS_KEY='rpg_progress';
+function rpgLoad(){try{return JSON.parse(localStorage.getItem(RPG_PROGRESS_KEY)||'null');}catch(e){return null;}}
+function rpgSave(d){localStorage.setItem(RPG_PROGRESS_KEY,JSON.stringify(d));}
+
+// ============ ジョーク（技）データ ============
+// ShiftMemoのJOKESと同じidを参照しつつ、RPG用に属性と威力を付与
+// 属性: 自虐/皮肉/ダジャレ/哲学/メタ/下ネタ
+const ATTR={jigyaku:{n:'自虐',c:'#5dca8a'},hiniku:{n:'皮肉',c:'#ff9dc0'},dajare:{n:'ダジャレ',c:'#ffd97a'},tetsugaku:{n:'哲学',c:'#cb8aff'},meta:{n:'メタ',c:'#5de5ff'},shimo:{n:'下ネタ',c:'#ff8c8c'}};
+
+// RPG用ジョーク技マスター（ShiftMemoのジョーク数と独立。idはrを付ける）
+// 威力 = ☆レベル基準（star*基礎）＋ステ。属性で相性
+const SKILLS=[
+  // ☆1（初期付与4つ＝開発者の初期装備。初回起動でcollectedにも追加）
+  {id:'s1',star:1,attr:'jigyaku',ja:'どうせ俺なんて無職寸前だし',pow:10},
+  {id:'s2',star:1,attr:'hiniku',ja:'お前のセンス、令和に置いてきた？',pow:10},
+  {id:'s3',star:1,attr:'dajare',ja:'布団がふっとんだ！どう、効いた？',pow:10},
+  {id:'s4',star:1,attr:'meta',ja:'これゲームだから俺は負けない設定',pow:10},
+  // ☆2
+  {id:'s5',star:2,attr:'jigyaku',ja:'貯金残高？　見ないことで守ってる',pow:18},
+  {id:'s6',star:2,attr:'hiniku',ja:'その理論、義務教育で習った？',pow:18},
+  {id:'s7',star:2,attr:'dajare',ja:'家賃がカチン!と来たわ',pow:18},
+  {id:'s8',star:2,attr:'tetsugaku',ja:'働くとは何か、君は考えたことが？',pow:18},
+  // ☆3
+  {id:'s9',star:3,attr:'hiniku',ja:'論破された顔、スクショしていい？',pow:28},
+  {id:'s10',star:3,attr:'meta',ja:'作者、ここのセリフ手抜きしてるぞ',pow:28},
+  {id:'s11',star:3,attr:'jigyaku',ja:'底辺だけど、底があるだけマシ',pow:28},
+  // ☆4
+  {id:'s12',star:4,attr:'tetsugaku',ja:'時給で計れぬ価値を、君は知らない',pow:40},
+  {id:'s13',star:4,attr:'dajare',ja:'デバッグ中に、出っ歯食う愚',pow:40},
+  // ☆5
+  {id:'s14',star:5,attr:'hiniku',ja:'君の人生、無料版でも要らないな',pow:55},
+  {id:'s15',star:5,attr:'meta',ja:'第四の壁ごしに殴る、これ反則',pow:55},
+  // ☆6
+  {id:'s16',star:6,attr:'tetsugaku',ja:'存在とは家賃の支払いの連続である',pow:72},
+  {id:'s17',star:6,attr:'shimo',ja:'下ネタは封印してた…解禁するぞ',pow:72},
+  // ☆7
+  {id:'s18',star:7,attr:'tetsugaku',ja:'宇宙の真理：面白い奴だけが残る',pow:95},
+  // ☆8
+  {id:'s19',star:8,attr:'meta',ja:'これは作者の自己投影だと暴露する',pow:125},
+  // ☆9
+  {id:'s20',star:9,attr:'hiniku',ja:'お前の全存在、論破済みだ',pow:160},
+  // ☆10（神ジョーク級）
+  {id:'s21',star:10,attr:'tetsugaku',ja:'笑いとは、絶望に勝った者の証だ',pow:210}
+];
+const INITIAL_SKILLS=['s1','s2','s3','s4']; // 初回付与＝図鑑にも載る
+
+function getSkill(id){return SKILLS.find(s=>s.id===id);}
+function ownedSkills(){
+  const p=rpgLoad();
+  return (p&&p.ownedSkills)?p.ownedSkills:INITIAL_SKILLS.slice();
+}
+
+// ============ パーティ ============
+const PARTY_DEF=[
+  {id:'dev',name:'開発者',role:'主人公',emoji:'🧑‍💻',sprite:'［開発者］',color:'var(--dev)',full:true},
+  {id:'ufo',name:'UFO乗組員',role:'謎の宇宙人',emoji:'👽',sprite:'［UFO乗組員］',color:'var(--ufo)',full:false},
+  {id:'cat',name:'ねこ',role:'武闘派',emoji:'🐱',sprite:'［ねこ］',color:'var(--cat)',full:false},
+  {id:'frog',name:'かえる',role:'通訳・参謀',emoji:'🐸',sprite:'［かえる］',color:'var(--frog)',full:false}
+];
+
+// ステータス計算：ShiftMemoレベル基準
+function calcStats(charId){
+  const lv=smGetLevel();
+  const baseHP=80+lv*4;
+  const baseAtk=10+lv*2;
+  const baseDef=5+Math.floor(lv*1.2);
+  const baseSpd=8+Math.floor(lv*0.8);
+  const isFull=PARTY_DEF.find(c=>c.id===charId).full;
+  if(isFull){
+    return {hp:baseHP,maxhp:baseHP,atk:baseAtk,def:baseDef,spd:baseSpd};
+  }else{
+    // 仲間：HPと防御はそのまま、それ以外（atk/spd）は半分
+    return {hp:Math.round(baseHP*0.9),maxhp:Math.round(baseHP*0.9),atk:Math.round(baseAtk/2),def:baseDef,spd:Math.round(baseSpd/2)};
+  }
+}
+
+// 各キャラの装備技（4枠）
+function getEquipped(charId){
+  const p=rpgLoad();
+  if(p&&p.equipped&&p.equipped[charId])return p.equipped[charId];
+  return INITIAL_SKILLS.slice();
+}
+function setEquipped(charId,arr){
+  const p=rpgLoad()||{};
+  if(!p.equipped)p.equipped={};
+  p.equipped[charId]=arr;
+  rpgSave(p);
+}
+
+// キャラ別セリフ（性格づけ）
+const VOICE={
+  dev:{atk:['いくぞ…！','これでどうだ','まだ言い返せるか？'],hit:['ぐっ…','効くなぁ','まだ家賃が…'],crit:['決まった…！'],miss:['滑った…！？']},
+  ufo:{atk:['あうー！','あうあうー！！','あう？'],hit:['あうっ','あう〜…'],crit:['あうーーー！！'],miss:['あう…']},
+  cat:{atk:['いてまうぞコラ','なめんなや','行くで！'],hit:['ちっ…','痛いやんけ'],crit:['オラオラオラ！'],miss:['しゃーないなぁ']},
+  frog:{atk:['失礼いたします','参ります','恐れ入ります'],hit:['むっ','痛みますね'],crit:['お見事、と申しましょうか'],miss:['滑りましてございます']}
+};
+// かえるのUFO通訳
+const FROG_TRANSLATE=['ただいま彼は「家賃が宇宙から請求された」と申しております','彼は「お腹が空いた」と申しております','彼曰く「君の負けだ」とのことです','「もう帰りたい」だそうです'];
+</script>
+<script>
+// ============ 敵10体（第1章）============
+// 背景は絵文字アクセント＋CSSグラデのタイプ名で指定
+const ENEMIES=[
+  {id:1,name:'鬼大家',emoji:'👹',hp:120,atk:13,weak:'jigyaku',bg:'town',talk:20,
+    profile:[['好きなもの','家賃の振込通知'],['嫌いなもの','言い訳'],['ひとこと','「来月まで」は3回まで']]},
+  {id:2,name:'★1レビュアー',emoji:'😈',hp:150,atk:15,weak:'hiniku',bg:'sns',talk:8,
+    profile:[['好きなもの','低評価ボタン'],['嫌いなもの','反論'],['ひとこと','「期待外れ。星1。」']]},
+  {id:3,name:'無断転載マン',emoji:'🥷',hp:175,atk:17,weak:'meta',bg:'sns',talk:8,
+    profile:[['好きなもの','他人の成果'],['嫌いなもの','出典'],['ひとこと','「拾った物は俺の物」']]},
+  {id:4,name:'クレーマー',emoji:'🗣️',hp:200,atk:18,weak:'jigyaku',bg:'town',talk:8,
+    profile:[['好きなもの','責任者を呼ぶこと'],['嫌いなもの','正論'],['ひとこと','「誠意を見せろ」']]},
+  {id:5,name:'バグの化身',emoji:'👾',hp:240,atk:21,weak:'meta',bg:'server',talk:20,
+    profile:[['好きなもの','想定外の入力'],['嫌いなもの','例外処理'],['ひとこと','「NullPointer…」']]},
+  {id:6,name:'課金圧力デーモン',emoji:'💸',hp:265,atk:22,weak:'hiniku',bg:'server',talk:8,
+    profile:[['好きなもの','課金導線'],['嫌いなもの','無料勢'],['ひとこと','「今だけ80%オフ」']]},
+  {id:7,name:'炎上の精霊',emoji:'🔥',hp:290,atk:24,weak:'tetsugaku',bg:'mystic',talk:8,
+    profile:[['好きなもの','燃料投下'],['嫌いなもの','沈静化'],['ひとこと','「拡散希望」']]},
+  {id:8,name:'承認欲求の魔王',emoji:'👑',hp:320,atk:26,weak:'hiniku',bg:'mystic',talk:8,
+    profile:[['好きなもの','いいね'],['嫌いなもの','無反応'],['ひとこと','「バズりたい」']]},
+  {id:9,name:'虚無の使者',emoji:'🟣',hp:360,atk:28,weak:'tetsugaku',bg:'void',talk:8,
+    profile:[['好きなもの','静寂'],['嫌いなもの','あなたの笑顔'],['ひとこと','「…無。」']]},
+  {id:10,name:'観測者',emoji:'🕳️',hp:450,atk:30,weak:'meta',bg:'cosmos',talk:20,
+    profile:[['正体','宇宙的存在'],['目的','つまらぬ世界の消去'],['ひとこと','「面白さを、観測する」']]}
+];
+
+// ============ 会話ラリー ============
+// {who:キャラid or 'enemy', t:セリフ}。whoが'ufo'の次に'frog'で通訳を置くと自然
+// 20往復・8往復ぶんを用意。敵ごとにbeforeを使う
+const DIALOGUES={
+  1:[ // 鬼大家：20往復
+    {who:'dev',t:'家賃、また払えない…。無料アプリは作れるのに、なぜ金は作れないんだ。'},
+    {who:'frog',t:'落ち着いてください、開発者どの。まず深呼吸を。'},
+    {who:'ufo',t:'あうー！あうあうー！'},
+    {who:'frog',t:'彼は「家賃を宇宙に返品しては」と申しております。'},
+    {who:'cat',t:'あほか。そんなんでカネ湧いたら誰も苦労せんわ。'},
+    {who:'dev',t:'ねこ…お前、口は悪いけど正論だな。'},
+    {who:'cat',t:'おう。儂はヤクザやのうて、ただの口の悪い猫やからな。'},
+    {who:'frog',t:'自分で言うあたり、説得力がございませんが。'},
+    {who:'ufo',t:'あう？あうあう。'},
+    {who:'frog',t:'「そもそも金とは何か」と哲学を始めました。'},
+    {who:'dev',t:'UFOの宇宙人、急に深いこと言うな…。'},
+    {who:'cat',t:'おい、ドアの外。誰か来とるで。'},
+    {who:'dev',t:'…この足音、まさか。'},
+    {who:'frog',t:'大家どのです。家賃の催促かと。'},
+    {who:'ufo',t:'あうーっ！'},
+    {who:'frog',t:'「逃げろ」と申しております。私も同意です。'},
+    {who:'cat',t:'逃げてどうすんねん。ここで話つけたるわ。'},
+    {who:'dev',t:'でも、どうやって…金はないぞ。'},
+    {who:'cat',t:'カネの代わりに、口で勝てばええ。レスバや。'},
+    {who:'enemy',t:'おい開発者ァ！今月の家賃、まだもらっとらんぞ！'},
+    {who:'dev',t:'お、大家さん…！その、来月まで…。'},
+    {who:'enemy',t:'「来月」は聞き飽きた。言い訳できるもんならしてみろ！'},
+    {who:'cat',t:'おもろい。その勝負、乗ったるわ。'},
+    {who:'frog',t:'では、レスバで勝てば待っていただける、と。'},
+    {who:'enemy',t:'ふん、俺を笑わせてみろ。できなきゃ即・追い出しだ！'}
+  ],
+  5:[ // バグの化身：20往復
+    {who:'dev',t:'アプリのレビューは持ち直した。やれやれだ。'},
+    {who:'frog',t:'お疲れ様でした。しかし、妙な不具合報告が増えております。'},
+    {who:'cat',t:'画面がチカチカするわ、データ消えるわ…なんやこれ。'},
+    {who:'ufo',t:'あうー…あう、あうあう。'},
+    {who:'frog',t:'「これは生きている」と申しております。…まさか。'},
+    {who:'dev',t:'バグが…意思を持った…？そんなバカな。'},
+    {who:'cat',t:'おい、画面の奥でなんか蠢いとるぞ。'},
+    {who:'frog',t:'コードの海から、何かが這い出てきます。'},
+    {who:'ufo',t:'あうーーー！'},
+    {who:'frog',t:'「逃げろ」二度目です。今回は本気で。'},
+    {who:'dev',t:'いや、逃げたらユーザー全員のデータが危ない。'},
+    {who:'cat',t:'ほう、ええ覚悟やんけ。見直したで。'},
+    {who:'dev',t:'これでも開発者だからな。バグは…俺が倒す。'},
+    {who:'frog',t:'頼もしい。ですが相手は未知のエラーです。'},
+    {who:'cat',t:'弱点はなんや？'},
+    {who:'frog',t:'おそらく「メタ発言」。自分がプログラムだと自覚させれば…。'},
+    {who:'dev',t:'なるほど。第四の壁ごしに殴れってことか。'},
+    {who:'ufo',t:'あう！あうあう！'},
+    {who:'frog',t:'「作者、頑張れ」と申しております。誰に言ってるんだ…。'},
+    {who:'enemy',t:'01001…セカイ…クウ…ワレハ…バグ…'},
+    {who:'dev',t:'言葉になってないけど、めちゃくちゃ不穏だ。'},
+    {who:'enemy',t:'スベテ…エラー…ニ…カエス…'},
+    {who:'cat',t:'何言うとるかわからんが、ボコす相手ってことやな。'},
+    {who:'frog',t:'端的に申せば、その通りです。'},
+    {who:'enemy',t:'デバッグ…デキルモノ…ナラ…ヤッテミロ…！'}
+  ],
+  10:[ // 観測者（ラスボス前）：20往復
+    {who:'dev',t:'…ここは。空間が、歪んでる。'},
+    {who:'frog',t:'もはや地球ですらありません。宇宙の果て、と申しましょうか。'},
+    {who:'cat',t:'家賃の話から、なんでこんなとこまで来てもうたんや。'},
+    {who:'dev',t:'俺が一番それを聞きたい。'},
+    {who:'ufo',t:'あうー…あう。'},
+    {who:'frog',t:'「故郷の匂いがする」と。彼の星が近いのかもしれません。'},
+    {who:'dev',t:'そういえばお前、なんで地球にいたんだ？'},
+    {who:'ufo',t:'あうあう、あうー！'},
+    {who:'frog',t:'「面白い星だと聞いて観光に来た」そうです。'},
+    {who:'cat',t:'観光で来て、レスバの旅に巻き込まれとるやんけ。'},
+    {who:'frog',t:'災難ですね。しかし、それも縁かと。'},
+    {who:'dev',t:'…前方に、何かいる。デカい。'},
+    {who:'enemy',t:'……面白さを、観測する。'},
+    {who:'dev',t:'喋った…！何者だ、お前。'},
+    {who:'enemy',t:'我は観測者。つまらぬ世界を、消す者。'},
+    {who:'cat',t:'なんやそれ。世界の評論家気取りか？'},
+    {who:'enemy',t:'この宇宙は、もう…面白くない。ゆえに、消す。'},
+    {who:'frog',t:'待ってください。世界の面白さを、勝手に決めるのですか。'},
+    {who:'enemy',t:'お前たちに、我を笑わせられるか？できねば、終わりだ。'},
+    {who:'dev',t:'…上等だ。俺は無料でアプリを作ってきた男だぞ。'},
+    {who:'dev',t:'世界を少しでも面白くするために。その本気、見せてやる。'},
+    {who:'ufo',t:'あうーーー！！'},
+    {who:'frog',t:'「みんなで勝とう」と。…珍しく、まともです。'},
+    {who:'cat',t:'ええやんけ。儂らの本気のレスバ、見せたろうや。'},
+    {who:'enemy',t:'では…始めよう。宇宙の存亡を賭けた、レスバを。'}
+  ]
+};
+// 8往復のショート会話（節目以外の敵で共通利用＋敵セリフ差し替え）
+function shortDialogue(enemy){
+  return [
+    {who:'dev',t:`次の相手は…「${enemy.name}」か。`},
+    {who:'cat',t:'どれ、儂が前座で揉んだろか。'},
+    {who:'frog',t:`お待ちを。弱点を分析します。`},
+    {who:'ufo',t:'あうー！'},
+    {who:'frog',t:'「いける」と申しております。根拠は不明です。'},
+    {who:'dev',t:'根拠なしか…まあ、いつものことだ。'},
+    {who:'enemy',t:`${enemy.profile[2][1]}`},
+    {who:'cat',t:'ごちゃごちゃ言うとらんと、かかってこんかい！'}
+  ];
+}
+
+// 次回予告（最後の敵以外）
+const NEXT_PREVIEW=[
+  '家賃は待ってもらえた。だが今度はネットに★1レビューの嵐が…！',
+  'レビュアーを黙らせた。しかし作品を勝手に使う影が…！',
+  '無断転載を撃退。だが理不尽な要求を叫ぶ声が店に響く…！',
+  'クレーマーを論破。その時、アプリの奥でバグが蠢き始めた…！',
+  'バグを倒した。だが今度は「課金しろ」と迫る悪魔が出現！',
+  '課金圧力を退けた。ネットの炎が、意思を持って燃え広がる…！',
+  '炎上を鎮めた。承認欲求を司る魔王が王座から見下ろす…！',
+  '魔王を倒した。空間に亀裂。その奥から、虚無が忍び寄る…！',
+  '虚無を払った先で、宇宙的な“それ”が静かにこちらを観測していた…！'
+];
+const PROLOGUE_LINES=[
+  {who:'dev',t:'無料でアプリを作った。世界を少し面白くするために。'},
+  {who:'dev',t:'…なのに、なぜ俺は家賃も払えないんだ？'},
+  {who:'frog',t:'開発者どの。嘆く前に、戦う準備をいたしましょう。'},
+  {who:'cat',t:'おう、儂らがついとるやんけ。'},
+  {who:'ufo',t:'あうー！'},
+  {who:'frog',t:'「金は無いが仲間はいる」と申しております。…泣けますね。'}
+];
+</script>
+<script>
+// ============ STATE ============
+let G={enemyIdx:0,party:[],enemy:null,tension:0,turnIdx:0,defending:{},battleOver:false};
+let ADV={lines:[],idx:0,afterFn:null};
+const SHIFTMEMO_URL='https://mexastarted.github.io/sihuto/';
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function backToShiftMemo(){location.href=SHIFTMEMO_URL;}
+
+// ============ SOUND ============
+let actx=null;
+function sfx(type){try{if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();const t=actx.currentTime;
+  if(type==='hit'){beep(180,t,0.08,'square');}
+  else if(type==='crit'){[400,600,900].forEach((f,i)=>beep(f,t+i*0.05,0.1,'square'));}
+  else if(type==='miss'){beep(200,t,0.2,'sine');beep(150,t+0.1,0.2,'sine');}
+  else if(type==='ult'){[523,659,784,1047,1319].forEach((f,i)=>beep(f,t+i*0.08,0.2,'triangle'));}
+  else if(type==='win'){[523,659,784,1047].forEach((f,i)=>beep(f,t+i*0.12,0.25,'triangle'));}
+  else if(type==='lose'){[400,300,200].forEach((f,i)=>beep(f,t+i*0.2,0.3,'sawtooth'));}
+  else if(type==='talk'){beep(520,t,0.03,'square');}
+  else if(type==='select'){beep(660,t,0.05);}
+}catch(e){}}
+function beep(f,s,d,w){const o=actx.createOscillator(),g=actx.createGain();o.type=w||'sine';o.frequency.value=f;o.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(0.1,s);g.gain.exponentialRampToValueAtTime(0.001,s+d);o.start(s);o.stop(s+d);}
+
+// ============ FX ============
+function fxFlash(){const f=document.getElementById('fx-flash');f.style.animation='none';void f.offsetWidth;f.style.animation='flashW 0.3s';}
+function fxShake(){const fld=document.getElementById('battle-field');fld.style.animation='none';void fld.offsetWidth;fld.style.animation='shake 0.4s';}
+function fxParticles(colors){const c=document.getElementById('fx-particles');c.innerHTML='';for(let i=0;i<24;i++){const p=document.createElement('div');const a=Math.random()*Math.PI*2,d=60+Math.random()*120;p.style.cssText=`position:absolute;top:40%;left:60%;width:7px;height:7px;border-radius:50%;background:${colors[i%colors.length]};--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px;animation:partBurst 0.9s ease-out forwards`;c.appendChild(p);}setTimeout(()=>c.innerHTML='',1000);}
+
+// ============ 背景（絵文字アクセント） ============
+function bgAccentHtml(type){
+  const star='<span class="bg-acc bg-twinkle" style="top:12px;left:18px;font-size:9px;color:#fff">✦</span><span class="bg-acc bg-twinkle" style="top:26px;right:50px;font-size:7px;color:#fff;animation-delay:.5s">✦</span>';
+  if(type==='town')return '<span class="bg-acc" style="top:10px;left:18px;font-size:15px">🌙</span><span class="bg-acc" style="bottom:28px;left:30px;font-size:13px">🏠</span>'+star+'<div class="bg-acc" style="bottom:0;left:0;right:0;height:30px;background:repeating-linear-gradient(90deg,#0a0a1a 0,#0a0a1a 16px,#15152a 16px,#15152a 32px)"></div>';
+  if(type==='sns')return '<span class="bg-acc" style="top:10px;left:20px;font-size:13px;opacity:.8">💬</span><span class="bg-acc" style="top:24px;right:60px;font-size:11px;opacity:.7">📱</span><span class="bg-acc" style="top:8px;right:28px;font-size:10px;opacity:.6">⭐</span><div class="bg-acc" style="bottom:0;left:0;right:0;height:30px;background:repeating-linear-gradient(90deg,#0a1a2a 0,#0a1a2a 14px,#15252a 14px,#15252a 28px)"></div>';
+  if(type==='server')return '<div class="bg-acc" style="inset:0;background:repeating-linear-gradient(0deg,transparent 0,transparent 7px,rgba(0,255,200,0.06) 7px,rgba(0,255,200,0.06) 8px)"></div><span class="bg-acc" style="top:8px;left:10px;font-size:8px;color:#5de5ff;font-family:monospace;opacity:.7">010011</span><span class="bg-acc" style="top:12px;right:50px;font-size:13px">⚡</span><span class="bg-acc" style="bottom:30px;left:40px;font-size:11px">💻</span>';
+  if(type==='mystic')return '<span class="bg-acc" style="top:14px;left:30px;font-size:13px">🌲</span><span class="bg-acc bg-twinkle" style="top:20px;right:40px;font-size:11px">✨</span><span class="bg-acc" style="bottom:30px;right:30px;font-size:12px">🔥</span>';
+  if(type==='void')return '<span class="bg-acc" style="top:14px;left:50%;transform:translateX(-50%);font-size:20px;opacity:.8">🌀</span><span class="bg-acc bg-twinkle" style="top:30px;left:30px;font-size:12px">👁️</span>'+star;
+  if(type==='cosmos')return '<span class="bg-acc" style="top:8px;left:50%;transform:translateX(-50%);font-size:15px">🌌</span><span class="bg-acc" style="bottom:40px;right:50px;font-size:12px">🪐</span>'+star+'<span class="bg-acc bg-twinkle" style="top:40px;left:60px;font-size:6px;color:#fff;animation-delay:.8s">✦</span>';
+  return star;
+}
+function bgClass(type){return 'bg-'+type;}
+
+// ============ INIT / TITLE ============
+function init(){
+  const p=rpgLoad();
+  if(p&&typeof p.enemyIdx==='number'&&p.enemyIdx>0){document.getElementById('continue-btn').style.display='block';}
+  if(!p||!p.initialized){
+    const prog=p||{};
+    prog.initialized=true;
+    prog.ownedSkills=INITIAL_SKILLS.slice();
+    prog.equipped={dev:INITIAL_SKILLS.slice(),ufo:INITIAL_SKILLS.slice(),cat:INITIAL_SKILLS.slice(),frog:INITIAL_SKILLS.slice()};
+    prog.enemyIdx=0;
+    rpgSave(prog);
+    // 初期スキルをShiftMemo図鑑にも反映（共有collected）
+    try{
+      const col=JSON.parse(localStorage.getItem('collected')||'[]');
+      // RPG初期ジョークはShiftMemoのid体系と別なので、ここではcollectedは触らずRPG内図鑑のみ
+    }catch(e){}
+  }
+}
+function startNewGame(){
+  sfx('select');
+  const p=rpgLoad()||{};
+  p.enemyIdx=0;p.initialized=true;
+  if(!p.ownedSkills)p.ownedSkills=INITIAL_SKILLS.slice();
+  if(!p.equipped)p.equipped={dev:INITIAL_SKILLS.slice(),ufo:INITIAL_SKILLS.slice(),cat:INITIAL_SKILLS.slice(),frog:INITIAL_SKILLS.slice()};
+  rpgSave(p);
+  G.enemyIdx=0;
+  startPrologue();
+}
+function continueGame(){
+  sfx('select');
+  const p=rpgLoad();
+  G.enemyIdx=p.enemyIdx||0;
+  startAdventure();
+}
+
+// ============ ADVENTURE (会話ラリー) ============
+function startPrologue(){
+  ADV.lines=PROLOGUE_LINES.slice();
+  ADV.idx=0;ADV.afterFn=()=>startAdventure();
+  setupAdvBg('town');
+  showScreen('adv');
+  renderAdvLine();
+}
+function startAdventure(){
+  const enemy=ENEMIES[G.enemyIdx];
+  if(!enemy){endChapter();return;}
+  // 会話を準備
+  let lines;
+  if(DIALOGUES[enemy.id])lines=DIALOGUES[enemy.id].slice();
+  else lines=shortDialogue(enemy);
+  ADV.lines=lines;ADV.idx=0;ADV.afterFn=()=>loadEnemyIntro();
+  setupAdvBg(enemy.bg);
+  showScreen('adv');
+  renderAdvLine();
+}
+function setupAdvBg(type){
+  const f=document.getElementById('adv-field');
+  const bg=document.getElementById('adv-bg');
+  f.className='adv-field';
+  bg.className='adv-bg '+bgClass(type);
+  bg.innerHTML=bgAccentHtml(type);
+}
+function renderAdvLine(){
+  const line=ADV.lines[ADV.idx];
+  if(!line){advFinish();return;}
+  // counter
+  document.getElementById('adv-counter').textContent=`会話 ${ADV.idx+1} / ${ADV.lines.length}`;
+  // speaker
+  const isEnemy=line.who==='enemy';
+  const char=PARTY_DEF.find(c=>c.id===line.who);
+  const enemy=ENEMIES[G.enemyIdx];
+  let speakerName,speakerColor;
+  if(isEnemy){speakerName=enemy?enemy.name:'？？？';speakerColor='var(--danger)';}
+  else if(char){speakerName=char.name;speakerColor=char.color;}
+  else {speakerName='';speakerColor='#fff';}
+  document.getElementById('adv-speaker').textContent=speakerName;
+  document.getElementById('adv-speaker').style.color=speakerColor;
+  document.getElementById('adv-text').textContent=line.t;
+  // characters display (speaking one big)
+  const chars=PARTY_DEF.map(c=>{
+    const speaking=c.id===line.who;
+    return `<div class="adv-char ${speaking?'speaking':'dim'}"><div class="em">${c.emoji}</div><div class="adv-char-name" style="color:${c.color}">${c.name}</div></div>`;
+  });
+  // 敵が喋るときは敵も右端に出す
+  let enemyEl='';
+  if(isEnemy&&enemy){enemyEl=`<div class="adv-char speaking"><div class="em">${enemy.emoji}</div><div class="adv-char-name" style="color:var(--danger)">${enemy.name}</div></div>`;}
+  document.getElementById('adv-chars').innerHTML=chars.join('')+enemyEl;
+  sfx('talk');
+}
+function advNext(){
+  ADV.idx++;
+  if(ADV.idx>=ADV.lines.length){advFinish();return;}
+  renderAdvLine();
+}
+function advFinish(){
+  if(ADV.afterFn)ADV.afterFn();
+}
+
+// ============ ENEMY INTRO ============
+function loadEnemyIntro(){
+  const e=ENEMIES[G.enemyIdx];
+  document.getElementById('ei-img').textContent=e.emoji;
+  document.getElementById('ei-img').style.fontSize='52px';
+  document.getElementById('ei-name').textContent=e.name;
+  document.getElementById('ei-profile').innerHTML=e.profile.map(p=>`<div><span class="lbl">${p[0]}</span>：${p[1]}</div>`).join('');
+  showScreen('enemy-intro');
+}
+</script>
+<script>
+// ============ BATTLE SETUP ============
+function startBattle(){
+  sfx('select');
+  const e=ENEMIES[G.enemyIdx];
+  G.party=PARTY_DEF.map(def=>{const st=calcStats(def.id);return {...def,...st,alive:true};});
+  G.enemy={...e,maxhp:e.hp,curhp:e.hp};
+  G.tension=0;G.turnIdx=0;G.defending={};G.battleOver=false;
+  const bf=document.getElementById('battle-field');
+  bf.className='battle-field '+bgClass(e.bg);
+  document.getElementById('battle-bg').innerHTML=bgAccentHtml(e.bg);
+  document.getElementById('battle-bg').className='';
+  document.getElementById('enemy-sprite').textContent=e.emoji;
+  document.getElementById('enemy-sprite').style.fontSize='40px';
+  document.getElementById('enemy-sprite').style.border='none';
+  document.getElementById('enemy-sprite').style.background='transparent';
+  document.getElementById('enemy-name-tag').textContent=e.name;
+  renderBattle();
+  showScreen('battle');
+  setMsg('',`${e.name} が現れた！ 弱点を見抜いてレスバで勝て！`);
+  startPlayerTurn();
+}
+function renderBattle(){
+  document.getElementById('enemy-hp-fill').style.width=(G.enemy.curhp/G.enemy.maxhp*100)+'%';
+  document.getElementById('party-zone').innerHTML=G.party.map((c,i)=>`
+    <div class="char ${i%2===0?'bobbing':'bobbing2'} ${c.alive?'':'dead'}" id="char-${c.id}">
+      <div class="char-sprite" style="border:none;background:transparent;font-size:30px">${c.emoji}</div>
+      <div class="char-name" style="color:${c.color}">${c.name}</div>
+    </div>`).join('');
+  document.getElementById('party-hp-grid').innerHTML=G.party.map(c=>`
+    <div class="php">
+      <div class="php-top"><span class="php-name" style="color:${c.color}">${c.name}</span><span class="php-val">${Math.max(0,c.hp)}/${c.maxhp}</span></div>
+      <div class="php-track"><div class="php-fill" style="width:${Math.max(0,c.hp/c.maxhp*100)}%;background:${c.color}"></div></div>
+    </div>`).join('');
+  document.getElementById('tension-fill').style.width=G.tension+'%';
+  document.getElementById('tension-pct').textContent=Math.round(G.tension)+'%';
+  document.getElementById('ult-btn').disabled=G.tension<100;
+}
+function setMsg(speaker,text,color){document.getElementById('battle-msg').innerHTML=(speaker?`<span class="speaker" style="color:${color||'var(--accent)'}">${speaker}</span>`:'')+text;}
+function aliveParty(){return G.party.filter(c=>c.alive);}
+function currentChar(){return aliveParty()[G.turnIdx];}
+function startPlayerTurn(){
+  if(G.battleOver)return;
+  const alive=aliveParty();
+  if(G.turnIdx>=alive.length){enemyTurn();return;}
+  const c=alive[G.turnIdx];
+  document.querySelectorAll('.char').forEach(el=>el.classList.remove('active-turn'));
+  const el=document.getElementById('char-'+c.id);if(el)el.classList.add('active-turn');
+  document.getElementById('cmd-label').innerHTML=`<span style="color:${c.color};font-weight:700">${c.name}</span> のターン ▶ コマンドを選べ`;
+  setCmdEnabled(true);
+}
+function setCmdEnabled(b){document.querySelectorAll('.cmd-btn').forEach(btn=>{if(btn.id==='ult-btn'){btn.disabled=!b||G.tension<100;}else btn.disabled=!b;});}
+
+// ============ COMMANDS ============
+let pendingUlt=false;
+function cmdAttack(){pendingUlt=false;openJokePick(currentChar(),false);}
+function cmdUltimate(){if(G.tension<100){toast('テンションが足りない！');return;}pendingUlt=true;openJokePick(currentChar(),true);}
+function cmdDefend(){const c=currentChar();G.defending[c.id]=true;setMsg(c.name,'は言い訳して身を守った！',c.color);sfx('select');setTimeout(()=>nextPlayerTurn(),700);}
+function cmdRun(){if(Math.random()<0.45){setMsg('','逃げ出した…！');sfx('miss');setTimeout(()=>showScreen('title'),1200);}else{setMsg('','逃げられなかった！');setTimeout(()=>nextPlayerTurn(),900);}}
+
+// ============ JOKE PICK ============
+function openJokePick(char,isUlt){
+  const equipped=getEquipped(char.id);
+  document.getElementById('joke-pick-name').textContent=char.name+(isUlt?' の神ジョーク（必殺）':' の技を選ぶ');
+  document.getElementById('joke-pick-list').innerHTML=equipped.map(sid=>{
+    const s=getSkill(sid);if(!s)return '';
+    const a=ATTR[s.attr];const isWeak=G.enemy.weak===s.attr;
+    const pow=calcDamage(char,s,isUlt,false).preview;
+    return `<div class="joke-opt" onclick="useJoke('${char.id}','${sid}',${isUlt})">
+      <div class="joke-opt-top"><span class="joke-opt-stars">${'★'.repeat(s.star)}${'☆'.repeat(10-s.star)}</span><span class="joke-opt-attr" style="background:${a.c}33;color:${a.c}">${a.n}${isWeak?' ★弱点!':''}</span></div>
+      <div class="joke-opt-text">「${s.ja}」</div>
+      <div class="joke-opt-pow">威力目安: ${pow}${isUlt?' ＋神ジョーク補正':''}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('joke-pick').classList.add('show');
+}
+function closeJokePick(){document.getElementById('joke-pick').classList.remove('show');}
+function calcDamage(char,skill,isUlt,roll){
+  const a=char.atk;let base=a+skill.pow;
+  const isWeak=G.enemy.weak===skill.attr;
+  if(isWeak)base=Math.round(base*1.8);
+  if(isUlt)base=Math.round(base*2.2);
+  const def=Math.round(G.enemy.atk*0.2);
+  let dmg=Math.max(1,base-def);
+  if(!roll)return {preview:dmg,isWeak};
+  let slip=false,crit=false;
+  if(isUlt&&Math.random()<0.25)slip=true;
+  else if(isWeak||Math.random()<0.15){crit=true;dmg=Math.round(dmg*1.3);}
+  return {dmg,isWeak,crit,slip};
+}
+
+// ============ 掛け合い（技後リアクション） ============
+const REACT={
+  dev:['開発者「よし、効いてる！」','開発者「家賃のためだ…！」'],
+  cat:['ねこ「ええぞ、もっと言うたれ！」','ねこ「儂の出番はまだか？」'],
+  frog:['かえる「お見事です」','かえる「冷静に、次へ」'],
+  ufo:['UFO乗組員「あうー！」','かえる（通訳）「『やったね』だそうです」']
+};
+const ENEMY_REACT=['敵「ぐっ…！」','敵「やるじゃないか…」','敵「その程度か？」','敵「効かんわ！」'];
+function randReact(){
+  const others=PARTY_DEF.filter(c=>c.alive!==false);
+  const c=others[Math.floor(Math.random()*others.length)];
+  const r=REACT[c.id];return r[Math.floor(Math.random()*r.length)];
+}
+
+function useJoke(charId,skillId,isUlt){
+  closeJokePick();setCmdEnabled(false);
+  const char=G.party.find(c=>c.id===charId);
+  const skill=getSkill(skillId);
+  const res=calcDamage(char,skill,isUlt,true);
+  const v=VOICE[charId];
+  if(isUlt)G.tension=0;else G.tension=Math.min(100,G.tension+18);
+  if(charId==='ufo'){
+    setMsg('UFO乗組員',v.atk[Math.floor(Math.random()*v.atk.length)],char.color);
+    setTimeout(()=>{setMsg('かえる',FROG_TRANSLATE[Math.floor(Math.random()*FROG_TRANSLATE.length)],'var(--frog)');setTimeout(()=>applyPlayerDamage(char,skill,res,isUlt),900);},800);
+  }else{
+    const line=res.slip?(v.miss[0]||'滑った…'):(res.crit?(v.crit[0]||v.atk[0]):v.atk[Math.floor(Math.random()*v.atk.length)]);
+    setMsg(char.name,`「${skill.ja}」 ${line}`,char.color);
+    setTimeout(()=>applyPlayerDamage(char,skill,res,isUlt),700);
+  }
+}
+function applyPlayerDamage(char,skill,res,isUlt){
+  if(res.slip){
+    fxFlash();sfx('miss');
+    const dmg=Math.round(char.maxhp*0.12);
+    showDmg('self',char,dmg,'miss','スベった');
+    char.hp-=dmg;if(char.hp<=0)char.alive=false;
+    setMsg(char.name,'のジョークは…完全に滑った！自分にダメージ！','var(--danger)');
+    renderBattle();
+    setTimeout(()=>battleReact(()=>nextPlayerTurn()),1100);return;
+  }
+  const es=document.getElementById('enemy-sprite');es.classList.remove('hit');void es.offsetWidth;es.classList.add('hit');
+  if(isUlt){fxFlash();fxShake();sfx('ult');fxParticles(['#ff9dc0','#FFD700','#fff','#ff6b9d']);}
+  else if(res.crit){fxShake();sfx('crit');fxParticles(['#FFD700','#fff']);}
+  else sfx('hit');
+  G.enemy.curhp=Math.max(0,G.enemy.curhp-res.dmg);
+  showDmg('enemy',null,res.dmg,res.crit||isUlt?'crit':'normal',res.isWeak?'弱点!':'');
+  renderBattle();
+  if(res.isWeak)setMsg('','弱点に刺さった！ 会心の一撃！','#FFD700');
+  setTimeout(()=>{
+    if(G.enemy.curhp<=0){winBattle();return;}
+    battleReact(()=>nextPlayerTurn());
+  },1000);
+}
+// 技後の掛け合い（敵の反応＋仲間の一言）
+function battleReact(after){
+  if(G.battleOver)return;
+  if(Math.random()<0.6){
+    const useEnemy=Math.random()<0.5;
+    const msg=useEnemy?ENEMY_REACT[Math.floor(Math.random()*ENEMY_REACT.length)]:randReact();
+    const isEnemy=msg.startsWith('敵');
+    setMsg('',msg.replace(/^敵/,'').replace(/^(開発者|ねこ|かえる|UFO乗組員)/,''),isEnemy?'var(--danger)':'var(--accent)');
+    // speaker付けて見やすく
+    const sp=msg.split('「')[0];
+    const body=msg.includes('「')?'「'+msg.split('「').slice(1).join('「'):msg;
+    setMsg(sp,body,isEnemy?'var(--danger)':'var(--accent)');
+    setTimeout(after,900);
+  }else after();
+}
+function showDmg(target,char,amount,cls,label){
+  const fld=document.getElementById('battle-field');
+  const d=document.createElement('div');d.className='dmg-num '+cls;d.textContent=(label?label+' ':'')+amount;
+  if(target==='enemy'){d.style.top='30px';d.style.right='60px';}
+  else{const el=document.getElementById('char-'+char.id);d.style.bottom='80px';d.style.left=(el?el.offsetLeft:100)+'px';el&&el.classList.remove('hit');void(el&&el.offsetWidth);el&&el.classList.add('hit');}
+  fld.appendChild(d);setTimeout(()=>d.remove(),1000);
+}
+function nextPlayerTurn(){
+  if(G.battleOver)return;
+  G.turnIdx++;
+  const alive=aliveParty();
+  if(G.turnIdx>=alive.length){G.turnIdx=0;enemyTurn();}else startPlayerTurn();
+}
+function enemyTurn(){
+  if(G.battleOver)return;
+  setCmdEnabled(false);
+  document.querySelectorAll('.char').forEach(el=>el.classList.remove('active-turn'));
+  const alive=aliveParty();const target=alive[Math.floor(Math.random()*alive.length)];
+  setMsg(G.enemy.name,'の攻撃！','var(--danger)');
+  setTimeout(()=>{
+    let dmg=Math.max(1,G.enemy.atk+Math.floor(Math.random()*8)-target.def);
+    if(G.defending[target.id])dmg=Math.round(dmg*0.4);
+    target.hp-=dmg;sfx('hit');fxFlash();
+    const el=document.getElementById('char-'+target.id);if(el){el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');}
+    showDmg('self',target,dmg,'normal','');
+    const hv=VOICE[target.id].hit;
+    if(target.hp<=0){target.hp=0;target.alive=false;setMsg(target.name,'は沈黙してしまった…','var(--muted)');}
+    else setMsg(target.name,hv[Math.floor(Math.random()*hv.length)],target.color);
+    G.defending={};renderBattle();
+    setTimeout(()=>{if(aliveParty().length===0){loseBattle();return;}G.turnIdx=0;startPlayerTurn();},1000);
+  },700);
+}
+
+// ============ WIN / LOSE ============
+function winBattle(){
+  G.battleOver=true;sfx('win');
+  const e=ENEMIES[G.enemyIdx];
+  const reward=unlockNextSkill();
+  // 進捗保存
+  const p=rpgLoad()||{};
+  p.enemyIdx=G.enemyIdx+1;
+  if(!p.defeated)p.defeated=[];
+  if(!p.defeated.includes(e.id))p.defeated.push(e.id);
+  rpgSave(p);
+  recordClearForShiftMemo(G.enemyIdx+1);
+  const isLast=G.enemyIdx>=ENEMIES.length-1;
+  showScreen('result');
+  document.getElementById('result-box').innerHTML=`
+    <div style="font-size:30px;margin-bottom:8px">${isLast?'🚀':'🎉'}</div>
+    <div style="font-size:19px;font-weight:800;color:var(--accent);margin-bottom:8px">${e.name} を論破した！</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:6px">開発者：「これで家賃が…！（${G.enemyIdx+1}/10体目）」</div>
+    ${reward?`<div style="background:var(--surface2);border-radius:9px;padding:11px;margin:12px 0;font-size:12px"><div style="color:var(--accent);font-weight:700;margin-bottom:3px">🎁 新ネタ習得！</div>「${reward.ja}」（★${reward.star}）</div>`:''}
+    <div style="font-size:11px;color:var(--frog);margin-bottom:12px">📡 ShiftMemoに進捗を保存しました</div>
+    <button class="btn-primary" onclick="afterWin()">${isLast?'▶ 結末へ':'▶ 次へ'}</button>`;
+}
+function afterWin(){
+  const isLast=G.enemyIdx>=ENEMIES.length-1;
+  if(isLast){endChapter();return;}
+  // 次回予告
+  document.getElementById('next-text').textContent=NEXT_PREVIEW[G.enemyIdx]||'次なる敵が待ち受ける…！';
+  showScreen('next');
+}
+function afterNext(){G.enemyIdx++;const p=rpgLoad()||{};p.enemyIdx=G.enemyIdx;rpgSave(p);startAdventure();}
+function loseBattle(){
+  G.battleOver=true;sfx('lose');
+  showScreen('result');
+  document.getElementById('result-box').innerHTML=`
+    <div style="font-size:30px;margin-bottom:8px">💀</div>
+    <div style="font-size:19px;font-weight:800;color:var(--danger);margin-bottom:8px">レスバに敗北…</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:6px">開発者：「ぐぬぬ…出直す」</div>
+    <div style="font-size:11px;color:var(--muted);margin:10px 0;line-height:1.6">ヒント：ShiftMemoでレベルを上げると強くなる。敵の弱点属性を狙え！</div>
+    <button class="btn-primary" onclick="startBattle()">▶ もう一度挑戦</button>
+    <button class="btn-primary" style="background:var(--surface2);color:var(--text);margin-top:8px" onclick="showScreen('title')">タイトルへ</button>`;
+}
+function endChapter(){
+  showScreen('result');
+  document.getElementById('result-box').innerHTML=`
+    <div style="font-size:34px;margin-bottom:10px">🌌</div>
+    <div style="font-size:18px;font-weight:800;color:var(--accent);margin-bottom:10px">第1章 完！ 10体すべて論破！</div>
+    <div style="font-size:13px;color:var(--text);line-height:1.8;margin-bottom:8px">観測者を退けた…と思いきや、奴は不敵に笑った。<br>「面白い。だが、本当の宇宙の戦いは“これから”だ」</div>
+    <div style="font-size:15px;font-weight:800;color:#FFD700;margin:14px 0">― アップデートに期待 ―</div>
+    <div style="font-size:11px;color:var(--frog);margin-bottom:14px">マルチバース存亡をかけた最終決戦は次回実装予定！</div>
+    <button class="btn-primary" onclick="backToShiftMemo()">ShiftMemoに戻る</button>
+    <button class="btn-primary" style="background:var(--surface2);color:var(--text);margin-top:8px" onclick="showScreen('title')">タイトルへ</button>`;
+}
+</script>
+<script>
+// ============ SKILL UNLOCK / SHIFTMEMO 連携 ============
+function unlockNextSkill(){
+  const p=rpgLoad()||{};
+  if(!p.ownedSkills)p.ownedSkills=INITIAL_SKILLS.slice();
+  // まだ持っていないスキルを星の低い順に1つ解放
+  const next=SKILLS.find(s=>!p.ownedSkills.includes(s.id));
+  if(next){
+    p.ownedSkills.push(next.id);
+    rpgSave(p);
+    return next;
+  }
+  return null;
+}
+
+function recordClearForShiftMemo(cleared){
+  localStorage.setItem('rpg_cleared_chapters',cleared.toString());
+  const ach=JSON.parse(localStorage.getItem('rpg_achievements')||'[]');
+  const id='defeat_'+cleared;
+  if(!ach.includes(id)){ach.push(id);localStorage.setItem('rpg_achievements',JSON.stringify(ach));}
+  try{const coins=parseInt(localStorage.getItem('coins')||'0');localStorage.setItem('coins',(coins+10).toString());}catch(e){}
+}
+
+// ============ PANELS ============
+let panelReturn='title';
+function openStatus(){panelReturn=getActiveScreen();renderStatus();showScreen('status');}
+function openNotebook(){panelReturn=getActiveScreen();renderNotebook();showScreen('notebook');}
+function closePanel(){showScreen(panelReturn);}
+function getActiveScreen(){const a=document.querySelector('.screen.active');return a?a.id.replace('screen-',''):'title';}
+
+function renderStatus(){
+  document.getElementById('status-cards').innerHTML=PARTY_DEF.map(def=>{
+    const st=calcStats(def.id);
+    const eq=getEquipped(def.id);
+    return `<div class="char-card">
+      <div class="char-card-head">
+        <div class="char-card-img">${def.sprite}</div>
+        <div><div class="char-card-name" style="color:${def.color}">${def.name}</div><div class="char-card-role">${def.role}${def.full?'':'（仲間：攻撃・素早さは半分）'}</div></div>
+      </div>
+      <div class="stat-row"><span>HP</span><span class="sv">${st.maxhp}</span></div>
+      <div class="stat-row"><span>攻撃力</span><span class="sv">${st.atk}</span></div>
+      <div class="stat-row"><span>防御力</span><span class="sv">${st.def}</span></div>
+      <div class="stat-row"><span>素早さ</span><span class="sv">${st.spd}</span></div>
+      <div style="font-size:9px;color:var(--muted);margin-top:8px">装備中の技：${eq.map(s=>{const sk=getSkill(s);return sk?'★'+sk.star:'';}).join(' / ')}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderNotebook(){
+  const owned=ownedSkills();
+  document.getElementById('notebook-content').innerHTML=PARTY_DEF.map(def=>{
+    const eq=getEquipped(def.id);
+    return `<div class="char-card">
+      <div class="char-card-name" style="color:${def.color};margin-bottom:8px">${def.name} の技（4枠）</div>
+      <div class="equip-jokes">${eq.map((sid,slot)=>{
+        const s=getSkill(sid);const a=s?ATTR[s.attr]:null;
+        return `<div class="equip-slot" onclick="openSwap('${def.id}',${slot})">
+          <div class="equip-slot-info">${s?`<span style="color:${a.c}">${'★'.repeat(s.star)}</span> 「${s.ja}」<br><span style="color:var(--muted)">${a.n}</span>`:'空き'}</div>
+          <div class="equip-change">変更 ▶</div>
+        </div>`;
+      }).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+let swapTarget=null;
+function openSwap(charId,slot){
+  swapTarget={charId,slot};
+  const owned=ownedSkills();
+  const eq=getEquipped(charId);
+  document.getElementById('joke-pick-name').textContent='どの技に変える？';
+  document.getElementById('joke-pick-list').innerHTML=owned.map(sid=>{
+    const s=getSkill(sid);const a=ATTR[s.attr];
+    const used=eq.includes(sid);
+    return `<div class="joke-opt" onclick="doSwap('${sid}')" style="${used?'opacity:0.5':''}">
+      <div class="joke-opt-top"><span class="joke-opt-stars">${'★'.repeat(s.star)}${'☆'.repeat(10-s.star)}</span><span class="joke-opt-attr" style="background:${a.c}33;color:${a.c}">${a.n}</span></div>
+      <div class="joke-opt-text">「${s.ja}」${used?' （装備中）':''}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('joke-pick').classList.add('show');
+}
+function doSwap(sid){
+  const eq=getEquipped(swapTarget.charId).slice();
+  eq[swapTarget.slot]=sid;
+  setEquipped(swapTarget.charId,eq);
+  closeJokePick();
+  renderNotebook();
+  sfx('select');
+  toast('技を変更しました');
+}
+
+// パネルへのアクセスボタンをタイトルとnewsに置くため、ショートカット
+function openStatusFromTitle(){panelReturn='title';renderStatus();showScreen('status');}
+function openNotebookFromTitle(){panelReturn='title';renderNotebook();showScreen('notebook');}
+
+// ============ INIT ============
+window.onload=function(){
+  init();
+};
+</script>
+</body>
+</html>

@@ -223,6 +223,11 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
       <div style="font-size:11px;color:#c8a000">🪙5枚で1回。光の色で期待度UP！50回で天井（☆10確定）</div>
       <div style="font-size:10px;color:#FFD700;margin-top:6px">所持コイン: <span id="gacha-coin-display">0</span>🪙 / 天井まで <span id="pity-display">50</span>回</div>
     </div>
+    <div class="card" onclick="openDevRPG()" style="cursor:pointer;background:linear-gradient(135deg,#1a0a2a,#0a0a1a);border-color:#cb8aff">
+      <div style="font-size:14px;font-weight:700;margin-bottom:3px;color:#cb8aff">🎮 開発者の現在（RPG）</div>
+      <div style="font-size:11px;color:#a575d5">金欠開発者がレスバでマルチバースを救う物語。集めたジョークが技になる！</div>
+      <div style="font-size:10px;color:#cb8aff;margin-top:6px" id="rpg-progress-display">▶ プレイする</div>
+    </div>
   </div>
 
   <!-- ========== ENCYCLOPEDIA PAGE ========== -->
@@ -1156,7 +1161,9 @@ function missionDefs(){
       {id:'lv50',name:'Lv.50到達',done:getLevel()>=50,coin:200,exp:0},
       {id:'lv100',name:'Lv.100到達',done:getLevel()>=100,coin:500,exp:0},
       {id:'joke50',name:'ジョーク50種',done:getCollected().length>=50,coin:100,exp:0},
-      {id:'jokeAll',name:'全150種コンプ',done:getCollected().length>=150,coin:500,exp:0}
+      {id:'jokeAll',name:'全150種コンプ',done:getCollected().length>=150,coin:500,exp:0},
+      {id:'rpgCh1',name:'開発者の現在：3体撃破',done:parseInt(ls('rpg_cleared_chapters','0'))>=3,coin:80,exp:100},
+      {id:'rpgCh3',name:'開発者の現在：第1章制覇（10体）',done:parseInt(ls('rpg_cleared_chapters','0'))>=10,coin:300,exp:500}
     ]
   };
 }
@@ -1546,6 +1553,14 @@ function didDonate(){
   addCoins(30,true);
 }
 
+// ========== DEV RPG 連携 ==========
+function openDevRPG(){location.href='rpg.html';}
+function checkRpgMissions(){
+  // RPGのクリア章数を読んでミッション判定に使う
+  const cleared=parseInt(ls('rpg_cleared_chapters','0'));
+  return cleared;
+}
+
 // ========== UPDATE / GUIDE / SETUP ==========
 function openUpdateModal(){document.getElementById('update-modal').classList.add('show');}
 function openHomeGuide(){document.getElementById('home-guide-modal').classList.add('show');}
@@ -1582,7 +1597,7 @@ function showPage(p){
   if(p==='missions'){renderMissions();}
   if(p==='profile'){renderNameplates();document.getElementById('profile-lv').textContent=getLevel();const rk=getRank();document.getElementById('profile-rank').textContent=rk.name;document.getElementById('profile-rank').style.color=rk.color;renderAchievements();}
   if(p==='settings')updateSettingsDisplay();
-  if(p==='games'){document.getElementById('tap-best').textContent='ベスト: ¥'+getTapBest().toLocaleString();document.getElementById('gacha-coin-display').textContent=getCoins();document.getElementById('pity-display').textContent=50-getPity();}
+  if(p==='games'){document.getElementById('tap-best').textContent='ベスト: ¥'+getTapBest().toLocaleString();document.getElementById('gacha-coin-display').textContent=getCoins();document.getElementById('pity-display').textContent=50-getPity();const rp=document.getElementById('rpg-progress-display');if(rp){const cl=parseInt(ls('rpg_cleared_chapters','0'));rp.textContent=cl>0?`▶ 続きから（${cl}/10体 撃破）`:'▶ プレイする';}}
 }
 
 // ========== RENDER HOME ==========
