@@ -29,6 +29,12 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 @keyframes partBurst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
 @keyframes glow{0%,100%{text-shadow:0 0 6px currentColor}50%{text-shadow:0 0 16px currentColor}}
 @keyframes zoomBurst{0%{transform:scale(0.3);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+/* 攻撃エフェクト */
+@keyframes fxHit{0%{transform:translate(-50%,-50%) scale(0.4) rotate(0);opacity:0}30%{opacity:1}60%{transform:translate(-50%,-50%) scale(1.4) rotate(15deg)}100%{transform:translate(-50%,-50%) scale(1.1) rotate(0);opacity:0}}
+@keyframes fxSlash{0%{transform:translate(-50%,-50%) scale(0.5) rotate(-30deg);opacity:0}40%{opacity:1;transform:translate(-50%,-50%) scale(1.3) rotate(10deg)}100%{transform:translate(-50%,-50%) scale(1.5) rotate(20deg);opacity:0}}
+@keyframes fxBig{0%{transform:translate(-50%,-50%) scale(0.2);opacity:0}40%{opacity:1;transform:translate(-50%,-50%) scale(1.6)}70%{transform:translate(-50%,-50%) scale(1.3)}100%{transform:translate(-50%,-50%) scale(1.8);opacity:0}}
+@keyframes fxRing{0%{transform:translate(-50%,-50%) scale(0.2);opacity:0.9}100%{transform:translate(-50%,-50%) scale(3);opacity:0}}
+.fx-emoji{position:absolute;z-index:6;pointer-events:none;left:50%;top:50%}
 
 /* ===== SCREENS ===== */
 .screen{display:none;min-height:100vh;flex-direction:column}
@@ -116,10 +122,11 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .cmd-btn:disabled{opacity:0.4;cursor:not-allowed}
 
 /* joke pick list */
-.joke-pick{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.joke-pick{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:180;display:none;align-items:flex-end;justify-content:center;overscroll-behavior:contain}
 .joke-pick.show{display:flex}
-.joke-pick-box{width:100%;max-width:480px;background:var(--surface);border-top:2px solid var(--accent);border-radius:16px 16px 0 0;padding:16px;max-height:70vh;overflow-y:auto}
-.joke-pick-title{font-size:13px;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.joke-pick-box{width:100%;max-width:480px;background:var(--surface);border-top:2px solid var(--accent);border-radius:16px 16px 0 0;padding:16px;height:78vh;max-height:78vh;overscroll-behavior:contain;display:flex;flex-direction:column}
+.joke-pick-title{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+#joke-pick-list{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;flex:1;padding-bottom:10px}
 .joke-opt{background:var(--surface2);border:0.5px solid var(--border);border-radius:9px;padding:11px;margin-bottom:7px;cursor:pointer}
 .joke-opt:active{transform:scale(0.99)}
 .joke-opt-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
@@ -131,7 +138,9 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 /* generic panel screens (status / notebook) */
 .panel{padding:16px;flex:1;overflow-y:auto}
 .panel-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.panel-back{background:var(--surface2);border:0.5px solid var(--border);border-radius:8px;padding:7px 12px;font-size:12px;color:var(--text);cursor:pointer;font-family:'Syne',sans-serif}
+.panel-back{background:var(--surface2);border:0.5px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--text);cursor:pointer;font-family:'Syne',sans-serif;position:relative;z-index:1}
+/* status/notebookパネルは最前面に出してメニューFAB等と干渉させない */
+#screen-status,#screen-notebook{position:fixed;inset:0;z-index:170;background:var(--bg);overflow-y:auto}
 .panel-title{font-size:18px;font-weight:800}
 .char-card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
 .char-card-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
@@ -155,6 +164,19 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 /* fx */
 #fx-flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:200}
 #fx-particles{position:fixed;inset:0;pointer-events:none;z-index:201}
+
+/* ☰ MENU */
+.menu-fab{position:fixed;top:10px;right:10px;width:38px;height:38px;border-radius:9px;background:rgba(20,20,30,0.8);border:0.5px solid var(--border);color:var(--text);font-size:18px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center}
+.rpg-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:160;display:none;align-items:center;justify-content:center;padding:18px;overscroll-behavior:contain}
+.rpg-overlay.show{display:flex}
+.menu-panel{width:100%;max-width:360px;background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:18px}
+.menu-title{font-size:15px;font-weight:800;margin-bottom:14px}
+.menu-item{display:block;width:100%;text-align:left;padding:12px 14px;margin-bottom:7px;background:var(--surface2);border:0.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.menu-item:active{transform:scale(0.98)}
+.menu-item.danger{color:var(--danger);border-color:#5a2a2a}
+input[type=range]{-webkit-appearance:none;appearance:none;height:6px;background:#2e2e3e;border-radius:3px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:none}
 
 /* ADVENTURE */
 #screen-adv{padding:0}
@@ -200,9 +222,10 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     <button class="title-btn cont" id="continue-btn" onclick="continueGame()" style="display:none">つづきから</button>
     <button class="title-btn link" onclick="openNotebookFromTitle()">📓 ネタ帳（技の付け替え）</button>
     <button class="title-btn link" onclick="openStatusFromTitle()">📊 パーティ状況</button>
+    <button class="title-btn link" onclick="openRpgUpdate()">📋 アップデート履歴</button>
     <button class="title-btn link" onclick="backToShiftMemo()">← ShiftMemoに戻る</button>
   </div>
-  <div class="title-foot" id="title-foot">v1.0.0 — ShiftMemo連携</div>
+  <div class="title-foot" id="title-foot">v1.2.0 — ShiftMemo連携</div>
 </div>
 
 <!-- ===== ADVENTURE (会話ラリー) ===== -->
@@ -267,6 +290,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     <div class="panel-head">
       <button class="panel-back" onclick="closePanel()">← 戻る</button>
       <div class="panel-title">パーティ状況</div>
+      <button class="panel-back" style="margin-left:auto" onclick="closePanel();showScreen('title')">🏠</button>
     </div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.6">ステータスはShiftMemoのプレイヤーレベルで決まります。仲間はHP・防御以外は開発者の半分。</div>
     <div id="status-cards"></div>
@@ -279,6 +303,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     <div class="panel-head">
       <button class="panel-back" onclick="closePanel()">← 戻る</button>
       <div class="panel-title">ネタ帳（技の付け替え）</div>
+      <button class="panel-back" style="margin-left:auto" onclick="closePanel();showScreen('title')">🏠</button>
     </div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.6">ShiftMemoで集めたジョークが技になります。各キャラに4つまで装備。タップで付け替え。</div>
     <div id="notebook-content"></div>
@@ -301,6 +326,71 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
   </div>
 </div>
 
+</div>
+
+<!-- RPG UPDATE MODAL -->
+<div class="rpg-overlay" id="rpg-update-modal">
+  <div class="menu-panel" style="max-height:80vh;overflow-y:auto;overscroll-behavior:contain">
+    <div class="menu-title">📋 アップデート履歴 <span onclick="closeRpgUpdate()" style="float:right;cursor:pointer;color:var(--muted)">✕</span></div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:14px">開発者の現在 — DEVELOPER'S PRESENT</div>
+    <div style="font-size:11px;color:#c8f060;font-family:'DM Mono',monospace;margin-bottom:4px">v1.2.0（最新）</div>
+    <div style="font-size:11px;line-height:1.9;margin-bottom:14px;color:var(--text)">
+      <span style="background:#1a3a0a;color:#c8f060;padding:1px 5px;border-radius:3px;font-size:9px">NEW</span> 攻撃・被弾エフェクト（☆レベルで演出が変化）<br>
+      <span style="background:#1a3a0a;color:#c8f060;padding:1px 5px;border-radius:3px;font-size:9px">NEW</span> アップデート履歴を追加<br>
+      <span style="background:#1a1a3a;color:#aaf;padding:1px 5px;border-radius:3px;font-size:9px">FIX</span> 技選択ウィンドウをスクロール可能に
+    </div>
+    <div style="border-top:0.5px solid var(--border);padding-top:12px">
+      <div style="font-size:10px;color:#5dc0ca;font-family:'DM Mono',monospace">v1.1.0</div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.6;margin-bottom:8px">☰メニュー・会話ログ・場面別BGM・音量設定を追加。バトル中のネタ帳ロック。</div>
+      <div style="font-size:10px;color:#5dc0ca;font-family:'DM Mono',monospace">v1.0.0</div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.6">初回リリース。第1章（敵10体）・会話パート・レスバ式コマンドバトル・ShiftMemoのジョークを技として使用・ShiftMemo連携。</div>
+    </div>
+    <div style="border-top:0.5px solid var(--border);margin-top:12px;padding-top:12px">
+      <div style="font-size:10px;color:#FFD700;font-family:'DM Mono',monospace">🚀 今後の予定</div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.6">最終決戦（観測者・マルチバース）／エンディング／仲間の追加イベント など</div>
+    </div>
+  </div>
+</div>
+
+<!-- ☰ MENU BUTTON (常時表示) -->
+<button class="menu-fab" id="menu-fab" onclick="openMenu()">☰</button>
+
+<!-- MENU PANEL -->
+<div class="rpg-overlay" id="rpg-menu">
+  <div class="menu-panel">
+    <div class="menu-title">メニュー <span onclick="closeMenu()" style="float:right;cursor:pointer;color:var(--muted)">✕</span></div>
+    <button class="menu-item" onclick="menuAction('notebook')">📓 ネタ帳（技の付け替え）</button>
+    <button class="menu-item" onclick="menuAction('status')">📊 パーティ状況</button>
+    <button class="menu-item" onclick="menuAction('log')">💬 会話ログ</button>
+    <button class="menu-item" onclick="menuAction('settings')">🔊 設定（音量）</button>
+    <button class="menu-item" onclick="menuAction('title')">🏠 タイトルへ</button>
+    <button class="menu-item" onclick="menuAction('shiftmemo')">← ShiftMemoに戻る</button>
+    <button class="menu-item danger" onclick="menuAction('reset')">🗑 RPGデータをリセット</button>
+  </div>
+</div>
+
+<!-- LOG MODAL -->
+<div class="rpg-overlay" id="log-modal">
+  <div class="menu-panel">
+    <div class="menu-title">💬 会話ログ <span onclick="closeLog()" style="float:right;cursor:pointer;color:var(--muted)">✕</span></div>
+    <div id="log-list" style="max-height:60vh;overflow-y:auto;overscroll-behavior:contain"></div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="rpg-overlay" id="settings-modal">
+  <div class="menu-panel">
+    <div class="menu-title">🔊 設定 <span onclick="closeSettings()" style="float:right;cursor:pointer;color:var(--muted)">✕</span></div>
+    <div style="margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>🎵 BGM音量</span><span id="set-bgm-val" style="color:var(--accent);font-family:'DM Mono',monospace">50</span></div>
+      <input type="range" min="0" max="100" value="50" id="set-bgm" oninput="onBgmSlider(this.value)" style="width:100%">
+    </div>
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>🔔 効果音（SE）音量</span><span id="set-se-val" style="color:var(--accent);font-family:'DM Mono',monospace">60</span></div>
+      <input type="range" min="0" max="100" value="60" id="set-se" oninput="onSeSlider(this.value)" style="width:100%">
+    </div>
+    <div style="font-size:10px;color:var(--muted);line-height:1.6;margin-top:14px">0にすると消音されます。設定は自動保存されます。</div>
+  </div>
 </div>
 
 <!-- JOKE PICK -->
@@ -339,44 +429,171 @@ const ATTR={jigyaku:{n:'自虐',c:'#5dca8a'},hiniku:{n:'皮肉',c:'#ff9dc0'},daj
 // RPG用ジョーク技マスター（ShiftMemoのジョーク数と独立。idはrを付ける）
 // 威力 = ☆レベル基準（star*基礎）＋ステ。属性で相性
 const SKILLS=[
-  // ☆1（初期付与4つ＝開発者の初期装備。初回起動でcollectedにも追加）
-  {id:'s1',star:1,attr:'jigyaku',ja:'どうせ俺なんて無職寸前だし',pow:10},
-  {id:'s2',star:1,attr:'hiniku',ja:'お前のセンス、令和に置いてきた？',pow:10},
-  {id:'s3',star:1,attr:'dajare',ja:'布団がふっとんだ！どう、効いた？',pow:10},
-  {id:'s4',star:1,attr:'meta',ja:'これゲームだから俺は負けない設定',pow:10},
-  // ☆2
-  {id:'s5',star:2,attr:'jigyaku',ja:'貯金残高？　見ないことで守ってる',pow:18},
-  {id:'s6',star:2,attr:'hiniku',ja:'その理論、義務教育で習った？',pow:18},
-  {id:'s7',star:2,attr:'dajare',ja:'家賃がカチン!と来たわ',pow:18},
-  {id:'s8',star:2,attr:'tetsugaku',ja:'働くとは何か、君は考えたことが？',pow:18},
-  // ☆3
-  {id:'s9',star:3,attr:'hiniku',ja:'論破された顔、スクショしていい？',pow:28},
-  {id:'s10',star:3,attr:'meta',ja:'作者、ここのセリフ手抜きしてるぞ',pow:28},
-  {id:'s11',star:3,attr:'jigyaku',ja:'底辺だけど、底があるだけマシ',pow:28},
-  // ☆4
-  {id:'s12',star:4,attr:'tetsugaku',ja:'時給で計れぬ価値を、君は知らない',pow:40},
-  {id:'s13',star:4,attr:'dajare',ja:'デバッグ中に、出っ歯食う愚',pow:40},
-  // ☆5
-  {id:'s14',star:5,attr:'hiniku',ja:'君の人生、無料版でも要らないな',pow:55},
-  {id:'s15',star:5,attr:'meta',ja:'第四の壁ごしに殴る、これ反則',pow:55},
-  // ☆6
-  {id:'s16',star:6,attr:'tetsugaku',ja:'存在とは家賃の支払いの連続である',pow:72},
-  {id:'s17',star:6,attr:'shimo',ja:'下ネタは封印してた…解禁するぞ',pow:72},
-  // ☆7
-  {id:'s18',star:7,attr:'tetsugaku',ja:'宇宙の真理：面白い奴だけが残る',pow:95},
-  // ☆8
-  {id:'s19',star:8,attr:'meta',ja:'これは作者の自己投影だと暴露する',pow:125},
-  // ☆9
-  {id:'s20',star:9,attr:'hiniku',ja:'お前の全存在、論破済みだ',pow:160},
-  // ☆10（神ジョーク級）
-  {id:'s21',star:10,attr:'tetsugaku',ja:'笑いとは、絶望に勝った者の証だ',pow:210}
+  {id:'j1',star:1,attr:'hiniku',ja:"開発者はお金がないので、このアプリは無料です。",pow:10},
+  {id:'j2',star:1,attr:'dajare',ja:"バイトの給料日、財布が一瞬だけ膨らむ。一瞬だけ。",pow:10},
+  {id:'j3',star:1,attr:'tetsugaku',ja:"時給計算したら、移動時間込みで最低賃金を下回った。",pow:10},
+  {id:'j4',star:1,attr:'tetsugaku',ja:"退勤ボタンを押した瞬間だけ、人生に希望が持てる。",pow:10},
+  {id:'j5',star:1,attr:'shimo',ja:"「今日も頑張った」と思ったら、まだ半分だった。",pow:10},
+  {id:'j6',star:1,attr:'jigyaku',ja:"深夜バイトの唯一のメリット：電車が空いている。",pow:10},
+  {id:'j7',star:1,attr:'hiniku',ja:"店長「お願いが」私「（給料上げて）」",pow:10},
+  {id:'j8',star:1,attr:'dajare',ja:"シフト希望を全部出したら全部却下された。",pow:10},
+  {id:'j9',star:1,attr:'tetsugaku',ja:"交通費が時給より高い日がある。",pow:10},
+  {id:'j10',star:1,attr:'meta',ja:"このアプリを使う時間も時給換算したい。",pow:10},
+  {id:'j11',star:1,attr:'shimo',ja:"「やりがい」という見えない給料をもらっている。",pow:10},
+  {id:'j12',star:1,attr:'jigyaku',ja:"バイト終わりのご飯が一番うまい。",pow:10},
+  {id:'j13',star:1,attr:'hiniku',ja:"今月の交通費を計算したら泣きそうになった。",pow:10},
+  {id:'j14',star:1,attr:'dajare',ja:"深夜割増25%のために命を削っている。",pow:10},
+  {id:'j15',star:1,attr:'tetsugaku',ja:"給料日の翌日にはもう残高が不安。",pow:10},
+  {id:'j16',star:1,attr:'meta',ja:"「楽なバイト」は都市伝説。",pow:10},
+  {id:'j17',star:1,attr:'shimo',ja:"今日も社会の歯車として精一杯回った。",pow:10},
+  {id:'j18',star:1,attr:'jigyaku',ja:"このアプリも誰かがバイト中に作ったのかも。",pow:10},
+  {id:'j19',star:1,attr:'hiniku',ja:"時給1000円の壁を越えた日、少し大人になる。",pow:10},
+  {id:'j20',star:1,attr:'dajare',ja:"開発者はラーメンが食べたい。真剣に。",pow:10},
+  {id:'j21',star:1,attr:'tetsugaku',ja:"バイト中の1分は家でのDONの10分に感じる。",pow:10},
+  {id:'j22',star:1,attr:'tetsugaku',ja:"レジ締めが1円合わないと宇宙が止まる。",pow:10},
+  {id:'j23',star:1,attr:'shimo',ja:"制服に着替えると別人格が起動する。",pow:10},
+  {id:'j24',star:1,attr:'jigyaku',ja:"出勤前の「行きたくない」は万国共通。",pow:10},
+  {id:'j25',star:1,attr:'hiniku',ja:"休憩時間だけ人間に戻れる。",pow:10},
+  {id:'j26',star:2,attr:'dajare',ja:"103万の壁を意識しながら働く。壁、壊していい？",pow:18},
+  {id:'j27',star:2,attr:'tetsugaku',ja:"掛け持ちは二つの会社に搾取されること。",pow:18},
+  {id:'j28',star:2,attr:'meta',ja:"有給を取ると罪悪感がある国に生まれた。",pow:18},
+  {id:'j29',star:2,attr:'shimo',ja:"バイトリーダーは給料が上がらない出世。",pow:18},
+  {id:'j30',star:2,attr:'jigyaku',ja:"「経験が積める」=お金を払いたくない",pow:18},
+  {id:'j31',star:2,attr:'hiniku',ja:"閉店作業後、人類で一番自由を感じる。",pow:18},
+  {id:'j32',star:2,attr:'dajare',ja:"「お客様は神様」を作った人を恨んでいる。",pow:18},
+  {id:'j33',star:2,attr:'tetsugaku',ja:"0時を過ぎると時給が上がる音がする気がする。",pow:18},
+  {id:'j34',star:2,attr:'meta',ja:"このアプリで計算するたび開発者に感謝してほしい。",pow:18},
+  {id:'j35',star:2,attr:'shimo',ja:"給料日前の財布はブラックホールより軽い。",pow:18},
+  {id:'j36',star:2,attr:'jigyaku',ja:"「少し早めに来て」=無給で来い",pow:18},
+  {id:'j37',star:2,attr:'hiniku',ja:"実質時給を計算すると現実逃避したくなる。",pow:18},
+  {id:'j38',star:2,attr:'dajare',ja:"このアプリを開くたび開発者がご飯を食べられる（嘘）。",pow:18},
+  {id:'j39',star:2,attr:'tetsugaku',ja:"社員「主体的に動いて」私「時給上がってから」",pow:18},
+  {id:'j40',star:2,attr:'meta',ja:"バイト後の星空が一番きれいな理由は不明。",pow:18},
+  {id:'j41',star:2,attr:'shimo',ja:"面接「長所は？」私「時間通り来ること」",pow:18},
+  {id:'j42',star:2,attr:'jigyaku',ja:"レジの「袋いりません」で1日が報われる。",pow:18},
+  {id:'j43',star:2,attr:'hiniku',ja:"先輩の「自分で考えて」は思考放棄の合図。",pow:18},
+  {id:'j44',star:2,attr:'dajare',ja:"シフトの「応相談」は断れない呪文。",pow:18},
+  {id:'j45',star:2,attr:'tetsugaku',ja:"バイト用の笑顔は3年で職人技になる。",pow:18},
+  {id:'j46',star:3,attr:'tetsugaku',ja:"人生で一番真剣に時計を見る場所：バイト中。",pow:28},
+  {id:'j47',star:3,attr:'shimo',ja:"「好きなことで生きる」私「寝るのが好き」",pow:28},
+  {id:'j48',star:3,attr:'jigyaku',ja:"休憩10分で人類の儚さを理解する。",pow:28},
+  {id:'j49',star:3,attr:'hiniku',ja:"寄付した人は天国に行けます（保証なし）。",pow:28},
+  {id:'j50',star:3,attr:'dajare',ja:"「頑張れば報われる」を信じてた自分に会いたい。",pow:28},
+  {id:'j51',star:3,attr:'tetsugaku',ja:"時給換算すると映画すら惜しい。それが現代人。",pow:28},
+  {id:'j52',star:3,attr:'meta',ja:"このアプリの制作時間を時給換算したら泣く。",pow:28},
+  {id:'j53',star:3,attr:'shimo',ja:"バイト仲間との絆は戦友に近い。",pow:28},
+  {id:'j54',star:3,attr:'tetsugaku',ja:"閉店後の静かな店で人生を考えるのが好きだった。",pow:28},
+  {id:'j55',star:3,attr:'hiniku',ja:"「引き継ぎお願い」=仕事が終わらなかった証。",pow:28},
+  {id:'j56',star:3,attr:'dajare',ja:"社会保険の壁を越えても給料は変わらない。",pow:28},
+  {id:'j57',star:3,attr:'tetsugaku',ja:"「アルバイト」は独語で労働。本質を突く。",pow:28},
+  {id:'j58',star:3,attr:'meta',ja:"理不尽さへの耐性こそ社会人の第一スキル。",pow:28},
+  {id:'j59',star:3,attr:'shimo',ja:"バイトを辞める日の空は特別に青い。",pow:28},
+  {id:'j60',star:3,attr:'jigyaku',ja:"レジ列が伸びるほど時間が遅くなる相対性理論。",pow:28},
+  {id:'j61',star:3,attr:'hiniku',ja:"「やる気ある？」と聞く人にやる気を奪われる。",pow:28},
+  {id:'j62',star:3,attr:'dajare',ja:"バイトの夢を見て休んだ気がしない朝がある。",pow:28},
+  {id:'j63',star:3,attr:'tetsugaku',ja:"時給は同じでも、優しい客の日は豊かだ。",pow:28},
+  {id:'j64',star:3,attr:'meta',ja:"新人に教える時、自分の成長に気づく。",pow:28},
+  {id:'j65',star:3,attr:'shimo',ja:"「あと5分」が一番長い5分。",pow:28},
+  {id:'j66',star:4,attr:'jigyaku',ja:"時給1円上げるのに、どれだけ魂を売る？",pow:40},
+  {id:'j67',star:4,attr:'hiniku',ja:"開発者の夢：このアプリでグリーン車に乗る。",pow:40},
+  {id:'j68',star:4,attr:'dajare',ja:"「向いてないかも」と思って三年経った。",pow:40},
+  {id:'j69',star:4,attr:'tetsugaku',ja:"深夜帰り、コンビニの匂いが最も優しい瞬間。",pow:40},
+  {id:'j70',star:4,attr:'jigyaku',ja:"「上がったら貯金」を5年言い続けている。",pow:40},
+  {id:'j71',star:4,attr:'shimo',ja:"100円の寄付で開発者は全力で喜ぶ。",pow:40},
+  {id:'j72',star:4,attr:'jigyaku',ja:"労働は時間を金に変える錬金術。効率は悪い。",pow:40},
+  {id:'j73',star:4,attr:'hiniku',ja:"常連客のことを知らぬ間に詳しくなっている。",pow:40},
+  {id:'j74',star:4,attr:'dajare',ja:"手取りを見て「これが私の一ヶ月か」と思う儀式。",pow:40},
+  {id:'j75',star:4,attr:'tetsugaku',ja:"開発者はあなたが読んでると知らないが感謝してる。",pow:40},
+  {id:'j76',star:4,attr:'meta',ja:"「正社員=安泰」の神話が懐かしい。",pow:40},
+  {id:'j77',star:4,attr:'shimo',ja:"辞める時の解放感は人類最高の自由の一つ。",pow:40},
+  {id:'j78',star:4,attr:'jigyaku',ja:"分単位で時給を計算したら本物のバイト戦士。",pow:40},
+  {id:'j79',star:4,attr:'hiniku',ja:"寄付は文化的行為。アート支援のようなもの。",pow:40},
+  {id:'j80',star:4,attr:'dajare',ja:"「また来る」客の8割は来ない（個人調べ）。",pow:40},
+  {id:'j81',star:4,attr:'tetsugaku',ja:"終電を逃すと時給が深夜タクシー代に消える。",pow:40},
+  {id:'j82',star:4,attr:'meta',ja:"バイトの語学力は接客で鍛えられる。",pow:40},
+  {id:'j83',star:4,attr:'shimo',ja:"「人手不足」は給料を上げない言い訳に使われる。",pow:40},
+  {id:'j84',star:4,attr:'jigyaku',ja:"レジ打ちの速さは履歴書に書けない誇り。",pow:40},
+  {id:'j85',star:4,attr:'hiniku',ja:"バイト先の備品で一番好きなのは休憩室の椅子。",pow:40},
+  {id:'j86',star:5,attr:'tetsugaku',ja:"人生の深夜割増は誰も払ってくれない。",pow:55},
+  {id:'j87',star:5,attr:'tetsugaku',ja:"開発者はある夜「計算面倒」と思いアプリを作った。",pow:55},
+  {id:'j88',star:5,attr:'meta',ja:"寄付は因果応報であなたに良いことが起きる（根拠なし）。",pow:55},
+  {id:'j89',star:5,attr:'shimo',ja:"社会人が最初に学ぶのは理不尽さへの耐性。",pow:55},
+  {id:'j90',star:5,attr:'jigyaku',ja:"時給がある限り人は時間と戦う。それが資本主義。",pow:55},
+  {id:'j91',star:5,attr:'hiniku',ja:"深夜の帰り道、財布は軽いが心は軽い。",pow:55},
+  {id:'j92',star:5,attr:'dajare',ja:"これを読むあなたは働くか休むか。お疲れ様です。",pow:55},
+  {id:'j93',star:5,attr:'tetsugaku',ja:"「夢を持て」と言う大人は夢を叶えていない。",pow:55},
+  {id:'j94',star:5,attr:'meta',ja:"給料日前の1週間は最高の節約術を学ぶ期間。",pow:55},
+  {id:'j95',star:5,attr:'shimo',ja:"開発者へのファンレターはPayPayで受付中。",pow:55},
+  {id:'j96',star:5,attr:'jigyaku',ja:"バイトは社会という劇場の舞台稽古だ。",pow:55},
+  {id:'j97',star:5,attr:'hiniku',ja:"疲れた日の自分への缶コーヒーは経費にしたい。",pow:55},
+  {id:'j98',star:5,attr:'dajare',ja:"理不尽な客の後の優しい客は天使に見える。",pow:55},
+  {id:'j99',star:5,attr:'tetsugaku',ja:"働くとは、誰かの「ありがとう」を集める旅だ。",pow:55},
+  {id:'j100',star:5,attr:'tetsugaku',ja:"レジの向こうにも、同じ人生がある。",pow:55},
+  {id:'j101',star:6,attr:'shimo',ja:"資本主義の皮肉：金が要る人ほど時間を買えない。",pow:72},
+  {id:'j102',star:6,attr:'tetsugaku',ja:"人生で最も正直な瞬間：給料明細を見た直後。",pow:72},
+  {id:'j103',star:6,attr:'jigyaku',ja:"理想と家賃の現実の間で人は生きている。",pow:72},
+  {id:'j104',star:6,attr:'dajare',ja:"深夜手当のたび、国が認める夜の価値を思う。",pow:72},
+  {id:'j105',star:6,attr:'tetsugaku',ja:"開発者も一儲け狙った。現実は甘くない。だから寄付を。",pow:72},
+  {id:'j106',star:6,attr:'tetsugaku',ja:"我々は賃金という数字に還元された存在だ。",pow:72},
+  {id:'j107',star:6,attr:'shimo',ja:"「やりがい搾取」の年、誰かが泣いて残業した。",pow:72},
+  {id:'j108',star:6,attr:'jigyaku',ja:"寄付は文明維持への貢献である（大げさ）。",pow:72},
+  {id:'j109',star:6,attr:'hiniku',ja:"時間を売る我々は、未来の自分から前借りしている。",pow:72},
+  {id:'j110',star:6,attr:'dajare',ja:"労働の尊さは、終わった後にだけ見える。",pow:72},
+  {id:'j111',star:7,attr:'tetsugaku',ja:"時給で測る人生で、測れぬものの価値を問う。友情、休息——無限かゼ…",pow:95},
+  {id:'j112',star:7,attr:'meta',ja:"開発者はあなたが開くたび喜ぶ。画面の向こうに感謝する人間がいる。",pow:95},
+  {id:'j113',star:7,attr:'shimo',ja:"深夜3時に働く人へ。世界が眠る中、あなたが社会を支えている。",pow:95},
+  {id:'j114',star:7,attr:'jigyaku',ja:"このアプリは誰かの「面倒」から生まれた。あなたの面倒も誰かを救う…",pow:95},
+  {id:'j115',star:7,attr:'hiniku',ja:"金で買えぬ時間を売る我々は、最も贅沢な貧者かもしれない。",pow:95},
+  {id:'j116',star:7,attr:'dajare',ja:"働く手は、世界を静かに動かし続ける無名の歯車だ。",pow:95},
+  {id:'j117',star:7,attr:'tetsugaku',ja:"疲れの底で見る朝日は、給料より価値がある時がある。",pow:95},
+  {id:'j118',star:8,attr:'meta',ja:"労働とは時間を貸すこと。今夜もあなたは、返らぬ時間とともに貸し続…",pow:125},
+  {id:'j119',star:8,attr:'tetsugaku',ja:"開発者はこれを書きつつ自問した。プログラマーか哲学者か。答えは出…",pow:125},
+  {id:'j120',star:8,attr:'jigyaku',ja:"給料日は社会が約束を守る日。月に一度、世界が少しだけ正しく見える。",pow:125},
+  {id:'j121',star:8,attr:'hiniku',ja:"あなたの労働は誰かの日常を支える見えない柱だ。気づかれずとも、確…",pow:125},
+  {id:'j122',star:8,attr:'tetsugaku',ja:"時間と引き換えに得た金で、また時間を買い戻そうとする。人生は美し…",pow:125},
+  {id:'j123',star:9,attr:'tetsugaku',ja:"今日ここを開いたのは偶然ではない。この日を選んだことに意味がある…",pow:160},
+  {id:'j124',star:9,attr:'meta',ja:"深夜に働く人の背中は、誰も見ぬ場所で光る。スポットライトなき舞台…",pow:160},
+  {id:'j125',star:9,attr:'shimo',ja:"寄付はデジタルの海へ投じた小石。波紋は見えずとも、開発者の胸に必…",pow:160},
+  {id:'j126',star:9,attr:'jigyaku',ja:"本当に価値あるものに値段はない。友の笑顔も、夕焼けも、今夜のあな…",pow:160},
+  {id:'j127',star:9,attr:'hiniku',ja:"毎日お疲れ様。給料が少なくても、シフトがきつくても、あなたが今日…",pow:160},
+  {id:'j128',star:9,attr:'dajare',ja:"働くあなたは、世界という大きな機械の、最も尊い部品だ。代えなど、…",pow:160},
+  {id:'j129',star:9,attr:'tetsugaku',ja:"いつか振り返る時、この苦労は物語になる。今はまだ、その序章の途中…",pow:160},
+  {id:'j130',star:10,attr:'tetsugaku',ja:"🏆 伝説のジョーク 🏆",pow:210},
+  {id:'j131',star:10,attr:'shimo',ja:"🏆 王者の言葉 🏆",pow:210},
+  {id:'j132',star:10,attr:'tetsugaku',ja:"🏆 黄金の真実 🏆",pow:210},
+  {id:'j133',star:10,attr:'hiniku',ja:"🏆 宮殿からの手紙 🏆",pow:210},
+  {id:'j134',star:10,attr:'tetsugaku',ja:"🏆 最終奥義 🏆",pow:210},
+  {id:'j135',star:10,attr:'tetsugaku',ja:"🏆 時の支配者 🏆",pow:210},
+  {id:'j136',star:1,attr:'meta',ja:"タイムカードを押す指に、今日の全意志が宿る。",pow:10},
+  {id:'j137',star:1,attr:'shimo',ja:"「あと10分で休憩」が一番長い10分。",pow:10},
+  {id:'j138',star:1,attr:'jigyaku',ja:"出勤前のコンビニで買う飲み物が、唯一の自由。",pow:10},
+  {id:'j139',star:2,attr:'hiniku',ja:"「シフト代わって」のLINEは、なぜか自分にだけ届く。",pow:18},
+  {id:'j140',star:2,attr:'dajare',ja:"忙しい日ほど時間が早い。暇な日ほど時計が凍る。",pow:18},
+  {id:'j141',star:3,attr:'tetsugaku',ja:"バイトを通して、人は「我慢」という名の筋肉を鍛える。",pow:28},
+  {id:'j142',star:3,attr:'meta',ja:"レジで「ちょうどです」と言える時の小さな勝利感。",pow:28},
+  {id:'j143',star:4,attr:'shimo',ja:"給料明細の数字より、誰かの「ありがとう」が効く日もある。",pow:40},
+  {id:'j144',star:4,attr:'jigyaku',ja:"開発者はこのジョークを満員電車で考えた。座れなかった。",pow:40},
+  {id:'j145',star:5,attr:'hiniku',ja:"働くとは、自分の時間を世界に編み込んでいく行為だ。",pow:55},
+  {id:'j146',star:6,attr:'dajare',ja:"賃金は労働の対価ではなく、忍耐への報酬かもしれない。",pow:72},
+  {id:'j147',star:7,attr:'tetsugaku',ja:"今日のあなたの一歩は、未来の誰かの道になる。たとえ時給が安くても…",pow:95},
+  {id:'j148',star:8,attr:'meta',ja:"時間は誰にも平等に与えられた唯一の通貨。あなたは今日、それを誇り…",pow:125},
+  {id:'j149',star:9,attr:'shimo',ja:"このアプリと出会い、ここまで読んでくれたあなたへ。画面の向こうの…",pow:160},
+  {id:'j150',star:10,attr:'jigyaku',ja:"🏆 最後のジョーク 🏆",pow:210}
 ];
-const INITIAL_SKILLS=['s1','s2','s3','s4']; // 初回付与＝図鑑にも載る
+const INITIAL_SKILLS=['j1','j2','j3','j4'];
 
 function getSkill(id){return SKILLS.find(s=>s.id===id);}
 function ownedSkills(){
+  // ShiftMemoで集めたジョーク(collected)を技として使う。最低でも初期4つ。
+  const col=smGetCollected();
+  const ids=col.map(n=>'j'+n).filter(id=>getSkill(id));
+  // RPGで追加解放した分があれば合流（後方互換）
   const p=rpgLoad();
-  return (p&&p.ownedSkills)?p.ownedSkills:INITIAL_SKILLS.slice();
+  let extra=(p&&p.ownedSkills)?p.ownedSkills:[];
+  let all=Array.from(new Set([...INITIAL_SKILLS,...ids,...extra]));
+  // 星の低い順に並べる
+  all.sort((a,b)=>{const sa=getSkill(a),sb=getSkill(b);return (sa?sa.star:0)-(sb?sb.star:0);});
+  return all.length?all:INITIAL_SKILLS.slice();
 }
 
 // ============ パーティ ============
@@ -595,7 +812,7 @@ function sfx(type){try{if(!actx)actx=new(window.AudioContext||window.webkitAudio
   else if(type==='talk'){beep(520,t,0.03,'square');}
   else if(type==='select'){beep(660,t,0.05);}
 }catch(e){}}
-function beep(f,s,d,w){const o=actx.createOscillator(),g=actx.createGain();o.type=w||'sine';o.frequency.value=f;o.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(0.1,s);g.gain.exponentialRampToValueAtTime(0.001,s+d);o.start(s);o.stop(s+d);}
+function beep(f,s,d,w){const o=actx.createOscillator(),g=actx.createGain();o.type=w||'sine';o.frequency.value=f;o.connect(g);g.connect(actx.destination);const vol=(typeof AUDIO!=='undefined'?AUDIO.se:0.6)*0.16;g.gain.setValueAtTime(vol,s);g.gain.exponentialRampToValueAtTime(0.001,s+d);o.start(s);o.stop(s+d);}
 
 // ============ FX ============
 function fxFlash(){const f=document.getElementById('fx-flash');f.style.animation='none';void f.offsetWidth;f.style.animation='flashW 0.3s';}
@@ -618,7 +835,24 @@ function bgClass(type){return 'bg-'+type;}
 // ============ INIT / TITLE ============
 function init(){
   const p=rpgLoad();
+  // 旧バージョンの技ID（s1〜s21）が残っていたら、新ID（j1〜）へ移行
+  if(p){
+    let changed=false;
+    const fix=arr=>arr&&arr.map(id=>{
+      if(getSkill(id))return id; // 有効なIDはそのまま
+      // s番号→j番号への単純移行、それでも無ければ初期技
+      const m=String(id).match(/^s(\d+)$/);
+      if(m&&getSkill('j'+m[1])){changed=true;return 'j'+m[1];}
+      changed=true;return INITIAL_SKILLS[0];
+    });
+    if(p.ownedSkills)p.ownedSkills=fix(p.ownedSkills);
+    if(p.equipped){Object.keys(p.equipped).forEach(k=>{p.equipped[k]=fix(p.equipped[k]);});}
+    if(changed)rpgSave(p);
+  }
   if(p&&typeof p.enemyIdx==='number'&&p.enemyIdx>0){document.getElementById('continue-btn').style.display='block';}
+  // 初回タップでタイトルBGM開始（スマホの自動再生制限対策）
+  const startTitleBgm=()=>{if(typeof playBgm==='function'&&getActiveScreen()==='title')playBgm('title');document.removeEventListener('pointerdown',startTitleBgm);};
+  document.addEventListener('pointerdown',startTitleBgm);
   if(!p||!p.initialized){
     const prog=p||{};
     prog.initialized=true;
@@ -626,11 +860,6 @@ function init(){
     prog.equipped={dev:INITIAL_SKILLS.slice(),ufo:INITIAL_SKILLS.slice(),cat:INITIAL_SKILLS.slice(),frog:INITIAL_SKILLS.slice()};
     prog.enemyIdx=0;
     rpgSave(prog);
-    // 初期スキルをShiftMemo図鑑にも反映（共有collected）
-    try{
-      const col=JSON.parse(localStorage.getItem('collected')||'[]');
-      // RPG初期ジョークはShiftMemoのid体系と別なので、ここではcollectedは触らずRPG内図鑑のみ
-    }catch(e){}
   }
 }
 function startNewGame(){
@@ -652,6 +881,7 @@ function continueGame(){
 
 // ============ ADVENTURE (会話ラリー) ============
 function startPrologue(){
+  if(typeof playBgm==='function')playBgm('adv');
   ADV.lines=PROLOGUE_LINES.slice();
   ADV.idx=0;ADV.afterFn=()=>startAdventure();
   setupAdvBg('town');
@@ -659,6 +889,7 @@ function startPrologue(){
   renderAdvLine();
 }
 function startAdventure(){
+  if(typeof playBgm==='function')playBgm('adv');
   const enemy=ENEMIES[G.enemyIdx];
   if(!enemy){endChapter();return;}
   // 会話を準備
@@ -693,6 +924,7 @@ function renderAdvLine(){
   document.getElementById('adv-speaker').textContent=speakerName;
   document.getElementById('adv-speaker').style.color=speakerColor;
   document.getElementById('adv-text').textContent=line.t;
+  if(typeof pushLog==='function')pushLog(speakerName,line.t,speakerColor);
   // characters display (speaking one big)
   const chars=PARTY_DEF.map(c=>{
     const speaking=c.id===line.who;
@@ -728,6 +960,7 @@ function loadEnemyIntro(){
 function startBattle(){
   sfx('select');
   const e=ENEMIES[G.enemyIdx];
+  if(typeof playBgm==='function')playBgm((e.id===5||e.id===10)?'boss':'battle');
   G.party=PARTY_DEF.map(def=>{const st=calcStats(def.id);return {...def,...st,alive:true};});
   G.enemy={...e,maxhp:e.hp,curhp:e.hp};
   G.tension=0;G.turnIdx=0;G.defending={};G.battleOver=false;
@@ -761,7 +994,7 @@ function renderBattle(){
   document.getElementById('tension-pct').textContent=Math.round(G.tension)+'%';
   document.getElementById('ult-btn').disabled=G.tension<100;
 }
-function setMsg(speaker,text,color){document.getElementById('battle-msg').innerHTML=(speaker?`<span class="speaker" style="color:${color||'var(--accent)'}">${speaker}</span>`:'')+text;}
+function setMsg(speaker,text,color){document.getElementById('battle-msg').innerHTML=(speaker?`<span class="speaker" style="color:${color||'var(--accent)'}">${speaker}</span>`:'')+text;if(typeof pushLog==='function'&&text)pushLog(speaker,text,color);}
 function aliveParty(){return G.party.filter(c=>c.alive);}
 function currentChar(){return aliveParty()[G.turnIdx];}
 function startPlayerTurn(){
@@ -797,9 +1030,9 @@ function openJokePick(char,isUlt){
       <div class="joke-opt-pow">威力目安: ${pow}${isUlt?' ＋神ジョーク補正':''}</div>
     </div>`;
   }).join('');
-  document.getElementById('joke-pick').classList.add('show');
+  document.getElementById('joke-pick').classList.add('show');document.body.style.overflow='hidden';
 }
-function closeJokePick(){document.getElementById('joke-pick').classList.remove('show');}
+function closeJokePick(){document.getElementById('joke-pick').classList.remove('show');document.body.style.overflow='';}
 function calcDamage(char,skill,isUlt,roll){
   const a=char.atk;let base=a+skill.pow;
   const isWeak=G.enemy.weak===skill.attr;
@@ -832,6 +1065,7 @@ function useJoke(charId,skillId,isUlt){
   closeJokePick();setCmdEnabled(false);
   const char=G.party.find(c=>c.id===charId);
   const skill=getSkill(skillId);
+  if(!skill){toast('技データが見つかりません');setCmdEnabled(true);return;}
   const res=calcDamage(char,skill,isUlt,true);
   const v=VOICE[charId];
   if(isUlt)G.tension=0;else G.tension=Math.min(100,G.tension+18);
@@ -855,6 +1089,7 @@ function applyPlayerDamage(char,skill,res,isUlt){
     setTimeout(()=>battleReact(()=>nextPlayerTurn()),1100);return;
   }
   const es=document.getElementById('enemy-sprite');es.classList.remove('hit');void es.offsetWidth;es.classList.add('hit');
+  if(typeof attackEffect==='function')attackEffect(skill.star,skill.attr,'enemy');
   if(isUlt){fxFlash();fxShake();sfx('ult');fxParticles(['#ff9dc0','#FFD700','#fff','#ff6b9d']);}
   else if(res.crit){fxShake();sfx('crit');fxParticles(['#FFD700','#fff']);}
   else sfx('hit');
@@ -906,6 +1141,7 @@ function enemyTurn(){
     if(G.defending[target.id])dmg=Math.round(dmg*0.4);
     target.hp-=dmg;sfx('hit');fxFlash();
     const el=document.getElementById('char-'+target.id);if(el){el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');}
+    if(typeof attackEffect==='function'){const estar=Math.min(9,Math.ceil((G.enemy.atk||15)/4));attackEffect(estar,'hiniku',target.id);}
     showDmg('self',target,dmg,'normal','');
     const hv=VOICE[target.id].hit;
     if(target.hp<=0){target.hp=0;target.alive=false;setMsg(target.name,'は沈黙してしまった…','var(--muted)');}
@@ -969,16 +1205,160 @@ function endChapter(){
 }
 </script>
 <script>
+// ============ 設定（音量） ============
+function getAudioSettings(){
+  try{const s=JSON.parse(localStorage.getItem('rpg_audio')||'null');if(s)return s;}catch(e){}
+  return {bgm:0.5,se:0.6};
+}
+function saveAudioSettings(s){localStorage.setItem('rpg_audio',JSON.stringify(s));}
+let AUDIO=getAudioSettings();
+
+// ============ BGM（Web Audio 合成・ループ） ============
+let bgmCtx=null,bgmTimer=null,bgmGain=null,bgmCurrent=null;
+function ensureBgmCtx(){if(!bgmCtx){try{bgmCtx=new(window.AudioContext||window.webkitAudioContext)();bgmGain=bgmCtx.createGain();bgmGain.gain.value=AUDIO.bgm*0.18;bgmGain.connect(bgmCtx.destination);}catch(e){bgmCtx=null;}}}
+// 各シーンのメロディ（周波数の配列・テンポ）
+const BGM_TRACKS={
+  title:{tempo:0.42,wave:'triangle',notes:[392,0,440,0,523,0,440,0,349,0,392,0,330,0,0,0]},
+  adv:{tempo:0.36,wave:'sine',notes:[294,330,349,330,294,262,294,0,330,349,392,349,330,294,330,0]},
+  battle:{tempo:0.22,wave:'square',notes:[330,330,392,330,294,330,0,330,262,294,330,294,247,262,0,0]},
+  boss:{tempo:0.20,wave:'sawtooth',notes:[220,233,220,196,220,261,220,196,174,196,220,233,261,233,220,0]}
+};
+function playBgm(scene){
+  if(AUDIO.bgm<=0){stopBgm();bgmCurrent=scene;return;}
+  if(bgmCurrent===scene&&bgmTimer)return;
+  bgmCurrent=scene;
+  stopBgm();
+  ensureBgmCtx();
+  if(!bgmCtx)return;
+  if(bgmCtx.state==='suspended')bgmCtx.resume();
+  const track=BGM_TRACKS[scene]||BGM_TRACKS.title;
+  let i=0;
+  const playNote=()=>{
+    const f=track.notes[i%track.notes.length];
+    if(f>0){
+      const o=bgmCtx.createOscillator(),g=bgmCtx.createGain();
+      o.type=track.wave;o.frequency.value=f;
+      o.connect(g);g.connect(bgmGain);
+      const t=bgmCtx.currentTime;
+      g.gain.setValueAtTime(0.0001,t);
+      g.gain.linearRampToValueAtTime(0.5,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,t+track.tempo*0.9);
+      o.start(t);o.stop(t+track.tempo);
+    }
+    // ベース音（低音）を時々
+    if(i%4===0&&f>0){
+      const ob=bgmCtx.createOscillator(),gb=bgmCtx.createGain();
+      ob.type='triangle';ob.frequency.value=f/2;
+      ob.connect(gb);gb.connect(bgmGain);
+      const t=bgmCtx.currentTime;
+      gb.gain.setValueAtTime(0.3,t);gb.gain.exponentialRampToValueAtTime(0.001,t+track.tempo*1.5);
+      ob.start(t);ob.stop(t+track.tempo*1.5);
+    }
+    i++;
+  };
+  playNote();
+  bgmTimer=setInterval(playNote,track.tempo*1000);
+}
+function stopBgm(){if(bgmTimer){clearInterval(bgmTimer);bgmTimer=null;}}
+function setBgmVolume(v){AUDIO.bgm=v;saveAudioSettings(AUDIO);if(bgmGain)bgmGain.gain.value=v*0.18;if(v<=0)stopBgm();else if(bgmCurrent)playBgm(bgmCurrent);}
+function setSeVolume(v){AUDIO.se=v;saveAudioSettings(AUDIO);}
+
+// ============ ☰ メニュー ============
+function openMenu(){document.getElementById('rpg-menu').classList.add('show');}
+function closeMenu(){document.getElementById('rpg-menu').classList.remove('show');}
+function menuAction(act){
+  closeMenu();
+  if(act==='shiftmemo'){if(getActiveScreen()==='battle'){if(!confirm('バトル中です。中断してShiftMemoに戻りますか？（この戦闘の進行は失われます）'))return;}backToShiftMemo();}
+  else if(act==='title'){if(getActiveScreen()==='battle'){if(!confirm('バトル中です。中断してタイトルに戻りますか？'))return;}stopBgm();playBgm('title');showScreen('title');}
+  else if(act==='notebook'){if(getActiveScreen()==='battle'){toast('バトル中は技を変更できません');return;}openNotebook();}
+  else if(act==='status'){openStatus();}
+  else if(act==='log'){openLog();}
+  else if(act==='settings'){openSettings();}
+  else if(act==='reset'){if(confirm('RPGの進行データだけをリセットします。（ShiftMemoのデータは消えません）よろしいですか？')){localStorage.removeItem('rpg_progress');localStorage.removeItem('rpg_cleared_chapters');localStorage.removeItem('rpg_achievements');location.reload();}}
+}
+
+// ============ 会話ログ ============
+let DIALOG_LOG=[];
+function pushLog(speaker,text,color){DIALOG_LOG.push({speaker,text,color});if(DIALOG_LOG.length>200)DIALOG_LOG.shift();}
+function openLog(){
+  const box=document.getElementById('log-list');
+  if(DIALOG_LOG.length===0){box.innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:20px">まだ会話がありません</div>';}
+  else{box.innerHTML=DIALOG_LOG.map(l=>`<div style="margin-bottom:8px;font-size:12px;line-height:1.5"><span style="color:${l.color||'#fff'};font-weight:700">${l.speaker||''}</span>${l.speaker?'：':''}${l.text}</div>`).join('');}
+  document.getElementById('log-modal').classList.add('show');
+  setTimeout(()=>{const b=document.getElementById('log-list');b.scrollTop=b.scrollHeight;},50);
+}
+function closeLog(){document.getElementById('log-modal').classList.remove('show');}
+
+// ============ 設定画面 ============
+function openSettings(){
+  document.getElementById('set-bgm').value=Math.round(AUDIO.bgm*100);
+  document.getElementById('set-se').value=Math.round(AUDIO.se*100);
+  document.getElementById('set-bgm-val').textContent=Math.round(AUDIO.bgm*100);
+  document.getElementById('set-se-val').textContent=Math.round(AUDIO.se*100);
+  document.getElementById('settings-modal').classList.add('show');
+}
+function closeSettings(){document.getElementById('settings-modal').classList.remove('show');}
+function onBgmSlider(v){document.getElementById('set-bgm-val').textContent=v;setBgmVolume(v/100);}
+function onSeSlider(v){document.getElementById('set-se-val').textContent=v;setSeVolume(v/100);}
+
+// ============ アップデート履歴 ============
+function openRpgUpdate(){document.getElementById('rpg-update-modal').classList.add('show');}
+function closeRpgUpdate(){document.getElementById('rpg-update-modal').classList.remove('show');}
+
+// ============ 攻撃エフェクト（☆レベル別 絵文字＋2Dアニメ） ============
+// targetSel: 'enemy' か 'self'(被弾キャラのid)
+function attackEffect(star,attr,targetSel){
+  const fld=document.getElementById('battle-field');
+  if(!fld)return;
+  // 位置決め
+  let x,y;
+  if(targetSel==='enemy'){x='75%';y='30%';}
+  else{const el=document.getElementById('char-'+targetSel);x=el?(el.offsetLeft+20)+'px':'30%';y='75%';}
+  // ☆レベルで絵文字とアニメを変える
+  let emojis,anim,size;
+  if(star<=3){emojis=['💢','💬','❗'];anim='fxHit';size=34;}
+  else if(star<=6){emojis=['⚡','🔥','✴️'];anim='fxSlash';size=46;}
+  else if(star<=9){emojis=['💥','✨','⭐'];anim='fxBig';size=58;}
+  else{emojis=['🌟','🌈','💫','🔥'];anim='fxBig';size=72;}
+  // 属性で色味の絵文字を少し寄せる
+  const attrEmoji={jigyaku:'😭',hiniku:'🙄',dajare:'😏',tetsugaku:'🌀',meta:'👁️',shimo:'💦'};
+  const main=emojis[Math.floor(Math.random()*emojis.length)];
+  // メインエフェクト
+  const e=document.createElement('div');
+  e.className='fx-emoji';e.textContent=main;
+  e.style.cssText=`position:absolute;left:${x};top:${y};transform:translate(-50%,-50%);font-size:${size}px;z-index:6;pointer-events:none;animation:${anim} 0.7s ease-out forwards`;
+  fld.appendChild(e);
+  // ☆7以上はリング状の拡散も追加
+  if(star>=7){
+    const ring=document.createElement('div');
+    ring.style.cssText=`position:absolute;left:${x};top:${y};width:60px;height:60px;border-radius:50%;border:3px solid ${star>=10?'#FFD700':'#fff'};z-index:5;pointer-events:none;animation:fxRing 0.6s ease-out forwards`;
+    fld.appendChild(ring);
+    setTimeout(()=>ring.remove(),650);
+  }
+  // 属性絵文字をサブで散らす（中ランク以上）
+  if(star>=4){
+    const sub=document.createElement('div');
+    sub.textContent=attrEmoji[attr]||'✨';
+    sub.style.cssText=`position:absolute;left:${x};top:${y};font-size:${size*0.5}px;z-index:6;pointer-events:none;animation:fxSlash 0.7s ease-out 0.1s forwards`;
+    fld.appendChild(sub);
+    setTimeout(()=>sub.remove(),850);
+  }
+  setTimeout(()=>e.remove(),750);
+}
+</script>
+<script>
 // ============ SKILL UNLOCK / SHIFTMEMO 連携 ============
 function unlockNextSkill(){
-  const p=rpgLoad()||{};
-  if(!p.ownedSkills)p.ownedSkills=INITIAL_SKILLS.slice();
-  // まだ持っていないスキルを星の低い順に1つ解放
-  const next=SKILLS.find(s=>!p.ownedSkills.includes(s.id));
-  if(next){
-    p.ownedSkills.push(next.id);
-    rpgSave(p);
-    return next;
+  // 勝利報酬：ShiftMemoの図鑑(collected)に未取得ジョークを1つ追加＝RPGの技も増える
+  const col=smGetCollected();
+  // まだ集めていないジョークidを探す（1〜150）
+  let target=null;
+  for(let i=1;i<=150;i++){if(!col.includes(i)&&getSkill('j'+i)){target=i;break;}}
+  if(target){
+    col.push(target);
+    localStorage.setItem('collected',JSON.stringify(col));
+    const sk=getSkill('j'+target);
+    return sk?{ja:sk.ja,star:sk.star}:null;
   }
   return null;
 }
@@ -1040,14 +1420,14 @@ function openSwap(charId,slot){
   const eq=getEquipped(charId);
   document.getElementById('joke-pick-name').textContent='どの技に変える？';
   document.getElementById('joke-pick-list').innerHTML=owned.map(sid=>{
-    const s=getSkill(sid);const a=ATTR[s.attr];
+    const s=getSkill(sid);if(!s)return '';const a=ATTR[s.attr];
     const used=eq.includes(sid);
     return `<div class="joke-opt" onclick="doSwap('${sid}')" style="${used?'opacity:0.5':''}">
       <div class="joke-opt-top"><span class="joke-opt-stars">${'★'.repeat(s.star)}${'☆'.repeat(10-s.star)}</span><span class="joke-opt-attr" style="background:${a.c}33;color:${a.c}">${a.n}</span></div>
       <div class="joke-opt-text">「${s.ja}」${used?' （装備中）':''}</div>
     </div>`;
   }).join('');
-  document.getElementById('joke-pick').classList.add('show');
+  document.getElementById('joke-pick').classList.add('show');document.body.style.overflow='hidden';
 }
 function doSwap(sid){
   const eq=getEquipped(swapTarget.charId).slice();
