@@ -1780,6 +1780,45 @@ function unlockPassive(charId,pid){
   if(!prog.unlockedPassives[charId].includes(pid)){prog.unlockedPassives[charId].push(pid);rpgSave(prog);return true;}
   return false;
 }
+// 実績パッシブの解禁条件（達成でその実績パッシブが解禁される）
+const PASSIVE_UNLOCK_COND={
+  // dev：ネタ収集・会心・神ジョーク・粘り・総合
+  d16:{label:'全150ジョーク収集',check:()=>smGetCollected().length>=150},
+  d17:{label:'ジョーク80種収集',check:()=>smGetCollected().length>=80},
+  d18:{label:'ボスを3体撃破',check:()=>defeatedCount()>=3},
+  d19:{label:'ボスを5体撃破',check:()=>defeatedCount()>=5},
+  d20:{label:'ウォッチャー撃破',check:()=>defeatedCount()>=10},
+  // cat：回復・粘り
+  c16:{label:'ジョーク50種収集',check:()=>smGetCollected().length>=50},
+  c17:{label:'ボスを4体撃破',check:()=>defeatedCount()>=4},
+  c18:{label:'ジョーク120種収集',check:()=>smGetCollected().length>=120},
+  c19:{label:'ボスを7体撃破',check:()=>defeatedCount()>=7},
+  c20:{label:'ウォッチャー撃破',check:()=>defeatedCount()>=10},
+  // frog：防御・タンク
+  f16:{label:'ボスを6体撃破',check:()=>defeatedCount()>=6},
+  f17:{label:'ジョーク60種収集',check:()=>smGetCollected().length>=60},
+  f18:{label:'ボスを5体撃破',check:()=>defeatedCount()>=5},
+  f19:{label:'ボスを8体撃破',check:()=>defeatedCount()>=8},
+  f20:{label:'ウォッチャー撃破',check:()=>defeatedCount()>=10},
+  // ufo：バフ・運・宇宙
+  u16:{label:'ジョーク70種収集',check:()=>smGetCollected().length>=70},
+  u17:{label:'ボスを6体撃破',check:()=>defeatedCount()>=6},
+  u18:{label:'ジョーク100種収集',check:()=>smGetCollected().length>=100},
+  u19:{label:'ボスを9体撃破',check:()=>defeatedCount()>=9},
+  u20:{label:'THE 開発者を撃破',check:()=>{const p=rpgLoad();return p&&p.theDevCleared;}}
+};
+function defeatedCount(){const p=rpgLoad();return (p&&p.defeated)?p.defeated.length:0;}
+// 解禁チェック（条件を満たした実績パッシブを解禁。新規解禁したものを配列で返す）
+function checkPassiveUnlocks(){
+  const newly=[];
+  Object.keys(PASSIVE_UNLOCK_COND).forEach(pid=>{
+    const charId=pid[0]==='d'?'dev':pid[0]==='c'?'cat':pid[0]==='f'?'frog':'ufo';
+    if(isPassiveUnlocked(charId,pid))return;
+    let ok=false;try{ok=PASSIVE_UNLOCK_COND[pid].check();}catch(e){}
+    if(ok){if(unlockPassive(charId,pid)){const p=getPassiveDef(charId,pid);newly.push({charId,pid,name:p?p.name:pid,icon:p?p.icon:'✨'});}}
+  });
+  return newly;
+}
 // キャラが装備しているパッシブ効果を集約（戦闘ロジックから参照）
 function getActivePassiveEffects(charId){
   const eq=getEquippedPassives(charId);const effs={};
@@ -1895,6 +1934,7 @@ function init(){
     prog.enemyIdx=0;
     rpgSave(prog);
   }
+  if(typeof checkPassiveUnlocks==='function')checkPassiveUnlocks();
   if(typeof initTitleFx==='function')initTitleFx();
 }
 // タイトル演出：星・コード・流れ星・お知らせバッジ
@@ -2537,6 +2577,7 @@ function winBattle(){
   }
   if(G.hiddenBoss){
     const p=rpgLoad()||{};p.theDevCleared=true;rpgSave(p);
+    if(typeof checkPassiveUnlocks==='function')checkPassiveUnlocks();
     if(typeof fxParticles==='function')fxParticles(['#cb8aff','#ff4dff','#fff','#aa00ff']);
     showScreen('result');
     document.getElementById('result-box').innerHTML=`
@@ -2552,6 +2593,7 @@ function winBattle(){
   const e=ENEMIES[G.enemyIdx];const reward=unlockNextSkill();
   const p=rpgLoad()||{};p.enemyIdx=G.enemyIdx+1;if(!p.defeated)p.defeated=[];if(!p.defeated.includes(e.id))p.defeated.push(e.id);rpgSave(p);
   recordClearForShiftMemo(G.enemyIdx+1);
+  if(typeof checkPassiveUnlocks==='function'){const nu=checkPassiveUnlocks();if(nu.length&&typeof toast==='function')setTimeout(()=>toast('🎉 新パッシブ解禁：'+nu.map(x=>x.icon+x.name).join('、')),600);}
   const isLast=G.enemyIdx>=ENEMIES.length-1;
   showScreen('result');
   document.getElementById('result-box').innerHTML=`
@@ -3466,9 +3508,9 @@ function openPassivePick(charId,slot){
     if(p.fixed)return '';
     const unlocked=isPassiveUnlocked(charId,p.id);
     const used=eq.includes(p.id);
-    return `<div class="joke-opt" onclick="${unlocked?`doPassiveSwap('${p.id}')`:''}" style="${!unlocked?'opacity:0.4':used?'opacity:0.6':''}">
+    return `<div class="joke-opt" onclick="${unlocked?`doPassiveSwap('${p.id}')`:''}" style="${!unlocked?'opacity:0.5':used?'opacity:0.6':''}">
       <div class="joke-opt-top"><span class="joke-opt-stars">${p.icon} ${p.name}${p.ach?' <span style=\"color:#FFD700;font-size:9px\">★実績</span>':''}</span></div>
-      <div class="joke-opt-text">${p.desc}${!unlocked?' <span style="color:#888">🔒未解禁</span>':used?' （装備中）':''}</div>
+      <div class="joke-opt-text">${p.desc}${!unlocked?' <span style="color:#ff9d6b">🔒'+((typeof PASSIVE_UNLOCK_COND!=='undefined'&&PASSIVE_UNLOCK_COND[p.id])?PASSIVE_UNLOCK_COND[p.id].label+'で解禁':'未解禁')+'</span>':used?' （装備中）':''}</div>
     </div>`;
   }).join('');
   document.getElementById('joke-pick').classList.add('show');document.body.style.overflow='hidden';
