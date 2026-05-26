@@ -23,6 +23,8 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 @keyframes sparkle{0%,100%{opacity:0;transform:scale(0.5)}50%{opacity:1;transform:scale(1)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 @keyframes zoomIn{0%{transform:scale(0.3);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.g10-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:6px 0}
+.g10-cell{background:#1a1a1a;border-radius:8px;padding:8px 2px;text-align:center;cursor:pointer}
 @keyframes flashWhite{0%{opacity:0}50%{opacity:0.9}100%{opacity:0}}
 @keyframes fall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(400px) rotate(720deg);opacity:0}}
 @keyframes riseUp{0%{transform:translateY(20px);opacity:0}100%{transform:translateY(0);opacity:1}}
@@ -289,10 +291,10 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     <button class="sub-btn" onclick="openNickModal()">👤 <span>ニックネーム変更</span></button>
     <button class="sub-btn" onclick="openPlateSelect()">🎨 <span>プレート変更・試着</span></button>
     <button class="sub-btn" onclick="openHomeGuide()">📱 <span>ホーム画面に追加</span></button>
-    <button class="sub-btn" onclick="openUpdateModal()" style="border-color:#5dc0ca;color:#5dc0ca">📋 <span>アップデート履歴</span> <span style="margin-left:auto;font-family:'DM Mono',monospace;font-size:10px">v1.4.0</span></button>
+    <button class="sub-btn" onclick="openUpdateModal()" style="border-color:#5dc0ca;color:#5dc0ca">📋 <span>アップデート履歴</span> <span style="margin-left:auto;font-family:'DM Mono',monospace;font-size:10px">v1.5.0</span></button>
     <button class="gold-btn" onclick="openDonate()" style="margin-bottom:8px">👑 開発者を応援する</button>
     <button class="sub-btn" onclick="resetSetup()" style="justify-content:center;color:var(--muted)">🌐 言語・通貨を変更する</button>
-    <div style="text-align:center;font-size:10px;color:var(--muted);margin-top:10px;font-family:'DM Mono',monospace">ShiftMemo v1.4.0</div>
+    <div style="text-align:center;font-size:10px;color:var(--muted);margin-top:10px;font-family:'DM Mono',monospace">ShiftMemo v1.5.0</div>
   </div>
 </div>
 
@@ -351,8 +353,10 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
       <div style="font-size:10px;color:var(--muted);margin-bottom:4px">天井まであと <span id="gacha-modal-pity">50</span>回</div>
       <div style="font-size:9px;color:#888;margin-bottom:16px">白→青→紫→金→虹（虹で☆10確定！）</div>
       <button class="gold-btn" id="gacha-pull-btn" onclick="doGacha()">引く（🪙5）</button>
+      <button class="gold-btn" id="gacha-pull10-btn" onclick="doGacha10()" style="margin-top:8px;background:linear-gradient(135deg,#FFD700,#ff8c00)">10連で引く（🪙50）</button>
     </div>
     <div id="gacha-anim" style="display:none;padding:30px 0;position:relative">
+      <div id="gacha-emoji" style="font-size:64px;margin-bottom:10px">📦</div>
       <div id="gacha-light" style="width:120px;height:120px;border-radius:50%;margin:0 auto;background:#fff;animation:pulse 0.3s infinite"></div>
       <div style="font-size:13px;color:var(--muted);margin-top:16px" id="gacha-anim-text">抽選中...</div>
     </div>
@@ -394,8 +398,13 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('update-modal')">✕</button>
     <div class="modal-title">📋 アップデート履歴</div>
-    <div class="modal-sub">ShiftMemo v1.4.0</div>
-    <div style="font-size:11px;color:#5dc0ca;font-family:'DM Mono',monospace;margin-bottom:4px">v1.4.0 — 2026.05（最新）</div>
+    <div class="modal-sub">ShiftMemo v1.5.0</div>
+    <div style="font-size:11px;color:#5dc0ca;font-family:'DM Mono',monospace;margin-bottom:4px">v1.5.0 — 2026.05（最新）</div>
+    <div style="font-size:11px;line-height:1.9;margin-bottom:14px">
+      <span style="background:#1a3a0a;color:#c8f060;padding:1px 5px;border-radius:3px;font-size:9px">NEW</span> 10連ガチャ追加（🪙50＝5回分・絵文字演出強化）<br>
+      <span style="background:#1a3a0a;color:#c8f060;padding:1px 5px;border-radius:3px;font-size:9px">NEW</span> RPG「開発者の現在」大幅アップデート（多人数バトル・ロール・ボス戦）<br>
+    </div>
+    <div style="font-size:11px;color:#5dc0ca;font-family:'DM Mono',monospace;margin-bottom:4px">v1.4.0 — 2026.05</div>
     <div style="font-size:11px;line-height:1.9;margin-bottom:14px">
       <span style="background:#1a3a0a;color:#c8f060;padding:1px 5px;border-radius:3px;font-size:9px">NEW</span> ニックネーム登録＋50色レベルシステム（Lv.100）<br>
       <span style="background:#1a3a0a;color:#c8f060;padding:1px 5px;border-radius:3px;font-size:9px">NEW</span> ネームプレート50種（試着・実績解放）<br>
@@ -1257,11 +1266,15 @@ function doGacha(){
   const light=document.getElementById('gacha-light');
   const colorByRarity=rarity>=10?'rainbow':rarity>=8?'#FFD700':rarity>=5?'#aa00ff':rarity>=3?'#5a8fdd':'#fff';
   const txt=document.getElementById('gacha-anim-text');
+  const gem=document.getElementById('gacha-emoji');
   sfx('drumroll');
   let step=0;
   const colors=['#fff','#5a8fdd','#aa00ff','#FFD700'];
+  // 抽選中の絵文字は期待度で変化（最終レア度をほのめかす）
+  const drawEmoji=rarity>=10?['📦','🎁','🔮','⭐','🌈']:rarity>=8?['📦','🎁','🔮','⭐']:rarity>=5?['📦','🎁','🔮']:rarity>=3?['📦','🎁']:['📦'];
   const ti=setInterval(()=>{
     step++;
+    if(gem){gem.textContent=drawEmoji[Math.min(step-1,drawEmoji.length-1)];gem.style.animation='zoomIn 0.3s';}
     if(rarity>=10){light.style.background=`conic-gradient(red,orange,yellow,green,blue,purple,red)`;light.style.animation='spin 0.5s linear infinite';txt.textContent='🌈🌈🌈';}
     else{const idx=Math.min(step-1,Math.floor(rarity/3));light.style.background=colors[Math.min(idx,colors.length-1)];}
   },400);
@@ -1290,6 +1303,81 @@ function showGachaResult(joke,isNew,rarity){
     <button class="sub-btn" style="justify-content:center" onclick="closeModal('gacha-modal');renderHome()">閉じる</button>
   </div>`;
   renderHome();
+}
+
+// ========== 10連ガチャ ==========
+function doGacha10(){
+  if(getCoins()<50){showToast('🪙コインが足りません（50枚必要）');return;}
+  spendCoins(50);
+  let pity=getPity();
+  const results=[];
+  for(let i=0;i<10;i++){
+    localStorage.setItem('gachaCount',(parseInt(ls('gachaCount','0'))+1).toString());
+    pity++;
+    let rarity=rollRarity();
+    if(pity>=50){rarity=10;pity=0;}
+    else if(rarity===10){pity=0;}
+    const pool=JOKES.filter(j=>j.r===rarity);
+    const joke=pool[Math.floor(Math.random()*pool.length)];
+    const isNew=!getCollected().includes(joke.id);
+    addToCollected(joke.id);
+    addExp(expFromJokeRarity(rarity),'gacha');
+    results.push({joke,isNew,rarity});
+  }
+  localStorage.setItem('pity',pity.toString());
+  checkMissionProgress('gacha');
+  checkMissionProgress('joke');
+  // 演出：最高レア度に応じたドラムロール後、1個ずつ開封
+  const maxR=Math.max(...results.map(r=>r.rarity));
+  document.getElementById('gacha-pre').style.display='none';
+  document.getElementById('gacha-result').style.display='none';
+  document.getElementById('gacha-anim').style.display='block';
+  const gem=document.getElementById('gacha-emoji');
+  const light=document.getElementById('gacha-light');
+  const txt=document.getElementById('gacha-anim-text');
+  txt.textContent='10連 抽選中...';
+  sfx('drumroll');
+  const drawEmoji=maxR>=10?['📦','🎁','🔮','⭐','🌈']:maxR>=8?['📦','🎁','🔮','⭐']:maxR>=5?['📦','🎁','🔮']:['📦','🎁'];
+  let step=0;
+  const ti=setInterval(()=>{step++;if(gem){gem.textContent=drawEmoji[Math.min(step-1,drawEmoji.length-1)];gem.style.animation='zoomIn 0.3s';}if(maxR>=10){light.style.background='conic-gradient(red,orange,yellow,green,blue,purple,red)';light.style.animation='spin 0.5s linear infinite';}else{light.style.background=maxR>=8?'#FFD700':maxR>=5?'#aa00ff':'#5a8fdd';}},350);
+  setTimeout(()=>{
+    clearInterval(ti);fxFlash();
+    if(maxR>=10){fxShake();sfx('fanfare');fxParticles(['red','orange','yellow','green','blue','purple']);}
+    else if(maxR>=8){fxShake();sfx('fanfare');fxParticles(['#FFD700','#FFA500','#fff']);}
+    else if(maxR>=5){sfx('sparkle');fxParticles(['#aa00ff','#cb8aff','#fff']);}
+    else sfx('sparkle');
+    showGacha10Result(results);
+  },2400);
+}
+function showGacha10Result(results){
+  document.getElementById('gacha-anim').style.display='none';
+  const el=document.getElementById('gacha-result');
+  el.style.display='block';
+  const cells=results.map((r,i)=>{
+    const emoji=r.rarity>=10?'🌈':r.rarity>=8?'⭐':r.rarity>=5?'🔮':r.rarity>=3?'🎁':'📦';
+    const border=r.rarity>=10?'2px solid #FFD700':r.rarity>=8?'1px solid #FFD700':r.rarity>=5?'1px solid #aa00ff':r.rarity>=3?'1px solid #5a8fdd':'1px solid #333';
+    const glow=r.rarity>=8?'box-shadow:0 0 8px rgba(255,215,0,0.6);':r.rarity>=5?'box-shadow:0 0 6px rgba(170,0,255,0.5);':'';
+    return `<div class="g10-cell" style="border:${border};${glow}animation:zoomIn 0.4s backwards;animation-delay:${i*0.12}s" onclick="showG10Detail(${r.joke.id},${r.rarity},${r.isNew})">
+      <div style="font-size:22px">${emoji}</div>
+      <div style="font-size:8px;color:#aaa">${stars(r.rarity).slice(0,5)}</div>
+      <div style="font-size:7px;color:${r.isNew?'#c8f060':'#666'}">${r.isNew?'NEW':'所持'}</div>
+    </div>`;
+  }).join('');
+  const newCount=results.filter(r=>r.isNew).length;
+  const maxR=Math.max(...results.map(r=>r.rarity));
+  el.innerHTML=`<div style="animation:zoomIn 0.4s">
+    <div class="modal-title" style="font-size:16px">10連結果 ${maxR>=10?'🌈最高レア!':maxR>=8?'⭐激アツ!':''}</div>
+    <div style="font-size:10px;color:#c8f060;margin-bottom:10px">NEW ${newCount}個 / 10個</div>
+    <div class="g10-grid">${cells}</div>
+    <div style="font-size:9px;color:#888;margin:8px 0">タップで内容を確認</div>
+    <button class="gold-btn" onclick="openGacha()" style="margin-bottom:6px">もう一度（🪙5 / 10連🪙50）</button>
+    <button class="sub-btn" style="justify-content:center" onclick="closeModal('gacha-modal');renderHome()">閉じる</button>
+  </div>`;
+  renderHome();
+}
+function showG10Detail(id,rarity,isNew){
+  const joke=JOKES.find(j=>j.id===id);if(!joke)return;
+  showToast(`${stars(rarity)} ${joke.ja.split('\n')[0]}`);
 }
 
 // ========== ADD TO COLLECTION ==========
