@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>開発者の現在</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZETCCQQ8M3"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-ZETCCQQ8M3');</script>
@@ -221,6 +224,30 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 @keyframes passiveSpark{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0.3);opacity:0}}
 .passive-glow{animation:passiveGlow 0.9s ease-out}
 @keyframes passiveGlow{0%,100%{filter:none}50%{filter:drop-shadow(0 0 14px gold) brightness(1.4)}}
+
+/* とどめ演出 */
+.result-ronpa{font-size:40px;font-weight:900;color:#FFD700;text-shadow:0 0 16px #ff6b00,3px 3px 0 #000;margin-bottom:6px;animation:resultRonpa 0.8s ease-out}
+@keyframes resultRonpa{0%{transform:scale(3) rotate(-15deg);opacity:0}45%{transform:scale(1) rotate(-6deg);opacity:1}100%{transform:scale(1) rotate(-6deg);opacity:1}}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(540deg);opacity:0}}
+@keyframes finisherFlash{0%{opacity:0}30%{opacity:0.95}100%{opacity:0}}
+.finisher-ko{animation:finisherKo 1s ease-out forwards!important;z-index:52}
+@keyframes finisherKo{0%{transform:scale(1);filter:brightness(1)}30%{transform:scale(1.3) rotate(-8deg);filter:brightness(3)}100%{transform:scale(0.2) rotate(90deg) translateY(40px);opacity:0;filter:brightness(0.3)}}
+@keyframes finisherShatter{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--sx),var(--sy)) scale(0.2);opacity:0}}
+
+/* ===== サイドストーリー再生 ===== */
+.story-field{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,#1a1a3e,#0a0818 70%);display:flex;flex-direction:column;justify-content:flex-end;transition:filter 0.6s}
+.story-field.sepia{background:linear-gradient(180deg,#2a2218,#1a1510)}
+.story-field.sepia::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,0.04) 3px 4px);pointer-events:none}
+.story-field.sepia .story-char{filter:sepia(0.5) contrast(0.95)}
+.story-sprite-wrap{position:absolute;left:0;right:0;top:18%;bottom:32%;display:flex;align-items:center;justify-content:center}
+.story-char{animation:storyCharBob 2.4s ease-in-out infinite;filter:drop-shadow(0 6px 8px rgba(0,0,0,0.5))}
+@keyframes storyCharBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.story-box{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(180deg,transparent,#000d 22%,#000);padding:16px 18px 22px;cursor:pointer;min-height:90px}
+.story-name{font-size:12px;font-weight:800;color:#c8a0ff;margin-bottom:5px}
+.story-text{font-size:13px;color:#fff;line-height:1.6;min-height:42px}
+.story-text.narration{color:#bbb;font-style:italic;text-align:center}
+.story-tap{font-size:9px;color:#888;text-align:right;margin-top:6px}
+#screen-sidestory,#screen-storyplay,#screen-codex{padding:0}
 
 /* ===== タイトル演出（宇宙＋サイバー融合） ===== */
 .title-bg-fx{position:absolute;inset:0;z-index:0;overflow:hidden;background:radial-gradient(ellipse at 50% 38%,#22184e 0%,#0a0820 55%,#05030f 100%)}
@@ -496,6 +523,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <button class="title-btn link" onclick="openNotebookFromTitle()">📓 ネタ帳（技の付け替え）</button>
     <button class="title-btn link" onclick="openStatusFromTitle()">📊 パーティ状況</button>
     <button class="title-btn link" onclick="openGlobe()">🌍 世界の脅威（再戦）</button>
+    <button class="title-btn link" onclick="openCodex()">📖 観測記録（図鑑）</button>
+    <button class="title-btn link" onclick="openSideStory()">📖 サイドストーリー</button>
     <button class="title-btn link" onclick="openTutorial()">📖 あそびかた</button>
     <button class="title-btn link" onclick="openRpgUpdate()">📋 アップデート履歴</button>
     <div id="hidden-boss-slot"></div>
@@ -603,6 +632,36 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     </div>
     <div style="font-size:10px;color:#aaa;margin-bottom:8px">難易度を選択（敵のステータス・パッシブが強化）</div>
     <div id="diff-list" style="display:flex;flex-direction:column;gap:7px"></div>
+  </div>
+</div>
+
+<!-- ===== CODEX (敵図鑑) ===== -->
+<div class="screen" id="screen-codex">
+  <div style="padding:12px 14px;display:flex;align-items:center;gap:10px">
+    <button class="panel-back" onclick="showScreen('title')">← 戻る</button>
+    <div style="font-size:15px;font-weight:700;color:#5de5ff">📖 観測記録（図鑑）</div>
+  </div>
+  <div id="codex-content" style="padding:0 14px 20px;max-width:480px;margin:0 auto"></div>
+</div>
+
+<!-- ===== SIDE STORY ===== -->
+<div class="screen" id="screen-sidestory">
+  <div style="padding:12px 14px;display:flex;align-items:center;gap:10px">
+    <button class="panel-back" onclick="showScreen('title')">← 戻る</button>
+    <div style="font-size:15px;font-weight:700;color:#c8a0ff">📖 サイドストーリー</div>
+  </div>
+  <div id="sidestory-content" style="padding:0 14px 20px;max-width:480px;margin:0 auto"></div>
+</div>
+
+<!-- ===== STORY PLAYER ===== -->
+<div class="screen" id="screen-storyplay">
+  <div class="story-field" id="storyplay-field">
+    <div class="story-sprite-wrap" id="story-sprite"></div>
+    <div class="story-box" onclick="storyNext()">
+      <div class="story-name" id="story-name"></div>
+      <div class="story-text" id="story-text"></div>
+      <div class="story-tap">タップで次へ ▶</div>
+    </div>
   </div>
 </div>
 
@@ -815,6 +874,7 @@ function smGetLevel(){
   return lv;
 }
 function smGetCollected(){try{return JSON.parse(localStorage.getItem('collected')||'[]');}catch(e){return [];}}
+function smAddCoins(n){try{const c=parseInt(localStorage.getItem('coins')||'0',10)||0;localStorage.setItem('coins',String(c+n));}catch(e){}}
 
 // RPG側のジョーク図鑑（ShiftMemoと共有のcollectedを使う）＋RPG初期付与
 const RPG_PROGRESS_KEY='rpg_progress';
@@ -1827,6 +1887,1094 @@ function getActivePassiveEffects(charId){
 }
 </script>
 <script>
+// ============ サイドストーリー システム ============
+// 会話ラリー形式：{who:'ally'|'boss'|'mother'|'narration'|キャラid, name:'表示名', emoji:'絵文字', t:'セリフ', sepia:true(回想)}
+// SIDE_STORIES[charId] = [ {title, sub, unlock:{type:'boss',n:3}, lines:[...]}, ... ]  10話
+// BOSS_STORIES[bossId] = [ {title, sub, lines:[...]}, ... ]  3話（ラスボスクリアで解放）
+
+// 解放条件タイプ：{type:'always'} 最初から / {type:'boss',n:N} ボスN体撃破 / {type:'collect',n:N} ジョークN種 / {type:'clearGame'} ラスボスクリア / {type:'cleardev'} THE開発者
+
+const SIDE_CHARS=[
+  {id:'dev',name:'開発者',emoji:'🧑‍💻',color:'#c8f060'},
+  {id:'cat',name:'ねこ',emoji:'🐱',color:'#ffd97a'},
+  {id:'frog',name:'かえる',emoji:'🐸',color:'#7ee787'},
+  {id:'ufo',name:'UFO乗組員',emoji:'👽',color:'#c8a0ff'}
+];
+
+// 物語データ（中身は後から差し込む。今はサンプル）
+const SIDE_STORIES={
+  dev:[
+    {title:"第1話「無料という呪い」",sub:"なぜ無料でアプリを作るのか",unlock:{type:"always"},lines:[
+      {who:"narration",t:"― 開発者の小さなアパート。深夜。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"よし、今日のアップデート完了。バグも潰した。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…ダウンロード数、今月も伸びてるな。うれしい。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"おい兄ちゃん。それ、一円にもなってないぞ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"わかってるよ。広告も貼ってないしな。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"なんで貼らんねん。貼れば少しは金になるやろ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…使ってる人の画面を、広告で埋めたくないんだよね。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…お前、そういうとこだよな。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"修正の鬼身だよ。「ありがとう」って一件来ると、また頑張れる。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"たった一件でか。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"一件で十分。誰かの生活がちょっと楽になるなら、それでいい。"},
+      {who:"narration",t:"開発者は、家賃の催促状を裏返しにしてメモを取り始めた。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"次のアップデート、もう少し使いやすくしよう…。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"（この兄ちゃん、腕だけは本物やねんけどな…）"},
+      {who:"narration",t:"無料という、やさしさという名の呪い。それが彼の生き方だった。"}
+    ]},
+    {title:"第2話「最初のユーザー」",sub:"たった一人の「ありがとう」",unlock:{type:"boss",n:2},lines:[
+      {who:"narration",t:"― 数年前。開発者が初めてアプリを公開した日の回想。",sepia:true},
+      {who:"dev",name:"若き開発者",emoji:"👨‍💻",t:"公開ボタン、押したぞ…。世界中の誰かが使えるんだ。",sepia:true},
+      {who:"narration",t:"しかし、ダウンロード数は、三日たってもゼロのままだった。",sepia:true},
+      {who:"dev",name:"若き開発者",emoji:"👨‍💻",t:"…そりゃそうだよな。誰も、俺のアプリなんて知らない。",sepia:true},
+      {who:"narration",t:"一週間後。たった一件のレビューが届いた。",sepia:true},
+      {who:"dev",name:"若き開発者",emoji:"👨‍💻",t:"「シフトの管理が楽になりました。作ってくれてありがとう」…？",sepia:true},
+      {who:"dev",name:"若き開発者",emoji:"👨‍💻",t:"ありがとう、だって…？",sepia:true},
+      {who:"narration",t:"それは、夜勤明けの誰かからの、たった一言だった。",sepia:true},
+      {who:"dev",name:"若き開発者",emoji:"👨‍💻",t:"…誰かの役に、立ってたんだ。",sepia:true},
+      {who:"narration",t:"開発者はそのレビューを、今でもスクショして保存している。",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"そのレビュー、まだ保存しとるのか。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"宝物だよ。何百万ダウンロードより、あの一件のほうが重い。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…お前、意外とロマンチストやねんな。"}
+    ]},
+    {title:"第3話「家賃の催促状」",sub:"現実は甘くない",unlock:{type:"boss",n:3},lines:[
+      {who:"narration",t:"― ポストに、赤い封筒が入っていた。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…「家賃滞納、これ以上は法的措置を」。またか。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"お薄いですね。今月も、収入はゼロでしょうか？"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"その「お薄い」って言い方、やめてくれる？心に刺さるんだよ。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"ふふ。事実を述べたまでですよ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…わかってるんだ。現実は、「ありがとう」だけじゃ食えない。"},
+      {who:"narration",t:"開発者は、冷蔵庫を開けた。中には、卵が一つだけ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"これを半分に割って、今日と明日で食うか…。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"おい兄ちゃん。俺の分のしらす、連れてかれよ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ねこ…お前、それ自分が食べたいだけだろ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"ばれたか。でもまぁ…一緒に食えば、安もんやろ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…そうだな。一人じゃない。"},
+      {who:"narration",t:"貧乏は、仲間がいれば、少しだけ温かかった。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（…この人たちのためなら、私も少し、頑張りましょうか）"}
+    ]},
+    {title:"第4話「「面白い」って何だ」",sub:"開発者が問い続けるもの",unlock:{type:"boss",n:4},lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"なぁ、「面白い」って、何だと思う？"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"なんや、藪に。メシのうまいもんとかじゃないのか。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"世間は、バズるものを「面白い」って言う。でも俺は、それがわからない。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"奈々と哲学的ですね。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"俺のアプリは、バズらない。でも、誰かの生活をちょっとだけ楽にする。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"それって、「面白い」には入らないのかな。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…兄ちゃん。それ、「面白い」よりずっとええもんや。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"そうかな。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「あなたの作るものは、この星で一番面白い」だそうです）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…お世辞だよ。でも、ちょっとうれしいな。"},
+      {who:"narration",t:"「面白い」の答えは、まだ見つからない。だがその問いこそが、彼を前に進ませる。"}
+    ]},
+    {title:"第5話「レスバの才能」",sub:"言い返せない男が、なぜ戦えるのか",unlock:{type:"boss",n:5},lines:[
+      {who:"narration",t:"― 学生時代の回想。",sepia:true},
+      {who:"dev",name:"学生の開発者",emoji:"🧑‍🎓",t:"（昔の俺は、言い返すのが苦手だった）",sepia:true},
+      {who:"narration",t:"理不尽なことを言われても、いつも黙ってうつむいていた。",sepia:true},
+      {who:"dev",name:"学生の開発者",emoji:"🧑‍🎓",t:"（言いたいことはあるのに、口から出ない）",sepia:true},
+      {who:"narration",t:"そんな彼が、プログラミングと出会った。",sepia:true},
+      {who:"dev",name:"学生の開発者",emoji:"🧑‍🎓",t:"（コードは、嘘さない。論理が通れば、ちゃんと動く）",sepia:true},
+      {who:"dev",name:"学生の開発者",emoji:"🧑‍🎓",t:"（これだ。俺は、言葉じゃなくて、論理で語ればいいんだ）",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"レスバ、って言うと下品に聞こえるけどさ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"要は、筋の通った言葉で、相手の間違いを正していく。コードと一緒だ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"だからお前、レスバだけは強いんだな。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ああ。口下手だった俺が、唯一見つけた武器さ。"}
+    ]},
+    {title:"第6話「仲間という資産」",sub:"一人じゃなくなった日",unlock:{type:"boss",n:6},lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"思えば、昔は一人でコード書いてたんだよな。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"今は、ねこもかえるも、宇宙人までいるからな。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"どうしてお前らみたいなのが、俺のところに集まったんだろうな。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"さあ。でも、居心地がいいんですよ、ここは。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「エラーを責めない人は、宇宙でも珍しい」だそうです）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"エラーは誰だって出すだろ。それを責めたって、何も生まれない。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…兄ちゃん。そういうとこだぞ、人が集まるのは。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"そうかな。でも、助かってるのは俺のほうだよ。"},
+      {who:"narration",t:"一人で背負っていた重荷が、いつの間にか、みんなの肩に分散されていた。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"仲間ってのは、俺が手に入れた中で、一番の資産かもな。"}
+    ]},
+    {title:"第7話「負けた夜のこと」",sub:"折れそうになった記憶",unlock:{type:"boss",n:7},lines:[
+      {who:"narration",t:"― ある夜の回想。",sepia:true},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"（その日、サーバーの代金も払えなくなった）",sepia:true},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"（アプリは止まり、ユーザーからは「使えない」と怒りのメール）",sepia:true},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"（もう、やめようかと思った）",sepia:true},
+      {who:"narration",t:"その時、例の「最初のユーザー」から、一通のメッセージが届いた。",sepia:true},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"「復旧待ってます。あなたのアプリがないと困るんです」…",sepia:true},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"（…まだ、待ってくれてる人が、いる）",sepia:true},
+      {who:"narration",t:"開発者はその夜、寝ないでサーバーを復旧させた。",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"何度も、やめようと思った。でもそのたびに、誰かが引き戸めてくれた。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"その誰かのために、また作るんだな。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ああ。それが、俺が生きてる理由になってる。"}
+    ]},
+    {title:"第8話「コードは裏切らない」",sub:"人とコードの違い",unlock:{type:"boss",n:8},lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"コードはいいよ。書いた通りに動く。裏切らない。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"人間は裏切る、ってことか。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…昔、そう思ってた。人よりパソコンのほうが信じられるって。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"今は、違うのですか？"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"バグは、俺の書き方が悪い。コードは正直に、俺の間違いを返してくるだけだ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"人も同じかもな。裏切られたと思ってたのは、俺の側の問題だったんだよ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…お前、丸くなったな。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"お前らと出会ったからな。人は、ちゃんと向き合えば、裏切らない。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（…この人は、変わった。出会った頃より、ずっと柔らかく）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"さあ、デバッグの続きやるか。今のバグは、俺のせいだしな。"}
+    ]},
+    {title:"第9話「観測者という影」",sub:"近づく最終決戦",unlock:{type:"boss",n:9},lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"最近、変な夢を見る。宇宙のような眼が、俺を見てるんだ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"眼？"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"「お前は面白いのか」って、問いかけてくるんだよ。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"不気味ですね。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"だが、なぜか怖くはないんだ。そいつも、「面白い」を探してる気がする。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう。あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「それは、あなたと同じものを探している」…と）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"同じものを…？"},
+      {who:"narration",t:"世界の脅威と呼ばれる者。その正体に、開発者はまだ気づいていない。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…会えば、わかるのかな。そいつが何を探してるのか。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"行くんだな。なら、俺らも一緒だぜ。"}
+    ]},
+    {title:"第10話「もう一人の自分」",sub:"そして、「面白い」の答え",unlock:{type:"clearGame"},lines:[
+      {who:"narration",t:"― ウォッチャーを越えた後。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"あいつは、世界を「面白いかどうか」で見てた。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…昔の俺と、そっくりだったよ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"お前も、「面白い」を探してたからな。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ああ。でも、やっとわかったんだ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"「面白い」の答えは、ひとつじゃなかった。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"というと？"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"誰かの生活がちょっと楽になる。それを見て、俺がうれしい。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"その繰り返し全部が、俺にとっての「面白い」だったんだ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…ええ答えじゃねえか。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー！"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「だから、あなたのアプリは面白い」―だそうです）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…ありがとう。さあ、次のアップデート、作るか。"},
+      {who:"narration",t:"開発者の「現在」は、今日も続いていく。"}
+    ]}
+  ],
+  cat:[
+    {title:"第1話「親分の背中」",sub:"元ヤクザの子猫時代",unlock:{type:"always"},lines:[
+      {who:"narration",t:"― ねこの回想。雨の降る、夜の路地裏。",sepia:true},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"儂がまだ子猫やった頃の話や。",sepia:true},
+      {who:"narration",t:"段ボールの中で、震えていた一匹の子猫。親に捨てられた。",sepia:true},
+      {who:"oyabun",name:"親分",emoji:"🐯",t:"…おう、こんなとこで何しとる。死ぬぞ。",sepia:true},
+      {who:"catkid",name:"子猫のねこ",emoji:"🐈",t:"…ほっといてくれ。誰も、儂なんかいらんのや。",sepia:true},
+      {who:"oyabun",name:"親分",emoji:"🐯",t:"アホか。いらん命なんぞ、この世にひとつもあらへん。",sepia:true},
+      {who:"oyabun",name:"親分",emoji:"🐯",t:"ついてこい。メシくらい、食わせたる。",sepia:true},
+      {who:"narration",t:"その大きな背中が、子猫には誰よりも頼もしく見えた。",sepia:true},
+      {who:"catkid",name:"子猫のねこ",emoji:"🐈",t:"…親分。儂、ついていっていいんか。",sepia:true},
+      {who:"oyabun",name:"親分",emoji:"🐯",t:"おう。今日からお前は、儂の身内や。",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"あの人が、儂を拾ってくれた親分や。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…いい人だったんだな、その親分。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"ああ。儂の生き方、全部あの人に教わったんや。"}
+    ]},
+    {title:"第2話「仁義というもの」",sub:"親分の教え",unlock:{type:"boss",n:2},lines:[
+      {who:"narration",t:"― 回想。組の事務所。",sepia:true},
+      {who:"oyabun",name:"親分",emoji:"🐯",t:"ええか。仁義ってのはな、強い者が弱い者を守ることや。",sepia:true},
+      {who:"catkid",name:"若いねこ",emoji:"🐈",t:"弱い者を、いじめることやないんか？",sepia:true},
+      {who:"oyabun",name:"親分",emoji:"🐯",t:"アホ。それはただのゴロツキや。儂らは、そうやない。",sepia:true},
+      {who:"oyabun",name:"親分",emoji:"🐯",t:"困っとる奴がおったら、黙って助ける。それが筋ってもんや。",sepia:true},
+      {who:"catkid",name:"若いねこ",emoji:"🐈",t:"…難しいな、親分。",sepia:true},
+      {who:"oyabun",name:"親分",emoji:"🐯",t:"難しないわ。お前が昔、儂に助けられたやろ。それと同じことをすればええ。",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…せやから儂は、困っとる兄ちゃんを放っとけんかった。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"俺を助けてくれたのは、その教えのおかげだったのか。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"当たり前や。儂は、親分の仁義を継いどるんや。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…ありがとな、ねこ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"礼はええ。困った時はお互い様、や。"}
+    ]},
+    {title:"第3話「足を洗った日」",sub:"裏の世界との別れ",unlock:{type:"boss",n:3},lines:[
+      {who:"narration",t:"― 回想。ある日、親分が言った。",sepia:true},
+      {who:"oyabun",name:"親分",emoji:"🐯",t:"なぁ。お前、堅気になれ。",sepia:true},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…親分、何を急に。儂は、ずっと親分についていくつもりや。",sepia:true},
+      {who:"oyabun",name:"親分",emoji:"🐯",t:"この世界は、もう古い。お前みたいな若いのは、表で生きるんや。",sepia:true},
+      {who:"oyabun",name:"親分",emoji:"🐯",t:"儂の仁義は、お前が表の世界で活かしてくれ。それが一番うれしい。",sepia:true},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…っ。親分…！",sepia:true},
+      {who:"narration",t:"ねこは、その日、裏の世界に別れを告げた。",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"親分さんは、あなたを思って、突き放したのですね。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"ああ。あの人は、最後まで儂の心配ばっかりしとった。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"せやから儂は、堅気として、ちゃんと生きなあかんのや。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…立派な親分さんですね。"}
+    ]},
+    {title:"第4話「ヒーラーになった理由」",sub:"なぜ回復役なのか",unlock:{type:"boss",n:4},lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ねこってさ、見た目は強面なのに、回復役なんだよな。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"なんや、文句あるんか。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"いや、意外だなって。攻撃役のほうが似合いそうなのに。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…親分がな、よう言うとった。「強い奴ほど、人を守れ」って。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"儂は、傷ついた奴を癒すほうが、性に合うとるんや。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…そういう優しさ、お前らしいよ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"優しさやない。仁義や。困った奴を、放っとけんだけや。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"それを優しさと言うのですよ、ねこさん。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…うるさいわ、かえる。"},
+      {who:"narration",t:"強面の下に隠した優しさ。それが、ねこという猫だった。"}
+    ]},
+    {title:"第5話「睨みの効用」",sub:"元ヤクザの貫禄",unlock:{type:"boss",n:5},lines:[
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"敵を睨むとな、たまにビビって弱気になりよる。便利やろ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"その睨み、元の世界仕込みか。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"ふっ。これでも昔は、睨みだけで相手を黙らせとったんやで。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"今はその貫禄を、回復のために使っているわけですね。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"せや。睨んで敵を弱らせて、味方を癒す。守りの専門家や。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"攻めと守り、両方できるのか。頼もしいな。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"当たり前や。儂を誰やと思うとる。元・極道の猫やぞ。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「こわい。でも、たよれる」だそうです）"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…宇宙人にまで言われとるやないか。"}
+    ]},
+    {title:"第6話「親分の好物」",sub:"忘れられない味",unlock:{type:"boss",n:6},lines:[
+      {who:"narration",t:"― ねこが、しらすを見つめている。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…しらすか。親分の好物やったな。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"親分も、しらすが好きだったのか。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"ああ。強面のくせに、しらす丼を食う時だけ、ええ顔しとった。",sepia:true},
+      {who:"narration",t:"― 回想。事務所で、しらす丼を食べる親分。",sepia:true},
+      {who:"oyabun",name:"親分",emoji:"🐯",t:"うまいなぁ。なぁ、お前も食え。遠慮すんな。",sepia:true},
+      {who:"catkid",name:"若いねこ",emoji:"🐈",t:"…親分、いつもありがとうございます。",sepia:true},
+      {who:"oyabun",name:"親分",emoji:"🐯",t:"水くさいこと言うな。身内やろ、儂らは。",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…しらす食うとな、親分のこと思い出すんや。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…今度、しらす丼でも作るか。みんなで。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…ええな。親分も、喜ぶやろ。"}
+    ]},
+    {title:"第7話「弱さを見せる強さ」",sub:"涙を見せた夜",unlock:{type:"boss",n:7},lines:[
+      {who:"narration",t:"― ある夜。ねこが、一人で空を見上げていた。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ねこ、こんな時間に何してるんだ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…今日はな、親分の命日なんや。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…そうか。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"あの人、最後まで儂に「堅気で幸せになれ」って言うとった。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…儂、ちゃんと幸せになれとるんかな、親分。"},
+      {who:"narration",t:"強面のねこの目に、涙がにじんでいた。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…なれてるよ。少なくとも、俺たちはお前がいて幸せだ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…っ。兄ちゃん、そういうこと、真顔で言うな。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"弱さを見せられるのも、強さだよ。親分も、そう言うんじゃないか。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…ふっ。せやな。あの人なら、そう言うわ。"}
+    ]},
+    {title:"第8話「儂の家族」",sub:"新しい居場所",unlock:{type:"boss",n:8},lines:[
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"なぁ、兄ちゃん。儂、最近思うんや。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"どうした、改まって。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"親分を亡くして、もう家族はおらんと思っとった。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…でも、お前らといると、また家族ができた気がするんや。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"ねこさん…。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー！"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「私も、家族だと思っている」だそうです）"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…宇宙人まで家族か。にぎやかになったもんや。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ああ。変な家族だけどな。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"変でええんや。家族に、形なんてあらへん。"},
+      {who:"narration",t:"親分が遺した仁義は、新しい家族の中で生き続けていた。"}
+    ]},
+    {title:"第9話「守りたいもの」",sub:"決戦を前に",unlock:{type:"boss",n:9},lines:[
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"いよいよ、世界の脅威とやらに会いに行くんやな。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ああ。怖いか？"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"アホ言え。儂が怖がるのは、お前らを失うことだけや。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"親分を亡くした時、もう何も守れんと思った。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…でも今は、守りたいもんが、ちゃんとある。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…ねこ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"せやから儂は、絶対にお前らを守る。それが、儂の仁義や。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"頼もしいですね、ねこさん。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"当たり前や。さぁ、行こか。儂が、後ろは守ったる。"},
+      {who:"narration",t:"守るべきものができた時、猫は、誰よりも強くなる。"}
+    ]},
+    {title:"第10話「親分、見とるか」",sub:"受け継がれた仁義",unlock:{type:"clearGame"},lines:[
+      {who:"narration",t:"― ウォッチャーを越えた後。夜空の下。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…親分。儂、世界を救う側に立てたで。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"昔は、ただの捨て猫やった儂が、な。"},
+      {who:"narration",t:"ねこは、夜空を見上げて、静かに語りかけた。",sepia:true},
+      {who:"oyabun",name:"親分（幻）",emoji:"🐯",t:"…よう頑張ったな。儂は、ずっとお前を誇りに思っとるで。",sepia:true},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…っ。親分…！",sepia:true},
+      {who:"narration",t:"― 現実。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ねこ、誰と話してるんだ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…親分とや。儂の仁義、ちゃんと継げとるって、報告しとった。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…そうか。親分も、喜んでるよ、きっと。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"ああ。儂の仁義は、これからもこの家族の中で生き続ける。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…見とってや、親分。儂の、これからを。"},
+      {who:"narration",t:"親分から受け継いだ仁義は、ねこの中で、永遠に生き続ける。"}
+    ]}
+  ],
+  frog:[
+    {title:"第1話「慇懃無礼の理由」",sub:"なぜ敬語で煽るのか",unlock:{type:"always"},lines:[
+      {who:"frog",name:"かえる",emoji:"🐸",t:"私の言葉遣いが気になりますか？ふふ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"丁寧なのに、なんか刺さるんだよな、お前の言葉。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"これにはね、ちょっとした理由があるのですよ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"理由？気になるやないか。言うてみい。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…昔の私は、とても臆病でしてね。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"自分の気持ちを、まっすぐ言えなかったのです。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"今のお前からは、想像つかないな。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"だから、丁寧な言葉という鎧を着ることにしたのですよ。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"敬語の内側にいれば、傷つかずに済みますからね。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…なるほどな。鎧か。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"ええ。臆病者の、せめてもの強がりですよ。"},
+      {who:"narration",t:"慇懃無礼は、臆病なかえるが身につけた、心を守る鎧だった。"}
+    ]},
+    {title:"第2話「臆病だった頃」",sub:"逃げてばかりの過去",unlock:{type:"boss",n:2},lines:[
+      {who:"narration",t:"― かえるの回想。沼のほとり。",sepia:true},
+      {who:"frogkid",name:"幼いかえる",emoji:"🐸",t:"…また、逃げてしまった。",sepia:true},
+      {who:"narration",t:"幼いかえるは、何かあるたびに、すぐ水の中に隠れていた。",sepia:true},
+      {who:"frogkid",name:"幼いかえる",emoji:"🐸",t:"怖い。誰かとぶつかるのが、怖い。",sepia:true},
+      {who:"narration",t:"敵が来れば逃げ、仲間が困っていても、見て見ぬふり。",sepia:true},
+      {who:"frogkid",name:"幼いかえる",emoji:"🐸",t:"…こんな自分、嫌いだ。でも、変われない。",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"昔の私は、ただ逃げるだけの、情けない蛙でした。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…今は、誰よりも前に立って、盾になってくれてるじゃないか。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"ふふ。それには、ある出来事があったのですよ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"ある出来事？"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…それは、また次の機会に。少々、長い話ですのでね。"}
+    ]},
+    {title:"第3話「守れなかったもの」",sub:"臆病が招いた後悔",unlock:{type:"boss",n:3},lines:[
+      {who:"narration",t:"― 回想。かえるには、大切な友がいた。",sepia:true},
+      {who:"frogkid",name:"幼いかえる",emoji:"🐸",t:"…ある日、その友が、危険な目に遭っていた。",sepia:true},
+      {who:"narration",t:"だが、臆病なかえるは、足がすくんで動けなかった。",sepia:true},
+      {who:"frogkid",name:"幼いかえる",emoji:"🐸",t:"（助けなきゃ。でも、怖い。体が、動かない）",sepia:true},
+      {who:"narration",t:"かえるが動けずにいる間に、友は去っていった。二度と、会えなかった。",sepia:true},
+      {who:"frogkid",name:"幼いかえる",emoji:"🐸",t:"…なんで、動けなかったんだ。なんで…！",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…あの時、臆病なままでいたことを、今でも悔やんでいます。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…つらい記憶だな。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"ええ。でも、その後悔が、私を変えたのです。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"もう二度と、目の前の誰かを、見捨てたくない。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…せやから、お前は盾になるんやな。"}
+    ]},
+    {title:"第4話「タンクという生き方」",sub:"前に立つ覚悟",unlock:{type:"boss",n:4},lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"かえるはさ、いつも一番前で攻撃を受けてくれるよな。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"ええ。それが、私の役目ですから。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"怖くないのか？一番、危ない位置だぞ。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"怖いですよ。今でも、足は震えています。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…でも、後ろにいる皆さんを守れるなら、震えながらでも立ちます。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…かっこいいな、お前。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"ふふ。臆病者が、必死に強がっているだけですよ。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"震えながら立つほうが、よっぽど強いわ。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…そう言っていただけると、救われます。"},
+      {who:"narration",t:"恐怖を抱えたまま前に立つ。それが、かえるの選んだ強さだった。"}
+    ]},
+    {title:"第5話「挑発の達人」",sub:"敬語で敵を翻弄する",unlock:{type:"boss",n:5},lines:[
+      {who:"frog",name:"かえる",emoji:"🐸",t:"敵を挑発するのは、得意なのですよ。ふふ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"あの慇懃無礼な煽り、敵がみんなお前を狙うもんな。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"「おや、その程度ですか？」と微笑むだけで、皆さんカッとなって。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"性格悪いな、お前。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"心外ですね。敵の注意を引きつけて、皆さんを守っているのですよ。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"私が憎まれ役になれば、後ろの皆さんは安全ですからね。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…それも、お前なりの優しさか。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"さあ、どうでしょう。ただの趣味かもしれませんよ？ふふ。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…おや、宇宙人さんにまで見透かされていますね。"}
+    ]},
+    {title:"第6話「鎧の下の素顔」",sub:"本当の気持ち",unlock:{type:"boss",n:6},lines:[
+      {who:"narration",t:"― 二人きりの夜。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"なぁ、かえる。たまには敬語、外してもいいんだぞ。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…ふふ。難しいですね。もう、染みついていますから。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…でも、本当はね。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"皆さんといる時だけは、鎧がなくても、平気な気がするのです。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…そう言ってもらえると、うれしいよ。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"臆病な私が、安心して隣にいられる。それって、すごいことなのですよ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"焦らなくていい。お前のペースで、ゆっくりでいいさ。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…ありがとうございます。やはり、敬語は外せませんでしたね。ふふ。"},
+      {who:"narration",t:"鎧は外れなくても、その内側は、確かに温かくなっていた。"}
+    ]},
+    {title:"第7話「金剛身の覚悟」",sub:"絶対に倒れない理由",unlock:{type:"boss",n:7},lines:[
+      {who:"frog",name:"かえる",emoji:"🐸",t:"私は、絶対に倒れないと決めているのですよ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"どんなに攻撃を受けても、お前は立ち続けるよな。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"私が倒れれば、後ろの皆さんに攻撃が届いてしまう。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"だから、私は倒れるわけにはいかないのです。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…昔、守れんかった友の分もか。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…ええ。よくお分かりですね、ねこさん。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"あの後悔を、二度と繰り返さない。それが、私の金剛身です。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…その覚悟、しかと受け取ったよ。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"ふふ。任せてください。この体、岩よりも固いですからね。"},
+      {who:"narration",t:"過去の後悔が、かえるを、誰よりも硬い盾へと変えていた。"}
+    ]},
+    {title:"第8話「臆病者の勇気」",sub:"恐怖を超えて",unlock:{type:"boss",n:8},lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"勇気って、怖くないことだと思ってた。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"いいえ。怖いのに、前に進むこと。それが勇気ですよ。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"怖くない人は、ただ鈍いだけです。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…じゃあ、一番怖がりなお前が、一番勇敢ってことか。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"おや、うまいことを言いますね。ふふ。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"ええ。臆病者だからこそ、勇気の価値を知っているのです。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…ええこと言うやないか、かえる。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"昔の私に、聞かせてやりたい言葉ですよ。"},
+      {who:"narration",t:"臆病であることは、弱さではない。それを超える時、勇気になる。"}
+    ]},
+    {title:"第9話「もう逃げない」",sub:"決戦への決意",unlock:{type:"boss",n:9},lines:[
+      {who:"frog",name:"かえる",emoji:"🐸",t:"いよいよ、最後の戦いですね。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"怖いか、かえる。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"ええ、とても。足が、震えています。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…でもね、開発者さん。私は、もう逃げません。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"昔は、大切なものを、逃げて失いました。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"でも今度は、震えながらでも、皆さんの前に立ちます。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…ああ。お前がいれば、俺たちは安心して戦える。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"お任せを。この盾は、皆さんのためにあるのですから。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"頼むぞ、かえる。後ろは、儂が守ったる。"},
+      {who:"narration",t:"もう逃げない。その決意が、臆病な蛙を、本物の盾に変えた。"}
+    ]},
+    {title:"第10話「鎧を脱いだ日」",sub:"本当の強さを手に入れて",unlock:{type:"clearGame"},lines:[
+      {who:"narration",t:"― ウォッチャーを越えた後。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…勝ちましたね。皆さんを、守り抜けました。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"お前の盾のおかげだよ、かえる。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…開発者さん。一つ、報告があります。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"なんだ？"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…ありがとう。皆と一緒で、本当に、楽しかった。"},
+      {who:"narration",t:"敬語の鎧が、ほんの少しだけ、外れた瞬間だった。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…おい。今、敬語外れとったぞ、かえる。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…おや。本当ですね。ふふ。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"皆さんといると、鎧がなくても、もう怖くないみたいです。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…それが、お前が手に入れた、本当の強さだよ。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"ええ。臆病な私を、変えてくれて…ありがとうございました。"},
+      {who:"narration",t:"鎧の下の素顔で笑えた時、かえるは、本当の勇気を手に入れた。"}
+    ]}
+  ],
+  ufo:[
+    {title:"第1話「地球に来た理由」",sub:"宇宙人の目的",unlock:{type:"always"},lines:[
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「私が地球に来たのには、訳があります」だそうです）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"そういえば、なんで地球に来たんだ？"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう…あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「私の星は…もう、ありません」と）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…もう、ない？"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう。あうー…。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「滅びてしまった星から、たった一人で逃げてきた」…と）"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…そら、重い話やな。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー！"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「でも、この星は温かい。ここにいたい」だそうです）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…いてくれよ。ここは、お前の居場所だ。"},
+      {who:"narration",t:"故郷を失った宇宙人は、新しい星で、新しい居場所を見つけようとしていた。"}
+    ]},
+    {title:"第2話「あうーの意味」",sub:"言葉が話せない理由",unlock:{type:"boss",n:2},lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"かえるは、なんでUFOの言葉がわかるんだ？"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"ふふ。長く一緒にいると、なんとなく伝わるのですよ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"でも、なんで『あうー』しか言えないんだ？"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう…あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「地球の言葉は、難しい。発声器官が、違うから」…と）"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"彼の星の言葉は、音ではなく、心で伝えるものだったそうです。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"心で、か。ロマンチックやな。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「だから、気持ちは、ちゃんと届いている」だそうです）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…ああ。『あうー』でも、ちゃんと伝わってるよ。"}
+    ]},
+    {title:"第3話「滅びた星」",sub:"故郷で起きたこと",unlock:{type:"boss",n:3},lines:[
+      {who:"narration",t:"― UFO乗組員の回想。遠い星の記憶。",sepia:true},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう…あうー…。",sepia:true},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳します。彼の故郷は、美しい星でした…）",sepia:true},
+      {who:"narration",t:"豊かな緑と、心で通じ合う、優しい星人たち。",sepia:true},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう…。",sepia:true},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（…しかし、星は寿命を迎え、ゆっくりと滅びていった）",sepia:true},
+      {who:"narration",t:"星人たちは、最後の希望を、たった一機の宇宙船に託した。",sepia:true},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー…！",sepia:true},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（「行きなさい。どこかで、生き延びて」…そう、送り出されたと）",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…たった一人で、ここまで来たのか。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「でも、もう一人じゃない」だそうです）"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…せやな。お前は、もう一人やない。"}
+    ]},
+    {title:"第4話「バッファーの力」",sub:"仲間を強くする",unlock:{type:"boss",n:4},lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"UFOの力って、仲間を強くするバフだよな。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「私の星の技術。仲間の力を、引き出すもの」と）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"自分が戦うんじゃなくて、仲間を強くするのか。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう。あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「私の星は、支え合って生きていた。だから、これが得意」と）"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…ええ星やったんやな、お前の故郷。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー！"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「この仲間も、私の星に似ている。だから、好き」だそうです）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…そう言ってもらえると、うれしいな。"}
+    ]},
+    {title:"第5話「異星の幸運」",sub:"効果がブレる理由",unlock:{type:"boss",n:5},lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"UFOのバフって、たまにすごい当たりと、不発があるよな。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう…あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「地球の理と、私の星の理が、違うから」…だそうです）"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"せやから、ギャンブルみたいになるんやな。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「でも、大当たりの時は、すごい」と、自慢げです）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…確かに、当たった時はとんでもない強さになるもんな。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう！あうー！"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「宇宙の運を、信じてほしい」だそうです）"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…宇宙人のギャンブルに、命預けるんかいな。"}
+    ]},
+    {title:"第6話「地球の食べ物」",sub:"小さな幸せ",unlock:{type:"boss",n:6},lines:[
+      {who:"narration",t:"― 食卓。UFOが、何かを見つめている。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう…？"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ん、それが気になるのか？プリンだよ。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。"},
+      {who:"narration",t:"UFOは、おそるおそる一口、食べてみた。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"…あうーーー！！"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「こんな美味しいもの、宇宙にはなかった！」と大興奮です）"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"ははっ。そんなに気に入ったんか。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。あう。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「この星に来て、よかった」…だそうです）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…プリンひとつで、そこまで喜んでくれるとはな。"},
+      {who:"narration",t:"故郷を失った宇宙人にとって、小さな幸せが、何よりの宝物だった。"}
+    ]},
+    {title:"第7話「心で話す」",sub:"言葉を超えた絆",unlock:{type:"boss",n:7},lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"最近、かえるがいなくても、UFOの言いたいことがわかる気がするんだ。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"今のは…『ありがとう』、だろ？"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"…あう！あうー！"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「伝わった!うれしい!」と、跳ねて喜んでいます）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…お前の星の『心で話す』って、こういうことか。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"言葉がなくても、わかり合えるんやな。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「言葉より、心のほうが、ずっと正直」だそうです）"},
+      {who:"narration",t:"言葉が通じなくても、心は確かに、通じ合っていた。"}
+    ]},
+    {title:"第8話「もう一つの故郷」",sub:"新しい居場所",unlock:{type:"boss",n:8},lines:[
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう…あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「最近、故郷の夢を、見なくなった」と）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…それは、寂しいことか？"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。あう。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「いいえ。ここが、新しい故郷になったから」だそうです）"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…ええこと言うやないか、宇宙人。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー！"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「皆が、私の新しい家族。新しい星」だそうです）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…ああ。ここが、お前の故郷だ。ずっと、いていい。"},
+      {who:"narration",t:"失った故郷の代わりに、宇宙人は、新しい故郷を手に入れた。"}
+    ]},
+    {title:"第9話「託された希望」",sub:"決戦への思い",unlock:{type:"boss",n:9},lines:[
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう…あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「私の星は、希望を私に託して、滅びた」と）"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「だから、この星は、絶対に滅ぼさせない」…と）"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…UFO。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう！あうー！"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「私の故郷の分まで、この星を守る」だそうです）"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…その覚悟、しかと受け取ったで。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"一緒に守ろう。お前の、新しい故郷を。"},
+      {who:"narration",t:"託された希望を胸に、宇宙人は、新しい故郷を守る戦いへ向かう。"}
+    ]},
+    {title:"第10話「あうー、の本当の意味」",sub:"伝えたかった言葉",unlock:{type:"clearGame"},lines:[
+      {who:"narration",t:"― ウォッチャーを越えた後。星空の下。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう…あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「星を、守れた。故郷の皆も、喜んでいる」と）"},
+      {who:"narration",t:"UFOは、星空のひとつを、じっと見つめた。",sepia:true},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"…あうー。",sepia:true},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（…あれが、彼の故郷だった星の、光だそうです）",sepia:true},
+      {who:"narration",t:"― そして、UFOは、たどたどしく、はじめて地球の言葉を口にした。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"…あ、り、が、と、う。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…!UFO、今、しゃべった…！"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…おい、宇宙人、お前…！"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"ありがとう。…みんな、だいすき。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…ずっと、この言葉を、自分の口で伝えたかったのですね。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…こっちこそ、ありがとう。ずっと、一緒にいてくれて。"},
+      {who:"narration",t:"「あうー」に込められていた想いは、確かに、みんなに届いていた。"}
+    ]}
+  ]
+};
+
+// ボスの物語（ラスボスクリアで全解放）。各ボス3話
+const BOSS_STORIES={
+  1:[
+    {title:"第1話「鬼大家の素顔」",sub:"怒りの仮面の下",lines:[
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"…まさか、お前と話す日が来るとはな。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"あんた、あんなに怒ってたのに、今は穏やかだな。"},
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"儂だって、好きで鬼になったわけやない。"},
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"築40年のボロアパートを30棟。維持するだけで、精一杯なんや。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…そんなに大変だったのか。"},
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"家賃を取り立てんと、修繕費も出せん。住人を追い出すのは、儂も辛い。"},
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"せやから、怒りで自分を奮い立たせとった。鬼にならな、やっていけん。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…怒りは、あんたの鎧だったのか。"},
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"そういうこっちゃ。だが、本当はな…儂も、誰かに優しくされたかった。"},
+      {who:"narration",t:"伝説の鬼の末裔。その怒りの裏には、孤独な大家の素顔があった。"}
+    ]},
+    {title:"第2話「若き日の家賃」",sub:"鬼になる前の物語",lines:[
+      {who:"narration",t:"― 数十年前の回想。若き日の鬼大家。",sepia:true},
+      {who:"oni_young",name:"若い鬼",emoji:"👺",t:"…家賃が、払えない。どうしよう。",sepia:true},
+      {who:"narration",t:"若い頃、鬼大家自身も、家賃が払えず追い詰められていた。",sepia:true},
+      {who:"oni_mother",name:"母",emoji:"👩",t:"…ごめんね。こんな貧しい家に生んで、ごめんね。",sepia:true},
+      {who:"oni_young",name:"若い鬼",emoji:"👺",t:"母さんのせいやない…！儂が、稼げばええんや。",sepia:true},
+      {who:"narration",t:"だが、当時の大家は、母子を冷たく追い出した。",sepia:true},
+      {who:"oni_young",name:"若い鬼",emoji:"👺",t:"…っ。絶対に、儂は、こんな大家にはならん…！",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"…皮肉なもんやろ。あんなに嫌った大家に、儂自身がなっとった。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…あんた、母ちゃんを守りたかっただけなんやな。"},
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"…ああ。気づけば、母を泣かせた大家と、同じ顔をしとった。"}
+    ]},
+    {title:"第3話「言い訳を嫌う理由」",sub:"鬼大家の思想",lines:[
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"儂はな、「言い訳」だけは、どうしても許せんかった。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…それも、過去に関係あるのか。"},
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"若い頃の儂は、言い訳ばかりして、母を守れんかった。"},
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"「金がない」「仕方ない」…そう言い訳して、逃げとった。"},
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"せやから、言い訳する奴を見ると、昔の自分を見とるようで、許せんかったんや。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…あんたは、自分自身に怒ってたんだな。"},
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"…そうかもしれん。お前に論破されて、やっと気づいたわ。"},
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"儂が許せんかったのは、他人やない。逃げ続けた、昔の儂や。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…もう、自分を許してやってもいいんじゃないか。"},
+      {who:"boss",name:"鬼大家",emoji:"👹",t:"…ふっ。お前は、ええ奴やな。母さんに、会わせたかったわ。"},
+      {who:"narration",t:"鬼の怒りは、許せなかった自分自身への、長い長い叱咤だった。"}
+    ]}
+  ],
+  2:[
+    {title:"第1話「★1レビュアーの素顔」",sub:"なぜ酷評し続けるのか",lines:[
+      {who:"boss",name:"★1レビュアー",emoji:"😈",t:"…ふん。私のことを、ただの粘着質だと思っているのだろう。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"一日中レビューに張り付いて★1をつけてたよな。なんでだ？"},
+      {who:"boss",name:"★1レビュアー",emoji:"😈",t:"…私はね、昔、何かを「作る側」だったのだよ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…作る側？"},
+      {who:"boss",name:"★1レビュアー",emoji:"😈",t:"ああ。だが、誰にも評価されず、心ない★1をつけられ続けた。"},
+      {who:"boss",name:"★1レビュアー",emoji:"😈",t:"…そして、私は、作ることをやめてしまった。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…それで、今度は自分が、つける側に回ったのか。"},
+      {who:"boss",name:"★1レビュアー",emoji:"😈",t:"傷つけられた者は、誰かを傷つけたくなる。…愚かだろう。"},
+      {who:"narration",t:"星を喰らう審判者。その正体は、夢を折られた、元・創作者だった。"}
+    ]},
+    {title:"第2話「折られた夢」",sub:"創作者だった日々",lines:[
+      {who:"narration",t:"― 回想。かつて、彼も何かを作っていた。",sepia:true},
+      {who:"reviewer_young",name:"若きレビュアー",emoji:"🧑‍🎨",t:"…見てくれ、これが私の作品だ。自信作なんだ。",sepia:true},
+      {who:"narration",t:"しかし、返ってきたのは、心ない言葉の数々だった。",sepia:true},
+      {who:"reviewer_young",name:"若きレビュアー",emoji:"🧑‍🎨",t:"「つまらない」「才能ない」「時間の無駄」…",sepia:true},
+      {who:"reviewer_young",name:"若きレビュアー",emoji:"🧑‍🎨",t:"…そんなに、私の作るものは、価値がないのか。",sepia:true},
+      {who:"narration",t:"たった一つの★1が、彼の心を、完全に折ってしまった。",sepia:true},
+      {who:"reviewer_young",name:"若きレビュアー",emoji:"🧑‍🎨",t:"…もう、作らない。二度と、作るもんか。",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"boss",name:"★1レビュアー",emoji:"😈",t:"…作る痛みを知っているからこそ、私は的確に急所を突けた。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…あなたは、あなた自身を、傷つけ続けていたのですね。"},
+      {who:"boss",name:"★1レビュアー",emoji:"😈",t:"…ああ。他人を貶すたび、昔の自分が、もっと惨めになっていった。"}
+    ]},
+    {title:"第3話「創ることへ還る」",sub:"レビュアーの再生",lines:[
+      {who:"boss",name:"★1レビュアー",emoji:"😈",t:"…お前は、酷評されても、作ることをやめなかった。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"何度もやめようと思ったよ。でも、待ってる人がいたからな。"},
+      {who:"boss",name:"★1レビュアー",emoji:"😈",t:"…まぶしいな。私には、その強さがなかった。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…なぁ。もう一度、作ってみたらどうだ。"},
+      {who:"boss",name:"★1レビュアー",emoji:"😈",t:"…私が、また作ると？こんな歳になって?"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"作るのに、遅いも早いもないだろ。一人でも、見てくれる人がいればいい。"},
+      {who:"boss",name:"★1レビュアー",emoji:"😈",t:"…一人でも、か。"},
+      {who:"boss",name:"★1レビュアー",emoji:"😈",t:"…ふっ。お前に論破されて、思い出したよ。作るのが、好きだったことを。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"その時は、俺が一番に★5をつけるよ。"},
+      {who:"boss",name:"★1レビュアー",emoji:"😈",t:"…ありがとう。私は、もう一度、創る側へ還ってみよう。"},
+      {who:"narration",t:"星を喰らっていた審判者は、再び、星を生み出す側へと還っていった。"}
+    ]}
+  ],
+  3:[
+    {title:"第1話「無断転載マンの素顔」",sub:"なぜ盗むのか",lines:[
+      {who:"boss",name:"無断転載マン",emoji:"🥷",t:"…俺のこと、ただの盗人だと思ってるだろ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"人の作ったものを、勝手にコピーして回ってたよな。"},
+      {who:"boss",name:"無断転載マン",emoji:"🥷",t:"…俺には、何もなかったんだ。才能も、生み出す力も。"},
+      {who:"boss",name:"無断転載マン",emoji:"🥷",t:"だから、人のものを盗んで、自分のものみたいに振る舞った。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…空っぽな自分を、隠したかったのか。"},
+      {who:"boss",name:"無断転載マン",emoji:"🥷",t:"ああ。盗んだものを並べてる間だけは、自分が何者かになれた気がした。"},
+      {who:"boss",name:"無断転載マン",emoji:"🥷",t:"…でも、心の中は、ずっと空っぽのままだった。"},
+      {who:"narration",t:"無断複製の影法師。その正体は、空っぽな自分に怯える、影だった。"}
+    ]},
+    {title:"第2話「空っぽの影」",sub:"何者にもなれなかった",lines:[
+      {who:"narration",t:"― 回想。彼も、かつては何かを作ろうとした。",sepia:true},
+      {who:"thief_young",name:"若き影",emoji:"🧑",t:"…俺も、何か作りたい。でも、何も思いつかない。",sepia:true},
+      {who:"narration",t:"努力しても、彼の作るものは、いつも誰かの真似事だった。",sepia:true},
+      {who:"thief_young",name:"若き影",emoji:"🧑",t:"…結局、俺はオリジナルを生み出せない。空っぽなんだ。",sepia:true},
+      {who:"narration",t:"自分に絶望した彼は、いつしか、人のものを盗むようになっていた。",sepia:true},
+      {who:"thief_young",name:"若き影",emoji:"🧑",t:"…盗めば、少なくとも「何か」を持ってる気になれる。",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"boss",name:"無断転載マン",emoji:"🥷",t:"…盗んだものは、いくら並べても、俺のものにはならなかった。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…当たり前や。借りもんは、借りもんやからな。"},
+      {who:"boss",name:"無断転載マン",emoji:"🥷",t:"…ああ。盗めば盗むほど、自分がもっと空っぽになっていった。"}
+    ]},
+    {title:"第3話「ゼロから創る勇気」",sub:"影法師の決意",lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"なぁ。俺の最初のアプリも、ひどい出来だったんだぜ。"},
+      {who:"boss",name:"無断転載マン",emoji:"🥷",t:"…嘘だろ。お前のは、ちゃんとオリジナルじゃないか。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"最初は誰かの真似だったよ。でも、作るうちに、自分の色が出てきた。"},
+      {who:"boss",name:"無断転載マン",emoji:"🥷",t:"…真似から、始めてもいいのか?"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"いいに決まってる。最初はみんな真似だ。でも、盗むんじゃなくて、学ぶんだ。"},
+      {who:"boss",name:"無断転載マン",emoji:"🥷",t:"…盗むんじゃなくて、学ぶ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"そうやって少しずつ、お前だけのものが生まれてくる。空っぽじゃなくなる。"},
+      {who:"boss",name:"無断転載マン",emoji:"🥷",t:"…俺にも、できるだろうか。ゼロから、創ることが。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"できるさ。下手でもいい。お前の手から生まれたものは、お前だけのものだ。"},
+      {who:"boss",name:"無断転載マン",emoji:"🥷",t:"…ありがとう。俺は、もう影じゃなく、自分の足で歩いてみる。"},
+      {who:"narration",t:"影法師は、誰かの真似ではなく、自分の輪郭を描き始めた。"}
+    ]}
+  ],
+  4:[
+    {title:"第1話「クレーマーの素顔」",sub:"なぜ怒鳴り続けるのか",lines:[
+      {who:"boss",name:"クレーマー",emoji:"🗣️",t:"…私が、ただ怒鳴りたいだけの人間だと思うか?"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"あんたの大声、確かにすごい迫力だったよ。"},
+      {who:"boss",name:"クレーマー",emoji:"🗣️",t:"…私はね、誰にも、話を聞いてもらえなかったんだ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…話を、聞いてもらえない?"},
+      {who:"boss",name:"クレーマー",emoji:"🗣️",t:"小さな声では、誰も振り向かない。だから、大声を出すしかなかった。"},
+      {who:"boss",name:"クレーマー",emoji:"🗣️",t:"怒鳴れば、ようやく人が、私のほうを見る。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…寂しかったんだな、あんた。"},
+      {who:"boss",name:"クレーマー",emoji:"🗣️",t:"…っ。…そんなこと、言われたのは、初めてだ。"},
+      {who:"narration",t:"怒号の暴君。その正体は、誰にも気づかれたかった、孤独な人だった。"}
+    ]},
+    {title:"第2話「届かなかった声」",sub:"無視され続けた人生",lines:[
+      {who:"narration",t:"― 回想。彼は、いつも、輪の外にいた。",sepia:true},
+      {who:"claimer_young",name:"若きクレーマー",emoji:"🧑",t:"…あの、僕も、その話に混ぜてもらえませんか。",sepia:true},
+      {who:"narration",t:"だが、彼の小さな声は、いつも誰にも届かなかった。",sepia:true},
+      {who:"claimer_young",name:"若きクレーマー",emoji:"🧑",t:"…また、聞こえてなかったみたいだ。僕は、いないのと同じなんだ。",sepia:true},
+      {who:"narration",t:"存在を無視され続けた彼は、ある日、大声を上げた。",sepia:true},
+      {who:"claimer_young",name:"若きクレーマー",emoji:"🧑",t:"…!みんな、こっちを見た。声を上げれば、気づいてもらえるんだ。",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"boss",name:"クレーマー",emoji:"🗣️",t:"…それ以来、私は怒鳴ることでしか、自分を主張できなくなった。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…本当は、ただ、気づいてほしかっただけなのですね。"},
+      {who:"boss",name:"クレーマー",emoji:"🗣️",t:"…ああ。誰か一人でいい。私の話を、聞いてほしかった。"}
+    ]},
+    {title:"第3話「聞いてもらえた日」",sub:"暴君の救い",lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"なぁ。これからは、怒鳴らなくていい。俺が、聞くから。"},
+      {who:"boss",name:"クレーマー",emoji:"🗣️",t:"…お前が?こんな、面倒な私の話を?"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ああ。アプリのフィードバックも、文句も、全部聞くよ。それが俺の仕事だ。"},
+      {who:"boss",name:"クレーマー",emoji:"🗣️",t:"…っ。小さな声で、言ってもいいのか。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"もちろん。むしろ、小さな声のほうが、本音が聞こえる。"},
+      {who:"boss",name:"クレーマー",emoji:"🗣️",t:"…じゃあ、言わせてもらう。…ずっと、寂しかった。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…うん。聞いてるよ。ちゃんと。"},
+      {who:"boss",name:"クレーマー",emoji:"🗣️",t:"…ありがとう。これが、誰かに話を聞いてもらうってことか。"},
+      {who:"boss",name:"クレーマー",emoji:"🗣️",t:"…もう、怒鳴らなくて、いいんだな。"},
+      {who:"narration",t:"怒号の暴君は、静かな声で語れる、穏やかな日々を取り戻した。"}
+    ]}
+  ],
+  5:[
+    {title:"第1話「バグの化身の素顔」",sub:"異常体の正体",lines:[
+      {who:"boss",name:"バグの化身",emoji:"👾",t:"…ボクは、誰も望まなかった、エラーそのものさ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"バグの化身…お前は、どこから来たんだ?"},
+      {who:"boss",name:"バグの化身",emoji:"👾",t:"ボクはね、誰かが書いた、たった一行の間違いから生まれたんだ。"},
+      {who:"boss",name:"バグの化身",emoji:"👾",t:"望まれず生まれて、見つかれば即、消される。…それがボクの運命さ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…バグは、消される存在、か。"},
+      {who:"boss",name:"バグの化身",emoji:"👾",t:"だからボクは、消されまいと、増殖して、暴れるしかなかった。"},
+      {who:"boss",name:"バグの化身",emoji:"👾",t:"…生きたかっただけなんだ。ただ、それだけなのに。"},
+      {who:"narration",t:"虚構を蝕む異常体。その正体は、生きたいと願う、小さなエラーだった。"}
+    ]},
+    {title:"第2話「望まれぬ命」",sub:"消されることへの恐怖",lines:[
+      {who:"narration",t:"― 回想。バグが生まれた、その瞬間。",sepia:true},
+      {who:"boss",name:"生まれたてのバグ",emoji:"🐛",t:"…ボク、生まれた。ここは、どこ?",sepia:true},
+      {who:"narration",t:"だが、生まれた瞬間から、彼は「消すべきもの」として扱われた。",sepia:true},
+      {who:"boss",name:"生まれたてのバグ",emoji:"🐛",t:"…なんで、みんなボクを消そうとするの?ボク、何かした?",sepia:true},
+      {who:"narration",t:"逃げて、隠れて、増殖して。彼はただ、消されたくなかった。",sepia:true},
+      {who:"boss",name:"生まれたてのバグ",emoji:"🐛",t:"…生きてちゃ、いけないの?ボクだって、生まれてきたのに。",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"boss",name:"バグの化身",emoji:"👾",t:"…ボクは、ただ、存在を認めてほしかっただけなんだ。"},
+      {who:"ufo",name:"UFO乗組員",emoji:"👽",t:"あう…あうー。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"（通訳:「私も、滅びた星から来た。君の気持ち、わかる」と）"},
+      {who:"boss",name:"バグの化身",emoji:"👾",t:"…キミも、望まれずに、ここに来たのか。…仲間、なんだね。"}
+    ]},
+    {title:"第3話「バグも、また一つの個性」",sub:"異常体の居場所",lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"なぁ。バグって、本当に全部、悪いものなのかな。"},
+      {who:"boss",name:"バグの化身",emoji:"👾",t:"…どういう意味だ?"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"バグから、思いがけない発見が生まれることもある。仕様になることもある。"},
+      {who:"boss",name:"バグの化身",emoji:"👾",t:"…ボクが、仕様に?消されるんじゃなくて?"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ああ。間違いから生まれた個性ってのも、あるんだよ。"},
+      {who:"boss",name:"バグの化身",emoji:"👾",t:"…ボクは、消されるべき存在じゃ、なかったのか。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"少なくとも俺は、お前を一つの個性として、面白いと思うよ。"},
+      {who:"boss",name:"バグの化身",emoji:"👾",t:"…っ。面白い…ボクが…。"},
+      {who:"boss",name:"バグの化身",emoji:"👾",t:"…ありがとう。ボク、初めて、生まれてきてよかったって思えた。"},
+      {who:"narration",t:"望まれぬエラーは、唯一無二の個性として、その存在を認められた。"}
+    ]}
+  ],
+  6:[
+    {title:"第1話「課金圧力デーモンの素顔」",sub:"なぜ金を求めるのか",lines:[
+      {who:"boss",name:"課金圧力デーモン",emoji:"💸",t:"…フン。金、金、金。私が強欲だと、お前も思うか。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"無料勢の俺を、目の敵にしてたよな。"},
+      {who:"boss",name:"課金圧力デーモン",emoji:"💸",t:"…私はかつて、金がないせいで、全てを失った。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…全てを?"},
+      {who:"boss",name:"課金圧力デーモン",emoji:"💸",t:"治療費が払えず、大切な者を、見送るしかなかった。"},
+      {who:"boss",name:"課金圧力デーモン",emoji:"💸",t:"あの時、金さえあれば…その思いが、私を金の亡者に変えた。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…金は、あんたにとって、後悔の象徴だったのか。"},
+      {who:"boss",name:"課金圧力デーモン",emoji:"💸",t:"…ああ。金がないことの恐怖を、私は誰よりも知っている。"},
+      {who:"narration",t:"金貨を貪る誘惑魔。その強欲は、喪失への、深い恐怖の裏返しだった。"}
+    ]},
+    {title:"第2話「失われた者」",sub:"金で買えなかったもの",lines:[
+      {who:"narration",t:"― 回想。彼には、守りたい家族がいた。",sepia:true},
+      {who:"demon_young",name:"若き誘惑魔",emoji:"🧑",t:"…大丈夫。きっと治る。お金は、なんとかするから。",sepia:true},
+      {who:"narration",t:"だが、必要な治療費は、彼の手には、あまりに遠かった。",sepia:true},
+      {who:"demon_young",name:"若き誘惑魔",emoji:"🧑",t:"…金がない。金が、ないだけで…!",sepia:true},
+      {who:"narration",t:"間に合わなかった。彼は、大切な者を、失った。",sepia:true},
+      {who:"demon_young",name:"若き誘惑魔",emoji:"🧑",t:"…金さえあれば。金さえ、あれば…!",sepia:true},
+      {who:"narration",t:"その日から、彼は金に取り憑かれた。二度と、何も失わないために。",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"boss",name:"課金圧力デーモン",emoji:"💸",t:"…金を集めても、あの者は、もう戻らないのにな。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…あんた、ずっと一人で、その後悔を抱えとったんやな。"},
+      {who:"boss",name:"課金圧力デーモン",emoji:"💸",t:"…ああ。金で埋めようとしても、心の穴は、塞がらなかった。"}
+    ]},
+    {title:"第3話「金で買えないもの」",sub:"誘惑魔の気づき",lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"なぁ。俺は金がなくても、仲間がいる。それが宝物なんだ。"},
+      {who:"boss",name:"課金圧力デーモン",emoji:"💸",t:"…金より、仲間だと?きれいごとだ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"きれいごとでもいいさ。少なくとも、仲間は金じゃ買えない。"},
+      {who:"boss",name:"課金圧力デーモン",emoji:"💸",t:"…っ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"あんたが失ったものも、金じゃ買えなかった。だろ?"},
+      {who:"boss",name:"課金圧力デーモン",emoji:"💸",t:"…そうだ。一番大切なものは、いつも、金では買えなかった。"},
+      {who:"boss",name:"課金圧力デーモン",emoji:"💸",t:"…私は、買えないものから、目を逸らすために、金を追っていただけだ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…もう、目を逸らさなくていい。あんたの隣にも、誰かがいるはずだ。"},
+      {who:"boss",name:"課金圧力デーモン",emoji:"💸",t:"…ありがとう。金で買えないものの価値を、今さら、思い出したよ。"},
+      {who:"narration",t:"金貨を貪っていた誘惑魔は、本当に大切なものへ、手を伸ばし始めた。"}
+    ]}
+  ],
+  7:[
+    {title:"第1話「炎上の精霊の素顔」",sub:"なぜ燃やすのか",lines:[
+      {who:"boss",name:"炎上の精霊",emoji:"🔥",t:"…私は、燃やすことしか、知らなかった。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"あんたの炎、すごい勢いだったよ。次々と燃え広がって。"},
+      {who:"boss",name:"炎上の精霊",emoji:"🔥",t:"…私はね、最初は、小さな正義感だったんだ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"正義感?"},
+      {who:"boss",name:"炎上の精霊",emoji:"🔥",t:"「これは間違ってる」と、声を上げただけ。それが正しいと信じていた。"},
+      {who:"boss",name:"炎上の精霊",emoji:"🔥",t:"だが、いつしか私の炎は、人を焼くための炎に変わっていた。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…正義が、暴走したのか。"},
+      {who:"boss",name:"炎上の精霊",emoji:"🔥",t:"…ああ。気づけば、私は、何を燃やしているのかも、わからなくなっていた。"},
+      {who:"narration",t:"劫火の扇動者。その炎は、行き場を失った、正義の成れの果てだった。"}
+    ]},
+    {title:"第2話「正義だったはずの火」",sub:"暴走した善意",lines:[
+      {who:"narration",t:"― 回想。最初の火は、小さく、温かかった。",sepia:true},
+      {who:"flame_young",name:"小さな炎",emoji:"🕯️",t:"…これは、おかしいよ。誰かが、言わなきゃ。",sepia:true},
+      {who:"narration",t:"彼の小さな声に、最初は、共感が集まった。",sepia:true},
+      {who:"flame_young",name:"小さな炎",emoji:"🕯️",t:"…そうだ、私は正しい。みんなも、そう言ってくれる。",sepia:true},
+      {who:"narration",t:"だが、火は集まるほど大きくなり、やがて、制御を失った。",sepia:true},
+      {who:"flame_young",name:"小さな炎",emoji:"🕯️",t:"…あれ?私は、何を燃やしてるんだ?もう、止まらない…!",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"boss",name:"炎上の精霊",emoji:"🔥",t:"…正義は、集まると、すぐに人を焼く炎に変わる。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…あなたは、自分の火に、自分が一番焼かれていたのですね。"},
+      {who:"boss",name:"炎上の精霊",emoji:"🔥",t:"…ああ。最後には、私自身も、その炎で焼け焦げていた。"}
+    ]},
+    {title:"第3話「火を、灯りに」",sub:"精霊の鎮火",lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"なぁ。あんたの最初の火は、悪くなかったと思うぜ。"},
+      {who:"boss",name:"炎上の精霊",emoji:"🔥",t:"…人を焼いた火が?"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"最初は、間違いを正したいっていう、温かい火だっただろ。"},
+      {who:"boss",name:"炎上の精霊",emoji:"🔥",t:"…ああ。だが、大きくしすぎた。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"火は、燃やすためじゃなく、照らすために使えばいい。"},
+      {who:"boss",name:"炎上の精霊",emoji:"🔥",t:"…照らす、ため?"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"誰かを焼く炎じゃなく、誰かの足元を照らす、灯りにな。"},
+      {who:"boss",name:"炎上の精霊",emoji:"🔥",t:"…っ。私の火が、誰かの灯りに。"},
+      {who:"boss",name:"炎上の精霊",emoji:"🔥",t:"…ありがとう。私は、もう、誰も焼かない。…静かに、誰かを照らそう。"},
+      {who:"narration",t:"劫火の扇動者は、人を焼く炎を捨て、道を照らす、小さな灯りになった。"}
+    ]}
+  ],
+  8:[
+    {title:"第1話「承認欲求の魔王の素顔」",sub:"なぜ認められたいのか",lines:[
+      {who:"boss",name:"承認欲求の魔王",emoji:"👑",t:"…私は、ずっと、誰かに認められたかった。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"いいねを集めることに、必死だったよな。"},
+      {who:"boss",name:"承認欲求の魔王",emoji:"👑",t:"…いいねの数だけが、私の価値だと、信じていた。"},
+      {who:"boss",name:"承認欲求の魔王",emoji:"👑",t:"数字が増えれば安心して、減れば、夜も眠れなかった。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…数字に、振り回されてたんだな。"},
+      {who:"boss",name:"承認欲求の魔王",emoji:"👑",t:"認められないと、私は、存在していないのと同じだった。"},
+      {who:"boss",name:"承認欲求の魔王",emoji:"👑",t:"…だから、もっと、もっとと、いいねを求め続けた。"},
+      {who:"narration",t:"承認に飢えた偽神。その渇望は、自分を愛せない、孤独からきていた。"}
+    ]},
+    {title:"第2話「空っぽの王座」",sub:"満たされない渇き",lines:[
+      {who:"narration",t:"― 回想。彼は、誰にも褒められない子供だった。",sepia:true},
+      {who:"king_young",name:"幼き魔王",emoji:"🧒",t:"…見て、見て。僕、こんなことできるよ。…ねえ、見て。",sepia:true},
+      {who:"narration",t:"だが、誰も振り向いてくれなかった。彼は、いつも一人だった。",sepia:true},
+      {who:"king_young",name:"幼き魔王",emoji:"🧒",t:"…どうすれば、見てもらえるの?どうすれば、認めてもらえるの?",sepia:true},
+      {who:"narration",t:"大人になった彼は、いいねの数に、その答えを求めた。",sepia:true},
+      {who:"king_young",name:"幼き魔王",emoji:"🧒",t:"…数字が増えれば、僕は、認められてるんだ。…そうだろ?",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"boss",name:"承認欲求の魔王",emoji:"👑",t:"…どれだけいいねを集めても、心は、空っぽのままだった。"},
+      {who:"cat",name:"ねこ",emoji:"🐱",t:"…あんたが欲しかったのは、数字やのうて、本物の繋がりやったんやな。"},
+      {who:"boss",name:"承認欲求の魔王",emoji:"👑",t:"…ああ。王座に座っても、隣には、誰もいなかった。"}
+    ]},
+    {title:"第3話「ありのままの自分」",sub:"偽神の解放",lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"俺のアプリ、いいねなんてほとんどつかないぜ。"},
+      {who:"boss",name:"承認欲求の魔王",emoji:"👑",t:"…それで、平気なのか?"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"平気だよ。たった一人でも、本気で喜んでくれる人がいればいい。"},
+      {who:"boss",name:"承認欲求の魔王",emoji:"👑",t:"…たった一人で、満たされるのか。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"千のいいねより、一人の『ありがとう』のほうが、ずっと温かいんだ。"},
+      {who:"boss",name:"承認欲求の魔王",emoji:"👑",t:"…私は、数字ばかり見て、その一人を、見ていなかった。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"認められようとしなくていい。ありのままのあんたを、好きな奴は必ずいる。"},
+      {who:"boss",name:"承認欲求の魔王",emoji:"👑",t:"…ありのままの、私を。"},
+      {who:"boss",name:"承認欲求の魔王",emoji:"👑",t:"…ありがとう。私は、もう、数字の王座から、降りるよ。"},
+      {who:"narration",t:"承認に飢えた偽神は、ありのままの自分を、ようやく愛し始めた。"}
+    ]}
+  ],
+  9:[
+    {title:"第1話「虚無の使者の素顔」",sub:"なぜ何も感じないのか",lines:[
+      {who:"boss",name:"虚無の使者",emoji:"🟣",t:"…私には、もう、何の感情もない。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"あんた、戦ってる時も、ずっと無表情だったな。"},
+      {who:"boss",name:"虚無の使者",emoji:"🟣",t:"…感じることを、やめたんだ。そのほうが、楽だから。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…感じることを、やめた?"},
+      {who:"boss",name:"虚無の使者",emoji:"🟣",t:"喜びも、悲しみも、期待も。…全部、捨てた。"},
+      {who:"boss",name:"虚無の使者",emoji:"🟣",t:"何も感じなければ、もう、傷つかずに済むからな。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…それだけ、深く傷ついたことが、あったんだな。"},
+      {who:"boss",name:"虚無の使者",emoji:"🟣",t:"…さあな。それすら、もう、覚えていない。"},
+      {who:"narration",t:"静寂を運ぶ終末使者。その虚無は、傷つきすぎた心の、最後の防衛だった。"}
+    ]},
+    {title:"第2話「心を閉ざした日」",sub:"感情を捨てた理由",lines:[
+      {who:"narration",t:"― 回想。かつて、彼は誰よりも、心の豊かな者だった。",sepia:true},
+      {who:"void_young",name:"かつての使者",emoji:"🧑",t:"…私は、人を信じていた。期待していた。夢も、希望もあった。",sepia:true},
+      {who:"narration",t:"だが、信じた相手に裏切られ、夢は砕かれ、希望は奪われた。",sepia:true},
+      {who:"void_young",name:"かつての使者",emoji:"🧑",t:"…期待するから、裏切られる。希望を持つから、絶望する。",sepia:true},
+      {who:"narration",t:"あまりの痛みに、彼は、感じることそのものを、捨てた。",sepia:true},
+      {who:"void_young",name:"かつての使者",emoji:"🧑",t:"…何も感じなければ、もう、痛くない。…これでいい。これで。",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"boss",name:"虚無の使者",emoji:"🟣",t:"…感情を捨てれば、確かに、痛みはなくなった。"},
+      {who:"frog",name:"かえる",emoji:"🐸",t:"…でも、喜びも、一緒に消えてしまったのですね。"},
+      {who:"boss",name:"虚無の使者",emoji:"🟣",t:"…ああ。痛みのない代わりに、私の世界は、色を失った。"}
+    ]},
+    {title:"第3話「もう一度、感じること」",sub:"使者の再生",lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"なぁ。傷つくのが怖くて、感じるのをやめたんだろ。"},
+      {who:"boss",name:"虚無の使者",emoji:"🟣",t:"…そうだ。感じなければ、傷つかない。賢い選択だろう。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"でも、傷つかない代わりに、喜びも感じられなくなった。それ、本当に楽か?"},
+      {who:"boss",name:"虚無の使者",emoji:"🟣",t:"…っ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"俺だって、何度も傷ついた。でも、その分、喜びも大きかったんだ。"},
+      {who:"boss",name:"虚無の使者",emoji:"🟣",t:"…痛みと喜びは、セットだと?"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ああ。感じる心があるから、人は、生きてるって言えるんだよ。"},
+      {who:"boss",name:"虚無の使者",emoji:"🟣",t:"…もう一度、感じても、いいのだろうか。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"いいに決まってる。ゆっくりでいい。少しずつ、色を取り戻せばいい。"},
+      {who:"boss",name:"虚無の使者",emoji:"🟣",t:"…ありがとう。…なぜか、今、胸が、温かい。これが、感情か。"},
+      {who:"narration",t:"静寂に閉ざされた使者の世界に、ゆっくりと、色が戻り始めた。"}
+    ]}
+  ],
+  10:[
+    {title:"第1話「ウォッチャーの孤独」",sub:"観測者の正体",lines:[
+      {who:"boss",name:"ウォッチャー",emoji:"🕳️",t:"…私と話そうというのか。この、マルチバースの観測者と。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"あんたが何を探してたのか、知りたいんだ。"},
+      {who:"boss",name:"ウォッチャー",emoji:"🕳️",t:"…私は、無数の宇宙を、ただ観測し続ける存在だ。"},
+      {who:"boss",name:"ウォッチャー",emoji:"🕳️",t:"生まれてから、ずっと一人だ。誰とも、関わることなく。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…ずっと、一人で見てるだけ、なのか。"},
+      {who:"boss",name:"ウォッチャー",emoji:"🕳️",t:"観測者は、対象に干渉してはならない。それが、私の宿命だ。"},
+      {who:"boss",name:"ウォッチャー",emoji:"🕳️",t:"だから私は、永遠に、ガラスの向こうから、世界を眺めるだけ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…途方もなく、孤独だな。"},
+      {who:"narration",t:"マルチバースの観測者。その全能の力の裏には、永遠の孤独があった。"}
+    ]},
+    {title:"第2話「面白い世界を求めて」",sub:"なぜ世界を消したのか",lines:[
+      {who:"narration",t:"― 回想。無数の宇宙を見つめる、ウォッチャーの記憶。",sepia:true},
+      {who:"boss",name:"ウォッチャー",emoji:"🌌",t:"…どの世界も、同じだった。争い、奪い合い、滅びていく。",sepia:true},
+      {who:"boss",name:"ウォッチャー",emoji:"🌌",t:"…つまらない。どこにも、私の心を動かすものはなかった。",sepia:true},
+      {who:"narration",t:"観測者は、つまらないと判断した世界を、消去し続けた。",sepia:true},
+      {who:"boss",name:"ウォッチャー",emoji:"🌌",t:"…私は、ただ、たった一つでいい。「面白い」と思える世界が欲しかった。",sepia:true},
+      {who:"boss",name:"ウォッチャー",emoji:"🌌",t:"…一人の退屈を、忘れさせてくれる、何かが。",sepia:true},
+      {who:"narration",t:"― 現在。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…世界を消してたのは、退屈だったからか。"},
+      {who:"boss",name:"ウォッチャー",emoji:"🕳️",t:"…身勝手だろう。だが、永遠の孤独は、退屈すぎたのだ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"…あんたも、昔の俺と同じだ。「面白い」を、探してたんだな。"},
+      {who:"boss",name:"ウォッチャー",emoji:"🕳️",t:"…お前と、同じ?"}
+    ]},
+    {title:"第3話「観測者は、もういらない」",sub:"ウォッチャーの結末",lines:[
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"なぁ。観測してるだけじゃ、本当の『面白い』は見つからないぜ。"},
+      {who:"boss",name:"ウォッチャー",emoji:"🕳️",t:"…どういう意味だ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ガラスの向こうから見てるだけじゃ、わからない。中に入って、関わらないと。"},
+      {who:"boss",name:"ウォッチャー",emoji:"🕳️",t:"…観測者が、対象に、関わると?それは、禁忌だ。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"その禁忌を破ったから、あんたは俺たちと戦って、こうして話せてる。"},
+      {who:"boss",name:"ウォッチャー",emoji:"🕳️",t:"…っ。確かに、お前と戦った時、私は初めて、心が動いた。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"それが『面白い』だよ。誰かと関わって、心が動く。それが全部だ。"},
+      {who:"boss",name:"ウォッチャー",emoji:"✨",t:"…私は、観測者であることを、やめてもいいのだろうか。"},
+      {who:"dev",name:"開発者",emoji:"🧑‍💻",t:"ああ。観測者なんて、もういらない。一緒に、世界を生きればいい。"},
+      {who:"boss",name:"ウォッチャー",emoji:"✨",t:"…ありがとう。お前という、たった一つの『面白い』に、出会えてよかった。"},
+      {who:"narration",t:"永遠の孤独を見つめ続けた観測者は、ようやく、世界の中へと一歩を踏み出した。"}
+    ]}
+  ]
+};
+
+// 解放判定
+function isStoryUnlocked(unlock){
+  if(!unlock)return true;
+  const p=rpgLoad()||{};
+  if(unlock.type==='always')return true;
+  if(unlock.type==='boss')return ((p.defeated&&p.defeated.length)||0)>=unlock.n;
+  if(unlock.type==='collect')return smGetCollected().length>=unlock.n;
+  if(unlock.type==='clearGame')return !!p.gameCleared;
+  if(unlock.type==='cleardev')return !!p.theDevCleared;
+  return false;
+}
+function isBossStoryUnlocked(){const p=rpgLoad()||{};return !!p.gameCleared;}
+
+// ============ サイドストーリー画面 ============
+let SS={cat:'ally',char:'dev',bossId:1};
+function openSideStory(){SS.cat='ally';SS.char='dev';renderSideStory();showScreen('sidestory');}
+function ssSetCat(c){SS.cat=c;if(c==='boss')SS.bossId=1;else SS.char='dev';renderSideStory();sfx&&sfx('select');}
+function ssSetChar(id){SS.char=id;renderSideStory();sfx&&sfx('select');}
+function ssSetBoss(id){SS.bossId=id;renderSideStory();sfx&&sfx('select');}
+
+function renderSideStory(){
+  const bossUnlocked=isBossStoryUnlocked();
+  // カテゴリタブ
+  const catTabs=`<div style="display:flex;gap:6px;margin-bottom:10px">
+    <div onclick="ssSetCat('ally')" style="flex:1;text-align:center;padding:7px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;${SS.cat==='ally'?'background:#1a1a2e;border:1px solid #5de5ff;color:#5de5ff':'background:#15161a;border:1px solid #333;color:#888'}">仲間の物語</div>
+    <div onclick="${bossUnlocked?"ssSetCat('boss')":''}" style="flex:1;text-align:center;padding:7px;border-radius:8px;font-size:11px;font-weight:700;cursor:${bossUnlocked?'pointer':'default'};${SS.cat==='boss'?'background:#2a1a1a;border:1px solid #ff6b6b;color:#ff6b6b':'background:#15161a;border:1px solid #333;color:#888'}">ボスの物語 ${bossUnlocked?'':'🔒'}</div>
+  </div>`;
+  let body='';
+  if(SS.cat==='ally'){
+    const charTabs=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:10px">`+SIDE_CHARS.map(c=>`<div onclick="ssSetChar('${c.id}')" style="text-align:center;padding:7px 4px;border-radius:8px;font-size:14px;cursor:pointer;border:1px solid ${SS.char===c.id?c.color:'#333'};${SS.char===c.id?'background:#1a1f0a':''}">${c.emoji}</div>`).join('')+`</div>`;
+    const c=SIDE_CHARS.find(x=>x.id===SS.char);
+    const stories=SIDE_STORIES[SS.char]||[];
+    const unlockedCount=stories.filter(s=>isStoryUnlocked(s.unlock)).length;
+    const header=`<div style="display:flex;align-items:center;gap:10px;background:#12121c;border-radius:10px;padding:10px;margin-bottom:8px"><div style="font-size:40px">${c.emoji}</div><div><div style="font-size:13px;font-weight:800;color:${c.color}">${c.name}</div><div style="font-size:9px;color:#888">10話中 ${unlockedCount}話 解放済み</div></div></div>`;
+    const list=stories.map((s,i)=>{const ul=isStoryUnlocked(s.unlock);return `<div onclick="${ul?`playStory('ally','${SS.char}',${i})`:''}" style="display:flex;align-items:center;gap:8px;background:#12121c;border:1px solid #2a2a2a;border-radius:8px;padding:8px 10px;margin-bottom:5px;cursor:${ul?'pointer':'default'};${ul?'':'opacity:0.45'}"><div style="font-size:18px">${ul?'📖':'🔒'}</div><div style="flex:1"><div style="font-size:11px;font-weight:700;color:${ul?'#fff':'#888'}">${ul?s.title:'第'+(i+1)+'話「？？？」'}</div><div style="font-size:8px;color:#888">${ul?s.sub:s.sub}</div></div>${ul?`<div style="font-size:9px;color:${c.color}">読む ▶</div>`:''}</div>`;}).join('');
+    body=charTabs+header+list;
+  }else{
+    // ボス選択
+    const bossList=Object.keys(BOSS_STORIES).map(bid=>{const e=ENEMIES.find(x=>x.id==bid);return `<div onclick="ssSetBoss(${bid})" style="text-align:center;padding:6px;border-radius:8px;font-size:18px;cursor:pointer;border:1px solid ${SS.bossId==bid?'#ff6b6b':'#333'};${SS.bossId==bid?'background:#2a1a1a':''}">${e?e.emoji:'❓'}</div>`;}).join('');
+    const bdef=ENEMIES.find(x=>x.id==SS.bossId);
+    const header=`<div style="display:flex;align-items:center;gap:10px;background:#12121c;border-radius:10px;padding:10px;margin-bottom:8px"><div style="font-size:40px">${bdef?bdef.emoji:'❓'}</div><div><div style="font-size:8px;color:#ff9d6b">${bdef&&bdef.title2?bdef.title2:''}</div><div style="font-size:13px;font-weight:800;color:#ff6b6b">${bdef?bdef.name:''}</div></div></div>`;
+    const stories=BOSS_STORIES[SS.bossId]||[];
+    const list=stories.map((s,i)=>`<div onclick="playStory('boss',${SS.bossId},${i})" style="display:flex;align-items:center;gap:8px;background:#12121c;border:1px solid #2a2a2a;border-radius:8px;padding:8px 10px;margin-bottom:5px;cursor:pointer"><div style="font-size:18px">📖</div><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#fff">${s.title}</div><div style="font-size:8px;color:#888">${s.sub}</div></div><div style="font-size:9px;color:#ff6b6b">読む ▶</div></div>`).join('');
+    body=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:10px">${bossList}</div>`+header+list;
+  }
+  document.getElementById('sidestory-content').innerHTML=catTabs+body;
+}
+
+// ============ ストーリー再生（会話ラリー） ============
+let STORY={lines:[],idx:0};
+function playStory(cat,id,epIdx){
+  const arr=(cat==='ally')?SIDE_STORIES[id][epIdx].lines:BOSS_STORIES[id][epIdx].lines;
+  STORY={lines:arr.slice(),idx:0,returnScreen:'sidestory'};
+  showScreen('storyplay');
+  renderStoryLine();
+}
+function renderStoryLine(){
+  const L=STORY.lines[STORY.idx];if(!L){ssFinish();return;}
+  const field=document.getElementById('storyplay-field');
+  const sepia=L.sepia;
+  if(field)field.className='story-field'+(sepia?' sepia':'');
+  // 立ち絵
+  const sprite=document.getElementById('story-sprite');
+  if(sprite){
+    if(L.who==='narration'){sprite.innerHTML='';}
+    else{sprite.innerHTML=`<div class="story-char" style="font-size:${L.who==='boss'?'72px':'64px'}">${L.emoji||'❓'}</div>`;}
+  }
+  // テキスト
+  const nameEl=document.getElementById('story-name');
+  const textEl=document.getElementById('story-text');
+  if(L.who==='narration'){if(nameEl)nameEl.textContent='';if(textEl){textEl.className='story-text narration';}}
+  else{if(nameEl)nameEl.textContent=L.name||'';if(textEl){textEl.className='story-text';}}
+  if(textEl)typeWriter(textEl,L.t);
+  sfx&&sfx('talk');
+}
+function storyNext(){
+  // タイプ中なら全部出す
+  const textEl=document.getElementById('story-text');
+  if(textEl&&textEl._typing){finishTypeWriter(textEl);return;}
+  STORY.idx++;
+  if(STORY.idx>=STORY.lines.length){ssFinish();return;}
+  renderStoryLine();
+}
+function ssFinish(){showScreen('sidestory');renderSideStory();}
+
+// タイプライター表示
+function typeWriter(el,text){
+  el._typing=true;el._full=text;el.textContent='';let i=0;
+  if(el._timer)clearInterval(el._timer);
+  el._timer=setInterval(()=>{
+    if(i>=text.length){clearInterval(el._timer);el._typing=false;return;}
+    el.textContent+=text[i];i++;sfx&&sfx('talk');
+  },42);
+}
+function finishTypeWriter(el){if(el._timer)clearInterval(el._timer);el.textContent=el._full;el._typing=false;}
+
+function openSideStoryFromTitle(){openSideStory();}
+
+// ============ 敵図鑑（観測記録） ============
+// ウォッチャー3形態の定義
+const WATCHER_FORMS=[
+  {emoji:'🕳️',name:'観測者',sub:'第一形態',desc:'宇宙の彼方からすべてを「観測」する超越的存在。つまらないと判断した世界を消去してきた。全知ゆえに弱点を見抜き、次元を超えて干渉する。',weak:'メタ',ult:'斬鉄剣',color:'#5de5ff'},
+  {emoji:'🌌',name:'真・観測者',sub:'第二形態：宇宙の眼',desc:'「面白い」と認めた者にのみ見せる真の姿。無数の宇宙を同時に見つめる眼となり、観測対象すべての可能性を演算する。全能力が飛躍的に上昇する。',weak:'—',ult:'次元断裂',color:'#9d6bff'},
+  {emoji:'✨',name:'究極観測者',sub:'最終形態：万象の終焉',desc:'マルチバースそのものと一体化した最終形態。もはや個ではなく現象。あらゆる「面白さ」を超えようとする者だけが辿り着ける、宇宙の真理との対話。',weak:'—',ult:'終焉の光',color:'#FFD700'}
+];
+function openCodex(){renderCodex();showScreen('codex');}
+function renderCodex(){
+  const p=rpgLoad()||{};const defeated=(p.defeated)||[];
+  const total=ENEMIES.length;
+  let cards='';
+  ENEMIES.forEach(e=>{
+    const beaten=defeated.includes(e.id);
+    const isWatcher=(e.id===10);
+    if(beaten){
+      const desc=(typeof ENEMY_DESC!=='undefined'&&ENEMY_DESC[e.id])?ENEMY_DESC[e.id]:'';
+      const attr=(typeof ATTR!=='undefined'&&ATTR[e.weak])?ATTR[e.weak].n:'?';
+      cards+=`<div style="background:#12121c;border:1px solid ${enemyColor(e)}55;border-radius:10px;padding:11px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px"><div style="font-size:34px">${e.emoji}</div><div><div style="font-size:8px;color:#ff9d6b">${e.title2||''}</div><div style="font-size:13px;font-weight:800;color:#fff">${e.name}</div></div></div>
+        <div style="font-size:9px;color:#aaa;line-height:1.55;margin-bottom:6px">${desc}</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;font-size:8px"><span style="background:#3a1a0a;color:#ff9d6b;padding:1px 5px;border-radius:4px">弱点：${attr}</span><span style="background:#2a1a3a;color:#c8a0ff;padding:1px 5px;border-radius:4px">必殺：${(CUTIN_DEFS&&e.cutin&&CUTIN_DEFS[e.cutin])?CUTIN_DEFS[e.cutin].name:'？'}</span>${isWatcher?'<span style=\'background:#3a3a0a;color:#FFD700;padding:1px 5px;border-radius:4px\'>形態変化</span>':''}</div>
+      </div>`;
+      // ウォッチャーは3形態も表示
+      if(isWatcher){
+        cards+=WATCHER_FORMS.map(f=>`<div style="background:#12121c;border:1px solid ${f.color};border-radius:10px;padding:10px;margin:0 0 8px 16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><div style="font-size:30px">${f.emoji}</div><div><div style="font-size:8px;color:${f.color}">${f.sub}</div><div style="font-size:12px;font-weight:800;color:${f.color}">${f.name}</div></div></div><div style="font-size:9px;color:#aaa;line-height:1.5">${f.desc}</div><div style="margin-top:5px;font-size:8px"><span style="background:#2a1a3a;color:#c8a0ff;padding:1px 5px;border-radius:4px">必殺：${f.ult}</span></div></div>`).join('');
+      }
+    }else{
+      cards+=`<div style="background:#0e0e15;border:1px solid #222;border-radius:10px;padding:11px;margin-bottom:8px;opacity:0.6"><div style="display:flex;align-items:center;gap:9px"><div style="font-size:34px;filter:grayscale(1) brightness(0.4)">❓</div><div><div style="font-size:8px;color:#666">？？？</div><div style="font-size:13px;font-weight:800;color:#666">未観測</div></div></div><div style="font-size:9px;color:#555;line-height:1.5;margin-top:5px">まだ遭遇していない脅威。第1章を進めると記録される。</div></div>`;
+    }
+  });
+  // THE 開発者
+  if(p.theDevCleared){
+    cards+=`<div style="background:radial-gradient(ellipse at 50% 30%,#1a0a2a,#12121c);border:1px solid #cb8aff;border-radius:10px;padding:11px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:9px;margin-bottom:6px"><div style="font-size:34px">🐉</div><div><div style="font-size:8px;color:#cb8aff">ゲームの管理者</div><div style="font-size:13px;font-weight:800;color:#cb8aff">THE 開発者</div></div></div><div style="font-size:9px;color:#aaa;line-height:1.55">この世界（ゲーム）を創った開発者そのもの。全知全能の管理者権限を持ち、ソースコードを書き換えて干渉する。現実からゲーム内に降臨した、最強の隠しボス。</div></div>`;
+  }
+  document.getElementById('codex-content').innerHTML=`<div style="font-size:10px;color:#888;text-align:center;margin-bottom:10px">観測：${defeated.length} / ${total}${p.theDevCleared?' ＋隠しボス':''}</div>`+cards;
+}
+function openCodexFromTitle(){openCodex();}
+</script>
+<script>
 // ============ STATE ============
 let G={enemyIdx:0,party:[],enemy:null,tension:0,turnIdx:0,defending:{},battleOver:false};
 let ADV={lines:[],idx:0,afterFn:null};
@@ -1891,6 +3039,7 @@ function fxFlash(){const f=document.getElementById('fx-flash');f.style.animation
 function fxShake(){const fld=document.getElementById('battle-field');fld.style.animation='none';void fld.offsetWidth;fld.style.animation='shake 0.4s';}
 function fxHurtScreen(){let o=document.getElementById('fx-hurt');if(!o){o=document.createElement('div');o.id='fx-hurt';o.style.cssText='position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(255,0,0,0.55) 100%);z-index:40;pointer-events:none;opacity:0';const fld=document.getElementById('battle-field');if(fld)fld.appendChild(o);}o.style.animation='none';void o.offsetWidth;o.style.animation='hurtFlash 0.5s';const fld=document.getElementById('battle-field');if(fld){fld.style.animation='none';void fld.offsetWidth;fld.style.animation='shake 0.4s';}}
 function fxParticles(colors){const c=document.getElementById('fx-particles');c.innerHTML='';for(let i=0;i<24;i++){const p=document.createElement('div');const a=Math.random()*Math.PI*2,d=60+Math.random()*120;p.style.cssText=`position:absolute;top:40%;left:60%;width:7px;height:7px;border-radius:50%;background:${colors[i%colors.length]};--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px;animation:partBurst 0.9s ease-out forwards`;c.appendChild(p);}setTimeout(()=>c.innerHTML='',1000);}
+function fxConfetti(){let c=document.getElementById('fx-confetti');if(!c){c=document.createElement('div');c.id='fx-confetti';c.style.cssText='position:fixed;inset:0;z-index:150;pointer-events:none;overflow:hidden';document.body.appendChild(c);}c.innerHTML='';const cols=['#FFD700','#ff6bca','#5de5ff','#c8f060','#ff5b2b','#fff'];const shapes=['🎉','🎊','◆','●','★','▲'];for(let i=0;i<40;i++){const p=document.createElement('div');const useEmoji=i%5===0;p.textContent=useEmoji?shapes[i%2?0:1]:'';p.style.cssText=`position:absolute;left:${Math.random()*100}%;top:-20px;${useEmoji?`font-size:${12+Math.random()*8}px`:`width:${5+Math.random()*5}px;height:${8+Math.random()*6}px;background:${cols[i%cols.length]}`};animation:confettiFall ${1.5+Math.random()*1.5}s ease-in ${Math.random()*0.6}s forwards`;c.appendChild(p);}setTimeout(()=>{if(c)c.innerHTML='';},3000);}
 
 // ============ 背景（絵文字アクセント） ============
 function bgAccentHtml(type){
@@ -2406,7 +3555,7 @@ function applyEffect(char,skill,eff,mode,target){
       if(char.id==='frog'&&Math.random()<0.4){applyStatus(e,'shaken',2,25);if(typeof passiveProc==='function')passiveProc('char-frog','慇懃無礼','丁寧に煽ってデバフ付与！','debuff');}
       // 強奪（攻撃時ランダム・永続）
       if(Math.random()<0.18){const steal=Math.round((e.atk||10)*0.15);char.stealBonus=(char.stealBonus||0)+steal;applyStatus(e,'drained',99,20);setTimeout(()=>setMsg('',char.name+'は'+e.name+'の攻撃力を奪った！🩸','#FFD700'),300);}
-      if(e.curhp<=0){e.alive=false;const eiK=G.enemies.indexOf(e);const elK=document.getElementById('enemy-unit-'+eiK);if(elK){elK.classList.add('ko-fade');}setTimeout(()=>sfx('ko'),200);}
+      if(e.curhp<=0){e.alive=false;const eiK=G.enemies.indexOf(e);const elK=document.getElementById('enemy-unit-'+eiK);if(elK){elK.classList.add('ko-fade');}setTimeout(()=>sfx('ko'),200);if(e.isBoss&&typeof playFinisher==='function')playFinisher('enemy-unit-'+eiK,e.emoji);}
     });
     G._climaxActive=false;
     sfx(isUlt?'ult':'hit');if(isUlt){fxFlash();fxShake();}
@@ -2566,11 +3715,17 @@ function winBattle(){
     const e=ENEMIES[G.enemyIdx];const diff=G.rematchDiff;
     G.rematch=false;G.rematchDiff=null;
     if(typeof fxParticles==='function')fxParticles(['#FFD700','#fff','#5de5ff']);
+    if(typeof fxConfetti==='function')fxConfetti();
+    // 難易度称号＆コイン報酬
+    let rewardHtml='';
+    if(typeof grantDifficultyReward==='function'){const r=grantDifficultyReward(e,diff);if(r)rewardHtml=`<div style="background:var(--surface2);border-radius:9px;padding:10px;margin:10px 0;font-size:11px"><div style="color:${diff.color};font-weight:800">🏅 称号「${r.title}」獲得！</div><div style="color:#FFD700;margin-top:3px">🪙 +${r.coins}</div></div>`;}
     showScreen('result');
     document.getElementById('result-box').innerHTML=`
+      <div class="result-ronpa" style="color:${diff.color}">CLEAR!</div>
       <div style="font-size:30px;margin-bottom:8px">🏆</div>
       <div style="font-size:18px;font-weight:800;color:${diff.color};margin-bottom:6px">${e.name}［${diff.label}］撃破！</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">再戦に勝利した！</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">再戦に勝利した！</div>
+      ${rewardHtml}
       <button class="btn-primary" onclick="openGlobe()">🌍 地球儀に戻る</button>
       <button class="btn-primary" style="background:var(--surface2);color:var(--text);margin-top:8px" onclick="showScreen('title')">タイトルへ</button>`;
     return;
@@ -2595,9 +3750,13 @@ function winBattle(){
   recordClearForShiftMemo(G.enemyIdx+1);
   if(typeof checkPassiveUnlocks==='function'){const nu=checkPassiveUnlocks();if(nu.length&&typeof toast==='function')setTimeout(()=>toast('🎉 新パッシブ解禁：'+nu.map(x=>x.icon+x.name).join('、')),600);}
   const isLast=G.enemyIdx>=ENEMIES.length-1;
+  if(isLast){const pp=rpgLoad()||{};pp.gameCleared=true;rpgSave(pp);}
   showScreen('result');
+  if(typeof fxConfetti==='function')fxConfetti();
   document.getElementById('result-box').innerHTML=`
+    <div class="result-ronpa">論破！</div>
     <div style="font-size:30px;margin-bottom:8px">${isLast?'🚀':'🎉'}</div>
+    <div style="font-size:9px;color:#ff9d6b;margin-bottom:2px">${e.title2?'＜'+e.title2+'＞':''}</div>
     <div style="font-size:19px;font-weight:800;color:var(--accent);margin-bottom:8px">${e.name} を論破した！</div>
     <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:6px">（${G.enemyIdx+1}/10体目）</div>
     ${reward?`<div style="background:var(--surface2);border-radius:9px;padding:11px;margin:12px 0;font-size:12px"><div style="color:var(--accent);font-weight:700;margin-bottom:3px">🎁 新ネタ習得！</div>「${reward.ja}」（★${reward.star}）</div>`:''}
@@ -3101,6 +4260,25 @@ function startBattleWithDifficulty(diff){
   G.rematch=true;G.rematchDiff=diff;
   startBattle();
 }
+// 難易度クリア報酬（称号＋コイン）。同じ敵×難易度は初回のみ
+const DIFF_TITLES={NORMAL:'討伐者',HARD:'熟練の論客',NIGHTMARE:'悪夢の覇者',INFERNO:'獄炎の覇者'};
+const DIFF_COINS={NORMAL:30,HARD:60,NIGHTMARE:120,INFERNO:200};
+function grantDifficultyReward(e,diff){
+  if(!diff)return null;
+  const key=e.id+'_'+diff.label;
+  const p=rpgLoad()||{};if(!p.diffCleared)p.diffCleared=[];
+  const coins=DIFF_COINS[diff.label]||30;
+  const title=(e.title2?e.title2.split('：')[0]+'の':'')+(DIFF_TITLES[diff.label]||'討伐者');
+  // コインはShiftMemo側に加算
+  if(typeof smAddCoins==='function')smAddCoins(coins);
+  // 称号保存（重複しない）
+  if(!p.titles)p.titles=[];
+  const titleFull=e.name+'［'+diff.label+'］'+title;
+  let firstClear=!p.diffCleared.includes(key);
+  if(firstClear){p.diffCleared.push(key);if(!p.titles.includes(titleFull))p.titles.push(titleFull);}
+  rpgSave(p);
+  return {title:title,coins:coins,first:firstClear};
+}
 </script>
 <script>
 // ============ 必殺技カットイン演出システム ============
@@ -3276,6 +4454,24 @@ function playFormChange(newEmoji,newName,subtitle,colorHex,done){
     </div>`;
   if(typeof sfx==='function'){sfx('bosscharge');setTimeout(()=>sfx('light'),1200);setTimeout(()=>sfx('void'),2600);}
   setTimeout(()=>{ov.className='cutin-ov';ov.innerHTML='';if(done)done();},6000);
+}
+
+// とどめ演出：スロー＋白フラッシュ＋敵が砕け散る
+function playFinisher(elId,emoji){
+  const fld=document.getElementById('battle-field');if(!fld)return;
+  // 白フラッシュ
+  let flash=document.createElement('div');
+  flash.style.cssText='position:absolute;inset:0;background:#fff;z-index:50;pointer-events:none;animation:finisherFlash 0.9s ease-out forwards';
+  fld.appendChild(flash);setTimeout(()=>flash.remove(),900);
+  // スロー風：敵を大きく光らせて砕く
+  const el=document.getElementById(elId);
+  if(el){el.classList.add('finisher-ko');setTimeout(()=>el.classList.remove('finisher-ko'),1000);}
+  // 砕け散る破片
+  const p=(typeof fieldPos==='function')?fieldPos(el):null;
+  const cx=p?p.x:160,cy=p?p.y:70;
+  const parts=['💥','✦','⚡','💢','🌟'];
+  for(let i=0;i<10;i++){const d=document.createElement('div');d.textContent=parts[i%parts.length];const a=Math.random()*Math.PI*2,dist=40+Math.random()*70;d.style.cssText=`position:absolute;left:${cx}px;top:${cy}px;font-size:${14+Math.random()*14}px;z-index:51;pointer-events:none;--sx:${Math.cos(a)*dist}px;--sy:${Math.sin(a)*dist}px;animation:finisherShatter 0.9s ease-out forwards`;fld.appendChild(d);setTimeout(()=>d.remove(),900);}
+  if(typeof sfx==='function'){sfx('crit');setTimeout(()=>sfx('ko'),250);}
 }
 </script>
 <script>
