@@ -78,7 +78,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .enemy-hp-track{width:90px;height:6px;background:#2e2e2e;border-radius:3px;margin-top:3px;overflow:hidden}
 .enemy-hp-fill{height:100%;background:var(--danger);transition:width 0.4s}
 .party-zone{position:absolute;bottom:12px;left:10px;right:10px;display:flex;justify-content:space-around;align-items:flex-end;z-index:2}
-.char{text-align:center;position:relative}
+.char{text-align:center;position:relative;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .char-sprite{width:46px;height:54px;border:1px dashed #4a4a5a;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:8px;text-align:center;background:rgba(20,20,40,0.6);line-height:1.2}
 .char.bobbing .char-sprite{animation:bob 1.6s ease-in-out infinite}
 .char.bobbing2 .char-sprite{animation:bobS 2s ease-in-out infinite}
@@ -180,7 +180,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 
 /* 多人数バトル：敵ユニット */
 .enemy-top-zone{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:center;align-items:flex-start;gap:5px;z-index:2;padding:0 8px;flex-wrap:nowrap}
-.enemy-unit{text-align:center;position:relative;transition:.2s;cursor:default;flex-shrink:1;min-width:42px;padding:4px 2px;border-radius:8px}
+.enemy-unit{text-align:center;position:relative;transition:.2s;cursor:default;flex-shrink:1;min-width:42px;padding:4px 2px;border-radius:8px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .enemy-unit .enemy-em{line-height:1}
 .enemy-unit.boss .enemy-em{animation:bossPulse 2.2s ease-in-out infinite}
 .enemy-unit.hit{animation:knockbackE 0.5s}
@@ -1543,7 +1543,7 @@ function renderBattle(){
     const big=e.isBoss;
     const hpbars=(big&&e.bars>1)?renderBossBars(e):`<div class="enemy-hp-track" style="width:${big?64:38}px"><div class="enemy-hp-fill" style="width:${e.curhp/e.maxhp*100}%"></div></div>`;
     const roleIcon=e.roleType==='zako_heal'?'💚':e.roleType==='zako_def'?'🛡':'';
-    return `<div class="enemy-unit ${big?'boss':''}" id="enemy-unit-${i}" data-ei="${i}" onclick="onEnemyTap(${i})" oncontextmenu="return showUnitDetail(event,'enemy',${i})">
+    return `<div class="enemy-unit ${big?'boss':''}" id="enemy-unit-${i}" data-ei="${i}" onclick="onEnemyTap(${i})" oncontextmenu="return showUnitDetail(event,'enemy',${i})" ontouchstart="lpStart('enemy',${i})" ontouchend="lpEnd()" ontouchmove="lpCancel()">
       <div class="enemy-em" style="font-size:${big?'46':'26'}px">${e.emoji}</div>
       <div class="enemy-unit-name" style="font-size:${big?'9':'7'}px;color:${big?'#ff3b3b':'#ff8c8c'}">${roleIcon}${e.name}</div>
       <div class="status-icons">${statusIconsHtml(e)}</div>
@@ -1552,7 +1552,7 @@ function renderBattle(){
   }).join('');
   document.getElementById('party-zone').innerHTML=G.party.map((c,i)=>{
     const ri=ROLE_INFO[c.roleType];
-    return `<div class="char ${i%2===0?'bobbing':'bobbing2'} ${c.alive?'':'dead'} ${c.awakened?'awakened':''}" id="char-${c.id}" onclick="onAllyTap('${c.id}')" oncontextmenu="return showUnitDetail(event,'ally','${c.id}')">
+    return `<div class="char ${i%2===0?'bobbing':'bobbing2'} ${c.alive?'':'dead'} ${c.awakened?'awakened':''}" id="char-${c.id}" onclick="onAllyTap('${c.id}')" oncontextmenu="return showUnitDetail(event,'ally','${c.id}')" ontouchstart="lpStart('ally','${c.id}')" ontouchend="lpEnd()" ontouchmove="lpCancel()">
       ${c.awakened?'<div class="aura-ring"></div>':''}
       <div class="char-sprite" style="border:none;background:transparent;font-size:30px">${c.emoji}</div>
       <div class="char-name" style="color:${c.color}">${ri.icon}${c.name}</div>
@@ -1669,8 +1669,8 @@ function promptTargetEnemy(){targetMode='enemy';setMsg('','攻撃する敵をタ
 function promptTargetAlly(){targetMode='ally';setMsg('','回復する仲間をタップで選べ！','#5dca8a');highlightTargets('ally');}
 function highlightTargets(kind){if(kind==='enemy'){G.enemies.forEach((e,i)=>{const el=document.getElementById('enemy-unit-'+i);if(el&&e.alive)el.classList.add('targetable');});}else{G.party.forEach(c=>{const el=document.getElementById('char-'+c.id);if(el&&c.alive)el.classList.add('targetable');});}}
 function clearTargets(){document.querySelectorAll('.targetable').forEach(el=>el.classList.remove('targetable'));targetMode=null;}
-function onEnemyTap(i){if(targetMode!=='enemy')return;const e=G.enemies[i];if(!e||!e.alive)return;clearTargets();executeSkill(i);}
-function onAllyTap(cid){if(targetMode!=='ally')return;const c=G.party.find(x=>x.id===cid);if(!c||!c.alive)return;clearTargets();executeSkill(cid);}
+function onEnemyTap(i){if(lpFired){lpFired=false;return;}if(targetMode!=='enemy')return;const e=G.enemies[i];if(!e||!e.alive)return;clearTargets();executeSkill(i);}
+function onAllyTap(cid){if(lpFired){lpFired=false;return;}if(targetMode!=='ally')return;const c=G.party.find(x=>x.id===cid);if(!c||!c.alive)return;clearTargets();executeSkill(cid);}
 
 // ============ スキル実行 ============
 function executeSkill(target){
@@ -1801,6 +1801,10 @@ function bossUltEffect(parts,mainEmoji){const fld=document.getElementById('battl
 
 // ============ 長押し詳細ウィンドウ ============
 let lpTimer2=null;
+let lpTimer=null,lpFired=false;
+function lpStart(side,key){lpFired=false;lpCancel();lpTimer=setTimeout(()=>{lpFired=true;openUnitDetail(side,key);if(navigator&&navigator.vibrate)navigator.vibrate(30);},500);}
+function lpEnd(){if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}}
+function lpCancel(){if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}}
 function showUnitDetail(ev,side,key){if(ev&&ev.preventDefault)ev.preventDefault();openUnitDetail(side,key);return false;}
 function openUnitDetail(side,key){
   let u,desc,passives=[],roleLabel='',weakLabel='';
