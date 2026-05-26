@@ -178,6 +178,47 @@ input[type=range]{-webkit-appearance:none;appearance:none;height:6px;background:
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer}
 input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:none}
 
+/* 多人数バトル：敵ユニット */
+.enemy-top-zone{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:center;align-items:flex-start;gap:5px;z-index:2;padding:0 8px;flex-wrap:nowrap}
+.enemy-unit{text-align:center;position:relative;transition:.2s;cursor:default;flex-shrink:1;min-width:42px;padding:4px 2px;border-radius:8px}
+.enemy-unit .enemy-em{line-height:1}
+.enemy-unit.boss .enemy-em{animation:bossPulse 2.2s ease-in-out infinite}
+.enemy-unit.hit{animation:knockbackE 0.5s}
+.enemy-unit.dead{opacity:0.3;filter:grayscale(1)}
+.enemy-unit.targetable{cursor:pointer;background:rgba(255,215,0,0.12);outline:1px dashed #FFD700}
+.enemy-unit.targetable .enemy-em{animation:targetBlink 0.7s infinite}
+.enemy-unit-name{margin-top:1px;font-weight:700;white-space:nowrap}
+@keyframes bossPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes targetBlink{0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 #FFD700)}50%{transform:scale(1.15);filter:drop-shadow(0 0 6px #FFD700)}}
+.char.targetable .char-sprite{animation:targetBlink 0.7s infinite}
+.char.targetable{cursor:pointer}
+.dmg-num.heal{color:#5dca8a}
+.enemy-hp-track{height:4px;background:#2e2e2e;border-radius:2px;margin:2px auto 0;overflow:hidden}
+.enemy-hp-fill{height:100%;background:var(--danger);transition:width 0.4s}
+
+/* ターン順バー */
+.turn-order{display:flex;align-items:center;gap:2px;padding:6px 8px;background:#0f0f16;border-bottom:0.5px solid var(--border);overflow-x:auto;min-height:42px}
+.q-unit{flex-shrink:0;text-align:center;position:relative}
+.q-em{width:30px;height:30px;border-radius:7px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px;background:#1a1a26}
+.q-now .q-em{border-width:2px;transform:scale(1.1)}
+.q-now-label{font-size:6px;color:var(--accent);font-weight:700;margin-top:1px}
+.q-arrow{color:#444;font-size:9px;flex-shrink:0}
+.status-icons{font-size:9px;line-height:1;margin-top:1px}
+.cmd-btn.role{border-color:#ffd97a;color:#ffd97a}
+/* 覚醒オーラ */
+@keyframes auraRot{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes auraPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:.9;transform:scale(1.15)}}
+.char.awakened .char-sprite{filter:drop-shadow(0 0 8px #FFD700)}
+.aura-ring{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:50px;height:50px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,0,0.4),transparent 70%);animation:auraPulse 1.5s infinite;z-index:0;pointer-events:none}
+
+/* TUTORIAL */
+#screen-tutorial{position:fixed;inset:0;z-index:175;background:var(--bg);overflow-y:auto}
+.tut-sec{padding:16px 0;border-bottom:0.5px solid var(--border)}
+.tut-emoji{font-size:32px;margin-bottom:6px}
+.tut-h{font-size:15px;font-weight:800;color:var(--accent);margin-bottom:6px}
+.tut-b{font-size:12px;line-height:1.8;color:var(--text)}
+
+/* TUTORIAL end */
 /* ADVENTURE */
 #screen-adv{padding:0}
 .adv-field{position:relative;flex:1;min-height:62vh;overflow:hidden}
@@ -222,10 +263,12 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <button class="title-btn cont" id="continue-btn" onclick="continueGame()" style="display:none">つづきから</button>
     <button class="title-btn link" onclick="openNotebookFromTitle()">📓 ネタ帳（技の付け替え）</button>
     <button class="title-btn link" onclick="openStatusFromTitle()">📊 パーティ状況</button>
+    <button class="title-btn link" onclick="openTutorial()">📖 あそびかた</button>
     <button class="title-btn link" onclick="openRpgUpdate()">📋 アップデート履歴</button>
     <button class="title-btn link" onclick="backToShiftMemo()">← ShiftMemoに戻る</button>
   </div>
   <div class="title-foot" id="title-foot">v1.2.0 — ShiftMemo連携</div>
+  <button onclick="debugLastBoss()" style="position:absolute;bottom:6px;right:6px;font-size:8px;color:#444;background:none;border:0.5px solid #333;border-radius:5px;padding:3px 7px;cursor:pointer">🐛 ボス戦テスト</button>
 </div>
 
 <!-- ===== ADVENTURE (会話ラリー) ===== -->
@@ -239,6 +282,59 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div class="adv-speaker" id="adv-speaker">開発者</div>
     <div class="adv-text" id="adv-text"></div>
     <div class="adv-tap" id="adv-tap">▼ タップ</div>
+  </div>
+</div>
+
+<!-- ===== TUTORIAL ===== -->
+<div class="screen" id="screen-tutorial">
+  <div class="panel" style="padding:0">
+    <div style="position:sticky;top:0;background:var(--bg);z-index:5;padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:10px">
+      <button class="panel-back" onclick="showScreen('title')">← 戻る</button>
+      <div class="panel-title" style="font-size:16px">あそびかた</div>
+    </div>
+    <div style="padding:18px;max-width:480px;margin:0 auto">
+      <div class="tut-sec">
+        <div class="tut-emoji">🧑‍💻</div>
+        <div class="tut-h">どんなゲーム？</div>
+        <div class="tut-b">無料アプリを作ったのに家賃も払えない開発者が、仲間とともに「レスバ（言い合い）」で世界の脅威に立ち向かう物語。最後はマルチバースの存亡を賭けた戦いへ…！</div>
+      </div>
+      <div class="tut-sec">
+        <div class="tut-emoji">💬</div>
+        <div class="tut-h">操作はかんたん</div>
+        <div class="tut-b">会話パートは画面をタップで進みます。バトルはコマンドを選ぶだけ。敵や味方を長押しすると、詳しい情報やキャラ説明が見られます。</div>
+      </div>
+      <div class="tut-sec">
+        <div class="tut-emoji">⚔</div>
+        <div class="tut-h">4つのコマンド</div>
+        <div class="tut-b"><b style="color:#c8f060">攻撃</b>：全員が使える。敵にダメージ（仲間は火力半分）<br><b style="color:#ffd97a">役割技</b>：各キャラ固有の特技<br><b style="color:#5de5ff">防御</b>：被ダメージを減らす<br><b style="color:#ff9dc0">神ジョーク</b>：テンション満タンで撃てる必殺技</div>
+      </div>
+      <div class="tut-sec">
+        <div class="tut-emoji">🎭</div>
+        <div class="tut-h">4人の役割</div>
+        <div class="tut-b">🧑‍💻 <b style="color:#c8f060">開発者（アタッカー）</b>：高火力<br>🐱 <b style="color:#ffd97a">ねこ（ヒーラー）</b>：回復<br>🐸 <b style="color:#7ad5ff">かえる（タンク）</b>：挑発で敵の攻撃を引き受ける<br>👽 <b style="color:#5dca8a">UFO乗組員（バッファー）</b>：味方を強化</div>
+      </div>
+      <div class="tut-sec">
+        <div class="tut-emoji">🃏</div>
+        <div class="tut-h">技＝集めたジョーク</div>
+        <div class="tut-b">技は、ShiftMemoで集めたジョークそのもの。☆が高いほど強力で、☆7以上は全体技に。敵には弱点属性があり、突くと大ダメージ。ネタ帳で技を付け替えられます。</div>
+      </div>
+      <div class="tut-sec">
+        <div class="tut-emoji">⚡</div>
+        <div class="tut-h">スピードと状態異常</div>
+        <div class="tut-b">行動順はスピード順（画面上部に表示）。攻撃・回復のほか、攻撃力UP/DOWN、毒、挑発、強奪など様々な状態異常があります。「📖状態一覧」でいつでも確認可。</div>
+      </div>
+      <div class="tut-sec">
+        <div class="tut-emoji">🔗</div>
+        <div class="tut-h">ShiftMemoと連携</div>
+        <div class="tut-b">あなたのShiftMemoのレベルが、そのままパーティの強さに。ジョークを集めるほど技が増えます。RPGで敵を倒すと、ShiftMemo側のミッションも達成＆コインGET！</div>
+      </div>
+      <div class="tut-sec" style="border:none">
+        <div class="tut-emoji">🔥</div>
+        <div class="tut-h">あつい展開も…！</div>
+        <div class="tut-b">ボスは必殺技を放ち、ラスボスは形態変化。仲間との合体必殺、開発者の覚醒など、熱い展開が待っています。さあ、レスバの旅へ！</div>
+      </div>
+      <button class="btn-primary" onclick="showScreen('title')" style="margin-bottom:20px">▶ タイトルに戻る</button>
+    </div>
   </div>
 </div>
 
@@ -256,31 +352,52 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 
 <!-- ===== BATTLE ===== -->
 <div class="screen" id="screen-battle">
+  <div class="turn-order" id="turn-order-bar"></div>
   <div class="battle-field" id="battle-field">
-    <div class="battle-bg" id="battle-bg">［背景：あなたが用意］</div>
-    <div class="enemy-zone">
-      <div class="enemy-sprite" id="enemy-sprite">［敵立ち絵］</div>
-      <div class="enemy-name-tag" id="enemy-name-tag">-</div>
-      <div class="enemy-hp-track"><div class="enemy-hp-fill" id="enemy-hp-fill" style="width:100%"></div></div>
-    </div>
+    <div class="battle-bg" id="battle-bg"></div>
     <div class="party-zone" id="party-zone"></div>
   </div>
   <div class="battle-ui">
     <div class="party-hp-grid" id="party-hp-grid"></div>
     <div class="tension-wrap">
-      <div class="tension-top"><span>テンション（場の空気）🔥</span><span id="tension-pct">0%</span></div>
+      <div class="tension-top"><span>テンション（場の空気）🔥</span><span style="display:flex;gap:8px"><span id="tension-pct">0%</span><span onclick="openStatusList()" style="cursor:pointer;color:#5de5ff">📖状態一覧</span></span></div>
       <div class="tension-track"><div class="tension-fill" id="tension-fill" style="width:0%"></div></div>
     </div>
   </div>
   <div class="battle-msg" id="battle-msg"><span>レスバが始まった…！</span></div>
   <div class="cmd-zone" id="cmd-zone">
-    <div class="cmd-label" id="cmd-label">- のターン ▶ コマンドを選べ</div>
+    <div class="cmd-label" id="cmd-label">- のターン</div>
     <div class="cmd-grid">
-      <button class="cmd-btn atk" onclick="cmdAttack()">💬 レスバ</button>
-      <button class="cmd-btn def" onclick="cmdDefend()">🛡 言い訳</button>
+      <button class="cmd-btn atk" onclick="cmdAttack()">⚔ 攻撃</button>
+      <button class="cmd-btn role" id="role-btn" onclick="cmdRole()">役割技</button>
+      <button class="cmd-btn def" onclick="cmdDefend()">🛡 防御</button>
       <button class="cmd-btn ult" id="ult-btn" onclick="cmdUltimate()">✨ 神ジョーク</button>
-      <button class="cmd-btn run" onclick="cmdRun()">🏃 逃げる</button>
     </div>
+    <div style="font-size:9px;color:var(--muted);text-align:center;margin-top:5px">敵/味方を長押しで詳細・パッシブ確認</div>
+  </div>
+</div>
+
+<!-- ULT CHOICE MODAL -->
+<div class="rpg-overlay" id="ult-choice-modal">
+  <div class="menu-panel">
+    <div class="menu-title">✨ 必殺技を選ぶ <span onclick="closeUltChoice()" style="float:right;cursor:pointer;color:var(--muted)">✕</span></div>
+    <div id="ult-choice-body"></div>
+  </div>
+</div>
+
+<!-- UNIT DETAIL MODAL -->
+<div class="rpg-overlay" id="unit-detail-modal">
+  <div class="menu-panel" style="max-height:84vh;overflow-y:auto;overscroll-behavior:contain">
+    <div style="text-align:right;margin-bottom:4px"><span onclick="closeUnitDetail()" style="cursor:pointer;color:var(--muted)">✕ 閉じる</span></div>
+    <div id="unit-detail-body"></div>
+  </div>
+</div>
+
+<!-- STATUS LIST MODAL -->
+<div class="rpg-overlay" id="status-list-modal">
+  <div class="menu-panel" style="max-height:80vh;overflow-y:auto;overscroll-behavior:contain">
+    <div class="menu-title">📖 バフ・デバフ一覧 <span onclick="closeStatusList()" style="float:right;cursor:pointer;color:var(--muted)">✕</span></div>
+    <div id="status-list-body"></div>
   </div>
 </div>
 
@@ -597,12 +714,19 @@ function ownedSkills(){
 }
 
 // ============ パーティ ============
+// ロール: attacker(攻撃) / healer(回復) / tank(挑発+防御) / buffer(バフ)
 const PARTY_DEF=[
-  {id:'dev',name:'開発者',role:'主人公',emoji:'🧑‍💻',sprite:'［開発者］',color:'var(--dev)',full:true},
-  {id:'ufo',name:'UFO乗組員',role:'謎の宇宙人',emoji:'👽',sprite:'［UFO乗組員］',color:'var(--ufo)',full:false},
-  {id:'cat',name:'ねこ',role:'武闘派',emoji:'🐱',sprite:'［ねこ］',color:'var(--cat)',full:false},
-  {id:'frog',name:'かえる',role:'通訳・参謀',emoji:'🐸',sprite:'［かえる］',color:'var(--frog)',full:false}
+  {id:'dev',name:'開発者',role:'アタッカー',roleType:'attacker',emoji:'🧑‍💻',sprite:'［開発者］',color:'var(--dev)',full:true},
+  {id:'cat',name:'ねこ',role:'ヒーラー',roleType:'healer',emoji:'🐱',sprite:'［ねこ］',color:'var(--cat)',full:false},
+  {id:'frog',name:'かえる',role:'タンク',roleType:'tank',emoji:'🐸',sprite:'［かえる］',color:'var(--frog)',full:false},
+  {id:'ufo',name:'UFO乗組員',role:'バッファー',roleType:'buffer',emoji:'👽',sprite:'［UFO乗組員］',color:'var(--ufo)',full:false}
 ];
+const ROLE_INFO={
+  attacker:{icon:'⚔',name:'アタッカー',desc:'敵にレスバでダメージ。☆が高いほど火力UP'},
+  healer:{icon:'💚',name:'ヒーラー',desc:'味方のHPを回復。☆が高いほど回復量UP'},
+  tank:{icon:'🛡',name:'タンク',desc:'敵の攻撃を引き受け、味方の被ダメを軽減。☆が高いほど防御UP'},
+  buffer:{icon:'⤴',name:'バッファー',desc:'味方の攻撃力UP＋テンション上昇。☆が高いほど効果UP'}
+};
 
 // ステータス計算：ShiftMemoレベル基準
 function calcStats(charId){
@@ -611,26 +735,81 @@ function calcStats(charId){
   const baseAtk=10+lv*2;
   const baseDef=5+Math.floor(lv*1.2);
   const baseSpd=8+Math.floor(lv*0.8);
-  const isFull=PARTY_DEF.find(c=>c.id===charId).full;
-  if(isFull){
+  const def=PARTY_DEF.find(c=>c.id===charId);
+  const rt=def.roleType;
+  // 開発者(アタッカー)はフル。仲間はatk/spd半分。さらにロールで微調整
+  if(def.full){
     return {hp:baseHP,maxhp:baseHP,atk:baseAtk,def:baseDef,spd:baseSpd};
-  }else{
-    // 仲間：HPと防御はそのまま、それ以外（atk/spd）は半分
-    return {hp:Math.round(baseHP*0.9),maxhp:Math.round(baseHP*0.9),atk:Math.round(baseAtk/2),def:baseDef,spd:Math.round(baseSpd/2)};
   }
+  let hp=Math.round(baseHP*0.9),atk=Math.round(baseAtk/2),dfn=baseDef,spd=Math.round(baseSpd/2);
+  if(rt==='tank'){hp=Math.round(baseHP*1.3);dfn=Math.round(baseDef*1.6);} // タンクはHP・防御高い
+  else if(rt==='healer'){hp=Math.round(baseHP*0.95);}
+  else if(rt==='buffer'){hp=Math.round(baseHP*0.85);}
+  return {hp:hp,maxhp:hp,atk:atk,def:dfn,spd:spd};
 }
 
-// 各キャラの装備技（4枠）
+// 各キャラの装備技（4枠）。空き枠は初期☆1ジョークで自動補充
 function getEquipped(charId){
   const p=rpgLoad();
-  if(p&&p.equipped&&p.equipped[charId])return p.equipped[charId];
-  return INITIAL_SKILLS.slice();
+  let arr=(p&&p.equipped&&p.equipped[charId])?p.equipped[charId].slice():INITIAL_SKILLS.slice();
+  // 4枠に満たない/無効idは初期ジョークで補充
+  arr=arr.filter(id=>getSkill(id));
+  let fill=0;
+  while(arr.length<4){arr.push(INITIAL_SKILLS[fill%INITIAL_SKILLS.length]);fill++;}
+  return arr.slice(0,4);
 }
 function setEquipped(charId,arr){
   const p=rpgLoad()||{};
   if(!p.equipped)p.equipped={};
   p.equipped[charId]=arr;
   rpgSave(p);
+}
+// 初期☆1ジョーク（共有可能な例外）
+function isInitialSkill(id){return INITIAL_SKILLS.includes(id);}
+// あるジョークが他のキャラ/スロットで使用中か（初期☆1は除外）
+function isSkillUsedElsewhere(skillId,exceptChar,exceptSlot){
+  if(isInitialSkill(skillId))return false; // 初期技は共有OK
+  const p=rpgLoad();if(!p||!p.equipped)return false;
+  for(const cid of Object.keys(p.equipped)){
+    const eq=p.equipped[cid];
+    for(let s=0;s<eq.length;s++){
+      if(eq[s]===skillId){if(cid===exceptChar&&s===exceptSlot)continue;return true;}
+    }
+  }
+  return false;
+}
+// そのキャラのスロットに既に☆10があるか（exceptSlotは除く）
+function hasStar10(charId,exceptSlot){
+  const eq=getEquipped(charId);
+  for(let s=0;s<eq.length;s++){if(s===exceptSlot)continue;const sk=getSkill(eq[s]);if(sk&&sk.star===10)return true;}
+  return false;
+}
+
+// ============ スキル効果計算（ロール別・☆で強化） ============
+// 戻り値: {type:'damage'|'heal'|'buff'|'taunt', amount, scope:'single'|'all', desc}
+function skillEffect(charId,skill){
+  const rt=PARTY_DEF.find(c=>c.id===charId).roleType;
+  const star=skill.star;
+  const st=calcStats(charId);
+  // 全体化: ☆7以上は全体対象
+  const scope=star>=7?'all':'single';
+  if(rt==='attacker'){
+    let amt=st.atk+skill.pow;
+    return {type:'damage',amount:amt,scope:scope,desc:(scope==='all'?'敵全体':'敵単体')+'に'+amt+'前後のダメージ'};
+  }
+  if(rt==='healer'){
+    const amt=Math.round(st.maxhp*(0.25+star*0.05)); // ☆で回復量UP
+    return {type:'heal',amount:amt,scope:star>=5?'all':'single',desc:(star>=5?'味方全体':'味方1人')+'のHPを'+amt+'回復'};
+  }
+  if(rt==='tank'){
+    const reduce=Math.min(60,20+star*4); // ☆で軽減率UP
+    return {type:'taunt',amount:reduce,scope:'self',desc:'挑発して敵の attack を引き受け、味方の被ダメを'+reduce+'%軽減（1ターン）'};
+  }
+  if(rt==='buffer'){
+    const up=Math.min(80,15+star*6); // ☆で攻撃UP率
+    return {type:'buff',amount:up,scope:'all',desc:'味方全体の攻撃力を'+up+'%UP＋テンション上昇（1ターン）'};
+  }
+  return {type:'damage',amount:st.atk+skill.pow,scope:'single',desc:''};
 }
 
 // キャラ別セリフ（性格づけ）
@@ -647,27 +826,51 @@ const FROG_TRANSLATE=['ただいま彼は「家賃が宇宙から請求された
 // ============ 敵10体（第1章）============
 // 背景は絵文字アクセント＋CSSグラデのタイプ名で指定
 const ENEMIES=[
-  {id:1,name:'鬼大家',emoji:'👹',hp:120,atk:13,weak:'jigyaku',bg:'town',talk:20,
+  {id:1,name:'鬼大家',emoji:'👹',hp:180,atk:13,def:8,spd:6,weak:'jigyaku',bg:'town',talk:22,ult:'家賃催促の大号令',ultEmoji:'📜',ultFx:'slam',
     profile:[['好きなもの','家賃の振込通知'],['嫌いなもの','言い訳'],['ひとこと','「来月まで」は3回まで']]},
-  {id:2,name:'★1レビュアー',emoji:'😈',hp:150,atk:15,weak:'hiniku',bg:'sns',talk:8,
+  {id:2,name:'★1レビュアー',emoji:'😈',hp:225,atk:15,def:10,spd:10,weak:'hiniku',bg:'sns',talk:10,ult:'星1レビュー爆撃',ultEmoji:'⭐',ultFx:'rain',
     profile:[['好きなもの','低評価ボタン'],['嫌いなもの','反論'],['ひとこと','「期待外れ。星1。」']]},
-  {id:3,name:'無断転載マン',emoji:'🥷',hp:175,atk:17,weak:'meta',bg:'sns',talk:8,
+  {id:3,name:'無断転載マン',emoji:'🥷',hp:265,atk:17,def:7,spd:18,weak:'meta',bg:'sns',talk:10,ult:'コピペ無限増殖',ultEmoji:'📋',ultFx:'multi',
     profile:[['好きなもの','他人の成果'],['嫌いなもの','出典'],['ひとこと','「拾った物は俺の物」']]},
-  {id:4,name:'クレーマー',emoji:'🗣️',hp:200,atk:18,weak:'jigyaku',bg:'town',talk:8,
+  {id:4,name:'クレーマー',emoji:'🗣️',hp:300,atk:18,def:11,spd:9,weak:'jigyaku',bg:'town',talk:10,ult:'責任者を呼べ',ultEmoji:'📢',ultFx:'wave',
     profile:[['好きなもの','責任者を呼ぶこと'],['嫌いなもの','正論'],['ひとこと','「誠意を見せろ」']]},
-  {id:5,name:'バグの化身',emoji:'👾',hp:240,atk:21,weak:'meta',bg:'server',talk:20,
+  {id:5,name:'バグの化身',emoji:'👾',hp:360,atk:21,def:14,spd:6,weak:'meta',bg:'server',talk:22,ult:'システムクラッシュ',ultEmoji:'💥',ultFx:'glitch',
     profile:[['好きなもの','想定外の入力'],['嫌いなもの','例外処理'],['ひとこと','「NullPointer…」']]},
-  {id:6,name:'課金圧力デーモン',emoji:'💸',hp:265,atk:22,weak:'hiniku',bg:'server',talk:8,
+  {id:6,name:'課金圧力デーモン',emoji:'💸',hp:400,atk:22,def:12,spd:12,weak:'hiniku',bg:'server',talk:10,ult:'課金ラッシュ',ultEmoji:'💰',ultFx:'rain',
     profile:[['好きなもの','課金導線'],['嫌いなもの','無料勢'],['ひとこと','「今だけ80%オフ」']]},
-  {id:7,name:'炎上の精霊',emoji:'🔥',hp:290,atk:24,weak:'tetsugaku',bg:'mystic',talk:8,
+  {id:7,name:'炎上の精霊',emoji:'🔥',hp:435,atk:24,def:11,spd:14,weak:'tetsugaku',bg:'mystic',talk:10,ult:'大炎上',ultEmoji:'🔥',ultFx:'flame',
     profile:[['好きなもの','燃料投下'],['嫌いなもの','沈静化'],['ひとこと','「拡散希望」']]},
-  {id:8,name:'承認欲求の魔王',emoji:'👑',hp:320,atk:26,weak:'hiniku',bg:'mystic',talk:8,
+  {id:8,name:'承認欲求の魔王',emoji:'👑',hp:480,atk:26,def:13,spd:11,weak:'hiniku',bg:'mystic',talk:10,ult:'いいね地獄',ultEmoji:'❤️',ultFx:'rain',
     profile:[['好きなもの','いいね'],['嫌いなもの','無反応'],['ひとこと','「バズりたい」']]},
-  {id:9,name:'虚無の使者',emoji:'🟣',hp:360,atk:28,weak:'tetsugaku',bg:'void',talk:8,
+  {id:9,name:'虚無の使者',emoji:'🟣',hp:540,atk:28,def:15,spd:9,weak:'tetsugaku',bg:'void',talk:10,ult:'虚無の波動',ultEmoji:'🌀',ultFx:'void',
     profile:[['好きなもの','静寂'],['嫌いなもの','あなたの笑顔'],['ひとこと','「…無。」']]},
-  {id:10,name:'観測者',emoji:'🕳️',hp:450,atk:30,weak:'meta',bg:'cosmos',talk:20,
+  {id:10,name:'観測者',emoji:'🕳️',hp:675,atk:30,def:18,spd:13,weak:'meta',bg:'cosmos',talk:22,ult:'宇宙的観測',ultEmoji:'👁️',ultFx:'cosmic',boss:true,
     profile:[['正体','宇宙的存在'],['目的','つまらぬ世界の消去'],['ひとこと','「面白さを、観測する」']]}
 ];
+
+// 雑魚敵プール（通常戦でボスの周りに出る。ロール持ち）
+// roleType: zako_atk(攻撃) / zako_heal(回復) / zako_def(盾)
+const ZAKO_POOL=[
+  {name:'信者A',emoji:'🧟',roleType:'zako_atk',weak:'hiniku'},
+  {name:'信者B',emoji:'👻',roleType:'zako_atk',weak:'meta'},
+  {name:'ヒーラー菌',emoji:'🦠',roleType:'zako_heal',weak:'jigyaku'},
+  {name:'盾持ち',emoji:'🛡️',roleType:'zako_def',weak:'dajare'},
+  {name:'コバンザメ',emoji:'🐟',roleType:'zako_atk',weak:'tetsugaku'},
+  {name:'やじ馬',emoji:'🗨️',roleType:'zako_atk',weak:'hiniku'},
+  {name:'回復スライム',emoji:'💧',roleType:'zako_heal',weak:'meta'},
+  {name:'石像',emoji:'🗿',roleType:'zako_def',weak:'jigyaku'}
+];
+// ボス必殺の演出パターン（案2：数パターンを使い回し、ボスごとに絵文字違い）
+const ULT_FX={
+  slam:{shake:true,flash:true,parts:['💢','📜','💥']},
+  rain:{shake:false,flash:true,parts:['⭐','💫','✨']},
+  multi:{shake:true,flash:false,parts:['📋','📋','📋']},
+  wave:{shake:true,flash:true,parts:['📢','〰️','💢']},
+  glitch:{shake:true,flash:true,parts:['💥','⚡','❌']},
+  flame:{shake:true,flash:true,parts:['🔥','🔥','💥']},
+  void:{shake:false,flash:true,parts:['🌀','🟣','⚫']},
+  cosmic:{shake:true,flash:true,parts:['👁️','🌌','💫','🌟']}
+};
 
 // ============ 会話ラリー ============
 // {who:キャラid or 'enemy', t:セリフ}。whoが'ufo'の次に'frog'で通訳を置くと自然
@@ -756,10 +959,98 @@ const DIALOGUES={
   ]
 };
 // 8往復のショート会話（節目以外の敵で共通利用＋敵セリフ差し替え）
+// 節目以外の敵：個別ストーリー（各10往復）
+const SHORT_DIALOGUES={
+  2:[ // ★1レビュアー
+    {who:'dev',t:'アプリのレビュー欄が、なんだか荒れてるな…。'},
+    {who:'frog',t:'拝見します。…これはひどい。★1の嵐です。'},
+    {who:'cat',t:'なんやこのレビュー。「笑える要素ゼロ」やと？'},
+    {who:'ufo',t:'あうー…あう。'},
+    {who:'frog',t:'「開発者が可哀想」と申しております。よけいなお世話です。'},
+    {who:'dev',t:'くっ…数字で殴られると、地味に効くな…。'},
+    {who:'enemy',t:'よう、開発者。お前のアプリ、★1付けといたぜ。期待外れだ。'},
+    {who:'cat',t:'出たな粘着野郎。文句しか言えん人生、楽しいんか？'},
+    {who:'enemy',t:'楽しいねぇ。お前らを叩いてる時が一番なァ！'},
+    {who:'frog',t:'……救えませんね。皮肉で黙らせましょう。'}
+  ],
+  3:[ // 無断転載マン
+    {who:'dev',t:'あれ…俺のジョーク、知らないアカウントが勝手に使ってる。'},
+    {who:'frog',t:'無断転載です。出典の表記もありません。'},
+    {who:'cat',t:'人のもんパクって、よう平気な顔できるな。'},
+    {who:'ufo',t:'あうあう！'},
+    {who:'frog',t:'「泥棒は宇宙の恥」と。彼の星では重罪のようです。'},
+    {who:'enemy',t:'へへっ、バレたか。でも拾ったもん勝ちだろ？'},
+    {who:'dev',t:'拾ったって…俺が作ったんだよ！'},
+    {who:'enemy',t:'証拠あんの？ネットじゃ早い者勝ちなんだよ！'},
+    {who:'cat',t:'こいつ素早いで。逃がさんようにせなあかん。'},
+    {who:'frog',t:'メタ的に“パクリ”を暴けば、言い逃れできません。'}
+  ],
+  4:[ // クレーマー
+    {who:'dev',t:'問い合わせフォームに、すごい剣幕のメッセージが…。'},
+    {who:'frog',t:'「責任者を出せ」と。何度も、何度も来ています。'},
+    {who:'cat',t:'うわ、声デカいやっちゃな。耳がキンキンするわ。'},
+    {who:'enemy',t:'おい！無料だからって手ぇ抜いてんじゃねえぞ！誠意を見せろ！'},
+    {who:'dev',t:'誠意と言われても…無料で精一杯やってるんですが…。'},
+    {who:'enemy',t:'言い訳すんな！とにかく誠意だ！誠意を見せろォ！'},
+    {who:'ufo',t:'あうー…あう。'},
+    {who:'frog',t:'「彼は寂しいだけでは」と。…鋭い指摘です。'},
+    {who:'cat',t:'なるほどな。寂しがり屋なら、自虐ネタが効くかもしれん。'},
+    {who:'dev',t:'よし、こっちの惨めさで共感を誘ってやる…！'}
+  ],
+  6:[ // 課金圧力デーモン
+    {who:'dev',t:'画面に「今だけ80%オフ！」ってポップアップが鬼のように出る…。'},
+    {who:'frog',t:'課金を迫る悪魔です。無料勢のあなたを目の敵にしています。'},
+    {who:'enemy',t:'おやおや、無料で遊ぼうなんて虫が良すぎませんか？さあ課金を！'},
+    {who:'cat',t:'うっとうしいやっちゃな。金、金、金や。'},
+    {who:'dev',t:'俺は無料でアプリを出してる側だぞ。課金の圧には負けない。'},
+    {who:'enemy',t:'強がりを。財布の紐、緩めたくなるでしょう？ほら、限定セール！'},
+    {who:'ufo',t:'あう！あうあう！'},
+    {who:'frog',t:'「宇宙では空気も無料」と申しております。羨ましい。'},
+    {who:'cat',t:'こいつには皮肉が効く。金の亡者を笑ったれ。'},
+    {who:'dev',t:'よし、こいつの守銭奴っぷりを皮肉で突いてやる！'}
+  ],
+  7:[ // 炎上の精霊
+    {who:'dev',t:'…SNSが、なんか急に燃えてる。火の手が見える。'},
+    {who:'frog',t:'炎上の精霊です。燃料が投下されるほど勢いを増します。'},
+    {who:'enemy',t:'ヒャハハ！燃えろ燃えろ！もっと燃料をよこせ！'},
+    {who:'cat',t:'うわ、近づくと熱いわ。どないすんねんこれ。'},
+    {who:'frog',t:'下手に反論すると燃料になります。冷静さが鍵かと。'},
+    {who:'ufo',t:'あうー。'},
+    {who:'frog',t:'「水をかけても無駄。火の本質を問え」と。哲学的ですね。'},
+    {who:'dev',t:'なるほど…感情的にならず、哲学で問いかければいいのか。'},
+    {who:'enemy',t:'どうした！怒れよ！燃やしてやるからよォ！'},
+    {who:'dev',t:'…落ち着け。こういう時こそ、静かに本質を突くんだ。'}
+  ],
+  8:[ // 承認欲求の魔王
+    {who:'dev',t:'でかい玉座に座った何かが、こっちを見下してる…。'},
+    {who:'frog',t:'承認欲求の魔王です。注目を浴びるほど力を増します。'},
+    {who:'enemy',t:'見ろ！この私を！いいねをよこせ！バズらせろ！'},
+    {who:'cat',t:'うっとうしいわ〜。かまってちゃんの王様か。'},
+    {who:'enemy',t:'無視するな！無視は一番の罪だ！私を見ろォォ！'},
+    {who:'ufo',t:'あう…あうあう。'},
+    {who:'frog',t:'「逆に無関心が弱点では」と。彼にしては冴えています。'},
+    {who:'dev',t:'でも今は倒さなきゃいけない。皮肉で承認欲求を刺激してやる。'},
+    {who:'cat',t:'おだてて落とすか、皮肉で刺すか。どっちにしろ口で勝負や。'},
+    {who:'frog',t:'では参りましょう。この王様、化けの皮を剥がします。'}
+  ],
+  9:[ // 虚無の使者
+    {who:'dev',t:'…急に、あたりが静かになった。色も、音もない。'},
+    {who:'frog',t:'虚無の使者です。すべてを無に還そうとしています。'},
+    {who:'enemy',t:'……無。すべては、無に帰す。お前たちの笑いも。'},
+    {who:'cat',t:'なんやこいつ、感情がないんか。気味悪いな。'},
+    {who:'ufo',t:'……あう。'},
+    {who:'frog',t:'UFO乗組員も言葉を失っています。珍しい。'},
+    {who:'enemy',t:'笑いなど無意味。すべては虚無に飲まれる定め。'},
+    {who:'dev',t:'…いや。無意味だとしても、笑うことに意味があるんだ。'},
+    {who:'frog',t:'デバフが効きません。哲学的な問いで虚無に罅を入れましょう。'},
+    {who:'cat',t:'よう分からんが、こいつの“無”をぶち壊したればええんやな。'}
+  ]
+};
 function shortDialogue(enemy){
+  if(SHORT_DIALOGUES[enemy.id])return SHORT_DIALOGUES[enemy.id].slice();
   return [
     {who:'dev',t:`次の相手は…「${enemy.name}」か。`},
-    {who:'cat',t:'どれ、儂が前座で揉んだろか。'},
+    {who:'cat',t:'どれ、儂が揉んだろか。'},
     {who:'frog',t:`お待ちを。弱点を分析します。`},
     {who:'ufo',t:'あうー！'},
     {who:'frog',t:'「いける」と申しております。根拠は不明です。'},
@@ -789,6 +1080,184 @@ const PROLOGUE_LINES=[
   {who:'ufo',t:'あうー！'},
   {who:'frog',t:'「金は無いが仲間はいる」と申しております。…泣けますね。'}
 ];
+</script>
+<script>
+// ============ 覚醒イベントの会話 ============
+const AWAKEN_LINES=[
+  {who:'enemy',t:'……無駄だ。お前たちの“面白い”など、私の前では塵に等しい。'},
+  {who:'dev',t:'（みんな倒れかけてる…俺の力じゃ、足りないのか…）'},
+  {who:'cat',t:'開発者…！しっかりせえ！まだ終わってへんやろ！'},
+  {who:'frog',t:'開発者どの。あなたが作ったあのアプリで、救われた人がいます。'},
+  {who:'ufo',t:'あうー！あうあうー！！'},
+  {who:'frog',t:'「世界はまだ、面白い」と。彼は、そう言っています。'},
+  {who:'dev',t:'……そうだ。俺は、無料でアプリを作った。'},
+  {who:'dev',t:'金のためじゃない。誰かの毎日を、少しでも面白くするためだ。'},
+  {who:'dev',t:'家賃のためだけに戦ってたわけじゃ、ない…！'},
+  {who:'enemy',t:'……ほう。その眼、まだ消えていないのか。'},
+  {who:'dev',t:'もう、家賃のためだけじゃない。'},
+  {who:'dev',t:'この世界の“面白い”を守るために——俺は、覚醒する…！'}
+];
+// 真の力の禁断ジョーク
+const TRUE_POWER_JOKE='この宇宙、レビューしたら星5つけといたぞ';
+</script>
+<script>
+// ============ 状態異常（バフ・デバフ）定義 ============
+// id: {name, icon, type:'buff'|'debuff', desc, stat:影響ステ, sign}
+const STATUS_DEFS={
+  atkup:   {name:'攻撃UP',   icon:'⤴', type:'buff',   desc:'攻撃力が上がる'},
+  defup:   {name:'防御UP',   icon:'🛡', type:'buff',   desc:'被ダメージが減る'},
+  regen:   {name:'再生',     icon:'💚', type:'buff',   desc:'毎ターンHPが回復する'},
+  debuffguard:{name:'デバフ無効',icon:'🪬',type:'buff',desc:'数ターン、デバフを受け付けない'},
+  stealboost:{name:'強奪',   icon:'🩸', type:'buff',   desc:'敵から奪った攻撃力が上乗せされている'},
+  weak:    {name:'弱気',     icon:'😵', type:'debuff', desc:'攻撃力が下がる'},
+  shaken:  {name:'動揺',     icon:'💔', type:'debuff', desc:'防御力が下がる'},
+  slow:    {name:'鈍化',     icon:'🐢', type:'debuff', desc:'素早さが下がり行動が遅くなる'},
+  taunt:   {name:'挑発',     icon:'🎯', type:'debuff', desc:'狙われやすくなる'},
+  poison:  {name:'毒',       icon:'☠️', type:'debuff', desc:'毎ターンHPが減る'},
+  drained: {name:'弱体',     icon:'🩸', type:'debuff', desc:'攻撃力を奪われている'}
+};
+// バフ/デバフ一覧表示用
+function statusListHtml(){
+  return Object.keys(STATUS_DEFS).map(k=>{
+    const s=STATUS_DEFS[k];
+    const col=s.type==='buff'?'#c8f060':'#ff9dc0';
+    return `<div style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:0.5px solid var(--border)"><span style="font-size:14px">${s.icon}</span><div style="flex:1"><span style="color:${col};font-weight:700;font-size:11px">${s.name}</span><span style="font-size:9px;color:var(--muted);margin-left:6px">${s.type==='buff'?'バフ':'デバフ'}</span><div style="font-size:10px;color:var(--text);line-height:1.4">${s.desc}</div></div></div>`;
+  }).join('');
+}
+
+// ============ 味方パッシブ ============
+const PASSIVES={
+  dev:{name:'無料の意地',icon:'🔥',desc:'HPが減るほど攻撃力が上がる（家賃の焦りが火事場の馬鹿力に）'},
+  cat:{name:'元ヤクザの貫禄',icon:'😼',desc:'回復時、低確率で敵を睨んで弱気（攻撃DOWN）を付与する'},
+  frog:{name:'慇懃無礼',icon:'🎩',desc:'挑発の成功率UP＋被弾時にたまに敵へデバフを返す'},
+  ufo:{name:'異星の理',icon:'🛸',desc:'バフ効果量がランダムで大きくブレる（大当たり/不発あり）'},
+  // 真・開発者の覚醒パッシブ
+  shin1:{name:'不屈のコミット',icon:'🛡',desc:'パッシブ封印を貫通。観測者に消されても効果が消えない'},
+  shin2:{name:'オープンソースの絆',icon:'🤝',desc:'倒れた仲間1人につき攻撃力が大幅UP'},
+  shin3:{name:'伝説のリリース',icon:'✨',desc:'神ジョークが因果の支配を無視して確実に通る'},
+  shin4:{name:'不屈の再起動',icon:'🔄',desc:'受けたダメージの8割を次ターン開始時に自動回復'}
+};
+
+// ============ ボスのパッシブ（各3つ／ラスボスは形態で増える） ============
+const BOSS_PASSIVES={
+  1:[['激昂','HPが減るほど攻撃力上昇'],['取り立ての執念','毎ターンHPを少し自己回復'],['家賃滞納の罰','攻撃時に確率で味方のテンションDOWN']],
+  2:[['星1爆撃','攻撃が複数回ヒット'],['粘着','受けたデバフを早く回復'],['酷評耐性','自虐・皮肉以外のダメージを軽減']],
+  3:[['高速転載','スピードが非常に高く先手を取る'],['コピペ増殖','低確率で行動後にもう1回行動'],['盗用','攻撃時に味方の攻撃力を奪う']],
+  4:[['誠意を見せろ','攻撃時に相手の防御を無視'],['大声','確率で味方を怯ませ行動を遅らせる'],['居座り','HPが減ると防御大幅上昇']],
+  5:[['想定外','味方の攻撃を確率で無効化'],['自己増殖','ターン経過で攻撃力上昇'],['再起動','一度だけHPを大幅回復']],
+  6:[['課金圧力','毎ターン味方のテンション徴収'],['無料勢への制裁','バフ持ちの味方を狙い大ダメージ'],['限定セール','確率で追撃']],
+  7:[['延焼','攻撃した相手に毒を付与'],['燃料投下','ターン経過で全体攻撃が激化'],['鎮火不能','回復効果を炎上で相殺']],
+  8:[['いいね吸収','味方を削るたびに自己強化'],['バズり','確率で1ターンに2回必殺'],['フォロワーの壁','分身で被弾を肩代わり']],
+  9:[['虚無化','味方のバフを確率で打ち消す'],['無感情','デバフがほぼ効かない'],['侵食','毎ターン味方全体のHPを削る']],
+  10:[['全知の観測','常に弱点を突いてくる'],['次元干渉','確率で味方1人の行動をスキップ'],['面白さの審判','HP半分以下で形態変化し全能力上昇']]
+};
+// ラスボス第二・第三形態の追加パッシブ
+const FINAL_BOSS_FORMS={
+  2:[['世界線の書き換え','確率で味方のバフ全消し＋行動を奪う'],['特異点崩壊','HPが減るほど必殺の威力・頻度が上昇'],['観測者の眼','味方の神ジョークを確率で無効化＋テンション0に']],
+  3:[['宇宙の終焉','毎ターン必ず全体攻撃'],['因果の支配','確率で味方の与ダメを無効化し自分が回復'],['概念崩壊','味方のパッシブを全て無効化']]
+};
+
+// ============ キャラ説明（味方） ============
+const CHAR_DESC={
+  dev:'無料アプリ「ShiftMemo」を世に放った開発者。世界を少し面白くするために作ったのに、なぜか自分は家賃も払えない。崖っぷちの精神力でレスバに挑む。追い詰められるほど力を発揮する主人公気質。',
+  cat:'元ヤクザの親分が可愛がっていた猫。親分が足を洗うと同時に「お前も堅気になれ」と託された。口は悪く気性は荒いが、仲間の傷を放っておけないお人好し。回復役として皆を支えるが「儂は別に優しいわけやないからな」と照れ隠しする。たまに「にゃ」と素が出る。',
+  frog:'どこからともなく現れた、敬語を話すかえる。やたら丁寧だが、その慇懃さが逆に相手を苛立たせる天性の煽り体質。UFO乗組員の「あうー」を完璧に通訳できる謎の能力を持つ。паーティの盾として、丁寧に敵を挑発し攻撃を一身に受ける。',
+  ufo:'「面白い星だと聞いて観光に来た」謎の宇宙人。言葉は「あうー」しか発しないが、かえるが通訳してくれる。異星の技術で味方を強化するが、その効果は地球の常識が通じず、ランダムに大きくブレる。レスバの旅に巻き込まれた被害者でもある。',
+  shin:'家賃のためだけに戦っていた開発者が、世界の「面白い」を守るために覚醒した姿。全身に金色のオーラをまとい、HP・防御が飛躍的に上昇。観測者の理不尽な力にも屈しない、不屈のコードを刻む者。'
+};
+// 雑魚の説明
+const ZAKO_DESC={
+  '信者A':'ボスに心酔するゾンビのような取り巻き。思考を停止し、ただボスの言葉を繰り返す。打たれ弱い。',
+  '信者B':'ボスを崇拝するあまり実体を失った幽霊。ふわふわ漂いながら攻撃してくる。メタ発言に弱い。',
+  'ヒーラー菌':'ボスの負の感情から生まれた謎の微生物。仲間（敵）を回復させる厄介者。放っておくとボスが倒れないので、先に潰すのが攻略のコツ。意外と打たれ弱い。',
+  '盾持ち':'ボスを守ることだけに特化した盾の精。防御は高いが攻撃は苦手。ダジャレで意外と崩れる。',
+  'コバンザメ':'強い者にくっついて生きる小物。ボスの威を借りて偉そうにするが、本体は弱い。素早い。',
+  'やじ馬':'騒ぎを聞きつけて集まった野次馬。無責任に煽ってくる。皮肉に弱く、論破すると黙る。',
+  '回復スライム':'じわじわ仲間を癒すスライム。一体だと脅威ではないが、複数いると面倒。先に処理推奨。',
+  '石像':'動かざること山の如し。防御は鉄壁だが、自虐ネタを聞くと感情移入して崩れる。'
+};
+</script>
+<script>
+// ============ 状態異常 操作ヘルパー ============
+// unit.statuses = [{id, turns, power}] の配列で管理
+function ensureStatuses(u){if(!u.statuses)u.statuses=[];return u.statuses;}
+function hasStatus(u,id){return ensureStatuses(u).some(s=>s.id===id);}
+function getStatus(u,id){return ensureStatuses(u).find(s=>s.id===id);}
+function applyStatus(u,id,turns,power){
+  ensureStatuses(u);
+  // デバフ無効中はデバフを弾く
+  const def=STATUS_DEFS[id];
+  if(def&&def.type==='debuff'&&hasStatus(u,'debuffguard'))return false;
+  const ex=getStatus(u,id);
+  if(ex){ex.turns=Math.max(ex.turns,turns);if(power)ex.power=Math.max(ex.power||0,power);}
+  else u.statuses.push({id,turns,power:power||0});
+  return true;
+}
+function removeStatus(u,id){if(u.statuses)u.statuses=u.statuses.filter(s=>s.id!==id);}
+function purgeOneDebuff(u){ // デバフを1つ解除
+  if(!u.statuses)return null;
+  const idx=u.statuses.findIndex(s=>STATUS_DEFS[s.id]&&STATUS_DEFS[s.id].type==='debuff');
+  if(idx>=0){const r=u.statuses[idx].id;u.statuses.splice(idx,1);return r;}
+  return null;
+}
+// ターン経過：turnsを減らし、毒・再生を処理。戻り値=ログ用メッセージ配列
+function tickStatuses(u){
+  const msgs=[];
+  if(!u.statuses)return msgs;
+  // 毒
+  const poison=getStatus(u,'poison');
+  if(poison){const dmg=Math.max(1,Math.round(u.maxhp*0.06));u.hp=Math.max(0,(u.hp!==undefined?u.hp:u.curhp)-dmg);if(u.curhp!==undefined)u.curhp=Math.max(0,u.curhp-dmg);msgs.push({t:(u.name||'')+'は毒で'+dmg+'のダメージ',c:'#9d4edd'});}
+  // 再生
+  const regen=getStatus(u,'regen');
+  if(regen){const heal=Math.round((u.maxhp)*0.1);if(u.hp!==undefined)u.hp=Math.min(u.maxhp,u.hp+heal);if(u.curhp!==undefined)u.curhp=Math.min(u.maxhp,u.curhp+heal);msgs.push({t:(u.name||'')+'は再生で'+heal+'回復',c:'#5dca8a'});}
+  // turns減算
+  u.statuses.forEach(s=>{if(s.turns>0)s.turns--;});
+  u.statuses=u.statuses.filter(s=>s.turns!==0);
+  return msgs;
+}
+// 有効攻撃力（バフデバフ・強奪込み）
+function effAtk(u){
+  let a=u.atk||0;
+  a+=(u.stealBonus||0); // 強奪で得た分
+  if(hasStatus(u,'atkup'))a=Math.round(a*(1+(getStatus(u,'atkup').power||30)/100));
+  if(hasStatus(u,'weak'))a=Math.round(a*(1-(getStatus(u,'weak').power||25)/100));
+  if(hasStatus(u,'drained'))a=Math.round(a*(1-(getStatus(u,'drained').power||20)/100));
+  if(u.buffAtk)a=Math.round(a*(1+u.buffAtk/100));
+  return Math.max(1,a);
+}
+// 有効防御力
+function effDef(u){
+  let d=u.def||0;
+  if(hasStatus(u,'defup'))d=Math.round(d*(1+(getStatus(u,'defup').power||30)/100));
+  if(hasStatus(u,'shaken'))d=Math.round(d*(1-(getStatus(u,'shaken').power||25)/100));
+  return Math.max(0,d);
+}
+// 有効スピード（鈍化込み）
+function effSpd(u){
+  let s=u.spd||10;
+  if(hasStatus(u,'slow'))s=Math.round(s*(1-(getStatus(u,'slow').power||30)/100));
+  return Math.max(1,s);
+}
+// 状態異常のアイコン列（表示用）
+function statusIconsHtml(u){
+  if(!u.statuses||!u.statuses.length)return '';
+  return u.statuses.map(s=>{const d=STATUS_DEFS[s.id];return d?`<span title="${d.name}">${d.icon}</span>`:'';}).join('');
+}
+</script>
+<script>
+// ============ ボスのキャラ説明 ============
+const ENEMY_DESC={
+  1:'築40年のボロアパートを30棟所有する地主。常に何かにキレており、その怒りが攻撃力の高さに直結している。家賃の取り立てには一切の容赦がない。だが実は若い頃、自分も家賃が払えず大家に泣きついた過去があり、「言い訳」だけは異常に嫌う。自虐ネタに弱い。',
+  2:'一日中アプリのレビュー欄に張り付き、★1を付けて回るのが生きがいの粘着質。何を作っても「期待外れ」と切り捨てる。反論されると異常にしつこく食い下がるが、的確な皮肉を返されると言葉に詰まる。',
+  3:'他人の成果を平然と自分のものとして発表する盗人。素早く立ち回り、捕まえどころがない。出典を求められること、メタ的に「お前のそれ、パクリだろ」と暴かれることを何より恐れる。',
+  4:'些細なことで「責任者を呼べ」と騒ぎ立てる理不尽の化身。正論には耳を貸さず、ただ大声で押し通そうとする。攻撃力は防御を無視するほど強引。だが本質は寂しがり屋で、自虐ネタに思わず同情してしまう。',
+  5:'コードの奥底に巣食ったバグが、無数のエラーを集めて意思を持った存在。想定外の挙動で味方の攻撃すら無効化する。HPも攻撃も高いが動きは鈍重。自分がプログラムだとメタ的に自覚させられると動揺する。',
+  6:'「今だけ80%オフ」と囁き、あらゆる場面で課金を迫る悪魔。無料で楽しもうとする者を敵視し、財布の紐を緩めさせようと圧をかけてくる。皮肉な物言いに弱い。',
+  7:'ネットの炎上から生まれた火の精霊。燃料が投下されるほど勢いを増し、周囲を巻き込んで燃え広がる。鎮火は難しいが、冷静な哲学的問いかけの前では火勢が衰える。',
+  8:'「バズりたい」「いいねが欲しい」という承認欲求が極まって生まれた魔王。注目を浴びるほど力を増す。無視されること、そして痛烈な皮肉が弱点。玉座にふんぞり返っている。',
+  9:'すべてを無に還そうとする虚無の使者。感情を持たず、デバフもほとんど効かない。あなたの笑顔を最も嫌う。静寂の中、じわじわと世界を侵食していく。哲学的な問いだけが、その虚무に罅を入れる。',
+  10:'宇宙の彼方からすべてを「観測」する超越的存在。つまらないと判断した世界を消去してきた。全知ゆえに弱点を見抜き、次元を超えて干渉する。だが「面白さ」だけは観測しきれない。追い詰められると三段階に姿を変え、宇宙そのものを賭けた戦いへと突入する。'
+};
 </script>
 <script>
 // ============ STATE ============
@@ -864,8 +1333,13 @@ function init(){
 }
 function startNewGame(){
   sfx('select');
+  // 進行データがある場合は確認
+  const ex=rpgLoad();
+  if(ex&&ex.enemyIdx>0){
+    if(!confirm('最初からはじめます。\n現在の進行（'+ex.enemyIdx+'体目まで）は消えますが、よろしいですか？\n\n※集めたジョークはShiftMemo側に残ります'))return;
+  }
   const p=rpgLoad()||{};
-  p.enemyIdx=0;p.initialized=true;
+  p.enemyIdx=0;p.initialized=true;p.defeated=[];
   if(!p.ownedSkills)p.ownedSkills=INITIAL_SKILLS.slice();
   if(!p.equipped)p.equipped={dev:INITIAL_SKILLS.slice(),ufo:INITIAL_SKILLS.slice(),cat:INITIAL_SKILLS.slice(),frog:INITIAL_SKILLS.slice()};
   rpgSave(p);
@@ -956,252 +1430,568 @@ function loadEnemyIntro(){
 }
 </script>
 <script>
-// ============ BATTLE SETUP ============
+// ============ 多人数バトル（スピード制ターンキュー） ============
 function startBattle(){
   sfx('select');
   const e=ENEMIES[G.enemyIdx];
-  if(typeof playBgm==='function')playBgm((e.id===5||e.id===10)?'boss':'battle');
-  G.party=PARTY_DEF.map(def=>{const st=calcStats(def.id);return {...def,...st,alive:true};});
-  G.enemy={...e,maxhp:e.hp,curhp:e.hp};
-  G.tension=0;G.turnIdx=0;G.defending={};G.battleOver=false;
+  const isBoss=!!e.boss;
+  G.party=PARTY_DEF.map(def=>{const st=calcStats(def.id);return {...def,...st,alive:true,buffAtk:0,guardReduce:0,stealBonus:0,statuses:[],_guarded:false,_dmgTaken:0,awakened:false};});
+  if(isBoss){
+    const bhp=Math.round(e.hp*1.6);
+    G.enemies=[{...e,curhp:bhp,maxhp:bhp,alive:true,isBoss:true,bars:5,form:1,statuses:[],stealBonus:0,actions:4}];
+  }else{
+    const bhp=e.hp;
+    const boss={...e,curhp:bhp,maxhp:bhp,alive:true,isBoss:true,bars:1,statuses:[],stealBonus:0,actions:1};
+    const zako=[];
+    const pool=ZAKO_POOL.slice().sort(()=>Math.random()-0.5).slice(0,4);
+    pool.forEach((z,i)=>{
+      const zhp=Math.round(e.hp*0.7);
+      zako.push({id:'zako'+i,name:z.name,emoji:z.emoji,roleType:z.roleType,weak:z.weak,
+        curhp:zhp,maxhp:zhp,atk:Math.round(e.atk*0.6),def:Math.round((e.def||10)*0.6),spd:8+Math.floor(Math.random()*10),alive:true,isBoss:false,statuses:[],stealBonus:0,actions:1});
+    });
+    G.enemies=[zako[0],zako[1],boss,zako[2],zako[3]];
+  }
+  G.tension=0;G.battleOver=false;G.bossUltTimer=0;G.queue=[];G.queuePos=0;
+  if(typeof playBgm==='function')playBgm(isBoss?'boss':'battle');
   const bf=document.getElementById('battle-field');
   bf.className='battle-field '+bgClass(e.bg);
   document.getElementById('battle-bg').innerHTML=bgAccentHtml(e.bg);
   document.getElementById('battle-bg').className='';
-  document.getElementById('enemy-sprite').textContent=e.emoji;
-  document.getElementById('enemy-sprite').style.fontSize='40px';
-  document.getElementById('enemy-sprite').style.border='none';
-  document.getElementById('enemy-sprite').style.background='transparent';
-  document.getElementById('enemy-name-tag').textContent=e.name;
   renderBattle();
   showScreen('battle');
-  setMsg('',`${e.name} が現れた！ 弱点を見抜いてレスバで勝て！`);
-  startPlayerTurn();
+  setMsg('',isBoss?`★ボス戦★ ${e.name} が立ちはだかる！`:`${e.name} の軍勢が現れた！`);
+  if(typeof applyAlliesSupport==='function')applyAlliesSupport();
+  buildQueue();
+  nextInQueue();
 }
+
+function aliveEnemies(){return G.enemies.filter(e=>e.alive);}
+function aliveParty(){return G.party.filter(c=>c.alive);}
+function getBoss(){return G.enemies.find(e=>e.isBoss&&e.alive)||G.enemies.find(e=>e.isBoss);}
+
+// ============ ターンキュー（スピード順） ============
+function buildQueue(){
+  // 各味方1回＋各敵(actions回)を、スピードでソート。ボスはactions回ぶん、毎回spdをランダム変動（最低spdは下回らない＝最遅にしない）
+  const entries=[];
+  aliveParty().forEach(c=>{entries.push({side:'party',ref:c,spd:effSpd(c)+Math.random()*3});});
+  aliveEnemies().forEach(e=>{
+    const acts=e.actions||1;
+    const baseSpd=effSpd(e);
+    for(let k=0;k<acts;k++){
+      // ボスの複数行動は毎回ランダム変動、ただし全体の最低spdを下回らないよう底上げ
+      let s=baseSpd*(0.7+Math.random()*0.6);
+      if(acts>1){const minSpd=Math.min(...aliveParty().map(effSpd));s=Math.max(s,minSpd+1);} // 最遅にしない
+      entries.push({side:'enemy',ref:e,spd:s});
+    }
+  });
+  entries.sort((a,b)=>b.spd-a.spd);
+  G.queue=entries;G.queuePos=0;
+  renderQueueBar();
+}
+function renderQueueBar(){
+  const bar=document.getElementById('turn-order-bar');if(!bar)return;
+  // 残りキュー（現在位置以降）を表示。死んだユニットは除外
+  const upcoming=G.queue.slice(G.queuePos).filter(en=>en.ref.alive);
+  bar.innerHTML=upcoming.slice(0,8).map((en,i)=>{
+    const u=en.ref;const isNow=i===0;
+    const emoji=u.emoji||'❓';
+    const col=en.side==='party'?(u.color||'#c8f060'):'#ff8c8c';
+    return `<div class="q-unit ${isNow?'q-now':''}"><div class="q-em" style="border-color:${isNow?'#c8f060':col}">${emoji}</div>${isNow?'<div class="q-now-label">NOW</div>':''}</div>`;
+  }).join('<span class="q-arrow">▶</span>');
+}
+
+function nextInQueue(){
+  if(G.battleOver)return;
+  // 勝敗チェック
+  if(aliveEnemies().length===0){winBattle();return;}
+  if(aliveParty().length===0){loseBattle();return;}
+  // キュー終端 → 新ターン（ターン経過処理）
+  if(G.queuePos>=G.queue.length){newRound();return;}
+  const entry=G.queue[G.queuePos];
+  // 死んでいたらスキップ
+  if(!entry.ref.alive){G.queuePos++;nextInQueue();return;}
+  renderQueueBar();
+  if(entry.side==='party'){
+    G.activeChar=entry.ref;
+    startPlayerTurn(entry.ref);
+  }else{
+    G.activeChar=null;
+    enemyAct(entry.ref,()=>{G.queuePos++;nextInQueue();});
+  }
+}
+function newRound(){
+  G.round=(G.round||0)+1;
+  G.bossUltTimer=(G.bossUltTimer||0)+1;
+  if(G.bossUltTimer>=3){G.bossUltReady=true;G.bossUltTimer=0;}
+  // 全ユニットの状態異常をtick、バフ・防御リセット
+  const logs=[];
+  [...G.party,...G.enemies].forEach(u=>{if(u.alive){const m=tickStatuses(u);m.forEach(x=>logs.push(x));if((u.hp!==undefined&&u.hp<=0)||(u.curhp!==undefined&&u.curhp<=0)){u.alive=false;}}});
+  // 真・開発者の再起動（被ダメ8割回復）
+  G.party.forEach(c=>{if(c.alive&&c.awakened&&c._dmgTaken>0){const heal=Math.round(c._dmgTaken*0.8);c.hp=Math.min(c.maxhp,c.hp+heal);c._dmgTaken=0;logs.push({t:c.name+'は再起動でHP'+heal+'回復！🔄',c:'#5de5ff'});}});
+  // 一時バフ（防御・挑発）リセット
+  G.party.forEach(c=>{c.guardReduce=0;});
+  renderBattle();
+  if(logs.length){let i=0;const showLog=()=>{if(i>=logs.length){buildQueue();nextInQueue();return;}setMsg('',logs[i].t,logs[i].c);i++;setTimeout(showLog,700);};showLog();}
+  else{buildQueue();nextInQueue();}
+}
+
 function renderBattle(){
-  document.getElementById('enemy-hp-fill').style.width=(G.enemy.curhp/G.enemy.maxhp*100)+'%';
-  document.getElementById('party-zone').innerHTML=G.party.map((c,i)=>`
-    <div class="char ${i%2===0?'bobbing':'bobbing2'} ${c.alive?'':'dead'}" id="char-${c.id}">
+  let topZone=document.getElementById('enemy-top-zone');
+  if(!topZone){topZone=document.createElement('div');topZone.id='enemy-top-zone';topZone.className='enemy-top-zone';document.getElementById('battle-field').insertBefore(topZone,document.getElementById('party-zone'));}
+  topZone.innerHTML=G.enemies.map((e,i)=>{
+    if(!e.alive)return `<div class="enemy-unit dead" data-ei="${i}"><div class="enemy-em" style="font-size:${e.isBoss?'46':'22'}px;opacity:0.25">${e.emoji}</div></div>`;
+    const big=e.isBoss;
+    const hpbars=(big&&e.bars>1)?renderBossBars(e):`<div class="enemy-hp-track" style="width:${big?64:38}px"><div class="enemy-hp-fill" style="width:${e.curhp/e.maxhp*100}%"></div></div>`;
+    const roleIcon=e.roleType==='zako_heal'?'💚':e.roleType==='zako_def'?'🛡':'';
+    return `<div class="enemy-unit ${big?'boss':''}" id="enemy-unit-${i}" data-ei="${i}" onclick="onEnemyTap(${i})" oncontextmenu="return showUnitDetail(event,'enemy',${i})">
+      <div class="enemy-em" style="font-size:${big?'46':'26'}px">${e.emoji}</div>
+      <div class="enemy-unit-name" style="font-size:${big?'9':'7'}px;color:${big?'#ff3b3b':'#ff8c8c'}">${roleIcon}${e.name}</div>
+      <div class="status-icons">${statusIconsHtml(e)}</div>
+      ${hpbars}
+    </div>`;
+  }).join('');
+  document.getElementById('party-zone').innerHTML=G.party.map((c,i)=>{
+    const ri=ROLE_INFO[c.roleType];
+    return `<div class="char ${i%2===0?'bobbing':'bobbing2'} ${c.alive?'':'dead'} ${c.awakened?'awakened':''}" id="char-${c.id}" onclick="onAllyTap('${c.id}')" oncontextmenu="return showUnitDetail(event,'ally','${c.id}')">
+      ${c.awakened?'<div class="aura-ring"></div>':''}
       <div class="char-sprite" style="border:none;background:transparent;font-size:30px">${c.emoji}</div>
-      <div class="char-name" style="color:${c.color}">${c.name}</div>
-    </div>`).join('');
+      <div class="char-name" style="color:${c.color}">${ri.icon}${c.name}</div>
+    </div>`;
+  }).join('');
   document.getElementById('party-hp-grid').innerHTML=G.party.map(c=>`
     <div class="php">
-      <div class="php-top"><span class="php-name" style="color:${c.color}">${c.name}</span><span class="php-val">${Math.max(0,c.hp)}/${c.maxhp}</span></div>
+      <div class="php-top"><span class="php-name" style="color:${c.color}">${ROLE_INFO[c.roleType].icon}${c.name} ${statusIconsHtml(c)}</span><span class="php-val">${Math.max(0,c.hp)}/${c.maxhp}</span></div>
       <div class="php-track"><div class="php-fill" style="width:${Math.max(0,c.hp/c.maxhp*100)}%;background:${c.color}"></div></div>
     </div>`).join('');
   document.getElementById('tension-fill').style.width=G.tension+'%';
   document.getElementById('tension-pct').textContent=Math.round(G.tension)+'%';
-  document.getElementById('ult-btn').disabled=G.tension<100;
+  const ub=document.getElementById('ult-btn');if(ub)ub.disabled=G.tension<100;
 }
-function setMsg(speaker,text,color){document.getElementById('battle-msg').innerHTML=(speaker?`<span class="speaker" style="color:${color||'var(--accent)'}">${speaker}</span>`:'')+text;if(typeof pushLog==='function'&&text)pushLog(speaker,text,color);}
-function aliveParty(){return G.party.filter(c=>c.alive);}
-function currentChar(){return aliveParty()[G.turnIdx];}
-function startPlayerTurn(){
+function renderBossBars(e){
+  const barColors=['#ff3b3b','#ff6b35','#ffd700','#5de5ff','#cb8aff'];
+  const perBar=e.maxhp/e.bars;
+  let html='<div style="display:flex;flex-direction:column;gap:1px;align-items:center;margin-top:2px">';
+  for(let b=0;b<e.bars;b++){const barMin=perBar*(e.bars-1-b);const fillPct=Math.max(0,Math.min(1,(e.curhp-barMin)/perBar))*100;html+=`<div style="width:70px;height:3px;background:#2e2e2e;border-radius:2px"><div style="width:${fillPct}%;height:100%;background:${barColors[b%5]};border-radius:2px"></div></div>`;}
+  html+='</div>';return html;
+}
+function setMsg(speaker,text,color){const m=document.getElementById('battle-msg');if(m)m.innerHTML=(speaker?`<span class="speaker" style="color:${color||'var(--accent)'}">${speaker}</span>`:'')+text;if(typeof pushLog==='function'&&text)pushLog(speaker,text,color);}
+
+// ============ プレイヤーターン ============
+function startPlayerTurn(c){
   if(G.battleOver)return;
-  const alive=aliveParty();
-  if(G.turnIdx>=alive.length){enemyTurn();return;}
-  const c=alive[G.turnIdx];
   document.querySelectorAll('.char').forEach(el=>el.classList.remove('active-turn'));
   const el=document.getElementById('char-'+c.id);if(el)el.classList.add('active-turn');
-  document.getElementById('cmd-label').innerHTML=`<span style="color:${c.color};font-weight:700">${c.name}</span> のターン ▶ コマンドを選べ`;
+  const ri=ROLE_INFO[c.roleType];
+  document.getElementById('cmd-label').innerHTML=`<span style="color:${c.color};font-weight:700">${ri.icon}${c.name}</span>（${ri.name}）のターン`;
+  // 役割技ボタンのラベルをロールで変える
+  const rb=document.getElementById('role-btn');
+  if(rb){const rl={attacker:'⚔ 強撃',healer:'💚 回復',tank:'🛡 挑発',buffer:'⤴ バフ'}[c.roleType];rb.textContent=rl;}
   setCmdEnabled(true);
 }
 function setCmdEnabled(b){document.querySelectorAll('.cmd-btn').forEach(btn=>{if(btn.id==='ult-btn'){btn.disabled=!b||G.tension<100;}else btn.disabled=!b;});}
+function currentChar(){return G.activeChar;}
+function afterPlayerAction(){G.queuePos++;nextInQueue();}
 
-// ============ COMMANDS ============
-let pendingUlt=false;
-function cmdAttack(){pendingUlt=false;openJokePick(currentChar(),false);}
-function cmdUltimate(){if(G.tension<100){toast('テンションが足りない！');return;}pendingUlt=true;openJokePick(currentChar(),true);}
-function cmdDefend(){const c=currentChar();G.defending[c.id]=true;setMsg(c.name,'は言い訳して身を守った！',c.color);sfx('select');setTimeout(()=>nextPlayerTurn(),700);}
-function cmdRun(){if(Math.random()<0.45){setMsg('','逃げ出した…！');sfx('miss');setTimeout(()=>showScreen('title'),1200);}else{setMsg('','逃げられなかった！');setTimeout(()=>nextPlayerTurn(),900);}}
+// ============ コマンド ============
+let pendingSkill=null;
+function cmdAttack(){openSkillPick(currentChar(),'attack');}
+function cmdRole(){openSkillPick(currentChar(),'role');}
+function cmdUltimate(){
+  if(G.tension<100){toast('テンションが足りない！');return;}
+  // 特殊必殺の選択肢を出す
+  const opts=[];
+  opts.push(`<button class="menu-item" onclick="closeUltChoice();openSkillPick(currentChar(),'ult')">✨ 神ジョーク（個人必殺）</button>`);
+  if(typeof canComboUlt==='function'&&canComboUlt())opts.push(`<button class="menu-item" style="border-color:#FFD700;color:#FFD700" onclick="closeUltChoice();cmdComboUlt()">🌟 合体必殺（フルパーティ・ロースト）</button>`);
+  if(typeof hasTruePower==='function'&&hasTruePower()&&getBoss()&&getBoss().isBoss)opts.push(`<button class="menu-item" style="border-color:#ff9dc0;color:#ff9dc0" onclick="closeUltChoice();cmdTruePower()">🔥 真の力（禁断の神ジョーク）</button>`);
+  document.getElementById('ult-choice-body').innerHTML=opts.join('');
+  document.getElementById('ult-choice-modal').classList.add('show');
+}
+function closeUltChoice(){document.getElementById('ult-choice-modal').classList.remove('show');}
+function cmdDefend(){const c=currentChar();c.guardReduce=50;setMsg(c.name,'は身を守っている（被ダメ50%減）',c.color);sfx('select');setTimeout(afterPlayerAction,700);}
 
-// ============ JOKE PICK ============
-function openJokePick(char,isUlt){
+// mode: 'attack'(全員ダメージ) / 'role'(固有役割技) / 'ult'(神ジョーク)
+function openSkillPick(char,mode){
   const equipped=getEquipped(char.id);
-  document.getElementById('joke-pick-name').textContent=char.name+(isUlt?' の神ジョーク（必殺）':' の技を選ぶ');
+  const ri=ROLE_INFO[char.roleType];
+  const modeLabel=mode==='attack'?'攻撃':mode==='ult'?'神ジョーク':'役割技';
+  document.getElementById('joke-pick-name').textContent=char.name+'｜'+modeLabel;
   document.getElementById('joke-pick-list').innerHTML=equipped.map(sid=>{
     const s=getSkill(sid);if(!s)return '';
-    const a=ATTR[s.attr];const isWeak=G.enemy.weak===s.attr;
-    const pow=calcDamage(char,s,isUlt,false).preview;
-    return `<div class="joke-opt" onclick="useJoke('${char.id}','${sid}',${isUlt})">
-      <div class="joke-opt-top"><span class="joke-opt-stars">${'★'.repeat(s.star)}${'☆'.repeat(10-s.star)}</span><span class="joke-opt-attr" style="background:${a.c}33;color:${a.c}">${a.n}${isWeak?' ★弱点!':''}</span></div>
-      <div class="joke-opt-text">「${s.ja}」</div>
-      <div class="joke-opt-pow">威力目安: ${pow}${isUlt?' ＋神ジョーク補正':''}</div>
+    const a=ATTR[s.attr];const eff=resolveEffect(char,s,mode);
+    const isWeak=eff.type==='damage'&&aliveEnemies().some(e=>e.weak===s.attr);
+    const typeLabel={damage:'攻撃',heal:'回復',taunt:'挑発',buff:'バフ'}[eff.type];
+    const scopeLabel=eff.scope==='all'?'全体':eff.scope==='self'?'自分':'単体';
+    return `<div class="joke-opt">
+      <div onclick="selectSkill('${char.id}','${sid}','${mode}')" style="cursor:pointer">
+        <div class="joke-opt-top"><span class="joke-opt-stars">${'★'.repeat(s.star)}${'☆'.repeat(10-s.star)}</span><span class="joke-opt-attr" style="background:${a.c}33;color:${a.c}">${a.n}</span></div>
+        <div class="joke-opt-text">「${s.ja}」</div>
+        <div class="joke-opt-pow">${typeLabel}・${scopeLabel}${isWeak?' ・弱点!':''}</div>
+      </div>
+      <div onclick="showSkillDescBox('${char.id}','${sid}','${mode}')" style="margin-top:6px;padding-top:6px;border-top:0.5px solid var(--border);font-size:10px;color:#7ad5ff;cursor:pointer">ⓘ ${eff.desc}</div>
     </div>`;
   }).join('');
   document.getElementById('joke-pick').classList.add('show');document.body.style.overflow='hidden';
 }
 function closeJokePick(){document.getElementById('joke-pick').classList.remove('show');document.body.style.overflow='';}
-function calcDamage(char,skill,isUlt,roll){
-  const a=char.atk;let base=a+skill.pow;
-  const isWeak=G.enemy.weak===skill.attr;
-  if(isWeak)base=Math.round(base*1.8);
-  if(isUlt)base=Math.round(base*2.2);
-  const def=Math.round(G.enemy.atk*0.2);
-  let dmg=Math.max(1,base-def);
-  if(!roll)return {preview:dmg,isWeak};
-  let slip=false,crit=false;
-  if(isUlt&&Math.random()<0.25)slip=true;
-  else if(isWeak||Math.random()<0.15){crit=true;dmg=Math.round(dmg*1.3);}
-  return {dmg,isWeak,crit,slip};
+function showSkillDescBox(charId,sid,mode){const c=G.party.find(x=>x.id===charId);const s=getSkill(sid);const eff=resolveEffect(c,s,mode);const a=ATTR[s.attr];toast(`${'★'.repeat(s.star)} ${a.n}｜${eff.desc}`);}
+
+// mode別に効果を解決：attack=全員ダメージ(仲間は半分)、role=ロール固有、ult=神ジョーク(高火力ダメージ)
+function resolveEffect(char,skill,mode){
+  const star=skill.star;const st=calcStats(char.id);
+  if(mode==='attack'||mode==='ult'){
+    const scope=(star>=7||mode==='ult')?'all':'single';
+    let amt=effAtk(char)+skill.pow;
+    if(!char.full&&mode==='attack')amt=Math.round(amt*0.5); // 仲間の攻撃は半分
+    if(mode==='ult')amt=Math.round(amt*2.2);
+    return {type:'damage',amount:amt,scope:scope,desc:(scope==='all'?'敵全体':'敵単体')+'に'+amt+'前後のダメージ'+(mode==='ult'?'（神ジョーク）':'')};
+  }
+  // role: キャラのロール固有技
+  return skillEffect(char.id,skill);
 }
 
-// ============ 掛け合い（技後リアクション） ============
-const REACT={
-  dev:['開発者「よし、効いてる！」','開発者「家賃のためだ…！」'],
-  cat:['ねこ「ええぞ、もっと言うたれ！」','ねこ「儂の出番はまだか？」'],
-  frog:['かえる「お見事です」','かえる「冷静に、次へ」'],
-  ufo:['UFO乗組員「あうー！」','かえる（通訳）「『やったね』だそうです」']
-};
-const ENEMY_REACT=['敵「ぐっ…！」','敵「やるじゃないか…」','敵「その程度か？」','敵「効かんわ！」'];
-function randReact(){
-  const others=PARTY_DEF.filter(c=>c.alive!==false);
-  const c=others[Math.floor(Math.random()*others.length)];
-  const r=REACT[c.id];return r[Math.floor(Math.random()*r.length)];
+// ============ 対象選択 ============
+function selectSkill(charId,sid,mode){
+  const char=G.party.find(c=>c.id===charId);const skill=getSkill(sid);if(!skill)return;
+  const eff=resolveEffect(char,skill,mode);
+  pendingSkill={charId,sid,mode,eff};
+  closeJokePick();
+  if(eff.type==='damage'){
+    if(eff.scope==='all'){setMsg(char.name,'は敵全体にレスバを放つ！',char.color);setTimeout(()=>executeSkill(null),500);}
+    else promptTargetEnemy();
+  }else if(eff.type==='heal'){
+    if(eff.scope==='all'){setMsg(char.name,'は味方全員を回復！💚','var(--cat)');setTimeout(()=>executeSkill(null),500);}
+    else promptTargetAlly();
+  }else if(eff.type==='taunt'){setMsg(char.name,'は敵を挑発する！🛡','var(--frog)');setTimeout(()=>executeSkill(null),500);}
+  else {setMsg(char.name,'は味方を鼓舞する！⤴','var(--ufo)');setTimeout(()=>executeSkill(null),500);}
 }
+let targetMode=null;
+function promptTargetEnemy(){targetMode='enemy';setMsg('','攻撃する敵をタップで選べ！','#FFD700');highlightTargets('enemy');}
+function promptTargetAlly(){targetMode='ally';setMsg('','回復する仲間をタップで選べ！','#5dca8a');highlightTargets('ally');}
+function highlightTargets(kind){if(kind==='enemy'){G.enemies.forEach((e,i)=>{const el=document.getElementById('enemy-unit-'+i);if(el&&e.alive)el.classList.add('targetable');});}else{G.party.forEach(c=>{const el=document.getElementById('char-'+c.id);if(el&&c.alive)el.classList.add('targetable');});}}
+function clearTargets(){document.querySelectorAll('.targetable').forEach(el=>el.classList.remove('targetable'));targetMode=null;}
+function onEnemyTap(i){if(targetMode!=='enemy')return;const e=G.enemies[i];if(!e||!e.alive)return;clearTargets();executeSkill(i);}
+function onAllyTap(cid){if(targetMode!=='ally')return;const c=G.party.find(x=>x.id===cid);if(!c||!c.alive)return;clearTargets();executeSkill(cid);}
 
-function useJoke(charId,skillId,isUlt){
-  closeJokePick();setCmdEnabled(false);
-  const char=G.party.find(c=>c.id===charId);
-  const skill=getSkill(skillId);
-  if(!skill){toast('技データが見つかりません');setCmdEnabled(true);return;}
-  const res=calcDamage(char,skill,isUlt,true);
-  const v=VOICE[charId];
-  if(isUlt)G.tension=0;else G.tension=Math.min(100,G.tension+18);
-  if(charId==='ufo'){
-    setMsg('UFO乗組員',v.atk[Math.floor(Math.random()*v.atk.length)],char.color);
-    setTimeout(()=>{setMsg('かえる',FROG_TRANSLATE[Math.floor(Math.random()*FROG_TRANSLATE.length)],'var(--frog)');setTimeout(()=>applyPlayerDamage(char,skill,res,isUlt),900);},800);
-  }else{
-    const line=res.slip?(v.miss[0]||'滑った…'):(res.crit?(v.crit[0]||v.atk[0]):v.atk[Math.floor(Math.random()*v.atk.length)]);
-    setMsg(char.name,`「${skill.ja}」 ${line}`,char.color);
-    setTimeout(()=>applyPlayerDamage(char,skill,res,isUlt),700);
-  }
+// ============ スキル実行 ============
+function executeSkill(target){
+  setCmdEnabled(false);
+  const {charId,sid,mode,eff}=pendingSkill;
+  const char=G.party.find(c=>c.id===charId);const skill=getSkill(sid);const v=VOICE[charId];
+  if(mode==='ult')G.tension=0;else G.tension=Math.min(100,G.tension+14);
+  const speak=(after)=>{
+    if(charId==='ufo'){setMsg('UFO乗組員',v.atk[Math.floor(Math.random()*v.atk.length)],char.color);setTimeout(()=>{setMsg('かえる',FROG_TRANSLATE[Math.floor(Math.random()*FROG_TRANSLATE.length)],'var(--frog)');setTimeout(after,700);},600);}
+    else{setMsg(char.name,`「${skill.ja}」`,char.color);setTimeout(after,600);}
+  };
+  speak(()=>applyEffect(char,skill,eff,mode,target));
 }
-function applyPlayerDamage(char,skill,res,isUlt){
-  if(res.slip){
-    fxFlash();sfx('miss');
-    const dmg=Math.round(char.maxhp*0.12);
-    showDmg('self',char,dmg,'miss','スベった');
-    char.hp-=dmg;if(char.hp<=0)char.alive=false;
-    setMsg(char.name,'のジョークは…完全に滑った！自分にダメージ！','var(--danger)');
-    renderBattle();
-    setTimeout(()=>battleReact(()=>nextPlayerTurn()),1100);return;
+function applyEffect(char,skill,eff,mode,target){
+  const isUlt=mode==='ult';
+  if(eff.type==='damage'){
+    let targets=(eff.scope==='all')?aliveEnemies():[G.enemies[target]].filter(Boolean);
+    // dev覚醒：オープンソースの絆（倒れた仲間ぶん火力UP）
+    let bondMult=1;
+    if(char.awakened){const dead=G.party.filter(c=>!c.alive).length;bondMult=1+dead*0.3;}
+    targets.forEach(e=>{
+      const isWeak=e.weak===skill.attr;
+      let dmg=Math.round(eff.amount*bondMult*(isWeak?1.8:1));
+      // 防御反映
+      dmg=Math.max(1,dmg-Math.round(effDef(e)*0.3));
+      // 神ジョーク滑り（覚醒の伝説のリリースなら滑らない）
+      if(isUlt&&!char.awakened&&Math.random()<0.25){setMsg(char.name,'の神ジョークは滑った…！','var(--danger)');return;}
+      let crit=isWeak||Math.random()<0.12;if(crit)dmg=Math.round(dmg*1.3);
+      e.curhp=Math.max(0,e.curhp-dmg);
+      const ei=G.enemies.indexOf(e);const el=document.getElementById('enemy-unit-'+ei);
+      if(el){el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');}
+      if(typeof attackEffect==='function')attackEffect(skill.star,skill.attr,'enemyunit'+ei);
+      showDmgAt('enemy-unit-'+ei,dmg,crit||isUlt?'crit':'normal',isWeak?'弱点!':'');
+      // 攻撃時ランダムデバフ（攻撃モード）
+      if(mode==='attack'&&Math.random()<0.3){const deb=['weak','shaken','slow','poison'][Math.floor(Math.random()*4)];if(applyStatus(e,deb,2,25))setTimeout(()=>setMsg('',e.name+'に'+STATUS_DEFS[deb].name+'！'+STATUS_DEFS[deb].icon,'#ff9dc0'),200);}
+      // かえるのパッシブ：攻撃時デバフ追加付与
+      if(char.id==='frog'&&Math.random()<0.4){applyStatus(e,'shaken',2,25);}
+      // 強奪（攻撃時ランダム・永続）
+      if(Math.random()<0.18){const steal=Math.round((e.atk||10)*0.15);char.stealBonus=(char.stealBonus||0)+steal;applyStatus(e,'drained',99,20);setTimeout(()=>setMsg('',char.name+'は'+e.name+'の攻撃力を奪った！🩸','#FFD700'),300);}
+      if(e.curhp<=0)e.alive=false;
+    });
+    sfx(isUlt?'ult':'hit');if(isUlt){fxFlash();fxShake();}
+  }else if(eff.type==='heal'){
+    let targets=eff.scope==='all'?aliveParty():[typeof target==='string'?G.party.find(c=>c.id===target):char].filter(Boolean);
+    targets.forEach(t=>{t.hp=Math.min(t.maxhp,t.hp+eff.amount);showDmgAt('char-'+t.id,eff.amount,'heal','+');});
+    // ☆高いと浄化も
+    if(skill.star>=6){targets.forEach(t=>{const r=purgeOneDebuff(t);});setMsg(char.name,'は回復＋デバフ解除！💚','var(--cat)');}
+    else setMsg(char.name,'は回復した！💚','var(--cat)');
+    // ねこパッシブ：回復時たまに敵に弱気
+    if(char.id==='cat'&&Math.random()<0.35){const e=aliveEnemies()[0];if(e){applyStatus(e,'weak',2,25);setTimeout(()=>setMsg('',e.name+'を睨んで弱気に！😼','#ff9dc0'),300);}}
+    sfx('win');
+  }else if(eff.type==='taunt'){
+    char.guardReduce=eff.amount;applyStatus(char,'tauntself',2,0);
+    // 敵に挑発（狙われやすく）
+    aliveEnemies().forEach(e=>applyStatus(e,'taunt',2,0));
+    setMsg(char.name,`は挑発！敵の攻撃を引き受ける（被ダメ${eff.amount}%減）🛡`,'var(--frog)');sfx('select');
+  }else if(eff.type==='buff'){
+    let up=eff.amount;
+    if(char.id==='ufo'){const r=Math.random();up=r<0.2?Math.round(up*0.3):r>0.8?Math.round(up*2):up;} // 異星の理：ブレ
+    aliveParty().forEach(c=>{applyStatus(c,'atkup',2,up);});
+    // ☆高いとデバフ無効も
+    if(skill.star>=6){aliveParty().forEach(c=>applyStatus(c,'debuffguard',2,0));setMsg(char.name,`のバフ！攻撃力+${up}%＋デバフ無効⤴🪬`,'var(--ufo)');}
+    else setMsg(char.name,`のバフ！味方全体の攻撃力+${up}%⤴`,'var(--ufo)');
+    G.tension=Math.min(100,G.tension+8);sfx('crit');
   }
-  const es=document.getElementById('enemy-sprite');es.classList.remove('hit');void es.offsetWidth;es.classList.add('hit');
-  if(typeof attackEffect==='function')attackEffect(skill.star,skill.attr,'enemy');
-  if(isUlt){fxFlash();fxShake();sfx('ult');fxParticles(['#ff9dc0','#FFD700','#fff','#ff6b9d']);}
-  else if(res.crit){fxShake();sfx('crit');fxParticles(['#FFD700','#fff']);}
-  else sfx('hit');
-  G.enemy.curhp=Math.max(0,G.enemy.curhp-res.dmg);
-  showDmg('enemy',null,res.dmg,res.crit||isUlt?'crit':'normal',res.isWeak?'弱点!':'');
   renderBattle();
-  if(res.isWeak)setMsg('','弱点に刺さった！ 会心の一撃！','#FFD700');
   setTimeout(()=>{
-    if(G.enemy.curhp<=0){winBattle();return;}
-    battleReact(()=>nextPlayerTurn());
+    if(aliveEnemies().length===0){winBattle();return;}
+    // ラスボス形態変化チェック
+    const boss=getBoss();
+    if(boss&&typeof checkFormChange==='function'&&checkFormChange(boss,()=>afterPlayerAction())){return;}
+    afterPlayerAction();
   },1000);
 }
-// 技後の掛け合い（敵の反応＋仲間の一言）
-function battleReact(after){
-  if(G.battleOver)return;
-  if(Math.random()<0.6){
-    const useEnemy=Math.random()<0.5;
-    const msg=useEnemy?ENEMY_REACT[Math.floor(Math.random()*ENEMY_REACT.length)]:randReact();
-    const isEnemy=msg.startsWith('敵');
-    setMsg('',msg.replace(/^敵/,'').replace(/^(開発者|ねこ|かえる|UFO乗組員)/,''),isEnemy?'var(--danger)':'var(--accent)');
-    // speaker付けて見やすく
-    const sp=msg.split('「')[0];
-    const body=msg.includes('「')?'「'+msg.split('「').slice(1).join('「'):msg;
-    setMsg(sp,body,isEnemy?'var(--danger)':'var(--accent)');
-    setTimeout(after,900);
-  }else after();
-}
-function showDmg(target,char,amount,cls,label){
-  const fld=document.getElementById('battle-field');
-  const d=document.createElement('div');d.className='dmg-num '+cls;d.textContent=(label?label+' ':'')+amount;
-  if(target==='enemy'){d.style.top='30px';d.style.right='60px';}
-  else{const el=document.getElementById('char-'+char.id);d.style.bottom='80px';d.style.left=(el?el.offsetLeft:100)+'px';el&&el.classList.remove('hit');void(el&&el.offsetWidth);el&&el.classList.add('hit');}
-  fld.appendChild(d);setTimeout(()=>d.remove(),1000);
-}
-function nextPlayerTurn(){
-  if(G.battleOver)return;
-  G.turnIdx++;
-  const alive=aliveParty();
-  if(G.turnIdx>=alive.length){G.turnIdx=0;enemyTurn();}else startPlayerTurn();
-}
-function enemyTurn(){
-  if(G.battleOver)return;
-  setCmdEnabled(false);
-  document.querySelectorAll('.char').forEach(el=>el.classList.remove('active-turn'));
-  const alive=aliveParty();const target=alive[Math.floor(Math.random()*alive.length)];
-  setMsg(G.enemy.name,'の攻撃！','var(--danger)');
+function showDmgAt(elId,amount,cls,label){const fld=document.getElementById('battle-field');const el=document.getElementById(elId);const d=document.createElement('div');d.className='dmg-num '+cls;d.textContent=(label||'')+amount;const rect=el?{left:el.offsetLeft+10,top:el.offsetTop+5}:{left:100,top:40};d.style.left=rect.left+'px';d.style.top=rect.top+'px';d.style.bottom='auto';fld.appendChild(d);setTimeout(()=>d.remove(),1000);}
+
+// ============ 敵の行動 ============
+function enemyAct(e,done){
+  if(!e.alive){done();return;}
+  // 回復役の雑魚
+  if(e.roleType==='zako_heal'){const hurt=aliveEnemies().filter(x=>x.curhp<x.maxhp).sort((a,b)=>a.curhp/a.maxhp-b.curhp/b.maxhp)[0];if(hurt){const heal=Math.round(hurt.maxhp*0.18);hurt.curhp=Math.min(hurt.maxhp,hurt.curhp+heal);setMsg(e.name,'が仲間を回復！💚','#ff8c8c');const ei=G.enemies.indexOf(hurt);showDmgAt('enemy-unit-'+ei,heal,'heal','+');renderBattle();setTimeout(done,800);return;}}
+  // ボス必殺（3ターンに1回。bossUltTimerはnewRoundで管理）
+  if(e.isBoss&&e.actions>1&&G.bossUltReady){G.bossUltReady=false;bossUltimate(e,done);return;}
+  // 通常攻撃：挑発持ちを優先的に狙う
+  const taunters=aliveParty().filter(c=>hasStatus(c,'tauntself'));
+  const target=taunters.length?taunters[0]:aliveParty()[Math.floor(Math.random()*aliveParty().length)];
+  if(!target){done();return;}
+  setMsg(e.name,'の攻撃！','var(--danger)');
   setTimeout(()=>{
-    let dmg=Math.max(1,G.enemy.atk+Math.floor(Math.random()*8)-target.def);
-    if(G.defending[target.id])dmg=Math.round(dmg*0.4);
-    target.hp-=dmg;sfx('hit');fxFlash();
+    let dmg=Math.max(1,effAtk(e)+Math.floor(Math.random()*6)-Math.round(effDef(target)*0.4));
+    if(target.guardReduce>0)dmg=Math.round(dmg*(1-target.guardReduce/100));
+    if(target.awakened)dmg=Math.round(dmg*0.34); // 真・開発者は3割しか食らわない
+    target.hp-=dmg;target._dmgTaken=(target._dmgTaken||0)+dmg;
+    sfx('hit');fxFlash();
     const el=document.getElementById('char-'+target.id);if(el){el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');}
-    if(typeof attackEffect==='function'){const estar=Math.min(9,Math.ceil((G.enemy.atk||15)/4));attackEffect(estar,'hiniku',target.id);}
-    showDmg('self',target,dmg,'normal','');
-    const hv=VOICE[target.id].hit;
-    if(target.hp<=0){target.hp=0;target.alive=false;setMsg(target.name,'は沈黙してしまった…','var(--muted)');}
-    else setMsg(target.name,hv[Math.floor(Math.random()*hv.length)],target.color);
-    G.defending={};renderBattle();
-    setTimeout(()=>{if(aliveParty().length===0){loseBattle();return;}G.turnIdx=0;startPlayerTurn();},1000);
+    if(typeof attackEffect==='function'){const es=Math.min(6,Math.ceil(effAtk(e)/5));attackEffect(es,'hiniku','char'+target.id);}
+    showDmgAt('char-'+target.id,dmg,'normal','');
+    // かえるパッシブ：被弾でカウンターデバフ
+    if(target.id==='frog'&&Math.random()<0.4){applyStatus(e,'weak',2,25);}
+    if(target.hp<=0){if(!target._guarded&&Math.random()<0.25){target.hp=1;target._guarded=true;setMsg(target.name,'は気合いでHP1で耐えた…！🔥','#FFD700');}else{target.hp=0;target.alive=false;setMsg(target.name,'は沈黙した…','var(--muted)');}}
+    renderBattle();
+    setTimeout(()=>{if(aliveParty().length===0){loseBattle();return;}done();},800);
+  },600);
+}
+function bossUltimate(e,done){
+  const fx=ULT_FX[e.ultFx]||ULT_FX.slam;
+  setMsg(e.name,`の必殺技『${e.ult}』！${e.ultEmoji}`,'#FFD700');
+  if(fx.flash)fxFlash();
+  setTimeout(()=>{
+    if(fx.shake)fxShake();
+    bossUltEffect(fx.parts,e.ultEmoji);sfx('ult');
+    setTimeout(()=>{
+      aliveParty().forEach(target=>{
+        let dmg=Math.max(1,Math.round(effAtk(e)*1.6)-Math.round(effDef(target)*0.5));
+        if(target.guardReduce>0)dmg=Math.round(dmg*(1-target.guardReduce/100));
+        if(target.awakened)dmg=Math.round(dmg*0.34);
+        target.hp-=dmg;target._dmgTaken=(target._dmgTaken||0)+dmg;
+        const el=document.getElementById('char-'+target.id);if(el){el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');}
+        showDmgAt('char-'+target.id,dmg,'crit','');
+        if(target.hp<=0){if(!target._guarded&&Math.random()<0.3){target.hp=1;target._guarded=true;}else{target.hp=0;target.alive=false;}}
+      });
+      setMsg('','全体に大ダメージ！','var(--danger)');renderBattle();
+      setTimeout(()=>{if(aliveParty().length===0){loseBattle();return;}done();},1000);
+    },700);
   },700);
 }
+function bossUltEffect(parts,mainEmoji){const fld=document.getElementById('battle-field');if(!fld)return;const main=document.createElement('div');main.textContent=mainEmoji;main.style.cssText='position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);font-size:90px;z-index:7;pointer-events:none;animation:fxBig 1s ease-out forwards';fld.appendChild(main);setTimeout(()=>main.remove(),1000);for(let i=0;i<18;i++){const p=document.createElement('div');p.textContent=parts[i%parts.length];const a=Math.random()*Math.PI*2,d=80+Math.random()*150;p.style.cssText=`position:absolute;left:50%;top:45%;font-size:${18+Math.random()*16}px;z-index:7;pointer-events:none;--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px;animation:partBurst 1s ease-out forwards`;fld.appendChild(p);setTimeout(()=>p.remove(),1050);}}
 
-// ============ WIN / LOSE ============
+// ============ 長押し詳細ウィンドウ ============
+let lpTimer2=null;
+function showUnitDetail(ev,side,key){if(ev&&ev.preventDefault)ev.preventDefault();openUnitDetail(side,key);return false;}
+function openUnitDetail(side,key){
+  let u,desc,passives=[],roleLabel='',weakLabel='';
+  if(side==='ally'){u=G.party.find(c=>c.id===key);desc=CHAR_DESC[u.awakened?'shin':u.id];roleLabel=ROLE_INFO[u.roleType].icon+ROLE_INFO[u.roleType].name;
+    const pid=u.awakened?['shin1','shin2','shin3','shin4']:[u.id];pid.forEach(p=>{if(PASSIVES[p])passives.push([PASSIVES[p].icon+' '+PASSIVES[p].name,PASSIVES[p].desc]);});}
+  else{u=G.enemies[key];if(!u)return;
+    if(u.isBoss){const bp=BOSS_PASSIVES[ENEMIES[G.enemyIdx].id]||[];bp.forEach(p=>passives.push(['👹 '+p[0],p[1]]));desc=ENEMY_DESC[ENEMIES[G.enemyIdx].id]||'';weakLabel='弱点：'+(ATTR[u.weak]?ATTR[u.weak].n:'?');roleLabel='ボス';}
+    else{desc=ZAKO_DESC[u.name]||'';roleLabel='雑魚'+(u.roleType==='zako_heal'?'（回復役）':u.roleType==='zako_def'?'（盾役）':'');weakLabel='弱点：'+(ATTR[u.weak]?ATTR[u.weak].n:'?');}}
+  const hp=u.hp!==undefined?u.hp:u.curhp;
+  // ステータス変動表示
+  const baseAtk=u.atk||0,curAtk=effAtk(u),baseDef=u.def||0,curDef=effDef(u),baseSpd=u.spd||10,curSpd=effSpd(u);
+  const diff=(b,c)=>c>b?`<span style="color:#c8f060">↑${c}</span>`:c<b?`<span style="color:#ff9dc0">↓${c}</span>`:`${c}`;
+  const statusTags=(u.statuses||[]).map(s=>{const d=STATUS_DEFS[s.id];if(!d)return '';const col=d.type==='buff'?'#1a3a1a':'#3a1a1a';const tc=d.type==='buff'?'#c8f060':'#ff9dc0';return `<span style="background:${col};color:${tc};padding:2px 7px;border-radius:4px;font-size:9px;margin:2px">${d.icon}${d.name}</span>`;}).join('');
+  const passHtml=passives.map(p=>`<div style="margin-bottom:6px"><div style="font-size:11px;font-weight:700;color:#FFD700">${p[0]}</div><div style="font-size:10px;color:#aaa;line-height:1.4">${p[1]}</div></div>`).join('');
+  document.getElementById('unit-detail-body').innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <div style="font-size:44px">${u.emoji}</div>
+      <div><div style="font-size:16px;font-weight:800;color:${side==='ally'?(u.color||'#fff'):'#ff6b6b'}">${u.name}</div><div style="font-size:10px;color:#888">${roleLabel}${weakLabel?' ／ '+weakLabel:''}</div></div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:10px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:0.5px solid var(--border)"><span>HP</span><span style="font-family:'DM Mono',monospace;color:#c8f060">${Math.max(0,hp)} / ${u.maxhp}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:0.5px solid var(--border)"><span>攻撃力</span><span style="font-family:'DM Mono',monospace">${baseAtk} → ${diff(baseAtk,curAtk)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:0.5px solid var(--border)"><span>防御力</span><span style="font-family:'DM Mono',monospace">${baseDef} → ${diff(baseDef,curDef)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0"><span>素早さ</span><span style="font-family:'DM Mono',monospace">${baseSpd} → ${diff(baseSpd,curSpd)}</span></div>
+    </div>
+    ${statusTags?`<div style="margin-bottom:10px">${statusTags}</div>`:''}
+    ${passHtml?`<div style="background:var(--surface2);border-radius:8px;padding:10px;margin-bottom:10px"><div style="font-size:10px;color:#FFD700;margin-bottom:6px">パッシブ</div>${passHtml}</div>`:''}
+    <div style="font-size:10px;line-height:1.7;color:#ccc;background:#0f0f0f;border-radius:8px;padding:10px">${desc}</div>`;
+  document.getElementById('unit-detail-modal').classList.add('show');
+}
+function closeUnitDetail(){document.getElementById('unit-detail-modal').classList.remove('show');}
+// バフデバフ一覧
+function openStatusList(){document.getElementById('status-list-body').innerHTML=statusListHtml();document.getElementById('status-list-modal').classList.add('show');}
+function closeStatusList(){document.getElementById('status-list-modal').classList.remove('show');}
+
+// ============ 勝敗 ============
 function winBattle(){
-  G.battleOver=true;sfx('win');
-  const e=ENEMIES[G.enemyIdx];
-  const reward=unlockNextSkill();
-  // 進捗保存
-  const p=rpgLoad()||{};
-  p.enemyIdx=G.enemyIdx+1;
-  if(!p.defeated)p.defeated=[];
-  if(!p.defeated.includes(e.id))p.defeated.push(e.id);
-  rpgSave(p);
+  if(G.battleOver)return;G.battleOver=true;sfx('win');clearTargets();
+  const e=ENEMIES[G.enemyIdx];const reward=unlockNextSkill();
+  const p=rpgLoad()||{};p.enemyIdx=G.enemyIdx+1;if(!p.defeated)p.defeated=[];if(!p.defeated.includes(e.id))p.defeated.push(e.id);rpgSave(p);
   recordClearForShiftMemo(G.enemyIdx+1);
   const isLast=G.enemyIdx>=ENEMIES.length-1;
   showScreen('result');
   document.getElementById('result-box').innerHTML=`
     <div style="font-size:30px;margin-bottom:8px">${isLast?'🚀':'🎉'}</div>
     <div style="font-size:19px;font-weight:800;color:var(--accent);margin-bottom:8px">${e.name} を論破した！</div>
-    <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:6px">開発者：「これで家賃が…！（${G.enemyIdx+1}/10体目）」</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:6px">（${G.enemyIdx+1}/10体目）</div>
     ${reward?`<div style="background:var(--surface2);border-radius:9px;padding:11px;margin:12px 0;font-size:12px"><div style="color:var(--accent);font-weight:700;margin-bottom:3px">🎁 新ネタ習得！</div>「${reward.ja}」（★${reward.star}）</div>`:''}
-    <div style="font-size:11px;color:var(--frog);margin-bottom:12px">📡 ShiftMemoに進捗を保存しました</div>
     <button class="btn-primary" onclick="afterWin()">${isLast?'▶ 結末へ':'▶ 次へ'}</button>`;
 }
-function afterWin(){
-  const isLast=G.enemyIdx>=ENEMIES.length-1;
-  if(isLast){endChapter();return;}
-  // 次回予告
-  document.getElementById('next-text').textContent=NEXT_PREVIEW[G.enemyIdx]||'次なる敵が待ち受ける…！';
-  showScreen('next');
-}
+function afterWin(){const isLast=G.enemyIdx>=ENEMIES.length-1;if(isLast){endChapter();return;}document.getElementById('next-text').textContent=NEXT_PREVIEW[G.enemyIdx]||'次なる敵が待ち受ける…！';showScreen('next');}
 function afterNext(){G.enemyIdx++;const p=rpgLoad()||{};p.enemyIdx=G.enemyIdx;rpgSave(p);startAdventure();}
-function loseBattle(){
-  G.battleOver=true;sfx('lose');
-  showScreen('result');
-  document.getElementById('result-box').innerHTML=`
-    <div style="font-size:30px;margin-bottom:8px">💀</div>
-    <div style="font-size:19px;font-weight:800;color:var(--danger);margin-bottom:8px">レスバに敗北…</div>
-    <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:6px">開発者：「ぐぬぬ…出直す」</div>
-    <div style="font-size:11px;color:var(--muted);margin:10px 0;line-height:1.6">ヒント：ShiftMemoでレベルを上げると強くなる。敵の弱点属性を狙え！</div>
-    <button class="btn-primary" onclick="startBattle()">▶ もう一度挑戦</button>
-    <button class="btn-primary" style="background:var(--surface2);color:var(--text);margin-top:8px" onclick="showScreen('title')">タイトルへ</button>`;
+function loseBattle(){if(G.battleOver)return;G.battleOver=true;sfx('lose');clearTargets();showScreen('result');document.getElementById('result-box').innerHTML=`<div style="font-size:30px;margin-bottom:8px">💀</div><div style="font-size:19px;font-weight:800;color:var(--danger);margin-bottom:8px">レスバに敗北…</div><div style="font-size:11px;color:var(--muted);margin:10px 0;line-height:1.6">ヒント：ShiftMemoでレベルUP／ねこで回復／かえるで挑発／弱点を狙え！</div><button class="btn-primary" onclick="startBattle()">▶ もう一度挑戦</button><button class="btn-primary" style="background:var(--surface2);color:var(--text);margin-top:8px" onclick="showScreen('title')">タイトルへ</button>`;}
+function endChapter(){showScreen('result');document.getElementById('result-box').innerHTML=`<div style="font-size:34px;margin-bottom:10px">🌌</div><div style="font-size:18px;font-weight:800;color:var(--accent);margin-bottom:10px">第1章 完！ 10体すべて論破！</div><div style="font-size:13px;color:var(--text);line-height:1.8;margin-bottom:8px">観測者を退けた…と思いきや、奴は不敵に笑った。<br>「面白い。だが、本当の宇宙の戦いは“これから”だ」</div><div style="font-size:15px;font-weight:800;color:#FFD700;margin:14px 0">― アップデートに期待 ―</div><button class="btn-primary" onclick="backToShiftMemo()">ShiftMemoに戻る</button><button class="btn-primary" style="background:var(--surface2);color:var(--text);margin-top:8px" onclick="showScreen('title')">タイトルへ</button>`;}
+</script>
+<script>
+// ============ 熱い要素 ============
+
+// ---- ラスボス形態変化 ----
+// 観測者(id10)のみ。HP閾値で第二(66%)・第三(33%)形態へ
+function checkFormChange(e,done){
+  if(!e.isBoss||ENEMIES[G.enemyIdx].id!==10){return false;}
+  const ratio=e.curhp/e.maxhp;
+  if(e.form===1&&ratio<=0.66){e.form=2;doFormChange(e,2,done);return true;}
+  if(e.form===2&&ratio<=0.33){e.form=3;doFormChange(e,3,done);return true;}
+  return false;
 }
-function endChapter(){
-  showScreen('result');
-  document.getElementById('result-box').innerHTML=`
-    <div style="font-size:34px;margin-bottom:10px">🌌</div>
-    <div style="font-size:18px;font-weight:800;color:var(--accent);margin-bottom:10px">第1章 完！ 10体すべて論破！</div>
-    <div style="font-size:13px;color:var(--text);line-height:1.8;margin-bottom:8px">観測者を退けた…と思いきや、奴は不敵に笑った。<br>「面白い。だが、本当の宇宙の戦いは“これから”だ」</div>
-    <div style="font-size:15px;font-weight:800;color:#FFD700;margin:14px 0">― アップデートに期待 ―</div>
-    <div style="font-size:11px;color:var(--frog);margin-bottom:14px">マルチバース存亡をかけた最終決戦は次回実装予定！</div>
-    <button class="btn-primary" onclick="backToShiftMemo()">ShiftMemoに戻る</button>
-    <button class="btn-primary" style="background:var(--surface2);color:var(--text);margin-top:8px" onclick="showScreen('title')">タイトルへ</button>`;
+function doFormChange(e,form,done){
+  G.cinematic=true;
+  if(form===2){
+    e.emoji='👁️‍🗨️';e.name='真・観測者';
+    setMsg(e.name,'「面白い…だが、まだ観測は終わらん」','#FFD700');
+    fxFlash();fxShake();bossUltEffect(['🌀','👁️','💫','⚫'],'👁️‍🗨️');
+    // 第二形態パッシブ付与（表示用フラグ）
+    e.formPassives=FINAL_BOSS_FORMS[2];
+    setTimeout(()=>{setMsg('','観測者が第二形態に変化した！全能力が上昇！','var(--danger)');e.atk=Math.round(e.atk*1.3);renderBattle();G.cinematic=false;done&&done();},1400);
+  }else if(form===3){
+    // 第三形態：覚醒イベントを挟む
+    G.pendingFinalForm={e,done};
+    startAwakening();
+  }
+}
+
+// ---- 開発者の覚醒（第三形態の直前） ----
+function startAwakening(){
+  ADV.lines=AWAKEN_LINES.slice();
+  ADV.idx=0;
+  ADV.afterFn=()=>doAwaken();
+  setupAdvBg('cosmos');
+  showScreen('adv');
+  renderAdvLine();
+}
+function doAwaken(){
+  const dev=G.party.find(c=>c.id==='dev');
+  if(dev){
+    dev.awakened=true;dev.name='真・開発者';dev.emoji='🦸';
+    dev.maxhp=Math.round(dev.maxhp*3);dev.hp=dev.maxhp;
+    dev.def=Math.round(dev.def*3);
+  }
+  // ラスボス第三形態へ
+  const {e}=G.pendingFinalForm||{};
+  if(e){
+    e.emoji='🌌';e.name='全知全能の観測者';
+    e.formPassives=FINAL_BOSS_FORMS[3];
+    e.actions=1; // 最終形態は1回行動
+    e.finalForm=true;
+    e.atk=Math.round(e.atk*1.15);
+  }
+  showScreen('battle');
+  setMsg('真・開発者','「この世界の“面白い”は、俺が守る…！」','#FFD700');
+  renderBattle();
+  G.cinematic=false;
+  const cb=G.pendingFinalForm&&G.pendingFinalForm.done;G.pendingFinalForm=null;
+  setTimeout(()=>{if(cb)cb();else{buildQueue();nextInQueue();}},1400);
+}
+
+// ---- 合体必殺（テンション満タン＆2人以上生存で発動可能） ----
+function canComboUlt(){return G.tension>=100&&aliveParty().length>=2;}
+function cmdComboUlt(){
+  if(!canComboUlt()){toast('合体必殺はテンション満タン＆2人以上で！');return;}
+  closeJokePick&&closeJokePick();
+  G.tension=0;setCmdEnabled(false);
+  const members=aliveParty();
+  const names=members.map(c=>c.name).join('＆');
+  setMsg('','✨合体必殺✨ '+names+'！','#FFD700');
+  fxFlash();fxShake();
+  if(typeof bossUltEffect==='function')bossUltEffect(['🌟','✨','💥','🔥','🌈'],'🌟');
+  sfx('ult');
+  setTimeout(()=>{
+    setMsg('','「フルパーティ・ロースト！！」','#FFD700');
+    // 全体に大ダメージ（人数ぶん威力UP）
+    let totalAtk=members.reduce((s,c)=>s+effAtk(c),0);
+    const dmg=Math.round(totalAtk*1.5);
+    aliveEnemies().forEach(e=>{
+      let d=dmg;const isWeak=false;
+      d=Math.max(1,d-Math.round(effDef(e)*0.2));
+      e.curhp=Math.max(0,e.curhp-d);
+      const ei=G.enemies.indexOf(e);showDmgAt('enemy-unit-'+ei,d,'crit','合体!');
+      const el=document.getElementById('enemy-unit-'+ei);if(el){el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');}
+      if(e.curhp<=0)e.alive=false;
+    });
+    renderBattle();
+    setTimeout(()=>{if(aliveEnemies().length===0){winBattle();return;}afterPlayerAction();},1200);
+  },1400);
+}
+
+// ---- 真の力（☆10ジョーク所持＆ボス戦で解禁される禁断の神ジョーク） ----
+function hasTruePower(){
+  // 装備中に☆10があるか
+  const eq=getEquipped('dev');
+  return eq.some(id=>{const s=getSkill(id);return s&&s.star===10;});
+}
+function cmdTruePower(){
+  if(!hasTruePower()){toast('真の力には☆10ジョークの装備が必要！');return;}
+  setCmdEnabled(false);G.tension=0;
+  setMsg('真・開発者','禁断の神ジョーク——「'+TRUE_POWER_JOKE+'」','#FFD700');
+  fxFlash();fxShake();
+  if(typeof bossUltEffect==='function')bossUltEffect(['🌟','🌈','💫','⚡','🔥'],'🌟');
+  sfx('ult');
+  setTimeout(()=>{
+    const boss=getBoss();
+    if(boss){const d=Math.round((effAtk(G.party.find(c=>c.id==='dev'))+250)*2.5);boss.curhp=Math.max(0,boss.curhp-d);const ei=G.enemies.indexOf(boss);showDmgAt('enemy-unit-'+ei,d,'crit','真の力!');if(boss.curhp<=0)boss.alive=false;}
+    renderBattle();
+    setTimeout(()=>{if(aliveEnemies().length===0){winBattle();return;}afterPlayerAction();},1200);
+  },1400);
+}
+
+// ---- 総力戦（最終決戦で、倒した敵全員が力を貸す：開幕全体バフ） ----
+function applyAlliesSupport(){
+  const p=rpgLoad();
+  const defeated=(p&&p.defeated)?p.defeated.length:0;
+  if(defeated>0&&ENEMIES[G.enemyIdx].id===10){
+    aliveParty().forEach(c=>{applyStatus(c,'atkup',99,Math.min(60,defeated*6));});
+    setMsg('','これまで倒した'+defeated+'体が力を貸してくれた！全員の攻撃力UP！🔥','#FFD700');
+  }
+}
+
+// ---- デバッグ：ラスボス戦からすぐ開始 ----
+function debugLastBoss(){
+  // ジョーク所持・☆10装備・9体撃破済みの状態を一時的に作る
+  const col=smGetCollected();
+  [1,2,3,4,5,21,46,79,130,150].forEach(n=>{if(!col.includes(n))col.push(n);});
+  localStorage.setItem('collected',JSON.stringify(col));
+  const p=rpgLoad()||{};
+  p.enemyIdx=9;p.defeated=[1,2,3,4,5,6,7,8,9];p.initialized=true;
+  if(!p.equipped)p.equipped={};
+  p.equipped.dev=['j150','j130','j79','j46']; // ☆10含む
+  rpgSave(p);
+  G.enemyIdx=9;
+  toast('デバッグ：ラスボス戦開始');
+  setTimeout(()=>startBattle(),400);
 }
 </script>
 <script>
@@ -1304,6 +2094,7 @@ function onSeSlider(v){document.getElementById('set-se-val').textContent=v;setSe
 // ============ アップデート履歴 ============
 function openRpgUpdate(){document.getElementById('rpg-update-modal').classList.add('show');}
 function closeRpgUpdate(){document.getElementById('rpg-update-modal').classList.remove('show');}
+function openTutorial(){showScreen('tutorial');const t=document.getElementById('screen-tutorial');if(t)t.scrollTop=0;}
 
 // ============ 攻撃エフェクト（☆レベル別 絵文字＋2Dアニメ） ============
 // targetSel: 'enemy' か 'self'(被弾キャラのid)
