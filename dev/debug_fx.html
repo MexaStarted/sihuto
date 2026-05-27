@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>演出・会話デバッグ — 開発者の現在</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{background:#07070d;color:#eee;font-family:-apple-system,'Segoe UI',sans-serif}
+  .wrap{max-width:440px;margin:0 auto;padding-bottom:40px}
+  /* ステージ */
+  #stage{position:relative;width:100%;height:300px;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#1a1030,#0a0518 70%,#05030f);border-bottom:1px solid #222}
+  #victim{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:78px;z-index:3;transition:none}
+  #slasher{position:absolute;font-size:52px;z-index:6;opacity:0;pointer-events:none}
+  #fxlayer{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden}
+  #flash{position:absolute;inset:0;z-index:8;background:#fff;opacity:0;pointer-events:none}
+  #cutname{position:absolute;left:50%;bottom:16px;transform:translate(-50%,0);z-index:9;font-size:22px;font-weight:900;opacity:0;white-space:nowrap;pointer-events:none}
+  #cine{position:absolute;inset:0;z-index:20;display:none;background:#000;overflow:hidden}
+  #cine.on{display:block}
+  .cine-talk{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,#000 30%);padding:50px 18px 18px;z-index:30}
+  .cine-spk{font-size:12px;font-weight:800;margin-bottom:6px}
+  .cine-txt{font-size:14px;line-height:1.7;color:#eee;min-height:48px}
+  .cine-emoji{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);font-size:64px;z-index:25}
+  .cine-card{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-size:17px;font-weight:800;color:#fff;letter-spacing:2px;line-height:1.9;padding:0 24px;z-index:30;text-shadow:0 0 12px #6b00b3}
+  .cine-star{position:absolute;border-radius:50%;background:#fff;z-index:22}
+  .cine-end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:35;gap:10px}
+  .cine-end .big{font-size:24px;font-weight:900;color:#b388ff;letter-spacing:6px;text-shadow:0 0 16px #6b00b3}
+  .cine-end .sub{font-size:12px;color:#889;letter-spacing:2px}
+  .cine-skip{position:absolute;right:10px;top:8px;font-size:10px;color:#667;z-index:40}
+  .splitline{position:absolute;left:0;right:0;height:2px;background:#fff;z-index:7;opacity:0;pointer-events:none}
+  /* パネル */
+  .panel{padding:14px}
+  .sec{margin-bottom:18px}
+  .sec h3{font-size:11px;color:#8af;font-weight:700;margin-bottom:8px;letter-spacing:1px;border-left:3px solid #5d9eff;padding-left:8px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+  .abtn{padding:11px 8px;border-radius:9px;font-size:12px;font-weight:700;border:1px solid #2a3450;background:#13141f;color:#cdd;cursor:pointer;text-align:left;transition:.12s;line-height:1.3}
+  .abtn:active{transform:scale(.96)}
+  .abtn.on{border-color:#5d9eff;background:#16213a;color:#bdf}
+  .abtn small{display:block;font-size:8px;color:#778;margin-top:2px}
+  .playbtn{width:100%;padding:14px;border-radius:10px;border:none;background:linear-gradient(135deg,#ff3b5b,#ff6b3b);color:#fff;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px}
+  .playbtn:active{transform:scale(.98)}
+  .slider{margin-bottom:11px}
+  .slider label{display:flex;justify-content:space-between;font-size:11px;color:#aab;margin-bottom:4px}
+  .slider input[type=range]{width:100%;accent-color:#5d9eff}
+  .val{color:#8cf;font-family:monospace}
+  .colorbtns{display:flex;gap:6px;flex-wrap:wrap}
+  .colorbtns div{width:38px;height:28px;border-radius:6px;cursor:pointer;border:2px solid transparent}
+  .colorbtns div.sel{border-color:#fff}
+  .toggle{display:flex;align-items:center;gap:8px;font-size:11px;color:#aab;margin-bottom:10px;cursor:pointer}
+  .toggle .box{width:40px;height:22px;border-radius:11px;background:#2a3450;position:relative;transition:.2s}
+  .toggle .box.on{background:#5d9eff}
+  .toggle .box::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.2s}
+  .toggle .box.on::after{left:20px}
+  #dump{width:100%;background:#0a0a12;border:1px solid #2a3450;color:#7e7;font-family:monospace;font-size:10px;padding:10px;border-radius:8px;white-space:pre-wrap;min-height:60px}
+  textarea{width:100%;background:#0a0a12;border:1px solid #2a3450;color:#eee;border-radius:8px;padding:8px;font-size:12px;font-family:inherit;resize:vertical}
+  .tinybtn{padding:8px 14px;border-radius:7px;border:1px solid #2a3450;background:#13141f;color:#cdd;font-size:11px;cursor:pointer}
+  /* 会話劇テスト */
+  #advbox{position:relative;background:linear-gradient(#0d1424,#0a0818);border:1px solid #2a3450;border-radius:12px;padding:14px;margin-top:8px;min-height:90px}
+  #adv-speaker{font-size:12px;font-weight:800;color:#5de5ff;margin-bottom:6px}
+  #adv-text{font-size:13px;line-height:1.7;min-height:44px}
+  #adv-tap{position:absolute;right:12px;bottom:8px;font-size:10px;color:#5de5ff;opacity:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="stage">
+    <div id="fxlayer"></div>
+    <div id="victim">🐸</div>
+    <div id="slasher">🧑‍🎨</div>
+    <div id="flash"></div>
+    <div id="cutname"></div>
+    <div id="cine"></div>
+  </div>
+
+  <div class="panel">
+    <div class="sec">
+      <h3>特殊演出：博士の死（第3話）</h3>
+      <button class="playbtn" style="background:linear-gradient(135deg,#8b0000,#3a0000)" onclick="playDeath()">☠ 博士の死シーンを再生</button>
+      <div style="font-size:9px;color:#778;line-height:1.5">痙攣→全身流血→体の歪み→崩落→静寂。victim絵文字を🧑‍🔬等にして確認。</div>
+    </div>
+    <div class="sec">
+      <h3>特殊演出：エンディング（Season2結末）</h3>
+      <button class="playbtn" style="background:linear-gradient(135deg,#3a1a6a,#0a0518)" onclick="playEnding()">🌌 エンディング・シネマティックを再生</button>
+      <div style="font-size:9px;color:#778;line-height:1.5">会話→ピエンターズ登場→フラッシュ→宇宙消滅→タイプライター状況説明→宇宙が次々消滅→END。約40秒。タップでスキップ可。</div>
+    </div>
+    <div class="sec">
+      <h3>斬殺アニメ 10案（タップで選択）</h3>
+      <div class="grid" id="anim-grid"></div>
+    </div>
+
+    <button class="playbtn" onclick="playSlash()">▶ 再生</button>
+
+    <div class="sec">
+      <h3>カスタマイズ</h3>
+      <div class="slider"><label>速度（再生の速さ） <span class="val" id="vSpeed">1.0</span></label><input type="range" id="sSpeed" min="0.3" max="2" step="0.1" value="1"></div>
+      <div class="slider"><label>斬撃の本数 <span class="val" id="vCount">5</span></label><input type="range" id="sCount" min="1" max="12" step="1" value="5"></div>
+      <div class="slider"><label>フラッシュ強さ <span class="val" id="vFlash">0.9</span></label><input type="range" id="sFlash" min="0" max="1" step="0.05" value="0.9"></div>
+      <div class="slider"><label>画面シェイク <span class="val" id="vShake">1.0</span></label><input type="range" id="sShake" min="0" max="2" step="0.1" value="1"></div>
+      <div class="sec" style="margin-bottom:8px"><label style="font-size:11px;color:#aab">斬撃の色</label>
+        <div class="colorbtns" id="colorBtns" style="margin-top:6px">
+          <div data-c="#ffffff" style="background:#ffffff" class="sel"></div>
+          <div data-c="#5de5ff" style="background:#5de5ff"></div>
+          <div data-c="#ff3b3b" style="background:#ff3b3b"></div>
+          <div data-c="#FFD700" style="background:#FFD700"></div>
+          <div data-c="#b388ff" style="background:#b388ff"></div>
+          <div data-c="#5dca8a" style="background:#5dca8a"></div>
+        </div>
+      </div>
+      <div class="toggle" onclick="toggleSlow()"><div class="box on" id="slowBox"></div><span>スロー演出（決めの瞬間にスロー）</span></div>
+      <div class="toggle" onclick="toggleName()"><div class="box on" id="nameBox"></div><span>技名を表示</span></div>
+      <div class="slider"><label>victim（斬られ役）の絵文字</label></div>
+      <div class="colorbtns" style="margin-bottom:8px">
+        <button class="tinybtn" onclick="setVictim('🐸')">🐸</button>
+        <button class="tinybtn" onclick="setVictim('👹')">👹</button>
+        <button class="tinybtn" onclick="setVictim('🧟')">🧟</button>
+        <button class="tinybtn" onclick="setVictim('👾')">👾</button>
+        <button class="tinybtn" onclick="setVictim('🧑‍🔬')">🧑‍🔬</button>
+        <button class="tinybtn" onclick="setVictim('👨‍🔬')">👨‍🔬</button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h3>現在の設定値（本番反映用）</h3>
+      <div id="dump"></div>
+    </div>
+
+    <div class="sec">
+      <h3>会話劇テスト（タイプライター＋感情）</h3>
+      <textarea id="adv-input" rows="3">殺してくれ……みんな……。僕が、僕である間に……！</textarea>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <button class="tinybtn" onclick="testAdv('かえる','#5dca8a')">かえるで再生</button>
+        <button class="tinybtn" onclick="testAdv('☆1レビュアー','#c8b0ff')">レビュアーで再生</button>
+      </div>
+      <div id="advbox">
+        <div id="adv-speaker">かえる</div>
+        <div id="adv-text"></div>
+        <div id="adv-tap">▼</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ 斬殺アニメ 10案 ============
+const ANIMS=[
+  {id:'issen',name:'① 一閃',desc:'横一文字・画面割れ'},
+  {id:'iai',name:'② 居合抜刀',desc:'静→一瞬の抜刀→遅れて斬'},
+  {id:'star',name:'③ 星屑の刃',desc:'無数の★が降り刻む'},
+  {id:'cross',name:'④ 十字斬り',desc:'縦横2連で十字'},
+  {id:'midare',name:'⑤ 乱れ斬り',desc:'高速多段→決めの一太刀'},
+  {id:'judge',name:'⑥ 評価の断罪',desc:'★☆☆☆☆が刃に'},
+  {id:'fall',name:'⑦ 落下斬り',desc:'急降下して両断'},
+  {id:'afterimage',name:'⑧ 残像斬り',desc:'分身が一斉に'},
+  {id:'blood',name:'⑨ 抜刀・血しぶき',desc:'リアル寄り・赤'},
+  {id:'silence',name:'⑩ 沈黙の一刀',desc:'無音→間→静かに崩落'}
+];
+let curAnim='iai';
+const cfg={speed:1,count:5,flash:0.9,shake:1,color:'#ffffff',slow:true,showName:true,victim:'🐸'};
+
+const stage=document.getElementById('stage'),fx=document.getElementById('fxlayer'),
+  victim=document.getElementById('victim'),slasher=document.getElementById('slasher'),
+  flash=document.getElementById('flash'),cutname=document.getElementById('cutname');
+
+function buildGrid(){
+  document.getElementById('anim-grid').innerHTML=ANIMS.map(a=>
+    `<div class="abtn ${a.id===curAnim?'on':''}" data-id="${a.id}" onclick="selAnim('${a.id}')">${a.name}<small>${a.desc}</small></div>`).join('');
+}
+function selAnim(id){curAnim=id;buildGrid();updateDump();playSlash();}
+
+// ===== ユーティリティ =====
+const D=(ms)=>ms/cfg.speed;
+function clearFx(){fx.innerHTML='';cutname.style.animation='';cutname.style.opacity='0';flash.style.animation='';flash.style.opacity='0';victim.style.animation='';victim.style.transform='translate(-50%,-50%)';victim.style.opacity='1';slasher.style.animation='';slasher.style.opacity='0';stage.style.animation='';}
+function doFlash(amt,dur,delay){flash.animate([{opacity:0},{opacity:amt},{opacity:0}],{duration:D(dur),delay:D(delay||0),easing:'ease-out'});}
+function doShake(power,dur){if(cfg.shake<=0)return;const p=power*cfg.shake;let frames=[];for(let i=0;i<8;i++)frames.push({transform:`translate(${(Math.random()*2-1)*p}px,${(Math.random()*2-1)*p}px)`});frames.push({transform:'translate(0,0)'});stage.animate(frames,{duration:D(dur)});}
+function slowZoom(){if(!cfg.slow)return;stage.animate([{filter:'brightness(1)'},{filter:'brightness(1.4)'},{filter:'brightness(1)'}],{duration:D(500)});}
+function showName(txt){if(!cfg.showName)return;cutname.textContent=txt;cutname.style.color=cfg.color==='#ffffff'?'#fff':cfg.color;cutname.style.textShadow=`0 0 16px ${cfg.color}`;cutname.animate([{opacity:0,transform:'translate(-50%,0) scale(2)',letterSpacing:'12px'},{opacity:1,transform:'translate(-50%,0) scale(1)',letterSpacing:'2px'},{opacity:1},{opacity:0}],{duration:D(1400),easing:'ease-out'});}
+function victimHit(){victim.animate([{transform:'translate(-50%,-50%)'},{transform:'translate(-52%,-50%) rotate(-3deg)'},{transform:'translate(-50%,-50%)'}],{duration:D(300)});}
+function victimFall(delay){setTimeout(()=>{victim.animate([{transform:'translate(-50%,-50%) rotate(0)',opacity:1},{transform:'translate(-50%,-30%) rotate(80deg)',opacity:0.3}],{duration:D(800),fill:'forwards',easing:'ease-in'});},D(delay));}
+function slashLine(angle,delay,len){
+  const d=document.createElement('div');
+  d.style.cssText=`position:absolute;left:50%;top:50%;width:${len||140}%;height:3px;background:linear-gradient(90deg,transparent,${cfg.color},transparent);transform:translate(-50%,-50%) rotate(${angle}deg) scaleX(0);box-shadow:0 0 12px ${cfg.color};transform-origin:center`;
+  fx.appendChild(d);
+  d.animate([{transform:`translate(-50%,-50%) rotate(${angle}deg) scaleX(0)`,opacity:0},{transform:`translate(-50%,-50%) rotate(${angle}deg) scaleX(1)`,opacity:1,offset:0.3},{transform:`translate(-50%,-50%) rotate(${angle}deg) scaleX(1)`,opacity:1,offset:0.7},{transform:`translate(-50%,-50%) rotate(${angle}deg) scaleX(0)`,opacity:0}],{duration:D(500),delay:D(delay||0),easing:'ease-out'});
+  setTimeout(()=>d.remove(),D((delay||0)+600));
+}
+function flySlasher(fromX,toX,y,dur,delay){
+  slasher.style.top=y+'%';
+  slasher.animate([{left:fromX+'%',opacity:0},{left:(fromX+(toX-fromX)*0.3)+'%',opacity:1,offset:0.2},{left:(fromX+(toX-fromX)*0.7)+'%',opacity:1,offset:0.6},{left:toX+'%',opacity:0}],{duration:D(dur),delay:D(delay||0),easing:'cubic-bezier(.2,0,.3,1)'});
+}
+function spawnParticle(txt,x,y,dx,dy,dur,delay,size){
+  const d=document.createElement('div');d.textContent=txt;
+  d.style.cssText=`position:absolute;left:${x}%;top:${y}%;font-size:${size||20}px;color:${cfg.color};z-index:6;transform:translate(-50%,-50%)`;
+  fx.appendChild(d);
+  d.animate([{transform:`translate(-50%,-50%) scale(0)`,opacity:0},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(1.2)`,opacity:1,offset:0.4},{transform:`translate(calc(-50% + ${dx*1.5}px),calc(-50% + ${dy*1.5}px)) scale(1)`,opacity:0}],{duration:D(dur),delay:D(delay||0),easing:'ease-out'});
+  setTimeout(()=>d.remove(),D((delay||0)+dur));
+}
+
+// ===== 各アニメ本体 =====
+function playSlash(){
+  clearFx();
+  const A=curAnim,n=cfg.count;
+  if(A==='issen'){
+    slowZoom();
+    flySlasher(-20,120,50,700,200);
+    setTimeout(()=>{slashLine(0,0,160);doFlash(cfg.flash,300);doShake(8,400);victimHit();},D(700));
+    setTimeout(()=>{const s=document.createElement('div');s.className='splitline';s.style.top='50%';s.style.opacity='1';s.style.background=cfg.color;fx.appendChild(s);s.animate([{transform:'scaleX(0)'},{transform:'scaleX(1)'}],{duration:D(200)});},D(720));
+    victimFall(1000);showName('一閃');
+  }
+  else if(A==='iai'){
+    // 静かに構え→一瞬の抜刀→背後→遅れて斬
+    slasher.style.top='50%';slasher.style.left='15%';
+    slasher.animate([{opacity:0},{opacity:1}],{duration:D(400),fill:'forwards'});
+    setTimeout(()=>{slowZoom();flySlasher(15,85,50,260,0);},D(600));
+    setTimeout(()=>{slasher.style.left='85%';slasher.animate([{opacity:1},{opacity:1}],{duration:D(400),fill:'forwards'});},D(870));
+    setTimeout(()=>{slashLine(8,0,150);doFlash(cfg.flash,250);doShake(6,300);victimHit();},D(1150));
+    victimFall(1500);showName('居合・抜刀');
+  }
+  else if(A==='star'){
+    for(let i=0;i<n+5;i++){const ang=Math.random()*360;spawnParticle('★',50,50,Math.cos(ang*Math.PI/180)*80,Math.sin(ang*Math.PI/180)*80,700,i*60,12+Math.random()*14);}
+    for(let i=0;i<n;i++)slashLine(Math.random()*180,i*70,120);
+    setTimeout(()=>{spawnParticle('★',50,50,0,0,600,0,80);doFlash(cfg.flash,300);doShake(7,400);victimHit();},D(n*70+200));
+    victimFall(n*70+700);showName('星屑の刃');
+  }
+  else if(A==='cross'){
+    slowZoom();flySlasher(-15,115,40,600,100);
+    setTimeout(()=>{slashLine(45,0,150);doShake(5,250);},D(650));
+    setTimeout(()=>{slashLine(-45,0,150);doFlash(cfg.flash,300);doShake(7,350);victimHit();},D(950));
+    setTimeout(()=>{spawnParticle('✚',50,50,0,0,500,0,60);},D(1000));
+    victimFall(1300);showName('十字斬り');
+  }
+  else if(A==='midare'){
+    for(let i=0;i<n;i++){const fromL=i%2===0;flySlasher(fromL?-15:115,fromL?115:-15,30+Math.random()*40,300,i*110);slashLine(Math.random()*120-60,i*110+80,140);doShake(3,150);}
+    setTimeout(()=>{slowZoom();slashLine(0,0,170);doFlash(cfg.flash,350);doShake(9,450);victimHit();},D(n*110+200));
+    victimFall(n*110+700);showName('乱れ斬り');
+  }
+  else if(A==='judge'){
+    // ★☆☆☆☆が浮かんで刃になる
+    const r=document.createElement('div');r.innerHTML='★<span style="opacity:.3">☆☆☆☆</span>';
+    r.style.cssText=`position:absolute;left:50%;top:30%;transform:translate(-50%,-50%);font-size:34px;color:${cfg.color};z-index:6;text-shadow:0 0 12px ${cfg.color}`;
+    fx.appendChild(r);
+    r.animate([{opacity:0,transform:'translate(-50%,-50%) scale(2)'},{opacity:1,transform:'translate(-50%,-50%) scale(1)'}],{duration:D(500),fill:'forwards'});
+    setTimeout(()=>{slowZoom();r.animate([{top:'30%'},{top:'50%'}],{duration:D(200),fill:'forwards'});slashLine(0,0,150);doFlash(cfg.flash,300);doShake(7,400);victimHit();},D(800));
+    setTimeout(()=>{spawnParticle('★',50,50,0,0,500,0,70);},D(900));
+    victimFall(1200);showName('評価の断罪');
+  }
+  else if(A==='fall'){
+    slasher.style.left='50%';
+    slasher.animate([{top:'-20%',opacity:0},{top:'20%',opacity:1,offset:0.3},{top:'48%',opacity:1,offset:0.7},{top:'120%',opacity:0}],{duration:D(600),delay:D(200),easing:'cubic-bezier(.4,0,.6,1)'});
+    setTimeout(()=>{slowZoom();slashLine(90,0,150);doFlash(cfg.flash,300);doShake(9,450);victimHit();},D(680));
+    victimFall(1000);showName('落下斬り');
+  }
+  else if(A==='afterimage'){
+    for(let i=0;i<n;i++){const d=document.createElement('div');d.textContent='🧑‍🎨';d.style.cssText=`position:absolute;top:50%;font-size:44px;z-index:6;opacity:${0.3+0.5*(i/n)};transform:translate(-50%,-50%)`;fx.appendChild(d);const fromX=-10+i*(130/n);d.animate([{left:fromX+'%',opacity:0},{left:'50%',opacity:0.6,offset:0.5},{left:'110%',opacity:0}],{duration:D(700),delay:D(i*50),easing:'ease-out'});setTimeout(()=>d.remove(),D(i*50+750));slashLine(Math.random()*60-30,i*50+100,130);}
+    setTimeout(()=>{slowZoom();doFlash(cfg.flash,350);doShake(8,450);victimHit();},D(n*50+300));
+    victimFall(n*50+700);showName('残像斬り');
+  }
+  else if(A==='blood'){
+    slowZoom();flySlasher(-15,115,48,500,150);
+    setTimeout(()=>{slashLine(12,0,150);doFlash(cfg.flash*0.7,250);doShake(8,400);victimHit();
+      for(let i=0;i<n+6;i++){const ang=-30+Math.random()*240;spawnParticle('●',50,50,Math.cos(ang*Math.PI/180)*70,Math.sin(ang*Math.PI/180)*70,600,Math.random()*100,6+Math.random()*8);}
+    },D(600));
+    // 血は赤固定
+    victimFall(1000);showName('抜刀');
+  }
+  else if(A==='silence'){
+    // 無音・間・静かに崩落
+    slasher.style.top='50%';slasher.style.left='20%';
+    slasher.animate([{opacity:0},{opacity:1}],{duration:D(600),fill:'forwards'});
+    setTimeout(()=>{flySlasher(20,80,50,500,0);},D(900));
+    setTimeout(()=>{slasher.style.left='80%';slasher.animate([{opacity:1}],{fill:'forwards'});},D(1300));
+    // 長い間
+    setTimeout(()=>{slowZoom();slashLine(5,0,150);victimHit();},D(2100));
+    victimFall(2400);showName('沈黙の一刀');
+  }
+  updateDump();
+}
+
+// ===== カスタマイズ =====
+function bindS(id,key,disp){const el=document.getElementById(id);el.addEventListener('input',()=>{cfg[key]=parseFloat(el.value);document.getElementById(disp).textContent=el.value;updateDump();});}
+bindS('sSpeed','speed','vSpeed');bindS('sCount','count','vCount');bindS('sFlash','flash','vFlash');bindS('sShake','shake','vShake');
+document.querySelectorAll('#colorBtns div').forEach(d=>d.addEventListener('click',()=>{document.querySelectorAll('#colorBtns div').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');cfg.color=d.dataset.c;updateDump();}));
+function toggleSlow(){cfg.slow=!cfg.slow;document.getElementById('slowBox').classList.toggle('on',cfg.slow);updateDump();}
+function toggleName(){cfg.showName=!cfg.showName;document.getElementById('nameBox').classList.toggle('on',cfg.showName);updateDump();}
+function setVictim(e){cfg.victim=e;victim.textContent=e;}
+function updateDump(){document.getElementById('dump').textContent=`anim: ${curAnim}\nspeed: ${cfg.speed}\ncount: ${cfg.count}\nflash: ${cfg.flash}\nshake: ${cfg.shake}\ncolor: ${cfg.color}\nslow: ${cfg.slow}\nshowName: ${cfg.showName}`;}
+
+// ===== 会話劇テスト =====
+let advTyping=false,advTimer=null;
+function testAdv(name,color){
+  const txt=document.getElementById('adv-input').value;
+  document.getElementById('adv-speaker').textContent=name;
+  document.getElementById('adv-speaker').style.color=color;
+  const el=document.getElementById('adv-text'),tap=document.getElementById('adv-tap');
+  let emote='talk';
+  if(/[！!]{2,}|殺/.test(txt))emote='shout';else if(/[！!]/.test(txt))emote='excited';else if(/[？?]/.test(txt))emote='question';else if(/[…。]$|なぜ|くっ/.test(txt))emote='sad';
+  if(emote==='shout'){const f=document.createElement('div');f.style.cssText='position:absolute;inset:0;background:radial-gradient(circle,#fff3,transparent 60%);';document.getElementById('advbox').appendChild(f);setTimeout(()=>f.remove(),400);}
+  el.textContent='';tap.style.opacity='0';if(advTimer)clearTimeout(advTimer);
+  const speed=emote==='shout'?16:emote==='sad'?50:32;let i=0;
+  (function step(){if(i>=txt.length){tap.style.opacity='1';return;}el.textContent+=txt[i];i++;advTimer=setTimeout(step,speed);})();
+}
+
+// ===== 特殊演出：博士の死 =====
+function playDeath(){
+  clearFx();
+  const v=victim;
+  // フェーズ1：異変（小刻みな痙攣）
+  v.animate([{transform:'translate(-50%,-50%)'},{transform:'translate(-50.5%,-50%)'},{transform:'translate(-49.5%,-50%)'},{transform:'translate(-50%,-50%)'}],{duration:D(120),iterations:6});
+  // 不穏な赤い明滅
+  setTimeout(()=>{doFlash(0.25,400,0,'#3a0000');},D(200));
+  // フェーズ2：全身から流血（毛穴・目・口）
+  setTimeout(()=>{
+    doShake(4,600);
+    for(let i=0;i<24;i++){const ang=Math.random()*360;const dist=20+Math.random()*60;spawnParticle('●',50,48,Math.cos(ang*Math.PI/180)*dist,Math.sin(ang*Math.PI/180)*dist,700,i*30,5+Math.random()*7,'#8b0000');}
+    // 目・口からの噴出
+    for(let i=0;i<10;i++){spawnParticle('💧',50,46,(Math.random()*2-1)*20,30+Math.random()*30,800,i*40,10+Math.random()*6,'#b30000');}
+    v.animate([{filter:'brightness(1)'},{filter:'brightness(.8) sepia(1) hue-rotate(-50deg) saturate(4)'}],{duration:D(800),fill:'forwards'});
+  },D(700));
+  // フェーズ3：体の歪み（捻じ曲がる・伸びる）
+  setTimeout(()=>{
+    doShake(6,800);
+    v.animate([
+      {transform:'translate(-50%,-50%) scale(1,1) rotate(0)'},
+      {transform:'translate(-50%,-50%) scale(1.2,.8) skewX(15deg) rotate(-8deg)'},
+      {transform:'translate(-50%,-50%) scale(.7,1.4) skewX(-20deg) rotate(12deg)'},
+      {transform:'translate(-50%,-50%) scale(1.3,.6) skewY(15deg) rotate(-15deg)'},
+      {transform:'translate(-50%,-48%) scale(.5,1.6) skewX(25deg) rotate(20deg)'}
+    ],{duration:D(1100),fill:'forwards',easing:'cubic-bezier(.7,0,.3,1)'});
+    // さらに血しぶき
+    for(let i=0;i<30;i++){const ang=Math.random()*360;const dist=40+Math.random()*90;spawnParticle('●',50,48,Math.cos(ang*Math.PI/180)*dist,Math.sin(ang*Math.PI/180)*dist,900,i*25,4+Math.random()*9,'#8b0000');}
+  },D(1700));
+  // フェーズ4：崩落（潰れて落ちる）＋赤黒フラッシュ
+  setTimeout(()=>{
+    doFlash(0.9,300,0,'#5a0000');doShake(10,400);
+    v.animate([{transform:'translate(-50%,-48%) scale(.5,1.6) skewX(25deg) rotate(20deg)',opacity:1},{transform:'translate(-50%,-20%) scale(1.4,.2) rotate(80deg)',opacity:0.2},{transform:'translate(-50%,0%) scale(1.6,.08) rotate(95deg)',opacity:0}],{duration:D(700),fill:'forwards',easing:'cubic-bezier(.6,0,.9,.2)'});
+    // 飛び散る大量の血
+    for(let i=0;i<40;i++){const ang=Math.random()*360;const dist=60+Math.random()*120;spawnParticle('●',50,55,Math.cos(ang*Math.PI/180)*dist,Math.abs(Math.sin(ang*Math.PI/180)*dist),800,Math.random()*120,5+Math.random()*10,'#8b0000');}
+  },D(2900));
+  // フェーズ5：暗転→静寂（無音の間）
+  setTimeout(()=>{
+    const dark=document.createElement('div');dark.style.cssText='position:absolute;inset:0;background:#000;opacity:0;z-index:9';fx.appendChild(dark);
+    dark.animate([{opacity:0},{opacity:1}],{duration:D(600),fill:'forwards'});
+  },D(3700));
+  // 静寂の一拍ののち、技名ならぬ「沈黙」
+  setTimeout(()=>{
+    if(cfg.showName){cutname.textContent='';cutname.style.opacity='0';}
+  },D(4400));
+}
+
+// ===== エンディング・シネマティック（Season2結末） =====
+let cineTimers=[],cineSkip=false,abTimer=null,abState=null;
+function cineClear(){cineTimers.forEach(t=>clearTimeout(t));cineTimers=[];if(abTimer){clearInterval(abTimer);abTimer=null;}if(abState)abState.dead=true;}
+function CT(fn,delay){const t=setTimeout(fn,delay);cineTimers.push(t);return t;}
+function playEnding(){
+  cineClear();cineSkip=false;
+  const c=document.getElementById('cine');c.className='on';c.innerHTML='<div class="cine-skip">タップでスキップ →</div>';
+  c.onclick=()=>{cineClear();c.className='';c.innerHTML='';c.onclick=null;};
+  // 会話パート（タイプライター）
+  const talks=[
+    {s:'開発者',c:'#5d9eff',e:'🦸',t:'はぁっ…はぁっ…。終わった…のか？'},
+    {s:'☆1レビュアー',c:'#c8b0ff',e:'🧑‍🎨',t:'…いや。まだ動いてる。あいつ、また“進化”しようとしてる。'},
+    {s:'サーモン握り',c:'#ff7b9b',e:'🍣',t:'ウソでしょ！？ 無限に強くなんの、アイツ！！'},
+    {s:'？？？',c:'#ff3b3b',e:'🤡',t:'——ふふっ。つまらないなぁ、ソレ。'},
+    {s:'ピエンターズ',c:'#ff3b3b',e:'🤡',t:'消えていいよ。きみも、きみの宇宙も、ぜんぶ。'},
+    {s:'ウォッチャー',c:'#b388ff',e:'👁️‍🗨️',t:'——逃げろ。こっちだ、早く来い…！！この宇宙は、もう保たない！'}
+  ];
+  let d=0;
+  talks.forEach((tk,i)=>{
+    CT(()=>{cineShowTalk(tk);},d);
+    d+=2600;
+  });
+  // フラッシュ→宇宙消滅
+  CT(()=>{cineFlash();},d);d+=900;
+  CT(()=>{cineCard('アース1995 — 消滅しました。');cineCollapse(1);},d);d+=3200;
+  // 別視点へ
+  // 別視点へ：オートバトル背景を起動してから会話
+  CT(()=>{cineCard('アース20065');},d);d+=2000;
+  CT(()=>{cineStartAutoBattle();},d-200);
+  CT(()=>{cineShowTalk({s:'開発者(20065)',c:'#5d9eff',e:'🧑‍💻',t:'虚無め…！ ここで食い止める…！'});},d);d+=2600;
+  CT(()=>{cineShowTalk({s:'ねこ(20065)',c:'#e5b85d',e:'🐱',t:'こいつ、なんて数だ…！ キリがねぇ！'});},d);d+=2600;
+  CT(()=>{cineShowTalk({s:'ピエンターズ',c:'#ff3b3b',e:'🤡',t:'みーつけた。'});},d);d+=1800;
+  CT(()=>{cineStopAutoBattle();},d-100);
+  CT(()=>{cineFlash();cineCard('アース20065 — 消滅しました。');cineCollapse(2);},d);d+=3200;
+  // 宇宙が次々消える＋タイプライター状況説明
+  const cards=[
+    'ピエンターズの侵食は、止まらない。',
+    'ひとつ、またひとつ。宇宙が、消えていく。',
+    '時間軸が。因果が。可能性そのものが——',
+    '無かったことに、されていく。',
+    'そして——',
+    '全ての時間軸、全ての宇宙、全ての次元の',
+    '99%が、消滅した。'
+  ];
+  CT(()=>{cineStarfield();},d);
+  cards.forEach((tx,i)=>{CT(()=>{cineCard(tx);if(i%2===0)cineCollapse(3);},d);d+=2600;});
+  // END
+  CT(()=>{cineEnd();},d);
+}
+function cineShowTalk(tk){
+  const c=document.getElementById('cine');
+  // 既存のtalk/cardを消す
+  c.querySelectorAll('.cine-talk,.cine-emoji,.cine-card').forEach(e=>e.remove());
+  const em=document.createElement('div');em.className='cine-emoji';em.textContent=tk.e;c.appendChild(em);
+  const box=document.createElement('div');box.className='cine-talk';
+  box.innerHTML=`<div class="cine-spk" style="color:${tk.c}">${tk.s}</div><div class="cine-txt"></div>`;
+  c.appendChild(box);
+  // タイプライター
+  const el=box.querySelector('.cine-txt');let i=0;
+  (function step(){if(cineSkip||!el.isConnected)return;if(i>=tk.t.length)return;el.textContent+=tk.t[i];i++;CT(step,34);})();
+}
+function cineFlash(){const c=document.getElementById('cine');const f=document.createElement('div');f.style.cssText='position:absolute;inset:0;background:#fff;z-index:40';c.appendChild(f);f.animate([{opacity:0},{opacity:1},{opacity:0}],{duration:700});setTimeout(()=>f.remove(),700);}
+function cineCard(txt){
+  const c=document.getElementById('cine');
+  c.querySelectorAll('.cine-talk,.cine-emoji,.cine-card').forEach(e=>e.remove());
+  const d=document.createElement('div');d.className='cine-card';c.appendChild(d);
+  let i=0;(function step(){if(cineSkip||!d.isConnected)return;if(i>=txt.length)return;d.textContent+=txt[i];i++;CT(step,46);})();
+}
+function cineStarfield(){const c=document.getElementById('cine');for(let i=0;i<50;i++){const s=document.createElement('div');s.className='cine-star';const sz=Math.random()*2+1;s.style.width=sz+'px';s.style.height=sz+'px';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.opacity=Math.random();c.appendChild(s);}}
+function cineCollapse(n){
+  // 宇宙（円）が消滅する演出
+  const c=document.getElementById('cine');
+  for(let k=0;k<3;k++){CT(()=>{
+    const g=document.createElement('div');const x=Math.random()*80+10,y=Math.random()*60+20,sz=20+Math.random()*40;
+    g.style.cssText=`position:absolute;left:${x}%;top:${y}%;width:${sz}px;height:${sz}px;border-radius:50%;background:radial-gradient(circle,#5d9eff,#1a0a3a);z-index:23;transform:translate(-50%,-50%)`;
+    c.appendChild(g);
+    g.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:.8},{transform:'translate(-50%,-50%) scale(1.4)',opacity:1,offset:.3},{transform:'translate(-50%,-50%) scale(0)',opacity:0}],{duration:900});
+    const fl=document.createElement('div');fl.style.cssText=`position:absolute;left:${x}%;top:${y}%;width:4px;height:4px;border-radius:50%;background:#fff;box-shadow:0 0 30px 12px #fff;z-index:24;transform:translate(-50%,-50%);opacity:0`;c.appendChild(fl);
+    fl.animate([{opacity:0},{opacity:1,offset:.4},{opacity:0}],{duration:900,delay:600});
+    setTimeout(()=>{g.remove();fl.remove();},1600);
+  },k*300);}
+}
+function cineEnd(){
+  const c=document.getElementById('cine');
+  c.querySelectorAll('.cine-talk,.cine-emoji,.cine-card').forEach(e=>e.remove());
+  const e=document.createElement('div');e.className='cine-end';
+  e.innerHTML='<div class="big">SEASON.2 END</div><div class="sub">残されたのは、1%。</div>';
+  c.appendChild(e);
+  e.animate([{opacity:0},{opacity:1}],{duration:1500,fill:'forwards'});
+}
+
+// ===== エンディング内オートバトル背景 =====
+function cineStartAutoBattle(){
+  const c=document.getElementById('cine');
+  const bg=document.createElement('div');bg.id='ab-bg';
+  bg.style.cssText='position:absolute;inset:0;z-index:21;background:radial-gradient(ellipse at 50% 35%,#0a1828,#06101c 70%,#040a14)';
+  bg.innerHTML=`
+    <div id="ab-enemy" style="position:absolute;left:50%;top:24%;transform:translate(-50%,-50%);font-size:66px">🕳️</div>
+    <div id="ab-ehp" style="position:absolute;left:50%;top:11%;transform:translateX(-50%);width:150px;height:7px;background:#2a0a0a;border-radius:4px;overflow:hidden;border:1px solid #500"><div id="ab-ehpf" style="height:100%;width:80%;background:linear-gradient(90deg,#e44,#f66)"></div></div>
+    <div id="ab-allies" style="position:absolute;left:0;right:0;bottom:30%;display:flex;justify-content:center;gap:26px"></div>
+    <div id="ab-fx" style="position:absolute;inset:0;pointer-events:none"></div>`;
+  c.insertBefore(bg,c.firstChild.nextSibling);
+  const al=bg.querySelector('#ab-allies');
+  ['🧑‍💻','🐱','🐸','👽'].forEach((e,i)=>{const d=document.createElement('div');d.className='ab-ally';d.dataset.i=i;d.style.cssText='font-size:36px;transition:transform .2s;filter:drop-shadow(0 2px 3px #000)';d.textContent=e;al.appendChild(d);});
+  abState={ehp:80,turn:0,dead:false};
+  const allies=[...bg.querySelectorAll('.ab-ally')];
+  const efx=bg.querySelector('#ab-fx');
+  const enemy=bg.querySelector('#ab-enemy'),ehpf=bg.querySelector('#ab-ehpf');
+  // 1体ずつ順番に。攻撃は「動く→斬撃1本→ダメージ1個」だけ。控えめに。
+  function oneDmg(val,col){const p=document.createElement('div');p.textContent=val;p.style.cssText=`position:absolute;left:50%;top:20%;font-weight:900;font-family:monospace;font-size:18px;color:${col};text-shadow:1px 1px 2px #000;z-index:26;transform:translate(-50%,-50%)`;efx.appendChild(p);p.animate([{transform:'translate(-50%,-50%) scale(.7)',opacity:0},{transform:'translate(-50%,-110%) scale(1)',opacity:1,offset:.4},{transform:'translate(-50%,-170%) scale(.9)',opacity:0}],{duration:800});setTimeout(()=>p.remove(),820);}
+  function oneSlash(){const s=document.createElement('div');s.style.cssText=`position:absolute;left:50%;top:24%;width:70px;height:3px;background:linear-gradient(90deg,transparent,#fff,transparent);transform:translate(-50%,-50%) rotate(-30deg);z-index:25;box-shadow:0 0 8px #8cf`;efx.appendChild(s);s.animate([{opacity:0,transform:'translate(-50%,-50%) rotate(-30deg) scaleX(0)'},{opacity:1,transform:'translate(-50%,-50%) rotate(-30deg) scaleX(1)'},{opacity:0}],{duration:400});setTimeout(()=>s.remove(),420);}
+  abTimer=setInterval(()=>{
+    if(!abState||abState.dead||!bg.isConnected)return;
+    const i=abState.turn%4;abState.turn++;
+    const ally=allies[i];if(!ally)return;
+    // 攻撃する味方だけ少し大きく光って前進
+    ally.animate([{transform:'translateY(0) scale(1)',filter:'drop-shadow(0 2px 3px #000)'},{transform:'translateY(-14px) scale(1.2)',filter:'drop-shadow(0 0 8px #8cf)'},{transform:'translateY(0) scale(1)',filter:'drop-shadow(0 2px 3px #000)'}],{duration:600});
+    setTimeout(()=>{oneSlash();oneDmg((Math.floor(Math.random()*9)+1)+','+(Math.floor(Math.random()*900)+100)+',000','#ffe8a0');enemy.animate([{transform:'translate(-50%,-50%)'},{transform:'translate(-53%,-50%)'},{transform:'translate(-50%,-50%)'}],{duration:250});abState.ehp-=4;if(abState.ehp<20)abState.ehp=80;ehpf.style.width=abState.ehp+'%';},300);
+  },1400); // ゆっくりにして見やすく
+}
+function cineStopAutoBattle(){
+  if(abState)abState.dead=true;
+  if(abTimer){clearInterval(abTimer);abTimer=null;}
+  const bg=document.getElementById('ab-bg');
+  if(bg){
+    // 全滅演出：味方が一斉に倒れる
+    bg.querySelectorAll('.ab-ally').forEach((a,i)=>{setTimeout(()=>{a.animate([{transform:'translateY(0) rotate(0)',opacity:1},{transform:'translateY(20px) rotate(90deg)',opacity:0}],{duration:500,fill:'forwards'});},i*120);});
+    const fx=bg.querySelector('#ab-fx');if(fx){const f=document.createElement('div');f.style.cssText='position:absolute;inset:0;background:#ff3b3b;opacity:0;z-index:27';fx.appendChild(f);f.animate([{opacity:0},{opacity:.6},{opacity:0}],{duration:600});}
+    setTimeout(()=>{if(bg.isConnected)bg.animate([{opacity:1},{opacity:0}],{duration:600,fill:'forwards'});},700);
+  }
+}
+
+buildGrid();updateDump();setVictim('🐸');
+</script>
+</body>
+</html>

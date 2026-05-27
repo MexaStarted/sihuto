@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>マルチバース英雄召喚デバッグ — 開発者の現在</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{background:#07060f;color:#eee;font-family:-apple-system,'Segoe UI',sans-serif}
+  .wrap{max-width:460px;margin:0 auto;padding-bottom:40px}
+  .top{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #1a1a2a;position:sticky;top:0;background:#07060f;z-index:30}
+  .top h1{font-size:14px;font-weight:800;color:#c8a0ff;letter-spacing:1px}
+  .coins{margin-left:auto;font-size:13px;font-weight:800;color:#FFD700;font-family:monospace}
+  .panel{padding:16px}
+  .btnrow{display:flex;gap:10px;margin-bottom:14px}
+  .gbtn{flex:1;padding:16px 8px;border-radius:12px;border:none;font-size:14px;font-weight:800;cursor:pointer;color:#fff;line-height:1.4}
+  .gbtn small{display:block;font-size:10px;opacity:.85;margin-top:3px;font-weight:600}
+  .g1{background:linear-gradient(135deg,#5d9eff,#3a5bff)}
+  .g10{background:linear-gradient(135deg,#c8a0ff,#7a3bff)}
+  .gbtn:active{transform:scale(.97)}
+  .gbtn:disabled{opacity:.4;cursor:not-allowed}
+  .util{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .ubtn{padding:9px 14px;border-radius:8px;border:1px solid #2a2a40;background:#13121f;color:#aab;font-size:11px;cursor:pointer}
+  .rates{font-size:10px;color:#778;line-height:1.7;background:#0d0c18;border-radius:8px;padding:10px;margin-bottom:8px}
+  h3{font-size:11px;color:#8af;margin:14px 0 8px;letter-spacing:1px}
+  /* コレクション */
+  .coll{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .citem{aspect-ratio:1;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:24px;border:1.5px solid #222;background:#100f1c;position:relative}
+  .citem.owned{border-color:#3a3a55}
+  .citem.miss{opacity:.25;font-size:18px}
+  .citem .dup{position:absolute;bottom:1px;right:3px;font-size:8px;color:#FFD700;font-weight:800}
+  .cn{font-size:6px;color:#99a;margin-top:1px;text-align:center;line-height:1;padding:0 1px;overflow:hidden;max-height:12px}
+  /* 召喚オーバーレイ */
+  #sum{position:fixed;inset:0;z-index:100;display:none;background:radial-gradient(ellipse at 50% 45%,#0a0a1e,#03020a 75%)}
+  #sum.on{display:block}
+  #sum-sky{position:absolute;inset:0;overflow:hidden}
+  .sgrain{position:absolute;left:50%;top:-6%;width:9px;height:13px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:linear-gradient(#fff,#ffe);box-shadow:0 0 10px #fff;transform:translateX(-50%)}
+  .segg{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);font-size:60px;z-index:5}
+  .shero{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%) scale(0);z-index:6;text-align:center}
+  .shero .he{font-size:84px;filter:drop-shadow(0 0 16px currentColor)}
+  .shero .hn{font-size:15px;font-weight:900;margin-top:4px}
+  .shero .hr{font-size:11px;font-weight:800;letter-spacing:2px}
+  .shero .hd{font-size:9px;color:#bbc;margin-top:4px;max-width:240px;margin-left:auto;margin-right:auto;line-height:1.4}
+  .sburst{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:4;pointer-events:none}
+  #sum-next{position:absolute;bottom:18px;left:0;right:0;text-align:center;font-size:11px;color:#aab;z-index:9;animation:blink 1.1s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+  #sum-prog{position:absolute;top:10px;right:14px;font-size:11px;color:#889;z-index:9;font-family:monospace}
+  /* 10連結果 */
+  #res{position:fixed;inset:0;z-index:90;display:none;background:rgba(3,2,10,.96);overflow-y:auto;padding:50px 14px 20px}
+  #res.on{display:block}
+  .resgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:440px;margin:0 auto}
+  .rcard{aspect-ratio:.8;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:30px;border:2px solid;position:relative;animation:rpop .4s ease-out both}
+  @keyframes rpop{0%{transform:scale(0) rotate(-20deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+  .rcard .rn{font-size:7px;margin-top:2px;color:#ccd;text-align:center;line-height:1.1;padding:0 2px}
+  .rcard .rNew{position:absolute;top:2px;left:3px;font-size:7px;color:#ff5b6b;font-weight:900}
+  #res-close{display:block;margin:18px auto 0;padding:12px 30px;border-radius:10px;border:none;background:#5d9eff;color:#fff;font-weight:800;font-size:14px;cursor:pointer}
+  #res-title{text-align:center;font-size:14px;font-weight:800;color:#c8a0ff;margin-bottom:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span style="font-size:18px">🍣</span>
+    <h1>マルチバース英雄召喚</h1>
+    <span class="coins" id="coin-disp">🪙 0</span>
+  </div>
+  <div class="panel">
+    <div class="rates" id="rates"></div>
+    <div class="btnrow">
+      <button class="gbtn g1" id="b1" onclick="pull(1)">召喚<small>100コイン ×1</small></button>
+      <button class="gbtn g10" id="b10" onclick="pull(10)">10連召喚<small>1000コイン ×10</small></button>
+    </div>
+    <div class="util">
+      <button class="ubtn" onclick="addCoins(1000)">＋1000コイン（デバッグ）</button>
+      <button class="ubtn" onclick="resetColl()">コレクション全消去</button>
+    </div>
+    <h3 id="coll-title">コレクション 0 / 100</h3>
+    <div class="coll" id="coll"></div>
+  </div>
+</div>
+
+<div id="sum">
+  <div id="sum-sky"></div>
+  <div id="sum-prog"></div>
+  <div id="sum-next">タップで進む ▶</div>
+</div>
+
+<div id="res">
+  <div id="res-title">10連 召喚結果</div>
+  <div class="resgrid" id="res-grid"></div>
+  <button id="res-close" onclick="closeRes()">とじる</button>
+</div>
+
+<script>
+// ============ キャラガチャ 100種データ（5話クリアで解放） ============
+// role: attacker/tank/healer/buffer/debuffer/trickster
+// rarity: N/R/SR/SSR/UR  (URの一部=ゲーム破壊級はpassives3つ)
+// passive: 通常1つ。最高レア級のみ配列で3つ。
+const GACHA_CHARS=[
+// ---------- N（ノーマル）24体：軽いネタ枠 ----------
+{id:'g001',emoji:'🍙',name:'おにぎり侍',role:'attacker',rarity:'N',desc:'握られて生まれた米の剣士。具は日替わり。',passive:['梅干しの酸味','攻撃時、低確率で相手をひるませる']},
+{id:'g002',emoji:'🧹',name:'ホウキ魔女見習い',role:'buffer',rarity:'N',desc:'まだ宙に浮けない。掃除はうまい。',passive:['お掃除','戦闘開始時、味方の状態異常を1つ消す']},
+{id:'g003',emoji:'🗿',name:'モアイ',role:'tank',rarity:'N',desc:'動かない。ただそこに在る。',passive:['不動','防御力が少し高いが素早さが最低']},
+{id:'g004',emoji:'☕',name:'カフェイン中毒',role:'attacker',rarity:'N',desc:'徹夜明けのエンジニア。手が震えてる。',passive:['覚醒のカフェイン','素早さが上がるが、たまに自滅で被弾']},
+{id:'g005',emoji:'🧦',name:'片方の靴下',role:'trickster',rarity:'N',desc:'相方はもういない。乾燥機に消えた。',passive:['行方不明','低確率で敵の攻撃を完全回避']},
+{id:'g006',emoji:'🪨',name:'ただの石',role:'tank',rarity:'N',desc:'石である。それ以上でも以下でもない。',passive:['石である','被ダメージをわずかに軽減']},
+{id:'g007',emoji:'🧅',name:'タマネギ戦士',role:'debuffer',rarity:'N',desc:'切ると皆を泣かせる。本人も泣いてる。',passive:['催涙','攻撃時、相手の命中をわずかに下げる']},
+{id:'g008',emoji:'📎',name:'クリップ精霊',role:'buffer',rarity:'N',desc:'「何かお困りですか？」絶妙にうざい。',passive:['おせっかい','毎ターン味方1人をわずかに回復']},
+{id:'g009',emoji:'🧻',name:'トイレットペーパー',role:'healer',rarity:'N',desc:'いざという時に限って切れている。',passive:['ロールの安心','回復量が少し上がる']},
+{id:'g010',emoji:'🪣',name:'バケツ',role:'tank',rarity:'N',desc:'かぶると無敵な気がする。気がするだけ。',passive:['かぶる','1度だけ被ダメージを半減']},
+{id:'g011',emoji:'🧽',name:'スポンジ',role:'tank',rarity:'N',desc:'攻撃を吸う。そして汚れる。',passive:['吸収','受けたダメージの一部をテンションに変換']},
+{id:'g012',emoji:'🕯️',name:'ロウソク',role:'attacker',rarity:'N',desc:'燃え尽きるまでが勝負。短い。',passive:['灯火','HPが減るほど攻撃が上がる']},
+{id:'g013',emoji:'🧊',name:'氷',role:'debuffer',rarity:'N',desc:'すぐ溶ける。だが冷たい。',passive:['冷却','攻撃時、低確率で相手の素早さ低下']},
+{id:'g014',emoji:'🪤',name:'ネズミ捕り',role:'trickster',rarity:'N',desc:'誰かがかかるのを待っている。',passive:['罠','反撃ダメージが少し上がる']},
+{id:'g015',emoji:'🧶',name:'毛糸玉',role:'healer',rarity:'N',desc:'ねこに狙われがち。ほどけがち。',passive:['ほっこり','回復時、低確率で多めに回復']},
+{id:'g016',emoji:'🔨',name:'金槌くん',role:'attacker',rarity:'N',desc:'全ての問題は釘に見える。',passive:['打ちつけ','単体攻撃のダメージが少し上がる']},
+{id:'g017',emoji:'🧃',name:'紙パックジュース',role:'healer',rarity:'N',desc:'最後のひと吸いがうるさい。',passive:['水分補給','味方のHPをわずかに回復']},
+{id:'g018',emoji:'🪥',name:'歯ブラシ戦士',role:'debuffer',rarity:'N',desc:'磨きすぎて毛先が開いている。',passive:['ゴシゴシ','相手の防御を少し削る']},
+{id:'g019',emoji:'🧯',name:'消火器',role:'tank',rarity:'N',desc:'炎上案件に強い。普段は隅にいる。',passive:['鎮火','炎・継続ダメージを軽減']},
+{id:'g020',emoji:'📌',name:'画びょう',role:'trickster',rarity:'N',desc:'踏むと痛い。それが全て。',passive:['不意打ち','先制時にダメージ上昇']},
+{id:'g021',emoji:'🧤',name:'軍手',role:'tank',rarity:'N',desc:'働き者の証。すぐ穴があく。',passive:['作業','かばった時の被ダメージを軽減']},
+{id:'g022',emoji:'🪫',name:'低電池',role:'debuffer',rarity:'N',desc:'残り1%。いつ落ちるか分からない。',passive:['省エネ','たまに行動不能だが消費テンションが低い']},
+{id:'g023',emoji:'🧷',name:'安全ピン',role:'healer',rarity:'N',desc:'とりあえず留めておく応急処置。',passive:['応急','瀕死の味方を少し回復']},
+{id:'g024',emoji:'🪙',name:'拾った10円',role:'buffer',rarity:'N',desc:'なんだか縁起がいい気がする。',passive:['幸運の10円','低確率で報酬コインが増える']},
+
+// ---------- R（レア）28体 ----------
+{id:'g025',emoji:'🍣',name:'マグロ握り',role:'tank',rarity:'R',desc:'サーモンの兄貴分。赤身一筋。',passive:['赤身の意地','HPが高いほど防御が上がる']},
+{id:'g026',emoji:'🦑',name:'イカ墨忍者',role:'trickster',rarity:'R',desc:'墨で姿を隠す。手がベタベタ。',passive:['煙幕','被弾後1ターン回避率上昇']},
+{id:'g027',emoji:'🐙',name:'タコ社長',role:'buffer',rarity:'R',desc:'8本の手で全部仕事を回す。残業の鬼。',passive:['八面六臂','味方全体の素早さを少し上げる']},
+{id:'g028',emoji:'🍤',name:'エビフライ拳士',role:'attacker',rarity:'R',desc:'サクサクの衣に拳を隠す。',passive:['サクサク連撃','攻撃が低確率で2回ヒット']},
+{id:'g029',emoji:'🥷',name:'下忍',role:'attacker',rarity:'R',desc:'まだ中忍になれない。努力家。',passive:['手裏剣','単体に追加の小ダメージ']},
+{id:'g030',emoji:'🧞',name:'ランプの精',role:'buffer',rarity:'R',desc:'願いは3つまで。だいたい1つ目で揉める。',passive:['願いの力','戦闘開始時、味方1人を強化']},
+{id:'g031',emoji:'🐉',name:'子竜',role:'attacker',rarity:'R',desc:'まだ火を吹けない。煙だけ出る。',passive:['火吹き練習','低確率で全体に小ダメージ']},
+{id:'g032',emoji:'🧛',name:'吸血鬼バイト',role:'attacker',rarity:'R',desc:'昼間は冷凍倉庫で働いている。',passive:['吸血','与ダメージの一部を回復']},
+{id:'g033',emoji:'🧟',name:'元気なゾンビ',role:'tank',rarity:'R',desc:'感染してないが憧れてゾンビのフリ。',passive:['しぶとい','HP0になっても低確率で踏ん張る']},
+{id:'g034',emoji:'👻',name:'恥ずかしがり幽霊',role:'trickster',rarity:'R',desc:'怖がらせたいのに照れて隠れる。',passive:['すり抜け','物理攻撃を低確率で無効']},
+{id:'g035',emoji:'🤖',name:'お掃除ロボ',role:'tank',rarity:'R',desc:'段差で詰む。健気に働く。',passive:['自動修復','毎ターンHPをわずかに回復']},
+{id:'g036',emoji:'👽',name:'観光客の宇宙人',role:'buffer',rarity:'R',desc:'地球が初めて。写真を撮りまくる。',passive:['未知の技術','味方の攻撃を少し底上げ']},
+{id:'g037',emoji:'🦖',name:'リストラ恐竜',role:'attacker',rarity:'R',desc:'隕石で職を失った。再就職活動中。',passive:['絶滅の意地','HP半分以下で攻撃大幅上昇']},
+{id:'g038',emoji:'🧜',name:'人魚',role:'healer',rarity:'R',desc:'歌で癒す。音痴ではない。',passive:['癒しの歌','毎ターン味方全体を小回復']},
+{id:'g039',emoji:'🦂',name:'サソリ刺客',role:'debuffer',rarity:'R',desc:'尻尾の毒が自慢。背中はかゆい。',passive:['猛毒','攻撃時、相手を毒状態にする']},
+{id:'g040',emoji:'🐍',name:'巻きつき蛇',role:'debuffer',rarity:'R',desc:'抱きしめてくる。力加減を知らない。',passive:['締めつけ','相手の行動を低確率で封じる']},
+{id:'g041',emoji:'🦉',name:'夜勤フクロウ',role:'buffer',rarity:'R',desc:'昼は使い物にならない。賢い。',passive:['知恵','味方の命中とクリ率を上げる']},
+{id:'g042',emoji:'🐝',name:'働きバチ',role:'attacker',rarity:'R',desc:'今日もノルマがある。社畜の鑑。',passive:['一刺し','攻撃後、低確率で自分も少し削れる代わり大ダメージ']},
+{id:'g043',emoji:'🦀',name:'カニ将軍',role:'tank',rarity:'R',desc:'横にしか進めない名将。',passive:['甲羅','正面からのダメージを軽減']},
+{id:'g044',emoji:'🍄',name:'キノコ仙人',role:'healer',rarity:'R',desc:'食べると伸びるか死ぬか。賭け。',passive:['胞子','回復時、低確率で味方を強化']},
+{id:'g045',emoji:'🧊',name:'氷の剣士',role:'attacker',rarity:'R',desc:'g013が修行して剣を持った姿。',passive:['氷結の刃','攻撃時、相手の素早さを下げる']},
+{id:'g046',emoji:'🪕',name:'吟遊詩人',role:'buffer',rarity:'R',desc:'戦いを歌にする。長い曲は嫌われる。',passive:['戦いの歌','味方全体のテンションを上げる']},
+{id:'g047',emoji:'🦊',name:'詐欺師ギツネ',role:'trickster',rarity:'R',desc:'油揚げで人を釣る。憎めない。',passive:['化かし','低確率で敵の攻撃対象を逸らす']},
+{id:'g048',emoji:'🐺',name:'一匹狼',role:'attacker',rarity:'R',desc:'群れない。寂しくなんかない。たぶん。',passive:['孤高','味方が少ないほど攻撃が上がる']},
+{id:'g049',emoji:'🦔',name:'ハリネズミ',role:'tank',rarity:'R',desc:'丸まると無敵。普段は臆病。',passive:['針防御','被弾時に反撃ダメージ']},
+{id:'g050',emoji:'🐢',name:'万年亀',role:'tank',rarity:'R',desc:'1万年生きている。気が長い。',passive:['長寿','最大HPが上昇']},
+{id:'g051',emoji:'🧨',name:'導火線くん',role:'attacker',rarity:'R',desc:'短気。すぐ着火する。',passive:['爆発四散','撃破時、隣の敵にもダメージ']},
+{id:'g052',emoji:'🪬',name:'お守り',role:'buffer',rarity:'R',desc:'神社で買った。効果は…信じる心次第。',passive:['加護','味方の状態異常耐性を上げる']},
+
+// ---------- SR（スーパーレア）26体 ----------
+{id:'g053',emoji:'🍱',name:'幕の内弁当',role:'buffer',rarity:'SR',desc:'バランス栄養満点。全部ちょっとずつ強い。',passive:['彩り','味方全体の全能力をわずかに底上げ']},
+{id:'g054',emoji:'🐲',name:'成竜',role:'attacker',rarity:'SR',desc:'子竜が成長した姿。ついに火を吹く。',passive:['竜の業火','全体に中ダメージ＋低確率で火傷']},
+{id:'g055',emoji:'🧙',name:'大魔導士',role:'attacker',rarity:'SR',desc:'呪文が長い。詠唱中に殴られがち。',passive:['大魔法','テンション満タン時、必殺の威力大幅up']},
+{id:'g056',emoji:'⚔️',name:'聖騎士',role:'tank',rarity:'SR',desc:'正義感が強い。融通は利かない。',passive:['聖盾','味方をかばい、被ダメージを大きく軽減']},
+{id:'g057',emoji:'🏹',name:'狙撃手エルフ',role:'attacker',rarity:'SR',desc:'千里先の的を射る。近距離は苦手。',passive:['必中の矢','攻撃が必ず命中し、防御を一部無視']},
+{id:'g058',emoji:'💉',name:'戦場の医師',role:'healer',rarity:'SR',desc:'どんな傷も縫う。麻酔はケチる。',passive:['救命処置','瀕死の味方を大きく回復']},
+{id:'g059',emoji:'🦅',name:'蒼天の鷹',role:'attacker',rarity:'SR',desc:'空の覇者。地上を見下している。',passive:['急降下','先制で大ダメージを与えやすい']},
+{id:'g060',emoji:'🐅',name:'白虎',role:'attacker',rarity:'SR',desc:'西を守る霊獣。プライドが高い。',passive:['虎の牙','クリティカル時のダメージが大幅増']},
+{id:'g061',emoji:'🐉',name:'青龍',role:'buffer',rarity:'SR',desc:'東を守る霊獣。雨を呼ぶ。',passive:['昇竜の風','味方全体の素早さと攻撃を上げる']},
+{id:'g062',emoji:'🦚',name:'孔雀明王',role:'debuffer',rarity:'SR',desc:'毒すら喰らう美の化身。',passive:['毒喰らい','敵の強化を打ち消し、毒を反射']},
+{id:'g063',emoji:'🧝',name:'森の女王',role:'healer',rarity:'SR',desc:'自然を操る。人間嫌い。',passive:['生命の祝福','毎ターン味方全体を中回復']},
+{id:'g064',emoji:'🗡️',name:'二刀の剣豪',role:'attacker',rarity:'SR',desc:'流派は自己流。我流が最強と信じる。',passive:['二刀流','攻撃が必ず2回ヒットする']},
+{id:'g065',emoji:'🛡️',name:'重装兵',role:'tank',rarity:'SR',desc:'動きは遅いが鉄壁。',passive:['鉄壁','一定値以下のダメージを完全カット']},
+{id:'g066',emoji:'🔮',name:'占い師',role:'debuffer',rarity:'SR',desc:'未来が見える。自分の未来は見えない。',passive:['予言','敵の必殺を低確率で不発にする']},
+{id:'g067',emoji:'⚡',name:'雷神の使い',role:'attacker',rarity:'SR',desc:'スピード狂。落雷より速い。',passive:['迅雷','必ず先制し、素早さが極めて高い']},
+{id:'g068',emoji:'🔥',name:'炎の舞姫',role:'attacker',rarity:'SR',desc:'踊りながら焼き尽くす。',passive:['業炎の舞','攻撃時、相手を火傷にし継続ダメージ']},
+{id:'g069',emoji:'❄️',name:'氷雪の女王',role:'debuffer',rarity:'SR',desc:'触れるもの全てを凍らせる。心も。',passive:['絶対零度','攻撃時、低確率で相手を行動不能']},
+{id:'g070',emoji:'🌊',name:'海神の巫女',role:'healer',rarity:'SR',desc:'潮の満ち引きで力が変わる。',passive:['潮癒し','HPが低い味方ほど大きく回復']},
+{id:'g071',emoji:'🦁',name:'獣王',role:'buffer',rarity:'SR',desc:'百獣の王。たてがみが自慢。',passive:['王の咆哮','戦闘開始時、味方全体の攻撃を大up']},
+{id:'g072',emoji:'🐊',name:'鰐の傭兵',role:'tank',rarity:'SR',desc:'金で動く。だが裏切らない。',passive:['噛みつき','かばうと同時に相手へ反撃']},
+{id:'g073',emoji:'🦇',name:'夜の支配者',role:'attacker',rarity:'SR',desc:'闇に紛れて急所を狙う。',passive:['闇討ち','夜（ターン経過）が進むほど与ダメージ増']},
+{id:'g074',emoji:'🎭',name:'仮面の役者',role:'trickster',rarity:'SR',desc:'本当の顔を誰も知らない。',passive:['擬態','戦闘中、味方1人の能力をコピー']},
+{id:'g075',emoji:'🧚',name:'妖精の長',role:'buffer',rarity:'SR',desc:'小さいが古い。森の記憶を持つ。',passive:['妖精の輪','味方全体に毎ターン少量の再生']},
+{id:'g076',emoji:'🐎',name:'天馬の騎士',role:'attacker',rarity:'SR',desc:'空を駆ける。地に足がつかない性格。',passive:['天翔ける','回避率が高く、回避後に反撃']},
+{id:'g077',emoji:'🪦',name:'墓守の死霊術師',role:'debuffer',rarity:'SR',desc:'死者と語る。生者とは語らない。',passive:['呪詛','敵全体に毎ターン継続ダメージ']},
+{id:'g078',emoji:'🎸',name:'ロックの魂',role:'buffer',rarity:'SR',desc:'魂のギターで仲間を鼓舞する。',passive:['ライブ','味方全体のテンションを毎ターン上昇']},
+
+// ---------- SSR（スーパースペシャルレア）16体 ----------
+{id:'g079',emoji:'🐱',name:'覚醒ねこ',role:'healer',rarity:'SSR',desc:'改造を受け入れ、真の力に目覚めたねこ。仲間想いは変わらない。',passive:['九生の癒し','毎ターン味方全体を大回復＋状態異常を1つ解除']},
+{id:'g080',emoji:'🧑‍🎨',name:'解放された批評家',role:'debuffer',rarity:'SSR',desc:'酷評の呪いを力に変えた☆1レビュアーの覚醒形。',passive:['星0の宣告','攻撃時、相手の全能力を大きく下げる']},
+{id:'g081',emoji:'🍣',name:'極・サーモン握り',role:'tank',rarity:'SSR',desc:'復讐を超え、世界を守る盾となったサーモン。',passive:['絶対防壁','味方全体をかばい、致死ダメージをHP1で耐える']},
+{id:'g082',emoji:'🐸',name:'記憶のかえる',role:'tank',rarity:'SSR',desc:'戦死したかえるを、仲間の記憶から再構成した幻影。本物ではない。だが、確かにかえるだ。',passive:['想いの盾','味方が倒れそうな時、必ずかばう。HPが高い']},
+{id:'g083',emoji:'👑',name:'星詠みの王',role:'buffer',rarity:'SSR',desc:'融合前の巨人の王、その在りし日の姿。',passive:['星の祝福','味方全体の全能力を大幅に底上げ']},
+{id:'g084',emoji:'🐦‍⬛',name:'終焉を告げる鴉',role:'attacker',rarity:'SSR',desc:'滅びの前にだけ現れるという。',passive:['終焉の predict','敵のHPが低いほど与ダメージが激増']},
+{id:'g085',emoji:'🦂',name:'砂漠の女帝',role:'debuffer',rarity:'SSR',desc:'毒と幻で砂漠を支配した女王。',passive:['女帝の毒','敵全体を猛毒にし、毒の相手に追加ダメージ']},
+{id:'g086',emoji:'🗿',name:'目覚めしモアイ',role:'tank',rarity:'SSR',desc:'動かぬ石が、ついに動いた。世界が震えた。',passive:['動いた','超高防御＋被弾するほど攻撃が永続上昇']},
+{id:'g087',emoji:'🎲',name:'運命のディーラー',role:'trickster',rarity:'SSR',desc:'全てを賭けに変える。勝てば最強、負ければ無。',passive:['大博打','毎ターン能力が大きく上下にランダム変動']},
+{id:'g088',emoji:'🦴',name:'不死の王',role:'tank',rarity:'SSR',desc:'死を超越した骨の王。倒れても起き上がる。',passive:['不死','戦闘不能になっても1度だけ全回復で復活']},
+{id:'g089',emoji:'🌙',name:'月の巫女',role:'healer',rarity:'SSR',desc:'月光で死者すら癒すという伝説の巫女。',passive:['満月の癒し','戦闘不能の味方を1度だけ蘇生できる']},
+{id:'g090',emoji:'☀️',name:'太陽の化身',role:'attacker',rarity:'SSR',desc:'近づくものを焼き尽くす恒星の意志。',passive:['日輪','毎ターン敵全体に確定ダメージ']},
+{id:'g091',emoji:'🐋',name:'天空鯨',role:'tank',rarity:'SSR',desc:'空を泳ぐ巨鯨。その背に町が乗るほど巨大。',passive:['悠久','最大HPが極めて高く、毎ターン自己回復']},
+{id:'g092',emoji:'🦋',name:'夢幻の蝶',role:'trickster',rarity:'SSR',desc:'触れた者を夢に閉じ込める。現か幻か。',passive:['夢幻','敵を低確率で数ターン行動不能（夢）にする']},
+{id:'g093',emoji:'⚖️',name:'天秤の裁定者',role:'debuffer',rarity:'SSR',desc:'全てを公平に裁く。情けはない。',passive:['断罪','敵味方のHP割合を均す（高い敵に大ダメージ）']},
+{id:'g094',emoji:'🩸',name:'紅の剣聖',role:'attacker',rarity:'SSR',desc:'血を捧げるほど剣が冴える求道者。',passive:['血の剣','自分のHPを消費して、特大の一撃を放つ']},
+
+// ---------- UR（ウルトラレア）6体：ゲーム破壊級・パッシブ3つ ----------
+{id:'g095',emoji:'🐸',name:'真・かえる／盾の王',role:'tank',rarity:'UR',desc:'戦死したかえるが、もし全てを乗り越え覚醒していたら――誰もが夢見た"if"の姿。最強の盾。',passive:['不滅の盾：味方全体への致死ダメージを常にHP1で防ぐ','献身の極み：かばうたび自分と味方全員の防御が永続上昇','優しき心の雨：毎ターン、味方全体のHPを与ダメージ以上に大回復']},
+{id:'g096',emoji:'🐱',name:'神・ねこ／九尾の癒し手',role:'healer',rarity:'UR',desc:'改造の果てに神域へ達したねこ。九つの尾が世界を癒す。',passive:['九生不滅：味方が倒れても毎ターン1人ずつ自動蘇生','完全治癒：回復が常に最大HPまで届き、状態異常を全て消す','癒しの暴走：回復が敵には超ダメージとして跳ね返る']},
+{id:'g097',emoji:'🧑‍💻',name:'全・開発者／世界の観測者',role:'attacker',rarity:'UR',desc:'観測者の力を完全に継いだ開発者の到達点。超究武神覇斬すら序の口。',passive:['無限デバッグ：あらゆる敵のパッシブと強化を無効化','神コミット：毎ターン必殺ゲージが満タンになる','観測完了：与ダメージが敵の防御を完全無視し、必ずクリティカル']},
+{id:'g098',emoji:'🤡',name:'？？？（封印）',role:'attacker',rarity:'UR',desc:'入手不可。ガチャには絶対に出ない。…はずだった。笑顔だけが、そこにある。',passive:['全消去：戦闘開始時、敵を低確率で"無かったことに"する','時間停止：たまに敵全体を1ターン完全停止','理外の存在：いかなるデバフ・即死・無効化も効かない']},
+{id:'g099',emoji:'👁️‍🗨️',name:'ウォッチャー／真観測者',role:'buffer',rarity:'UR',desc:'別次元から戻った観測者。世界の理を書き換える。',passive:['全知：戦闘開始時、敵全ての弱点を看破し味方の与ダメージ激増','次元干渉：毎ターン味方全体を強化し続ける（解除不能）','観測者の特権：味方全員の必殺クールダウンを無くす']},
+{id:'g100',emoji:'🍣',name:'伝説・サーモン握り／不沈の握り',role:'tank',rarity:'UR',desc:'英検4級を極め（？）、復讐も赦しも越えて世界の盾となった究極のサーモン。',passive:['不沈艦：パーティ全員が、HP1未満になっても1ターン耐える','無限の米：毎ターン味方全体を大回復＋全状態異常を解除','握りの覚悟：自分が場にいる限り、味方は即死しない']}
+];
+
+// レアリティ別の排出率（%）
+const GACHA_RATES={N:48,R:30,SR:15,SSR:6,UR:1};
+// レアリティ表示色
+const GACHA_RARITY_COLOR={N:'#9aa0b0',R:'#5dca8a',SR:'#5d9eff',SSR:'#c8a0ff',UR:'#FFD700'};
+
+// ===== コイン（ShiftMemo共通 localStorage 'coins'） =====
+function getCoins(){try{return parseInt(localStorage.getItem('coins')||'0',10)||0;}catch(e){return 0;}}
+function setCoins(n){try{localStorage.setItem('coins',String(Math.max(0,n)));}catch(e){}updateCoinDisp();}
+function addCoins(n){setCoins(getCoins()+n);}
+function updateCoinDisp(){document.getElementById('coin-disp').textContent='🪙 '+getCoins().toLocaleString('en-US');
+  const c=getCoins();document.getElementById('b1').disabled=c<100;document.getElementById('b10').disabled=c<1000;}
+
+// ===== コレクション（localStorage 'rpg_gacha_owned'） =====
+function getOwned(){try{return JSON.parse(localStorage.getItem('rpg_gacha_owned')||'{}');}catch(e){return {};}}
+function saveOwned(o){try{localStorage.setItem('rpg_gacha_owned',JSON.stringify(o));}catch(e){}}
+
+// ===== 排出ロジック =====
+function rollRarity(){
+  const r=Math.random()*100;let acc=0;
+  for(const k of ['UR','SSR','SR','R','N']){ // 高レア優先で判定
+    acc+=GACHA_RATES[k];
+    if(r<=acc&&false)break; // 下のループで正しく処理
+  }
+  // 正しい累積判定（N→URの順で）
+  let x=Math.random()*100,a=0;
+  for(const k of ['N','R','SR','SSR','UR']){a+=GACHA_RATES[k];if(x<a)return k;}
+  return 'N';
+}
+function rollOne(){
+  const rar=rollRarity();
+  const pool=GACHA_CHARS.filter(c=>c.rarity===rar);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+// ===== 召喚演出 =====
+let sumQueue=[],sumIdx=0,sumIsMulti=false,sumResults=[];
+function pull(n){
+  const cost=n===10?1000:100;
+  if(getCoins()<cost){alert('コインが足りません');return;}
+  setCoins(getCoins()-cost);
+  sumResults=[];for(let i=0;i<n;i++)sumResults.push(rollOne());
+  // 所持に反映＆new判定
+  const owned=getOwned();
+  sumResults.forEach(r=>{r._isNew=!owned[r.id];owned[r.id]=(owned[r.id]||0)+1;});
+  saveOwned(owned);
+  sumIsMulti=(n===10);sumQueue=sumResults.slice();sumIdx=0;
+  document.getElementById('sum').className='on';
+  playSummon(sumQueue[0]);
+}
+function playSummon(hero){
+  const sky=document.getElementById('sum-sky');sky.innerHTML='';
+  document.getElementById('sum-prog').textContent=sumIsMulti?((sumIdx+1)+' / '+sumQueue.length):'';
+  const col=GACHA_RARITY_COLOR[hero.rarity];
+  // 1. 米粒が涙のように落ちる
+  const grain=document.createElement('div');grain.className='sgrain';sky.appendChild(grain);
+  grain.animate([{top:'-6%',opacity:0},{top:'10%',opacity:1,offset:.15},{top:'44%',opacity:1}],{duration:900,easing:'cubic-bezier(.5,0,.7,1)',fill:'forwards'});
+  // 2. 着地→卵出現
+  setTimeout(()=>{
+    grain.remove();
+    const egg=document.createElement('div');egg.className='segg';egg.textContent='🥚';sky.appendChild(egg);
+    // レア色のオーラ
+    const aura=document.createElement('div');aura.className='sburst';aura.style.cssText+=`;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,${col}55,transparent 70%)`;sky.appendChild(aura);
+    aura.animate([{opacity:0,transform:'translate(-50%,-50%) scale(.5)'},{opacity:1,transform:'translate(-50%,-50%) scale(1.4)'}],{duration:600,fill:'forwards'});
+    // 卵が揺れる（レアほど長く・激しく）
+    const shakeN=hero.rarity==='UR'?6:hero.rarity==='SSR'?5:hero.rarity==='SR'?4:3;
+    egg.animate([{transform:'translate(-50%,-50%) rotate(0)'},{transform:'translate(-52%,-50%) rotate(-8deg)'},{transform:'translate(-48%,-50%) rotate(8deg)'},{transform:'translate(-50%,-50%) rotate(0)'}],{duration:300,iterations:shakeN});
+    // 3. 割れて英雄登場
+    setTimeout(()=>{egg.remove();crackBurst(col,hero.rarity);revealHero(hero,col);},shakeN*300+200);
+  },900);
+}
+function crackBurst(col,rar){
+  const sky=document.getElementById('sum-sky');
+  const count=rar==='UR'?40:rar==='SSR'?28:rar==='SR'?18:10;
+  for(let i=0;i<count;i++){const ang=Math.random()*360,dist=60+Math.random()*120;
+    const p=document.createElement('div');p.textContent=(rar==='UR'||rar==='SSR')?'✦':'・';
+    p.style.cssText=`position:absolute;left:50%;top:46%;color:${col};font-size:${10+Math.random()*14}px;z-index:5;transform:translate(-50%,-50%)`;sky.appendChild(p);
+    p.animate([{transform:'translate(-50%,-50%) scale(0)',opacity:1},{transform:`translate(calc(-50% + ${Math.cos(ang)*dist}px),calc(-50% + ${Math.sin(ang)*dist}px)) scale(1)`,opacity:0}],{duration:800,easing:'ease-out'});
+    setTimeout(()=>p.remove(),800);
+  }
+  // フラッシュ（高レアほど強い）
+  const fl=document.createElement('div');fl.style.cssText=`position:absolute;inset:0;background:${col};z-index:4`;sky.appendChild(fl);
+  const fa=rar==='UR'?.9:rar==='SSR'?.7:rar==='SR'?.5:.25;
+  fl.animate([{opacity:0},{opacity:fa},{opacity:0}],{duration:600});setTimeout(()=>fl.remove(),600);
+}
+function revealHero(hero,col){
+  const sky=document.getElementById('sum-sky');
+  const roleJP={attacker:'アタッカー',tank:'タンク',healer:'ヒーラー',buffer:'バッファー',debuffer:'デバッファー',trickster:'トリッキー'};
+  const box=document.createElement('div');box.className='shero';box.style.color=col;
+  const passHtml=hero.passive.length===3
+    ? '★ゲーム破壊級パッシブ×3'
+    : 'パッシブ：'+hero.passive[0];
+  box.innerHTML=`<div class="he">${hero.emoji}</div>`+
+    `<div class="hr" style="color:${col}">${hero.rarity}${hero._isNew?' ✨NEW':''}</div>`+
+    `<div class="hn" style="color:#fff">${hero.name}</div>`+
+    `<div class="hd">[${roleJP[hero.role]}] ${hero.desc}</div>`+
+    `<div class="hd" style="color:${col}">${passHtml}</div>`;
+  sky.appendChild(box);
+  box.animate([{transform:'translate(-50%,-50%) scale(0) rotate(-15deg)',opacity:0},{transform:'translate(-50%,-50%) scale(1.15) rotate(5deg)',opacity:1,offset:.6},{transform:'translate(-50%,-50%) scale(1) rotate(0)',opacity:1}],{duration:700,easing:'cubic-bezier(.3,1.4,.5,1)',fill:'forwards'});
+}
+// タップで次へ
+document.getElementById('sum').onclick=()=>{
+  sumIdx++;
+  if(sumIdx<sumQueue.length){playSummon(sumQueue[sumIdx]);}
+  else{
+    document.getElementById('sum').className='';
+    if(sumIsMulti){showResults();}
+    renderColl();
+  }
+};
+function showResults(){
+  const grid=document.getElementById('res-grid');grid.innerHTML='';
+  const order={UR:0,SSR:1,SR:2,R:3,N:4};
+  const sorted=sumResults.slice().sort((a,b)=>order[a.rarity]-order[b.rarity]);
+  sorted.forEach((r,i)=>{const col=GACHA_RARITY_COLOR[r.rarity];
+    const d=document.createElement('div');d.className='rcard';d.style.borderColor=col;d.style.background=col+'18';d.style.animationDelay=(i*0.06)+'s';
+    d.innerHTML=`${r._isNew?'<div class="rNew">NEW</div>':''}<div>${r.emoji}</div><div class="hr" style="font-size:8px;color:${col};font-weight:800">${r.rarity}</div><div class="rn">${r.name}</div>`;
+    grid.appendChild(d);});
+  document.getElementById('res').className='on';
+}
+function closeRes(){document.getElementById('res').className='';renderColl();}
+
+// ===== コレクション表示 =====
+function renderColl(){
+  const owned=getOwned();const cnt=Object.keys(owned).length;
+  document.getElementById('coll-title').textContent='コレクション '+cnt+' / 100';
+  const order={UR:0,SSR:1,SR:2,R:3,N:4};
+  const sorted=GACHA_CHARS.slice().sort((a,b)=>order[a.rarity]-order[b.rarity]);
+  document.getElementById('coll').innerHTML=sorted.map(c=>{
+    const o=owned[c.id];const col=GACHA_RARITY_COLOR[c.rarity];
+    if(o)return `<div class="citem owned" style="border-color:${col}66"><div>${c.emoji}</div><div class="cn">${c.name}</div>${o>1?'<div class="dup">×'+o+'</div>':''}</div>`;
+    return `<div class="citem miss">❓</div>`;
+  }).join('');
+}
+function resetColl(){if(confirm('コレクションを全消去しますか？')){saveOwned({});renderColl();}}
+
+// 初期化
+document.getElementById('rates').innerHTML='排出率：'+['UR','SSR','SR','R','N'].map(k=>k+' '+GACHA_RATES[k]+'%').join('　/　')+'<br>UR6体はゲーム破壊級パッシブ×3。コインはShiftMemo共通。';
+if(getCoins()===0)setCoins(3000); // デバッグ初期コイン
+updateCoinDisp();renderColl();
+</script>
+</body>
+</html>

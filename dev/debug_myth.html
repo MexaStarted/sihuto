@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>神話回想シネマティック — 開発者の現在</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow:hidden;background:#000;font-family:-apple-system,'Hiragino Sans','Segoe UI',serif}
+  #app{position:fixed;inset:0}
+  canvas{display:block}
+  /* 上下の黒帯（シネマスコープ）*/
+  .bar{position:fixed;left:0;right:0;height:9%;background:#000;z-index:40;pointer-events:none}
+  .bar.top{top:0}.bar.bot{bottom:0}
+  /* テロップ */
+  #telop{position:fixed;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;z-index:50;pointer-events:none;padding:0 30px}
+  #telop .big{font-size:30px;font-weight:900;letter-spacing:4px;color:#fff;text-shadow:0 0 24px #6b8bff,0 2px 4px #000;opacity:0;line-height:1.5}
+  #telop .sub{font-size:14px;color:#cdd;letter-spacing:3px;margin-top:12px;opacity:0;text-shadow:0 0 10px #000}
+  #subtitle{position:fixed;left:0;right:0;bottom:12%;text-align:center;z-index:50;font-size:15px;color:#fff;letter-spacing:1px;text-shadow:0 2px 6px #000,0 0 12px #000;opacity:0;padding:0 26px;line-height:1.6}
+  #flash{position:fixed;inset:0;background:#fff;opacity:0;z-index:45;pointer-events:none}
+  #vig{position:fixed;inset:0;z-index:38;pointer-events:none;box-shadow:inset 0 0 200px 60px rgba(0,0,0,.85)}
+  /* UI */
+  #start{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 50%,#0a0a1a,#000);gap:20px}
+  #start h1{color:#c8d4ff;font-size:18px;letter-spacing:3px;text-shadow:0 0 16px #6b8bff;text-align:center;line-height:1.6}
+  #start p{color:#778;font-size:11px;text-align:center;padding:0 40px;line-height:1.6}
+  #playbtn{padding:15px 40px;border-radius:30px;border:1px solid #6b8bff;background:linear-gradient(135deg,#1a2050,#0a0a20);color:#c8d4ff;font-size:15px;font-weight:800;letter-spacing:2px;cursor:pointer;box-shadow:0 0 24px #6b8bff55}
+  #playbtn:active{transform:scale(.97)}
+  #skip{position:fixed;right:12px;top:calc(9% + 8px);z-index:60;font-size:11px;color:#99a;background:rgba(0,0,0,.5);padding:5px 12px;border-radius:14px;cursor:pointer;display:none}
+  #replay{position:fixed;left:50%;bottom:calc(9% + 20px);transform:translateX(-50%);z-index:60;display:none;padding:12px 28px;border-radius:24px;border:1px solid #6b8bff;background:#0a0a20;color:#c8d4ff;font-weight:700;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="bar top"></div><div class="bar bot"></div>
+<div id="vig"></div>
+<div id="telop"><div class="big" id="telop-big"></div><div class="sub" id="telop-sub"></div></div>
+<div id="subtitle"></div>
+<div id="flash"></div>
+<div id="skip" onclick="skipAll()">スキップ ▶▶</div>
+<button id="replay" onclick="location.reload()">↻ もう一度見る</button>
+<div id="start">
+  <h1>神 話 回 想<br><span style="font-size:12px;color:#889">― 田村くん誕生から人類創世まで ―</span></h1>
+  <p>10億年前。この宇宙アース1995で、最初の生命が生まれた物語。<br>終盤テキストを10パターンから選べます。</p>
+  <select id="patsel" style="padding:10px 14px;border-radius:10px;background:#0a0a20;color:#c8d4ff;border:1px solid #6b8bff;font-size:13px;max-width:280px"></select>
+  <button id="playbtn" onclick="startCine()">▶ 再生する</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+let scene,cam,renderer,clock,W,H;
+// ===== エンディング・テキスト10パターン =====
+const EP_PATTERNS=[
+{name:'① 荘厳・神話調',seal1:'神々は、彼を一つの星の核へ封じた。',seal2:'永遠に、出られぬように。',flowTitle:'― だが、封印は完全ではなかった ―',flow:'彼の思想、根源的なエネルギー、そして怒りが、地殻を伝い、地表へと滲み出した。',microbe:'やがて――その力に触れ、最初の生命が芽生えた。',eonsTitle:'― それから、数億年 ―',human:'生命は形を変え、ついに人へと至った。',lastTitle:'これが、人類の始まり。',lastSub:'私たちは皆、彼から生まれた。'},
+{name:'② 静謐・詩的',seal1:'星の最も深き底に、彼は沈められた。',seal2:'光も、声も、届かぬ場所へ。',flowTitle:'― けれど ―',flow:'封じられてなお、彼の想いは静かに地を昇っていった。',microbe:'冷たい海の底で、小さな命が、ふるえながら生まれた。',eonsTitle:'― 幾億年の、まどろみ ―',human:'命は枝分かれし、やがて二人の人が立っていた。',lastTitle:'はじまりの、二人。',lastSub:'彼らは知らない。自分たちが"彼の子"であることを。'},
+{name:'③ 重厚・叙事詩',seal1:'神の鎖が、彼を星の中心に縛りつけた。',seal2:'これが、神々の下した罰であった。',flowTitle:'― 封印の底より ―',flow:'彼の怒りと根源の力は、岩を溶かし、地表へと這い上がった。',microbe:'その熱と力の中から、原初の微生物が産声をあげる。',eonsTitle:'― 数億年の時を経て ―',human:'進化の果てに、二人の人類が大地に立った。',lastTitle:'人類創世。',lastSub:'全ての人の血に、彼が流れている。'},
+{name:'④ ささやき・不気味',seal1:'……こうして、僕は星の底に閉じ込められた。',seal2:'でも、僕は消えなかったよ。',flowTitle:'― ねえ、知ってる？ ―',flow:'僕の想いも、力も、怒りも……ぜんぶ、地面を通って外に出ていったんだ。',microbe:'そして、小さな命が生まれた。僕のかけらから。',eonsTitle:'― 何億年か、過ぎてね ―',human:'ようやく、君たちが生まれた。アダムと、イブが。',lastTitle:'だから、君たちは僕の子供。',lastSub:'……はじめまして、と言うべきかな。'},
+{name:'⑤ 科学＋神話の融合',seal1:'彼は惑星の核へと封印された。',seal2:'核の圧力すら、彼を殺せなかった。',flowTitle:'― エネルギーの漏出 ―',flow:'彼の根源エネルギーは地殻を貫き、原始の海に注ぎ込まれた。',microbe:'有機物が結びつき、最初の単細胞生命が誕生する。',eonsTitle:'― 約38億年後 ―',human:'生命は人類へと進化し、二人の祖が生まれた。',lastTitle:'これが、生命と人類の起源。',lastSub:'起源は、神でも偶然でもなく――彼だった。'},
+{name:'⑥ 悲哀・切ない',seal1:'彼は、たった一人、星の底へ落とされた。',seal2:'誰にも理解されないまま、闇の中へ。',flowTitle:'― それでも ―',flow:'孤独な彼の想いは、温もりを求めるように地表へ昇っていった。',microbe:'その想いに応えるように、小さな命が生まれた。',eonsTitle:'― 長い、長い時のあとで ―',human:'命は人となり、二人は手を取り合った。',lastTitle:'彼が遺したのは、孤独ではなく――',lastSub:'いのち、だった。'},
+{name:'⑦ 壮大ナレーション',seal1:'神々は彼を、世界の中心へ封じた。',seal2:'それが、神殺しへの裁きだった。',flowTitle:'― 世界は、彼を中心に回り始めた ―',flow:'彼の思想と力と怒りは、星の隅々へと広がっていった。',microbe:'生命の最初のきらめきが、海に灯る。',eonsTitle:'― 悠久の時を超えて ―',human:'そして今、人類がこの星に満ちている。',lastTitle:'全ての始まりは、一人の被造物。',lastSub:'― 田村くん、と呼ばれる者。'},
+{name:'⑧ 簡潔・力強い',seal1:'彼は星の核に封じられた。',seal2:'神々をもってしても、殺せなかったから。',flowTitle:'― 封印は、漏れた ―',flow:'彼の力が地表に溢れ出す。',microbe:'命が生まれた。',eonsTitle:'― 数億年後 ―',human:'人が生まれた。',lastTitle:'起源は、彼。',lastSub:'人類は、彼の末裔。'},
+{name:'⑨ 厳粛・聖書調',seal1:'かくて彼は、地の最も深き淵に封じられたり。',seal2:'神々の怒りは、彼を滅ぼすこと能わず。',flowTitle:'― されど、その力は地に満ちたり ―',flow:'彼の息吹は地殻を貫き、地の面を覆えり。',microbe:'水の中に、最初の命、生まれいでたり。',eonsTitle:'― 幾世代を経て ―',human:'土より人、生まれたり。男と女、これなり。',lastTitle:'これ、人の始まりなり。',lastSub:'人は皆、彼より出でたる者なり。'},
+{name:'⑩ 田村くん独白・カヲル風',seal1:'神々は、僕を星の底へ封じた。怖かったんだろうね、僕が。',seal2:'でも、閉じ込めることしかできなかった。',flowTitle:'― 不思議だろう？ ―',flow:'僕の想いも、力も、怒りも……地面を通って、外の世界へ零れ落ちていった。',microbe:'すると、小さな命が生まれたんだ。僕の、かけらから。',eonsTitle:'― それから、ずいぶん経って ―',human:'君たち人間が生まれた。最初の、二人がね。',lastTitle:'つまり――僕は、君たちの祖先だ。',lastSub:'同じ命だよ、君と僕は。ふふっ。'}
+];
+let EP=EP_PATTERNS[0];
+let running=false,t0=0,skipReq=false;
+const groups={};
+let raf=null;
+
+function init(){
+  W=innerWidth;H=innerHeight;
+  scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x000008,0.018);
+  cam=new THREE.PerspectiveCamera(55,W/H,0.1,2000);
+  cam.position.set(0,0,60);
+  renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  document.getElementById('app').appendChild(renderer.domElement);
+  scene.add(new THREE.AmbientLight(0x223,0.6));
+  const key=new THREE.PointLight(0x88aaff,1.2,400);key.position.set(30,40,60);scene.add(key);
+  buildStarfield();
+  buildTamura();
+  buildGods();
+  buildEarth();
+  buildLife();
+  buildParticleSystems();
+  addEventListener('resize',onResize);
+}
+function onResize(){W=innerWidth;H=innerHeight;cam.aspect=W/H;cam.updateProjectionMatrix();renderer.setSize(W,H);}
+
+// ===== 星空 =====
+function buildStarfield(){
+  const g=new THREE.BufferGeometry();const N=2500;const pos=new Float32Array(N*3);
+  for(let i=0;i<N;i++){const r=200+Math.random()*600;const th=Math.random()*Math.PI*2,ph=Math.acos(Math.random()*2-1);
+    pos[i*3]=r*Math.sin(ph)*Math.cos(th);pos[i*3+1]=r*Math.sin(ph)*Math.sin(th);pos[i*3+2]=r*Math.cos(ph);}
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const m=new THREE.PointsMaterial({color:0x99bbff,size:1.4,transparent:true,opacity:0.85});
+  const pts=new THREE.Points(g,m);scene.add(pts);groups.stars=pts;
+}
+
+// ===== 田村くん（光の人型→人型シルエット）=====
+function buildTamura(){
+  const g=new THREE.Group();
+  // 光の核
+  const core=new THREE.Mesh(new THREE.SphereGeometry(1.4,32,32),
+    new THREE.MeshBasicMaterial({color:0xffffff}));
+  g.add(core);groups.tamuraCore=core;
+  // 淡いオーラ
+  const aura=new THREE.Mesh(new THREE.SphereGeometry(2.6,32,32),
+    new THREE.MeshBasicMaterial({color:0x88bbff,transparent:true,opacity:0.25,blending:THREE.AdditiveBlending}));
+  g.add(aura);groups.tamuraAura=aura;
+  // 人型シルエット（球＋円柱で簡易ヒューマノイド）：戦争時に現れる
+  const body=new THREE.Group();
+  const torso=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.45,3,16),new THREE.MeshStandardMaterial({color:0x0a0a14,emissive:0x223366,emissiveIntensity:0.6,roughness:0.4}));
+  torso.position.y=0;body.add(torso);
+  const head=new THREE.Mesh(new THREE.SphereGeometry(0.7,24,24),new THREE.MeshStandardMaterial({color:0x0a0a14,emissive:0x335588,emissiveIntensity:0.7}));
+  head.position.y=2.2;body.add(head);
+  // 髪（カヲルくん風の淡い色を頭頂に薄く）
+  const hair=new THREE.Mesh(new THREE.SphereGeometry(0.74,24,24,0,Math.PI*2,0,Math.PI*0.55),new THREE.MeshStandardMaterial({color:0xcfd8ff,emissive:0x8899cc,emissiveIntensity:0.5}));
+  hair.position.y=2.35;body.add(hair);
+  // 腕（細い円柱）
+  [-1,1].forEach(s=>{const arm=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,2.4,10),new THREE.MeshStandardMaterial({color:0x0a0a14,emissive:0x223366,emissiveIntensity:0.5}));arm.position.set(s*0.8,0.2,0);arm.rotation.z=s*0.25;body.add(arm);});
+  // 剣（神を斬る刀）
+  const sword=new THREE.Mesh(new THREE.BoxGeometry(0.12,3.4,0.12),new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xaaccff,emissiveIntensity:1.2}));
+  sword.position.set(1.1,1.4,0.2);body.add(sword);groups.sword=sword;
+  body.visible=false;g.add(body);groups.tamuraBody=body;
+  g.position.set(0,0,0);g.visible=false;scene.add(g);groups.tamura=g;
+}
+
+// ===== 神々（真っ黒な多眼・触手の巨大シルエット）複数体 =====
+function makeGod(scale){
+  const god=new THREE.Group();
+  const mat=new THREE.MeshStandardMaterial({color:0x000000,roughness:0.9,metalness:0.1,emissive:0x110022,emissiveIntensity:0.4});
+  // 巨大な不定形の本体（潰した球を複数重ねる）
+  const main=new THREE.Mesh(new THREE.SphereGeometry(6,24,24),mat);main.scale.set(1,1.5,1);god.add(main);
+  const lump1=new THREE.Mesh(new THREE.SphereGeometry(4,16,16),mat);lump1.position.set(3,3,1);god.add(lump1);
+  const lump2=new THREE.Mesh(new THREE.SphereGeometry(3.4,16,16),mat);lump2.position.set(-3,-2,2);god.add(lump2);
+  // 触手（曲げた円柱を放射状に）
+  const eyes=[];
+  for(let i=0;i<10;i++){const ang=i/10*Math.PI*2;const len=8+Math.random()*6;
+    const tent=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.05,len,8),mat);
+    tent.position.set(Math.cos(ang)*5,Math.sin(ang)*7,Math.sin(ang*2)*3);
+    tent.rotation.z=ang+Math.PI/2;tent.rotation.x=Math.random()*0.6-0.3;
+    god.add(tent);}
+  // 多眼（赤く光る目）
+  for(let i=0;i<7;i++){const eye=new THREE.Mesh(new THREE.SphereGeometry(0.6+Math.random()*0.5,16,16),
+      new THREE.MeshBasicMaterial({color:0xff1133}));
+    eye.position.set((Math.random()*2-1)*5,(Math.random()*2-1)*7,4+Math.random()*2);
+    god.add(eye);eyes.push(eye);}
+  // 1つだけ巨大な中央眼
+  const bigEye=new THREE.Mesh(new THREE.SphereGeometry(1.6,24,24),new THREE.MeshBasicMaterial({color:0xff2244}));
+  bigEye.position.set(0,2,5.2);god.add(bigEye);eyes.push(bigEye);
+  // 王冠状の角（黒い棘）
+  for(let i=0;i<7;i++){const ang=(i/7-0.5)*1.6;const horn=new THREE.Mesh(new THREE.ConeGeometry(0.4,3,6),mat);
+    horn.position.set(Math.sin(ang)*4,8+Math.cos(ang)*1,0);horn.rotation.z=-ang;god.add(horn);}
+  god.scale.setScalar(scale||1);
+  god.userData.eyes=eyes;
+  return god;
+}
+function buildGods(){
+  const gg=new THREE.Group();
+  const positions=[[-44,6,-30],[44,10,-40],[0,30,-70],[-70,-6,-90],[70,-4,-100]];
+  positions.forEach((p,i)=>{const god=makeGod(1.0+i*0.15);god.position.set(...p);gg.add(god);});
+  gg.visible=false;scene.add(gg);groups.gods=gg;
+}
+
+// ===== 地球 =====
+function buildEarth(){
+  const g=new THREE.Group();
+  const earth=new THREE.Mesh(new THREE.SphereGeometry(10,48,48),
+    new THREE.MeshStandardMaterial({color:0x1a3a6a,emissive:0x06121f,emissiveIntensity:0.5,roughness:0.8}));
+  g.add(earth);groups.earthBall=earth;
+  // 大陸っぽい緑の斑点
+  for(let i=0;i<14;i++){const c=new THREE.Mesh(new THREE.SphereGeometry(2+Math.random()*2.5,12,12),
+      new THREE.MeshStandardMaterial({color:0x2a7a3a,emissive:0x0a2a12,roughness:1}));
+    const th=Math.random()*Math.PI*2,ph=Math.acos(Math.random()*2-1);
+    c.position.set(10*Math.sin(ph)*Math.cos(th),10*Math.sin(ph)*Math.sin(th),10*Math.cos(ph));
+    c.scale.z=0.3;c.lookAt(0,0,0);earth.add(c);}
+  // コアの赤い光（封印された田村くん）
+  const core=new THREE.Mesh(new THREE.SphereGeometry(2,20,20),new THREE.MeshBasicMaterial({color:0xff3311,transparent:true,opacity:0.0}));
+  g.add(core);groups.earthCore=core;
+  // 大気
+  const atmo=new THREE.Mesh(new THREE.SphereGeometry(11,48,48),new THREE.MeshBasicMaterial({color:0x4a90ff,transparent:true,opacity:0.12,side:THREE.BackSide}));
+  g.add(atmo);
+  g.position.set(0,-4,0);g.visible=false;scene.add(g);groups.earth=g;
+}
+
+// ===== パーティクル（爆発・血・封印・生命）=====
+let burstSys=[];
+function buildParticleSystems(){}
+function spawnBurst(x,y,z,color,count,spread,size){
+  const g=new THREE.BufferGeometry();const pos=new Float32Array(count*3);const vel=[];
+  for(let i=0;i<count;i++){pos[i*3]=x;pos[i*3+1]=y;pos[i*3+2]=z;
+    const a=Math.random()*Math.PI*2,b=Math.acos(Math.random()*2-1),sp=spread*(0.3+Math.random());
+    vel.push([Math.sin(b)*Math.cos(a)*sp,Math.sin(b)*Math.sin(a)*sp,Math.cos(b)*sp]);}
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const m=new THREE.PointsMaterial({color:color,size:size||1.2,transparent:true,opacity:1,blending:THREE.AdditiveBlending});
+  const p=new THREE.Points(g,m);scene.add(p);
+  burstSys.push({pts:p,vel:vel,life:0,max:2.2});
+}
+function updateBursts(dt){
+  for(let i=burstSys.length-1;i>=0;i--){const b=burstSys[i];b.life+=dt;
+    const pos=b.pts.geometry.attributes.position.array;
+    for(let j=0;j<b.vel.length;j++){pos[j*3]+=b.vel[j][0]*dt*20;pos[j*3+1]+=b.vel[j][1]*dt*20-dt*4;pos[j*3+2]+=b.vel[j][2]*dt*20;}
+    b.pts.geometry.attributes.position.needsUpdate=true;
+    b.pts.material.opacity=Math.max(0,1-b.life/b.max);
+    if(b.life>=b.max){scene.remove(b.pts);burstSys.splice(i,1);}
+  }
+}
+
+// ===== テロップ／字幕ヘルパ =====
+function telop(big,sub,dur){
+  const b=document.getElementById('telop-big'),s=document.getElementById('telop-sub');
+  b.textContent=big;s.textContent=sub||'';
+  b.animate([{opacity:0,letterSpacing:'16px'},{opacity:1,letterSpacing:'4px',offset:0.2},{opacity:1,offset:0.8},{opacity:0}],{duration:dur,easing:'ease-out'});
+  if(sub)s.animate([{opacity:0},{opacity:1,offset:0.3},{opacity:1,offset:0.8},{opacity:0}],{duration:dur});
+}
+function subtitle(txt,dur){const s=document.getElementById('subtitle');s.textContent=txt;
+  s.animate([{opacity:0},{opacity:1,offset:0.15},{opacity:1,offset:0.85},{opacity:0}],{duration:dur,easing:'ease-out'});}
+function flash(amt,dur){const f=document.getElementById('flash');f.animate([{opacity:0},{opacity:amt},{opacity:0}],{duration:dur,easing:'ease-out'});}
+
+// ===== タイムライン =====
+let timeline=[],tlIdx=0;
+function at(time,fn){timeline.push({time,fn,done:false});}
+function buildTimeline(){
+  timeline=[];tlIdx=0;
+  // 0s: 暗黒に星
+  at(0.2,()=>{groups.stars.visible=true;telop('― 10億年前 ―','宇宙、アース1995',4000);});
+  at(4.5,()=>{subtitle('全ては、無だった。',3500);});
+  // 8s: 神々が闇から浮かび上がる
+  at(8.0,()=>{groups.gods.visible=true;camTo(0,8,90,3);subtitle('やがて、神々が在った。',4000);});
+  at(9.0,()=>{for(let k=0;k<5;k++)setTimeout(()=>spawnBurst((Math.random()*2-1)*40,(Math.random()*2-1)*20,-40,0x6622aa,40,8,1.4),k*200);});
+  // 13s: 神が最初の生命を創る（光）
+  at(13.0,()=>{groups.tamura.visible=true;groups.tamuraBody.visible=false;groups.tamuraCore.visible=true;camTo(0,0,30,3);subtitle('神は、最初の生命を創った。',4000);flash(0.7,800);spawnBurst(0,0,0,0xffffff,80,6,1.6);});
+  at(17.0,()=>{telop('TAMURA','最初の被造物',3500);});
+  // 20s: 田村くん人型に
+  at(20.5,()=>{groups.tamuraBody.visible=true;groups.tamuraCore.visible=false;camTo(6,2,22,3);subtitle('それは、あまりに美しく――あまりに、強かった。',4500);});
+  // 25s: 戦争勃発
+  at(25.5,()=>{telop('― 神 々 の 戦 争 ―','',3500);camShake(true);});
+  at(26.0,()=>{subtitle('被造物は、創造主たる神々に牙を剥いた。',4000);});
+  at(27.0,()=>{for(let k=0;k<8;k++)setTimeout(()=>{spawnBurst((Math.random()*2-1)*50,(Math.random()*2-1)*30,-30,0xff3322,50,12,1.6);flash(0.3,200);},k*300);});
+  // 31s: 斬首
+  at(31.0,()=>{camTo(-30,8,40,2);subtitle('そして――神の一柱が、堕ちた。',3500);});
+  at(33.0,()=>{godBeheaded(0);flash(0.95,700);spawnBurst(-44,6,-30,0xff1133,160,16,2.2);camShake(true);});
+  at(36.0,()=>{camShake(false);telop('神 殺 し','',3000);});
+  // 39s: 神々の怒り・封印
+  at(39.0,()=>{subtitle('神々の怒りは、宇宙を灼いた。',3800);camTo(0,6,80,3);for(let k=0;k<6;k++)setTimeout(()=>spawnBurst((Math.random()*2-1)*60,(Math.random()*2-1)*30,-50,0xaa44ff,60,14,1.8),k*250);});
+  at(43.0,()=>{subtitle('被造物は殺せなかった。ゆえに――封じた。',4200);});
+  // 46s: 地球登場、田村くんを核へ封印
+  at(46.5,()=>{groups.earth.visible=true;groups.earth.position.set(0,-4,-10);camTo(0,0,50,3);flash(0.6,700);subtitle(EP.seal1,3800);});
+  at(50.0,()=>{sealTamura();subtitle(EP.seal2,3500);});
+  // 53s: 思想・根源的エネルギー・怒りが地殻を通り地表へ
+  at(53.5,()=>{telop(EP.flowTitle,'',3500);camTo(0,2,40,4);});
+  at(55.5,()=>{subtitle(EP.flow,4200);for(let k=0;k<6;k++)setTimeout(()=>spawnBurst(0,-4,0,0xff5522,30,3,1.4),k*200);});
+  // 59s: 微生物誕生
+  at(59.0,()=>{groups.microbes.visible=true;camTo(0,0,24,3);subtitle(EP.microbe,4000);for(let k=0;k<5;k++)setTimeout(()=>spawnBurst((Math.random()*2-1)*8,(Math.random()*2-1)*6,5,0x33ff88,30,4,1.0),k*250);});
+  // 63s: 数億年後
+  at(63.0,()=>{telop(EP.eonsTitle,'',3000);groups.microbes.visible=false;});
+  // 65.5s: 人類誕生（アダムとイブ）
+  at(65.5,()=>{groups.humans.visible=true;camTo(0,-1.5,16,3);flash(0.5,700);subtitle(EP.human,4500);spawnBurst(0,-2,5,0xffffff,60,5,1.4);});
+  at(70.0,()=>{telop(EP.lastTitle,EP.lastSub,5000);});
+  at(75.0,()=>{subtitle('',100);endCine();});
+}
+
+// ===== 微生物・人類（アダムとイブ）=====
+function buildLife(){
+  const microbes=new THREE.Group();
+  for(let i=0;i<30;i++){const c=new THREE.Mesh(new THREE.SphereGeometry(0.18+Math.random()*0.2,10,10),
+    new THREE.MeshStandardMaterial({color:0x33ff88,emissive:0x0a5a2a,emissiveIntensity:0.8,transparent:true,opacity:0.9}));
+    c.position.set((Math.random()*2-1)*14,(Math.random()*2-1)*8,4+(Math.random()*2-1)*3);
+    c.userData.ph=Math.random()*Math.PI*2;microbes.add(c);}
+  microbes.visible=false;scene.add(microbes);groups.microbes=microbes;
+  const humans=new THREE.Group();
+  [[-2.4,0xbfd0ff],[2.4,0xffd0e0]].forEach(([x,col])=>{
+    const h=new THREE.Group();
+    const torso=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.3,2,12),new THREE.MeshStandardMaterial({color:0x101018,emissive:col,emissiveIntensity:0.5}));h.add(torso);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.5,18,18),new THREE.MeshStandardMaterial({color:0x101018,emissive:col,emissiveIntensity:0.6}));head.position.y=1.5;h.add(head);
+    [-1,1].forEach(s=>{const arm=new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.11,1.6,8),new THREE.MeshStandardMaterial({color:0x101018,emissive:col,emissiveIntensity:0.4}));arm.position.set(s*0.55,0.1,0);arm.rotation.z=s*0.3;h.add(arm);});
+    h.position.x=x;humans.add(h);
+  });
+  const fruit=new THREE.Mesh(new THREE.SphereGeometry(0.35,16,16),new THREE.MeshBasicMaterial({color:0xff4466}));
+  fruit.position.set(0,0.6,0.5);humans.add(fruit);
+  humans.position.set(0,-2,5);humans.scale.setScalar(0.9);humans.visible=false;scene.add(humans);groups.humans=humans;
+}
+
+// カメラ補間
+let camTarget=null,camLerp=0,camDur=1,camFrom=null;
+function camTo(x,y,z,dur){camFrom={x:cam.position.x,y:cam.position.y,z:cam.position.z};camTarget={x,y,z};camLerp=0;camDur=dur;}
+let shaking=false;
+function camShake(on){shaking=on;}
+
+// 神斬首演出
+function godBeheaded(idx){
+  const god=groups.gods.children[idx];if(!god)return;
+  god.userData.falling=true;
+  // 剣を振る
+  if(groups.sword){groups.sword.parent.rotation.z=-1.2;}
+}
+function sealTamura(){
+  // 田村くんを地球の核へ吸い込み、コアを赤く光らせる
+  groups.tamura.userData.sealing=true;
+  groups.earthCore.material.opacity=0.9;
+}
+function endCine(){
+  document.getElementById('replay').style.display='block';
+  document.getElementById('skip').style.display='none';
+}
+
+function skipAll(){skipReq=true;
+  timeline.forEach(e=>{if(!e.done){e.done=true;}});
+  endCine();
+  groups.earth.visible=true;groups.earthCore.material.opacity=0.9;groups.humans.visible=true;camTo(0,-1.5,16,1);
+  telop(EP.lastTitle,EP.lastSub,4000);
+}
+
+// ===== ループ =====
+function animate(){
+  raf=requestAnimationFrame(animate);
+  const dt=Math.min(clock.getDelta(),0.05);
+  const el=(performance.now()-t0)/1000;
+  // タイムライン実行
+  if(!skipReq)timeline.forEach(e=>{if(!e.done&&el>=e.time){e.done=true;e.fn();}});
+  // 星ゆっくり回転
+  if(groups.stars)groups.stars.rotation.y+=dt*0.01;
+  // 神々：触手うねうね＆眼が脈動＆浮遊
+  if(groups.gods&&groups.gods.visible){groups.gods.children.forEach((god,gi)=>{
+    god.rotation.y+=dt*0.06*(gi%2?1:-1);
+    god.position.y+=Math.sin(el*0.6+gi)*dt*1.2;
+    (god.userData.eyes||[]).forEach((eye,ei)=>{const s=1+Math.sin(el*3+ei+gi)*0.2;eye.scale.setScalar(s);});
+    if(god.userData.falling){god.position.y-=dt*14;god.rotation.z+=dt*1.5;god.scale.multiplyScalar(1-dt*0.4);
+      god.children.forEach(c=>{if(c.material&&c.material.opacity!==undefined){}});
+      if(god.position.y<-60)god.visible=false;}
+  });}
+  // 田村くん：核は脈動、人型はゆらめき
+  if(groups.tamura&&groups.tamura.visible){
+    if(groups.tamuraCore.visible){const s=1+Math.sin(el*4)*0.15;groups.tamuraCore.scale.setScalar(s);groups.tamuraAura.scale.setScalar(s*1.1);groups.tamuraAura.rotation.y+=dt;}
+    if(groups.tamuraBody.visible){groups.tamuraBody.rotation.y+=dt*0.3;groups.tamuraBody.position.y=Math.sin(el*1.2)*0.4;}
+    if(groups.tamura.userData.sealing){groups.tamura.scale.multiplyScalar(1-dt*0.8);groups.tamura.position.y+=(-4-groups.tamura.position.y)*dt*2;groups.tamura.position.z+=(-10-groups.tamura.position.z)*dt*2;if(groups.tamura.scale.x<0.05)groups.tamura.visible=false;}
+  }
+  // 地球：自転、コア脈動
+  if(groups.earth&&groups.earth.visible){groups.earthBall.rotation.y+=dt*0.15;
+    if(groups.earthCore.material.opacity>0){const s=1+Math.sin(el*5)*0.2;groups.earthCore.scale.setScalar(s);}}
+  // 微生物：ふわふわ漂う
+  if(groups.microbes&&groups.microbes.visible){groups.microbes.children.forEach((c,i)=>{c.position.y+=Math.sin(el*1.5+c.userData.ph)*dt*0.6;c.position.x+=Math.cos(el*1.2+c.userData.ph)*dt*0.4;const s=1+Math.sin(el*3+i)*0.2;c.scale.setScalar(s);});groups.microbes.rotation.y+=dt*0.1;}
+  // 人類：ゆっくり浮遊、果実の光が脈動
+  if(groups.humans&&groups.humans.visible){groups.humans.children.forEach((h,i)=>{if(i<2)h.position.y=Math.sin(el*1+i*1.5)*0.15;});const fr=groups.humans.children[2];if(fr){const s=1+Math.sin(el*4)*0.3;fr.scale.setScalar(s);}}
+  // カメラ補間
+  if(camTarget){camLerp=Math.min(1,camLerp+dt/camDur);const e=1-Math.pow(1-camLerp,3);
+    cam.position.x=camFrom.x+(camTarget.x-camFrom.x)*e;
+    cam.position.y=camFrom.y+(camTarget.y-camFrom.y)*e;
+    cam.position.z=camFrom.z+(camTarget.z-camFrom.z)*e;
+    if(camLerp>=1)camTarget=null;}
+  // シェイク
+  if(shaking){cam.position.x+=(Math.random()-0.5)*0.6;cam.position.y+=(Math.random()-0.5)*0.6;}
+  cam.lookAt(0,0,0);
+  updateBursts(dt);
+  renderer.render(scene,cam);
+}
+
+function startCine(){
+  EP=EP_PATTERNS[+document.getElementById('patsel').value||0];
+  document.getElementById('start').style.display='none';
+  document.getElementById('skip').style.display='block';
+  init();clock=new THREE.Clock();t0=performance.now();
+  buildTimeline();running=true;animate();
+}
+// パターン選択肢を生成
+(function(){const sel=document.getElementById('patsel');EP_PATTERNS.forEach((p,i)=>{const o=document.createElement('option');o.value=i;o.textContent=p.name;sel.appendChild(o);});})();
+</script>
+</body>
+</html>
