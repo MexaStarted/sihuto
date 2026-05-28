@@ -699,7 +699,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div id="hidden-boss-slot"></div>
     <button class="title-btn link" onclick="backToShiftMemo()">← ShiftMemoに戻る</button>
   </div>
-  <div class="title-foot" id="title-foot">v2.13.2 — 7話バトルキー修正（歪みの番人）・巨人の王の絵文字変更</div>
+  <div class="title-foot" id="title-foot">v2.13.4 — デバッグ画面ムービー化を撤回・召喚チュートリアル撤廃</div>
 </div>
 
 <!-- ===== ADVENTURE (会話ラリー) ===== -->
@@ -3830,7 +3830,7 @@ function init(){
   if(typeof mvUpdateUnlocks==='function')mvUpdateUnlocks();
 }
 // タイトル演出：星・コード・流れ星・お知らせバッジ
-const RPG_VERSION='2.13.2';
+const RPG_VERSION='2.13.4';
 function initTitleFx(){
   // 星
   const stars=document.getElementById('tfx-stars');
@@ -4067,18 +4067,46 @@ function startBattle(){
       // フォールバック：物語キャラ固定
       G.party=PARTY_DEF.map(def=>{const st=calcStats(def.id);return {...def,...st,emoji:(typeof getCharEmoji==='function'?getCharEmoji(def.id):def.emoji),alive:true,buffAtk:0,guardReduce:0,stealBonus:0,statuses:[],_guarded:false,_dmgTaken:0,awakened:false};});
     }
-    // ★カエル戦（2話）：かえるは敵なので、開発者・ねこ・UFOの3人を強制編成（1vs3）
+    // ★Season2では物語キャラのかえる(frog)は離脱済み。バトルパーティから除外（ガチャfrogは残す）
+    G.party=G.party.filter(function(c){ return !(c && c.id==='frog' && !c.isGacha && !c.gacha); });
+    // ★カエル戦（2話）：かえるは敵なので強制編成。前半=3人(dev/cat/ufo)、後半=4人(rev追加で1vs4)
     if(G._s2chap===2){
-      var forcedIds=['dev','cat','ufo'];
-      G.party=forcedIds.map(function(fid){
-        var def=PARTY_DEF.find(function(p){return p.id===fid;});
-        if(!def)return null;
-        var st=calcStats(def.id);
-        return Object.assign({},def,st,{
-          emoji:(typeof getCharEmoji==='function'?getCharEmoji(def.id):def.emoji),
-          alive:true,buffAtk:0,guardReduce:0,stealBonus:0,statuses:[],_guarded:false,_dmgTaken:0,awakened:false
+      var isLatter=(G._s2enemyKey==='2b'); // 後半（闇堕ち）
+      var forcedIds=isLatter?['dev','cat','ufo','rev']:['dev','cat','ufo'];
+      G.party=forcedIds.map(function(fid){return makeBattleChar(fid);}).filter(Boolean);
+    }
+    // ★3話チワワ戦：サーモン強制参加。開発者・ねこは残し、それ以外から1人外してサーモンを入れる
+    if(G._s2chap===3){
+      var keep3=[];var others3=[];
+      G.party.forEach(function(c){
+        if(!c)return;
+        if(c.id==='frog' && !c.gacha)return; // 物語かえるは除外
+        if(c.id==='dev'||c.id==='cat')keep3.push(c);
+        else others3.push(c);
+      });
+      var salmon3=makeBattleChar('sal'); // サーモン
+      var hasSalmon3=keep3.concat(others3).some(function(c){return c.id==='sal';});
+      var newParty3=keep3.slice();
+      if(salmon3 && !hasSalmon3)newParty3.push(salmon3);
+      others3.forEach(function(c){ if(newParty3.length<4 && c.id!=='sal')newParty3.push(c); });
+      if(newParty3.length<4){
+        ['dev','cat','ufo'].forEach(function(fid){
+          if(newParty3.length>=4)return;
+          if(newParty3.some(function(c){return c.id===fid;}))return;
+          var mc=makeBattleChar(fid);
+          if(mc)newParty3.push(mc);
         });
-      }).filter(Boolean);
+      }
+      G.party=newParty3.slice(0,4);
+    }
+    // frog除外などで4人未満になった場合の補充（カエル戦・チワワ戦は強制編成済みなので対象外）
+    if(G._s2chap!==2 && G._s2chap!==3 && G.party.length<4){
+      ['dev','cat','ufo','sal','rev'].forEach(function(fid){
+        if(G.party.length>=4)return;
+        if(G.party.some(function(c){return c.id===fid;}))return;
+        var mc=makeBattleChar(fid);
+        if(mc)G.party.push(mc);
+      });
     }
   }else{
     // Season1モード：従来通り
@@ -4221,6 +4249,43 @@ function newRound(){
   else{buildQueue();nextInQueue();}
 }
 
+// 敵の顔表示：画像があればimg、なければ絵文字（GitHub画像方式対応）
+var ENEMY_IMG_BASE='https://mexastarted.github.io/sihuto/dev/';
+function enemyFaceHtml(e, sizePx, extraStyle){
+  extraStyle=extraStyle||'';
+  if(e.img){
+    // 画像（GitHub上のファイル）。読み込み失敗時は絵文字にフォールバック
+    var fallback=(e.emoji||'👾').replace(/'/g,"");
+    return '<img src="'+ENEMY_IMG_BASE+e.img+'" style="width:'+sizePx+'px;height:'+sizePx+'px;object-fit:contain;position:relative;z-index:2'+extraStyle+'" onerror="this.style.display=\'none\';this.insertAdjacentHTML(\'afterend\',\'<div class=&quot;enemy-em&quot; style=&quot;font-size:'+Math.round(sizePx*0.8)+'px;position:relative;z-index:2&quot;>'+fallback+'</div>\')">';
+  }
+  return '<div class="enemy-em" style="font-size:'+Math.round(sizePx*0.85)+'px;position:relative;z-index:2'+extraStyle+'">'+(e.emoji||'👾')+'</div>';
+}
+// バトル用キャラ生成：PARTY_DEFにいなければ固定データから（sal/rev等）
+function makeBattleChar(charId){
+  var def=PARTY_DEF.find(function(p){return p.id===charId;});
+  if(def){
+    var st=calcStats(def.id);
+    return Object.assign({},def,st,{
+      emoji:(typeof getCharEmoji==='function'?getCharEmoji(def.id):def.emoji),
+      alive:true,buffAtk:0,guardReduce:0,stealBonus:0,statuses:[],_guarded:false,_dmgTaken:0,awakened:false
+    });
+  }
+  // PARTY_DEFにいない物語キャラ（sal=サーモン, rev=☆1レビュアー）
+  var EXTRA={
+    sal:{name:'サーモン握り',emoji:'🍣',roleType:'tank'},
+    rev:{name:'☆1レビュアー',emoji:'🧑‍🎨',roleType:'debuffer'}
+  };
+  if(EXTRA[charId]){
+    var x=EXTRA[charId];
+    var st2=calcStats(charId);
+    return {
+      id:charId, name:x.name, emoji:x.emoji, color:'#8fd3ff', roleType:x.roleType,
+      hp:st2.hp,maxhp:st2.maxhp,atk:st2.atk,def:st2.def,spd:st2.spd,
+      alive:true,buffAtk:0,guardReduce:0,stealBonus:0,statuses:[],_guarded:false,_dmgTaken:0,awakened:false
+    };
+  }
+  return null;
+}
 function renderBattle(){
   let topZone=document.getElementById('enemy-top-zone');
   if(!topZone){topZone=document.createElement('div');topZone.id='enemy-top-zone';topZone.className='enemy-top-zone';document.getElementById('battle-field').insertBefore(topZone,document.getElementById('party-zone'));}
@@ -4233,7 +4298,7 @@ function renderBattle(){
     const roleIcon=e.roleType==='zako_heal'?'💚':e.roleType==='zako_def'?'🛡':'';
     return `<div class="enemy-unit ${big?'boss':''} ${td?'thedev':''}" id="enemy-unit-${i}" data-ei="${i}" onclick="onEnemyTap(${i})" oncontextmenu="return showUnitDetail(event,'enemy',${i})" ontouchstart="lpStart('enemy',${i})" ontouchend="lpEnd()" ontouchmove="lpCancel()">
       ${td?'<div class="td-aura"></div><div class="td-ring"></div>':''}
-      <div class="enemy-em" style="font-size:${e._bigBoss?'110':td?'108':big?'96':'26'}px;position:relative;z-index:2${e.zombieFx?';filter:hue-rotate(80deg) saturate(2) brightness(0.7) drop-shadow(0 0 14px #6a0dad) drop-shadow(0 0 8px #2a0a0a);animation:zombiePulse 1.4s ease-in-out infinite':''}">${e.emoji}</div>
+      ${e.img?enemyFaceHtml(e, (e._bigBoss?110:td?108:big?96:26), (e.zombieFx?';filter:hue-rotate(80deg) saturate(2) brightness(0.7) drop-shadow(0 0 14px #6a0dad) drop-shadow(0 0 8px #2a0a0a);animation:zombiePulse 1.4s ease-in-out infinite':'')):`<div class="enemy-em" style="font-size:${e._bigBoss?'110':td?'108':big?'96':'26'}px;position:relative;z-index:2${e.zombieFx?';filter:hue-rotate(80deg) saturate(2) brightness(0.7) drop-shadow(0 0 14px #6a0dad) drop-shadow(0 0 8px #2a0a0a);animation:zombiePulse 1.4s ease-in-out infinite':''}">${e.emoji}</div>`}
       <div class="enemy-unit-name" style="font-size:${big?'9':'7'}px;color:${big?'#ff3b3b':'#ff8c8c'};position:relative;z-index:2">${roleIcon}${e.name}</div>
       <div class="status-icons">${statusIconsHtml(e)}</div>
       ${hpbars}
@@ -6664,6 +6729,8 @@ function initData(){
     if(d.partyIds){party=d.partyIds.map(function(pid){if(!pid)return null;var t=pid.slice(0,1),id=pid.slice(2);return owned.find(function(c){return c.id===id&&((t==='g')===!!c.gacha);})||null;});}
     else party=[owned[0],owned[1],owned[2],owned[3]];
   }else{party=[owned[0],owned[1],owned[2],owned[3]];}
+  // ★1話以降、物語キャラのかえる(frog)は離脱：パーティから除外（nullに）
+  party=party.map(function(c){ return (c && c.id==='frog' && !c.gacha)?null:c; });
 }
 
 function cf(c){return c.forms?c.forms[c.cur]:c;}
@@ -6698,7 +6765,11 @@ function cardFX(r){var col=RC[r];var h='<div class="mvfx">';
 var sortMode='pw';
 var SORTS=[['pw','戦力順'],['rarity','レア順'],['lv','Lv順'],['role','役割順']];
 function rarOrder(r){return {UR:0,SSR:1,SR:2,R:3,N:4}[r];}
-function sortedOwned(){var a=owned.slice();
+function sortedOwned(){var a=owned.slice().filter(function(c){
+    // 1話以降、物語キャラの「かえる」は離脱（編成不可）。ガチャのかえるは別IDなので可
+    if(c.id==='frog' && !c.gacha)return false;
+    return true;
+  });
   if(sortMode==='pw')a.sort(function(x,y){return bp(y)-bp(x);});
   else if(sortMode==='rarity')a.sort(function(x,y){return rarOrder(gR(x))-rarOrder(gR(y))||bp(y)-bp(x);});
   else if(sortMode==='lv')a.sort(function(x,y){return y.lv-x.lv;});
@@ -7023,7 +7094,7 @@ function show(which){
   }
 }
 function openFormation(){show('formation');}
-function openSummon(){show('summon');if(typeof maybeShowTutorial==='function')maybeShowTutorial('summon');}
+function openSummon(){show('summon');}
 function close(){
   document.querySelectorAll('.mv-screen').forEach(function(s){s.classList.remove('on');});
   // 来歴に応じて戻り先を決める
@@ -7963,6 +8034,22 @@ function _toMenuInner(){
   // Season2マップフロー：MVS終了時にクリアモーダル＋地図画面へ
   if(window.__mvtS2Playing){
     var chapNum=window.__mvtS2Chap||1;
+    // ★シネマのみモード：クリア記録せず地図に戻すだけ
+    if(window.__s2cinemaOnly){
+      window.__s2cinemaOnly=false;
+      window.__mvtS2Playing=false;
+      window.__mvtS2Chap=0;
+      $('mvs-menu').style.display='none';
+      $('mvs-root').classList.remove('on');
+      setTimeout(function(){
+        if(typeof MVT!=='undefined'){
+          document.querySelectorAll('.mvt-screen').forEach(function(s){s.classList.remove('on');});
+          document.getElementById('mvt-map').classList.add('on');
+          if(typeof MVT.renderS2Map==='function')MVT.renderS2Map();
+        }
+      },200);
+      return;
+    }
     try{
       var prev=parseInt(localStorage.getItem('s2_cleared')||'0',10)||0;
       if(chapNum>prev){localStorage.setItem('s2_cleared',String(chapNum));}
@@ -8037,6 +8124,10 @@ function _nextInner(){
   var line=seq[idx++];
   if(line.chap!==undefined){showChap(line.chap);return;}
   if(line.battle!==undefined){
+    // ★シネマのみモード（クリア済み章の見直し）：バトルをスキップ
+    if(window.__s2cinemaOnly){
+      next();return;
+    }
     if(window.__mvtS2Playing){
       // ★ バトル中の連打対策：idxを1つ戻す（battle行を再処理してもstartS2Battle中なら無効化）
       idx--;
@@ -8146,12 +8237,10 @@ function mapMovie(cue){
   return 0;
 }
 function mapMovieExternal(cue){
-  // 独立HTMLとして完成済みのムービー → iframeで再生
+  // 独立HTMLとして完成済みの「ムービー」のみ（デバッグUIは除外）
   if(cue.indexOf('神話')>=0)return 'debug_myth.html';
-  if(cue.indexOf('博士の死')>=0)return 'debug_fx.html';
   if(cue.indexOf('カエル')>=0)return 'debug_frog.html';
-  if(cue.indexOf('英雄召喚')>=0)return 'debug_gacha.html';
-  if(cue.indexOf('エンディング')>=0)return 'debug_fx.html';
+  // 英雄召喚・博士の死・エンディングは、専用ムービー未完成のため準備中マーカー表示
   return null;
 }
 function getS2BossSpec(chap, battleLabel){
@@ -8893,11 +8982,15 @@ function renderS2Map(){if(typeof maybeShowTutorial==='function')maybeShowTutoria
     var cleared=c.n<=s2c;
     var color=cleared?'#5dca8a':(unlocked?'#ffd700':'#666');
     var ringColor=unlocked?color:'#444';
-    h+='<div onclick="'+(unlocked?'MVT.playChapter('+c.n+')':'MVT.lockedChap('+c.n+')')+'" style="position:absolute;left:'+c.x+'%;top:'+c.y+'%;transform:translate(-50%,-50%);z-index:10;cursor:'+(unlocked?'pointer':'default')+';text-align:center">'+
+    var clickAction;
+    if(cleared){ clickAction='MVT.s2ClearedMenu('+c.n+')'; } // クリア済み→シネマ視聴メニュー
+    else if(unlocked){ clickAction='MVT.playChapter('+c.n+')'; } // 挑戦可能
+    else { clickAction='MVT.lockedChap('+c.n+')'; } // 未解放
+    h+='<div onclick="'+clickAction+'" style="position:absolute;left:'+c.x+'%;top:'+c.y+'%;transform:translate(-50%,-50%);z-index:10;cursor:'+(unlocked?'pointer':'default')+';text-align:center">'+
       '<div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;border:2px solid '+ringColor+';background:rgba(0,0,0,.6);box-shadow:0 0 14px '+ringColor+'66'+(unlocked&&!cleared?';animation:mvtbob 2s infinite':'')+'"></div>'+
       '<div style="position:relative;font-size:30px;width:64px;height:64px;line-height:64px;'+(unlocked?'':'opacity:.4;filter:grayscale(1)')+'">'+(cleared?'✓':(unlocked?c.emoji:'🔒'))+'</div>'+
       '<div style="position:absolute;left:50%;top:calc(50% + 36px);transform:translateX(-50%);font-size:10px;font-weight:800;color:'+color+';text-shadow:0 1px 4px #000;white-space:nowrap">第'+c.n+'話</div>'+
-      '<div style="position:absolute;left:50%;top:calc(50% + 50px);transform:translateX(-50%);font-size:8px;color:#cde;text-shadow:0 1px 3px #000;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis">'+(unlocked?c.title:'???')+'</div>'+
+      '<div style="position:absolute;left:50%;top:calc(50% + 50px);transform:translateX(-50%);font-size:8px;color:#cde;text-shadow:0 1px 3px #000;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis">'+(unlocked?(cleared?'▶ 物語を見る':c.title):'???')+'</div>'+
       '</div>';
   });
   // 異空間（クリア後）
@@ -8918,6 +9011,7 @@ function playChapter(n){
   showChapterConfirm(n, function(){
     window.__mvtS2Playing=true;
     window.__mvtS2Chap=n;
+    window.__s2cinemaOnly=false;
     document.getElementById('mvt-map').classList.remove('on');
     MVS.open();
     setTimeout(function(){
@@ -8925,6 +9019,36 @@ function playChapter(n){
       MVS.play(n);
     },120);
   });
+}
+
+// クリア済み章のメニュー：物語（シネマ）を見るだけ（バトルなし・再プレイ不可）
+function s2ClearedMenu(n){
+  var titles={1:'タコパと、終わりの音',2:'優しい心の雨',3:'生きた寿司と、おじいちゃん',4:'王と、あうー',5:'米の中の宇宙',6:'ふろしき将軍と、宇宙船泥棒',7:'過去の自分と、レスバ',8:'神と、ガチレスバ',9:'核の囚人',10:'終わりの、その先'};
+  var modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;z-index:2300;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)';
+  modal.innerHTML='<div style="max-width:340px;width:100%;background:linear-gradient(180deg,#13233a,#0a1420);border:2px solid #5dca8a;border-radius:16px;padding:24px 20px;text-align:center;color:#fff;box-shadow:0 0 36px #5dca8a66">'+
+    '<div style="font-size:38px;margin-bottom:6px">✓</div>'+
+    '<div style="font-size:11px;color:#5dca8a;letter-spacing:2px;font-weight:800">CLEARED</div>'+
+    '<div style="font-size:16px;font-weight:900;margin:6px 0 4px">第'+n+'話</div>'+
+    '<div style="font-size:12px;color:#9ab;margin-bottom:16px">'+(titles[n]||'')+'</div>'+
+    '<div style="font-size:10px;color:#789;margin-bottom:16px;line-height:1.7">この章はクリア済みです。<br>物語（シネマ）をもう一度見られます。<br>※バトルはスキップされます</div>'+
+    '<button id="s2cv-watch" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(180deg,#5dca8a,#2a8a5a);color:#fff;font-weight:900;font-size:13px;cursor:pointer;margin-bottom:8px">▶ 物語を見る</button>'+
+    '<button id="s2cv-close" style="width:100%;padding:10px;border-radius:10px;border:1px solid #345;background:transparent;color:#9ab;font-size:12px;cursor:pointer">閉じる</button>'+
+  '</div>';
+  document.body.appendChild(modal);
+  document.getElementById('s2cv-close').onclick=function(){modal.remove();};
+  document.getElementById('s2cv-watch').onclick=function(){
+    modal.remove();
+    window.__mvtS2Playing=true;
+    window.__mvtS2Chap=n;
+    window.__s2cinemaOnly=true; // ★シネマのみモード（バトルスキップ）
+    document.getElementById('mvt-map').classList.remove('on');
+    MVS.open();
+    setTimeout(function(){
+      document.getElementById('mvs-menu').style.display='none';
+      MVS.play(n);
+    },120);
+  };
 }
 
 // Season2: 章開始の確認モーダル
@@ -9039,7 +9163,7 @@ function boot(){
 }
 if(document.readyState!=='loading')boot();else document.addEventListener('DOMContentLoaded',boot);
 
-return {openSeasonSelect:openSeasonSelect,selSeason:setSeason,enter:enter,showRec:showRec,closeRec:closeRec,gotoSeason1:gotoSeason1,forceSeason2:forceSeason2,backToSeason:backToSeason,playS1:playS1,playS2:playS2,close:close,openThreat:openThreat,closeThreat:closeThreat,threatPrev:threatPrev,threatNext:threatNext,threatGo:threatGo,hitThreat:hitThreat,playChapter:playChapter,closeMap:closeMap,lockedChap:lockedChap,showChapterClearModal:showChapterClearModal,renderS2Map:renderS2Map,gotoHub:gotoHub};
+return {openSeasonSelect:openSeasonSelect,selSeason:setSeason,enter:enter,showRec:showRec,closeRec:closeRec,gotoSeason1:gotoSeason1,forceSeason2:forceSeason2,backToSeason:backToSeason,playS1:playS1,playS2:playS2,close:close,openThreat:openThreat,closeThreat:closeThreat,threatPrev:threatPrev,threatNext:threatNext,threatGo:threatGo,hitThreat:hitThreat,playChapter:playChapter,closeMap:closeMap,lockedChap:lockedChap,showChapterClearModal:showChapterClearModal,renderS2Map:renderS2Map,gotoHub:gotoHub,s2ClearedMenu:s2ClearedMenu};
 })();
 
 
@@ -9228,7 +9352,12 @@ window.s2nav=function(dest){
       '宇宙の漂流物（小バトル）':99
     };
     var mapped = BATTLE_KEY_MAP[battleKey];
-    var enemyKey = (mapped !== undefined) ? mapped : (typeof battleKey==='number' ? battleKey : chap);
+    var _es2r = (typeof ENEMIES_S2!=='undefined')?ENEMIES_S2:window.ENEMIES_S2;
+    var enemyKey;
+    if(mapped !== undefined){ enemyKey = mapped; }
+    else if(typeof battleKey==='number'){ enemyKey = battleKey; }
+    else if(typeof battleKey==='string' && _es2r && _es2r[battleKey]!==undefined){ enemyKey = battleKey; }
+    else { enemyKey = chap; }
     var ENEMIES_S2_ref = (typeof ENEMIES_S2!=='undefined')?ENEMIES_S2:window.ENEMIES_S2;
     if(!ENEMIES_S2_ref){alert('ENEMIES_S2未定義');if(callbacks&&callbacks.onLose)callbacks.onLose();return;}
     var e = ENEMIES_S2_ref[enemyKey];
