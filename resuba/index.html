@@ -125,6 +125,12 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
 .card .meta{flex:1;z-index:2}.card .meta .nm{font-weight:700;font-size:15px}.card .meta .role{font-size:10px;color:#9bd}
 .card .grip{z-index:2;color:#56688a;font-size:18px;padding-left:4px}
 .card .formbtn{position:absolute;top:6px;right:6px;z-index:5;font-size:10px;font-family:'Orbitron';letter-spacing:1px;color:#ffe98a;border:1px solid #ffe98a;border-radius:10px;padding:3px 7px;background:rgba(40,30,0,.6);cursor:pointer}
+.card .card-rank{position:absolute;top:7px;right:8px;z-index:4;font-family:'Orbitron';font-weight:700;font-size:9px;padding:1px 6px;border-radius:6px}
+.card .card-rank.R{color:#9be3ff;border:1px solid #6fd6ff}
+.card .card-rank.SR{color:#ff7ae6;border:1px solid var(--neon-m)}
+.card .card-rank.SSR{color:var(--neon-y);border:1px solid var(--neon-y)}
+.card .card-rank.UR{color:#ffe98a;border:1px solid #ffe98a}
+.card:has(.formbtn) .card-rank{right:78px}
 .card .formbtn:active{transform:scale(.92)}
 .card .card-stats{width:100%;margin-top:6px;z-index:2}
 .card .cs-pw{font-family:'Orbitron';font-size:10px;color:var(--neon-y);text-align:center;margin-bottom:3px}
@@ -383,7 +389,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
 .u-rbolt{position:absolute;top:0;width:16px;height:0;z-index:32;background:linear-gradient(180deg,#fff,#ffb0b8,#ff3a4a);box-shadow:0 0 22px #ff3a4a,0 0 44px #c81e2e;opacity:0;clip-path:polygon(40% 0,60% 0,48% 40%,72% 40%,30% 100%,52% 55%,30% 55%)}
 .u-rbolt.go{animation:urboltGo .3s steps(2)}@keyframes urboltGo{0%{opacity:0;height:0}25%{opacity:1;height:100%}100%{opacity:0;height:100%}}
 /* キャラ詳細 */
-#charDetail{position:absolute;inset:0;z-index:150;background:rgba(3,4,12,.85);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:24px}
+#charDetail{position:fixed;inset:0;z-index:9000;background:rgba(3,4,12,.88);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:20px}
 #charDetail.on{display:flex;animation:scin .25s ease}
 .cd-box{width:100%;max-width:330px;border:1px solid var(--neon-c);border-radius:16px;padding:18px;background:linear-gradient(160deg,var(--bg2),#10122e);box-shadow:0 0 30px rgba(0,240,255,.4)}
 .cd-box .cdh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
@@ -1141,6 +1147,9 @@ const BGM_OF={title:'title',main:'main',party:'main',gacha:'gacha',gachaResult:'
 function scr(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show'));
   document.getElementById(id).classList.add('show');
+  // 開いている詳細モーダルを閉じる
+  const cd=document.getElementById('charDetail');if(cd)cd.classList.remove('on');
+  const zd=document.getElementById('zDetail');if(zd)zd.classList.remove('on');
   const b=BGM_OF[id]; if(b)Audio.playBGM(b);
 }
 function refresh(){
@@ -1375,17 +1384,16 @@ function drawBench(){const el=document.getElementById('bench');el.innerHTML='';
       return;
     }
     d.innerHTML=`<div class="f">${c.face}</div>
-      <div class="meta"><div class="nm">${c.name}</div><div class="role">${c.role}</div></div>
+      <div class="meta"><div class="nm">${c.name}</div><div class="role">${(BD[c.id]?BD[c.id].roles.map(r=>(ROLE_ICON[r]||'')+r).join(' / '):c.role)}</div></div>
+      <span class="card-rank ${c.rare}">${c.rare}</span>
       ${fx?'<span class="innow fix">主人公・固定</span>':inP?'<span class="innow">編成中</span>':''}
       <span class="swipefx">▲ 編成</span><div class="grip">${fx?'🔒':'⠿'}</div>`;
-    // 戦力＋ステータス
+    // 戦力＋ステータス（図鑑と同じ表記）
     const lv=getUserLevel();const st=unitStats(c.id,lv);const pw=unitPower(c.id,lv);
     if(st){const sb=document.createElement('div');sb.className='card-stats';
       sb.innerHTML=`<div class="cs-pw">⚔ 戦力 <b>${disp(pw)}</b></div>
         <div class="cs-grid"><span>HP ${disp(st.HP)}</span><span>ATK ${disp(st.ATK)}</span><span>DEF ${disp(st.DEF)}</span><span>SPD ${disp(st.SPD)}</span></div>`;
       d.appendChild(sb);}
-    // 長押しで詳細モーダル
-    bindCardLongPress(d,c.id);
     // フォルムチェンジ可能（解禁済み）なら切替ボタン
     const b=baseOf(c.id);
     if(FORMS[b] && S.formUnlocked && S.formUnlocked[b]){
@@ -1397,24 +1405,30 @@ function drawBench(){const el=document.getElementById('bench');el.innerHTML='';
   document.getElementById('benchCnt').textContent=ownedChars().length+'体';
 }
 function bindDrag(card,id){
-  let sx,sy,dragging=false,clone=null,moved=false;
-  const start=e=>{const t=e.touches?e.touches[0]:e;sx=t.clientX;sy=t.clientY;dragging=true;moved=false;
+  let sx,sy,dragging=false,clone=null,moved=false,lpTimer=null,lpFired=false;
+  const clearLP=()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}};
+  const start=e=>{const t=e.touches?e.touches[0]:e;sx=t.clientX;sy=t.clientY;dragging=true;moved=false;lpFired=false;
+    // 長押し：400ms動かさなければ詳細モーダル
+    clearLP();lpTimer=setTimeout(()=>{if(!moved){lpFired=true;dragging=false;Audio.SE.select();openCharDetailById(effId(id));}},400);
     document.addEventListener('mousemove',move);document.addEventListener('mouseup',end);
     document.addEventListener('touchmove',move,{passive:false});document.addEventListener('touchend',end);};
   const move=e=>{if(!dragging)return;const t=e.touches?e.touches[0]:e;const dx=t.clientX-sx,dy=t.clientY-sy;
-    if(!moved&&Math.hypot(dx,dy)>8){moved=true;clone=card.cloneNode(true);clone.classList.add('dragging');
+    if(!moved&&Math.hypot(dx,dy)>8){moved=true;clearLP();clone=card.cloneNode(true);clone.classList.add('dragging');
       clone.style.width=card.offsetWidth+'px';document.getElementById('app').appendChild(clone);card.style.opacity=.25;}
     if(moved){e.preventDefault();clone.style.left=(t.clientX-card.offsetWidth/2)+'px';clone.style.top=(t.clientY-30)+'px';hlSlot(t.clientY);}};
-  const end=e=>{dragging=false;
+  const end=e=>{clearLP();const wasDragging=dragging;dragging=false;
     document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',end);
     document.removeEventListener('touchmove',move);document.removeEventListener('touchend',end);
+    if(lpFired){return;} // 長押しで詳細を開いたのでタップ処理しない
     if(moved){const t=e.changedTouches?e.changedTouches[0]:e;
-      const r=document.getElementById('slots').getBoundingClientRect();clone.remove();card.style.opacity='';clearHL();
+      const r=document.getElementById('slots').getBoundingClientRect();if(clone)clone.remove();card.style.opacity='';clearHL();
       if(t.clientY<r.bottom+30)addToParty(id);
-    }else{ if(id===FIXED){toast('主人公は外せません');Audio.SE.error();return;}
+    }else if(wasDragging){ if(id===FIXED){toast('主人公は外せません');Audio.SE.error();return;}
       if(S.party.includes(id)){S.party=S.party.filter(x=>x!=id);Audio.SE.back();save();drawSlots();drawBench();}else addToParty(id);}
   };
   card.addEventListener('mousedown',start);card.addEventListener('touchstart',start,{passive:true});
+  card.addEventListener('mouseleave',end);
+  card.addEventListener('contextmenu',ev=>ev.preventDefault());
 }
 function hlSlot(y){const r=document.getElementById('slots').getBoundingClientRect();
   document.querySelectorAll('.slot').forEach(s=>s.classList.toggle('drop',y<r.bottom+30));}
@@ -1675,7 +1689,8 @@ function openDetail(c){document.getElementById('zdFace').textContent=c.face;
     h+=b.ults.map(u=>`<div class="zd-sk ult"><span class="sn">⚡${u.n}</span><span class="sd">${u.d}</span></div>`).join('');
     skEl.innerHTML=h;
   } else skEl.innerHTML='';
-  document.getElementById('zDetail').classList.add('on');}
+  const zR=document.getElementById('zDetail');if(zR.parentElement!==document.body)document.body.appendChild(zR);
+  zR.classList.add('on');}
 document.getElementById('zdClose').onclick=()=>{Audio.SE.back();document.getElementById('zDetail').classList.remove('on');};
 document.getElementById('zdX').onclick=()=>{Audio.SE.back();document.getElementById('zDetail').classList.remove('on');};
 document.getElementById('zDetail').addEventListener('click',e=>{if(e.target.id==='zDetail'){Audio.SE.back();document.getElementById('zDetail').classList.remove('on');}});
@@ -1744,22 +1759,22 @@ const POOL={R:1000,SR:1300,SSR:1700,UR:5000};
 // alloc:[ATK,DEF,SPD,MP] baseHP, roles[], passives[3], skills[4], ults[]
 const BD={
   // ===== 味方4体（全員SR） =====
-  1:{alloc:[760,280,340,300],baseHP:1900,roles:["アタッカー"],
-     passives:["勇者の覚悟：HP30%以下でATK+25%","開発者の閃き：ターン開始時たまにテンション+10","ウォッチャー撃退者：与ダメージ+10%"],
+  1:{alloc:[1520,560,680,600],baseHP:3800,roles:["アタッカー"],
+     passives:["残業：ターン経過ごとに全ステータス+5%（上限+400%）","開発者の閃き：ターン開始時テンション+50%","絆の力：生存している味方1体につきATK+15%"],
      skills:[
        {n:"渾身のコード",d:"単体にATK130%",pow:1.3,mp:60,tgt:"one"},
        {n:"デバッグソード",d:"ATK100%+相手DEF-15%",pow:1.0,mp:90,tgt:"one",deb:{DEF:-0.15,t:3}},
        {n:"連続コミット",d:"ATK80%×2回",pow:0.8,mp:110,tgt:"one",hits:2},
        {n:"全力リリース",d:"単体にATK170%",pow:1.7,mp:150,tgt:"one"}],
-     ults:[{n:"勇者の連撃 -ウォッチャー断ち-",d:"敵全体ATK330%",pow:3.3,tgt:"all",ultfx:"thunder"}]},
+     ults:[{n:"勇者の連撃 -ウォッチャー断ち-",d:"敵全体に攻撃力20%×30回",pow:0.2,tgt:"all",hits:30,ultfx:"thunder"}]},
   2:{alloc:[340,300,360,420],baseHP:1700,roles:["バフ"],
-     passives:["元ヤクザの義理：味方が倒れそうな時たまに庇う","姉御肌：味方への回復+15%","ドスの効いた一喝：ターン開始時味方MP小回復"],
+     passives:["元ヤクザの義理：味方が致死ダメージを受けた時HP1で耐える(各味方1回)","姉御肌：自身の回復効果+40%","ドスの効いた一喝：ターン開始時に味方全体のMPを8%回復＆テンション+10"],
      skills:[
-       {n:"おらっ！",d:"単体にATK110%",pow:1.1,mp:60,tgt:"one"},
-       {n:"傷の手当て",d:"対象1体のHPを中回復",pow:0,mp:90,tgt:"ally1",healOne:0.30},
-       {n:"みんな下がれ",d:"味方全体HP小回復",pow:0,mp:130,tgt:"allyAll",healAll:0.18},
-       {n:"喝！",d:"味方全体ATK+15%",pow:0,mp:110,tgt:"allyAll",buf:{ATK:0.15,t:3}}],
-     ults:[{n:"仁義なきカチコミ",d:"敵全体ATK180%＋味方全体を大回復＋ATK+20%",pow:1.8,tgt:"all",healAll:0.4,allybuf:{ATK:0.2,t:3},ultfx:"fire_heal"}]},
+       {n:"おらっ！",d:"単体にATK160%",pow:1.6,mp:60,tgt:"one"},
+       {n:"傷の手当て",d:"対象1体のHPを大回復",pow:0,mp:90,tgt:"ally1",healOne:0.55},
+       {n:"みんな下がれ",d:"味方全体HP中回復",pow:0,mp:130,tgt:"allyAll",healAll:0.35},
+       {n:"喝！",d:"味方全体ATK+30%",pow:0,mp:110,tgt:"allyAll",buf:{ATK:0.3,t:3}}],
+     ults:[{n:"仁義なきカチコミ",d:"敵全体ATK360%＋味方全体を全回復＋ATK+40%(3T)",pow:3.6,tgt:"all",healAll:0.8,allybuf:{ATK:0.4,t:3},ultfx:"fire_heal"}]},
   3:{alloc:[240,520,200,340],baseHP:3000,roles:["タンク"],
      passives:["がんばる：HP40%以下でDEF+40%","みんなのために：味方全体DEF+8%常時","ぼくが盾になるよ：被弾時テンション+50%増"],
      skills:[
@@ -1769,13 +1784,13 @@ const BD={
        {n:"やさしいバリア",d:"味方全体DEF+25%",pow:0,mp:120,tgt:"allyAll",buf:{DEF:0.25,t:3}}],
      ults:[{n:"やさしい雨",d:"3ターン味方全体被ダメ-50%＋大回復＋自分に反射",pow:0,tgt:"self",selfbuf:{DEF:0.5,t:3},reflect:true,allybuf:{DEF:0.3,t:3},healAll:0.3,ultfx:"rain_heal"}]},
   4:{alloc:[300,300,380,500],baseHP:1600,roles:["トリッキー","デバフ"],
-     passives:["異星の知覚：敵の弱点をたまに見抜きデバフ強化","あうー（理解者）：かえると共闘時SPD+10%","謎の勘：被デバフをたまに無効化"],
+     passives:["異星の知覚：自身の与えるデバフ効果+50%・命中率上昇","あうー（理解者）：味方全体のSPD+15%","謎の勘：被デバフを無効化・たまに敵の必殺を遅延"],
      skills:[
-       {n:"あうー！",d:"ATK100%+相手SPD-20%",pow:1.0,mp:70,tgt:"one",deb:{SPD:-0.2,t:3}},
-       {n:"未知の電波",d:"相手の全能力-15%",pow:0,mp:110,tgt:"one",deb:{ATK:-0.15,DEF:-0.15,SPD:-0.15,t:3}},
-       {n:"時空のゆらぎ",d:"味方全体SPD+25%",pow:0,mp:120,tgt:"allyAll",buf:{SPD:0.25,t:3}},
-       {n:"記憶混濁",d:"相手MP-25%＋30%で沈黙",pow:0,mp:100,tgt:"one",mpdmg:0.25,silence:0.3}],
-     ults:[{n:"あうー！（全弾照準）",d:"敵全体ATK230%＋全能力-20%",pow:2.3,tgt:"all",deb:{ATK:-0.2,DEF:-0.2,SPD:-0.2,t:3},ultfx:"alien"}]},
+       {n:"あうー！",d:"ATK150%+相手SPD-40%",pow:1.5,mp:70,tgt:"one",deb:{SPD:-0.4,t:3}},
+       {n:"未知の電波",d:"相手の全能力-30%",pow:0,mp:110,tgt:"one",deb:{ATK:-0.3,DEF:-0.3,SPD:-0.3,t:3}},
+       {n:"時空のゆらぎ",d:"味方全体SPD+50%",pow:0,mp:120,tgt:"allyAll",buf:{SPD:0.5,t:3}},
+       {n:"記憶混濁",d:"相手MP-50%＋60%で沈黙",pow:0,mp:100,tgt:"one",mpdmg:0.5,silence:0.6}],
+     ults:[{n:"あうー！（全弾照準）",d:"敵全体ATK460%＋全能力-40%(3T)",pow:4.6,tgt:"all",deb:{ATK:-0.4,DEF:-0.4,SPD:-0.4,t:3},ultfx:"alien"}]},
   // ===== 鬼大家（1話ボス・ゾンビ化） =====
   5:{alloc:[420,340,260,200],baseHP:2200,roles:["タンク","アタッカー"],
      passives:["鬼の末裔：被ダメ-10%","怒りの徴収：HP50%以下でATK+30%","ゾンビ化：戦闘不能時たまにHP20%で復活"],
@@ -2056,6 +2071,7 @@ function makeUnit(charId,lv,isEnemy){
     cid:charId, name:c.name, face:c.face, rare:c.rare, roles:b.roles,
     passives:b.passives, skills:b.skills, ults:b.ults,
     base:{...st}, maxHP, hp:maxHP, maxMP:st.MP, mp:st.MP, dmul,
+    turnsAlive:0,
     tension:0, isEnemy, isBoss:isEnemy, alive:true, buffs:[], guard:false, taunt:false,
     reflect:false, revived:false
   };
@@ -2067,8 +2083,14 @@ function eff(u,key){
   // 常時パッシブ
   if(key==='DEF'&&u.cid===3) mult+=0.08;                                   // かえる：味方全体DEF+8%(簡易=自分DEF)
   if(key==='DEF'&&u.cid===3&&u.hp/u.maxHP<=0.40) mult+=0.40;               // かえる：HP40%以下でDEF+40%
-  if(key==='ATK'&&u.cid===1&&u.hp/u.maxHP<=0.30) mult+=0.25;               // 開発者：HP30%以下でATK+25%
-  if(key==='ATK'&&u.cid===1) mult+=0.10;                                   // 開発者：与ダメ+10%相当
+  // 開発者(cid1) 新パッシブ
+  if(u.cid===1){
+    // 残業：ターン経過ごとに全ステータス+5%（上限+400%）
+    const ot=Math.min(4.0,(u.turnsAlive||0)*0.05);
+    mult+=ot;
+    // 絆の力：生存している味方1体につきATK+15%
+    if(key==='ATK'&&B&&B.allies){const live=B.allies.filter(a=>a.alive).length;mult+=0.15*live;}
+  }
   if(key==='DEF'&&u.cid===5) mult+=0.10;                                   // 鬼大家：被ダメ-10%相当(DEF底上げ)
   if(key==='ATK'&&u.cid===5&&u.hp/u.maxHP<=0.50) mult+=0.30;               // 鬼大家：HP50%以下でATK+30%
   if(key==='DEF'&&u.cid===7) mult+=0.15;                                   // スパチャ神：DEF+15%
@@ -2088,6 +2110,8 @@ function eff(u,key){
   }
   if(key==='SPD'){
     if(pas.includes('韋駄天')) mult+=0.30;
+    // UFO乗組員（cid4）が同じ陣営に生存していれば味方全体SPD+15%（理解者オーラ）
+    if(!u.isEnemy&&B&&B.allies&&B.allies.some(a=>a.alive&&a.cid===4)) mult+=0.15;
   }
   return Math.max(1,Math.round(v*mult));
 }
@@ -2138,9 +2162,11 @@ function startTurn(){
     if(!u.alive)return;
     u.guard=false;
     u.buffs=u.buffs.filter(bf=>{bf.t--;return bf.t>0;});
+    // 生存ターン数カウント（開発者の「残業」パッシブ等で使用）
+    u.turnsAlive=(u.turnsAlive||0)+1;
     // ターン開始MP回復系パッシブ
-    if(u.cid===1&&Math.random()<0.4)u.tension=Math.min(100,u.tension+10);     // 開発者：たまにテンション+10
-    if(u.cid===2)B.allies.forEach(a=>{if(a.alive)a.mp=Math.min(a.maxMP,a.mp+Math.round(a.maxMP*0.04));}); // ねこ：味方MP回復
+    if(u.cid===1)u.tension=Math.min(100,u.tension+50);                         // 開発者：開発者の閃き テンション+50
+    if(u.cid===2)B.allies.forEach(a=>{if(a.alive){a.mp=Math.min(a.maxMP,a.mp+Math.round(a.maxMP*0.08));a.tension=Math.min(100,a.tension+10);}}); // ねこ：味方MP8%回復＆テンション+10
     if(u.cid===7)B.allies.forEach(a=>{if(a.alive)a.mp=Math.min(a.maxMP,a.mp+Math.round(a.maxMP*0.04));}); // スパチャ神：味方MP回復
     if(u.cid===10)u.hp=Math.min(u.maxHP,u.hp+Math.round(u.maxHP*0.10));         // サーモン握り：米の加護 HP10%回復
     if(u.cid===102){const side=u.isEnemy?B.enemies:B.allies;side.forEach(a=>{if(a.alive)a.hp=Math.min(a.maxHP,a.hp+Math.round(a.maxHP*0.05));});} // 伝説ねこ：原初の慈愛
@@ -2299,6 +2325,10 @@ function applyDmg(src,tgt,raw,opt={}){
   if((tgt.passives||[]).join('').includes('原初の護り'))d=Math.round(d*0.70); // 伝説かえる：被ダメ-30%
   if(tgt.guard)d=Math.round(d*0.5);
   tgt.hp=Math.max(0,tgt.hp-d);
+  // ねこ「元ヤクザの義理」：味方が致死ダメージ→各味方1回だけHP1で耐える（ねこ生存時）
+  if(tgt.hp<=0 && !tgt.isEnemy && !tgt.nekoSaved && B&&B.allies&&B.allies.some(a=>a.alive&&a.cid===2&&a!==tgt)){
+    tgt.hp=1;tgt.nekoSaved=true;
+  }
   tgt.tension=Math.min(100,tgt.tension+ ((tgt.cid===3||tgt.cid===8)?15:10));
   const dmul=Math.max((src&&src.dmul)||1,(tgt&&tgt.dmul)||1); // ボスが絡む表示は据え置き(×2)
   popDmg(tgt,d,opt.crit,false,dmul);
@@ -2393,7 +2423,7 @@ function applyEffects(u,sk,t,ally){
   if(sk.mpheal){u.mp=Math.min(u.maxMP,u.mp+Math.round(u.maxMP*sk.mpheal));}
   if(sk.silence&&Math.random()<sk.silence){addBuff(t,{silence:true,t:2,icon:'🤐'});}
 }
-function healAmt(src,tgt,ratio){let r=Math.round(tgt.maxHP*ratio);if(src&&src.cid===2)r=Math.round(r*1.15);return r;}
+function healAmt(src,tgt,ratio){let r=Math.round(tgt.maxHP*ratio);if(src&&src.cid===2)r=Math.round(r*1.40);return r;}
 function buffPart(o){const{t,...s}=o;return s;}
 function addBuff(u,bf){
   // アイコン付与
@@ -2787,7 +2817,10 @@ function showCharDetail(u){
     <div class="cd-eff"><div class="et">パッシブ</div>${u.passives.map(p=>{const[n,d]=p.split('：');return `<div class="cd-pas"><b>${n}</b>${d?`<span>${d}</span>`:''}</div>`;}).join('')}</div>
     <div class="cd-eff"><div class="et">技</div>${skills}${ults}</div>
     <div class="cd-close"><div class="nbtn" onclick="document.getElementById('charDetail').classList.remove('on')">閉じる</div></div>`;
-  document.getElementById('charDetail').classList.add('on');
+  const cdRoot=document.getElementById('charDetail');
+  if(cdRoot.parentElement!==document.body)document.body.appendChild(cdRoot);
+  cdRoot.classList.add('on');
+  cdRoot.onclick=(e)=>{if(e.target===cdRoot){Audio.SE.back();cdRoot.classList.remove('on');}};
 }
 
 </script>
