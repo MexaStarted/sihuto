@@ -117,7 +117,9 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
 .bench-ttl .cnt{color:#9bd;font-size:9px}
 .bench{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:2px;margin:0 -2px}
 .bench::-webkit-scrollbar{width:5px}.bench::-webkit-scrollbar-thumb{background:rgba(0,240,255,.4);border-radius:5px}
-.card{display:flex;align-items:center;flex-wrap:wrap;gap:13px;border-radius:14px;padding:11px 14px;position:relative;background:rgba(8,10,24,.85);cursor:grab;transition:transform .12s,box-shadow .15s;touch-action:pan-y}
+.card{display:flex;align-items:center;flex-wrap:wrap;gap:13px;border-radius:14px;padding:11px 14px;position:relative;background:rgba(8,10,24,.85);cursor:grab;transition:transform .12s,box-shadow .15s;touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.card *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;pointer-events:none}
+.card .formbtn,.card .rm{pointer-events:auto}
 .card:active{cursor:grabbing}
 .card .f{font-size:38px;z-index:2;width:46px;text-align:center}
 .card .meta{flex:1;z-index:2}.card .meta .nm{font-weight:700;font-size:15px}.card .meta .role{font-size:10px;color:#9bd}
@@ -181,9 +183,9 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
 .boss-nums .unum-max{font-family:'Rajdhani';font-size:10px;color:#a77}
 .boss-ten{height:5px !important;margin-top:3px}
 /* 巨大ボスを置くゾーン（Aレイアウト：見上げ構図） */
-.view-big{margin-top:96px}
+.view-big{margin-top:84px}
 .view-big .mob-row{gap:14px;margin-bottom:0}
-.view-big .boss-row{margin-top:-10px;min-height:230px}
+.view-big .boss-row{margin-top:0;min-height:min(58vw,240px);margin-bottom:28px}
 /* half表示（Dレイアウト：右上から半身） */
 .view-half{align-items:stretch}
 .view-half .boss-row{position:absolute;top:-20px;right:-60px;z-index:8}
@@ -194,7 +196,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
 .view-half .unit.boss::before,.view-half .unit.boss::after{display:none}
 .view-half .mob-row{position:relative;z-index:12;margin-top:150px;justify-content:flex-start;padding-left:18px;max-width:60%}
 .mob-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;width:100%}
-.boss-row{display:flex;justify-content:center;width:100%}
+.boss-row{display:flex;justify-content:center;width:100%;position:relative}
 /* 雑魚 */
 .unit.mob{width:54px;cursor:pointer;position:relative}
 .mob-av{font-size:34px;text-align:center;filter:drop-shadow(0 0 8px rgba(255,0,120,.5));animation:mobfloat 3s ease-in-out infinite}
@@ -205,16 +207,16 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
 .unit.mob.dead{opacity:.25;filter:grayscale(1)}
 /* ボス：巨大・禍々しい */
 .unit.boss{position:relative;width:100%;display:flex;flex-direction:column;align-items:center;padding-top:4px}
-.boss-aura{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:340px;height:340px;border-radius:50%;z-index:0;
+.boss-aura{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:min(78vw,340px);height:min(78vw,340px);border-radius:50%;z-index:0;
   background:radial-gradient(circle,rgba(255,0,80,.4),rgba(120,0,60,.16) 50%,transparent 72%);animation:bossaura 3.5s ease-in-out infinite}
 @keyframes bossaura{50%{transform:translateX(-50%) scale(1.12);opacity:.82}}
-.unit.boss .boss-av{font-size:280px;text-align:center;position:relative;z-index:2;line-height:1;
+.unit.boss .boss-av{font-size:min(62vw,260px);text-align:center;position:relative;z-index:2;line-height:1;
   filter:drop-shadow(0 0 14px #ff0050) drop-shadow(0 0 36px #b3005f) drop-shadow(0 6px 12px #000);
   animation:bossbreath 3.4s ease-in-out infinite}
 @keyframes bossbreath{0%,100%{transform:scale(1) rotate(-1deg)}50%{transform:scale(1.05) rotate(1deg)}}
-.unit.boss::before{content:"";position:absolute;top:30px;left:50%;transform:translateX(-50%);width:300px;height:300px;z-index:1;border-radius:50%;
+.unit.boss::before{content:"";position:absolute;top:30px;left:50%;transform:translateX(-50%);width:min(70vw,300px);height:min(70vw,300px);z-index:1;border-radius:50%;
   border:2px dashed rgba(255,0,80,.4);animation:spin 16s linear infinite}
-.unit.boss::after{content:"";position:absolute;top:10px;left:50%;transform:translateX(-50%);width:340px;height:340px;z-index:1;border-radius:50%;
+.unit.boss::after{content:"";position:absolute;top:10px;left:50%;transform:translateX(-50%);width:min(78vw,340px);height:min(78vw,340px);z-index:1;border-radius:50%;
   border:1px solid rgba(255,40,120,.3);animation:spin 11s linear reverse infinite}
 .boss-rare{font-size:9px;padding:1px 5px;border-radius:6px;background:rgba(0,0,0,.5)}
 .boss-rare.SR{color:var(--neon-m)}.boss-rare.SSR{color:var(--neon-y)}.boss-rare.UR{color:#ffe98a}
@@ -224,7 +226,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
 .boss-av.uhit{animation:bossHit .35s}
 @keyframes bossHit{0%,100%{transform:scale(1)}25%{transform:translateX(-14px) scale(1.04) rotate(-3deg)}75%{transform:translateX(14px) scale(1.04) rotate(3deg)}}
 .mob-av.uhit{animation:uhit .3s}
-.bt-allies{display:flex;justify-content:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.bt-allies{display:flex;justify-content:center;gap:8px;margin-bottom:10px;margin-top:8px;flex-wrap:wrap;position:relative;z-index:20;background:linear-gradient(180deg,transparent,rgba(6,7,15,.55) 30%,rgba(6,7,15,.75));border-radius:16px;padding-top:6px}
 .unit{width:88px;border-radius:12px;padding:6px 5px 7px;background:rgba(8,10,24,.7);position:relative;transition:.2s;cursor:pointer}
 .unit.rare-SSR::before,.unit.rare-UR::after{opacity:.5}
 .unit .uav,.unit .unm,.unit .uhp-track,.unit .unum,.unit .uten-track,.unit .ubuffs{position:relative;z-index:3}
@@ -499,9 +501,11 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
 .z-sort.on{background:linear-gradient(90deg,var(--neon-m),var(--neon-c));color:#04060f;border-color:transparent}
 .z-no{position:absolute;top:5px;left:7px;font-family:'Orbitron';font-size:8px;color:#567;z-index:3}
 .z-badge{position:absolute;top:5px;right:7px;font-family:'Orbitron';font-size:8px;color:var(--neon-y);z-index:3}
-#zDetail{position:absolute;inset:0;z-index:70;background:rgba(3,4,12,.85);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:24px}
+#zDetail{position:fixed;inset:0;z-index:9000;background:rgba(3,4,12,.88);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
 #zDetail.on{display:flex;animation:scin .35s ease}
-.zd-box{width:100%;max-width:400px;border:1px solid var(--neon-c);border-radius:18px;overflow:hidden;background:linear-gradient(160deg,var(--bg2),#10122e);box-shadow:0 0 36px rgba(0,240,255,.4);max-height:90%;overflow-y:auto}
+.zd-box{position:relative;width:100%;max-width:400px;border:1px solid var(--neon-c);border-radius:18px;overflow:hidden;background:linear-gradient(160deg,var(--bg2),#10122e);box-shadow:0 0 36px rgba(0,240,255,.4);max-height:90%;overflow-y:auto}
+.zd-x{position:absolute;top:10px;right:10px;z-index:20;width:40px;height:40px;border-radius:50%;border:1px solid var(--neon-c);background:rgba(6,7,15,.95);color:var(--neon-c);font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(0,240,255,.5)}
+.zd-x:active{transform:scale(.9)}
 .zd-port{display:flex;align-items:center;gap:16px;padding:20px;background:radial-gradient(circle at 20% 30%,rgba(0,240,255,.18),rgba(0,0,0,.35))}
 .zd-port .big{font-size:72px;filter:drop-shadow(0 0 18px var(--neon-c))}
 .zd-port h3{font-family:'Orbitron';font-size:20px;letter-spacing:2px;text-shadow:0 0 10px var(--neon-c)}
@@ -730,6 +734,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
     </div>
     <div class="z-grid scr" id="zGrid"></div>
     <div id="zDetail"><div class="zd-box">
+      <button class="zd-x" id="zdX" aria-label="閉じる">✕</button>
       <div class="zd-port"><div class="big" id="zdFace">👑</div>
         <div><h3 id="zdName">論破女王</h3><div class="tag" id="zdTag"></div>
           <div class="zd-roles" id="zdRoles"></div>
@@ -1327,14 +1332,15 @@ function toggleForm(baseId){
   drawSlots();drawBench();
 }
 // 編成カード長押し → 詳細モーダル
-function bindLongPress(card,id){
+function bindCardLongPress(card,id){
   let timer=null,moved=false,sx=0,sy=0;
   const start=e=>{moved=false;const t=e.touches?e.touches[0]:e;sx=t.clientX;sy=t.clientY;
-    timer=setTimeout(()=>{if(!moved){Audio.SE.select();openCharDetailById(effId(id));}},420);};
+    timer=setTimeout(()=>{if(!moved){Audio.SE.select();openCharDetailById(effId(id));}},400);};
   const move=e=>{const t=e.touches?e.touches[0]:e;if(Math.hypot(t.clientX-sx,t.clientY-sy)>8){moved=true;clearTimeout(timer);}};
   const end=()=>clearTimeout(timer);
   card.addEventListener('touchstart',start,{passive:true});card.addEventListener('touchmove',move,{passive:true});card.addEventListener('touchend',end);
   card.addEventListener('mousedown',start);card.addEventListener('mousemove',move);card.addEventListener('mouseup',end);card.addEventListener('mouseleave',end);
+  card.addEventListener('contextmenu',e=>e.preventDefault());
 }
 // CHARS idから詳細モーダル（編成・図鑑共用）。基準レベルの疑似ユニットを生成してshowCharDetailへ
 function openCharDetailById(id){
@@ -1379,7 +1385,7 @@ function drawBench(){const el=document.getElementById('bench');el.innerHTML='';
         <div class="cs-grid"><span>HP ${disp(st.HP)}</span><span>ATK ${disp(st.ATK)}</span><span>DEF ${disp(st.DEF)}</span><span>SPD ${disp(st.SPD)}</span></div>`;
       d.appendChild(sb);}
     // 長押しで詳細モーダル
-    bindLongPress(d,c.id);
+    bindCardLongPress(d,c.id);
     // フォルムチェンジ可能（解禁済み）なら切替ボタン
     const b=baseOf(c.id);
     if(FORMS[b] && S.formUnlocked && S.formUnlocked[b]){
@@ -1671,6 +1677,8 @@ function openDetail(c){document.getElementById('zdFace').textContent=c.face;
   } else skEl.innerHTML='';
   document.getElementById('zDetail').classList.add('on');}
 document.getElementById('zdClose').onclick=()=>{Audio.SE.back();document.getElementById('zDetail').classList.remove('on');};
+document.getElementById('zdX').onclick=()=>{Audio.SE.back();document.getElementById('zDetail').classList.remove('on');};
+document.getElementById('zDetail').addEventListener('click',e=>{if(e.target.id==='zDetail'){Audio.SE.back();document.getElementById('zDetail').classList.remove('on');}});
 
 /* ===================== 設定 ===================== */
 function loadSettingsUI(){const st=S.settings;
