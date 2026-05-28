@@ -2177,6 +2177,8 @@ function showCommands(u){
 }
 function showSkills(u){
   const sub=document.getElementById('btSub');sub.style.display='block';
+  document.getElementById('btAllies').style.visibility='hidden';
+  const _c=document.getElementById('btCmd');if(_c)_c.style.visibility='hidden';
   let h=`<h4><span>ガチレス — 技を選ぶ</span><span class="x" onclick="hideSub()">✕</span></h4>`;
   u.skills.forEach((sk,i)=>{const cost=Math.round(sk.mp*(1));
     const no=u.mp<cost;
@@ -2196,13 +2198,18 @@ function showSkills(u){
 function showUlts(u){
   if(u.ults.length===1){castUlt(u,u.ults[0]);return;}
   const sub=document.getElementById('btSub');sub.style.display='block';
+  document.getElementById('btAllies').style.visibility='hidden';
+  const _c=document.getElementById('btCmd');if(_c)_c.style.visibility='hidden';
   let h=`<h4><span>必殺技を選ぶ</span><span class="x" onclick="hideSub()">✕</span></h4>`;
   u.ults.forEach((ul,i)=>h+=`<div class="skill-item" data-ul="${i}">
     <div class="si-l"><div class="sn">⚡${ul.n}</div><div class="sd">${ul.d}</div></div></div>`);
   sub.innerHTML=h;
   sub.querySelectorAll('[data-ul]').forEach(el=>el.onclick=()=>{Audio.SE.select();hideSub();castUlt(u,u.ults[+el.dataset.ul]);});
 }
-function hideSub(){document.getElementById('btSub').style.display='none';}
+function hideSub(){document.getElementById('btSub').style.display='none';
+  const a=document.getElementById('btAllies');if(a)a.style.visibility='';
+  const c=document.getElementById('btCmd');if(c)c.style.visibility='';
+}
 
 /* ---- ターゲット選択 ---- */
 let targetCb=null;
@@ -2657,7 +2664,9 @@ function unitHTML(u){
 }
 function renderBattle(){
   renderEnemies();
-  document.getElementById('btAllies').innerHTML=B.allies.map(unitHTML).join('');
+  const btA=document.getElementById('btAllies');
+  btA.innerHTML=B.allies.map(unitHTML).join('');
+  btA.style.visibility='';
   document.getElementById('btCmd').style.display = (B.acting&&!B.acting.isEnemy)?'grid':'none';
   bindLongPress();
 }
