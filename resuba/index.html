@@ -1,1 +1,2778 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>開発者の現在2 // RESUBA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{--bg:#05060f;--bg2:#0a0e24;--neon-c:#00f0ff;--neon-m:#ff00d4;--neon-y:#faff00;--neon-g:#00ff9d;--line:rgba(0,240,255,.35);--txt:#e8f4ff}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);overflow:hidden;user-select:none;position:fixed;inset:0}
+#app{position:relative;width:100%;height:100%;max-width:520px;margin:0 auto;overflow:hidden;box-shadow:0 0 60px rgba(0,240,255,.12)}
 
+/* 背景演出 */
+.bg-grid{position:absolute;inset:0;z-index:0;background:linear-gradient(transparent 0,transparent 39px,rgba(0,240,255,.06) 40px),linear-gradient(90deg,transparent 0,transparent 39px,rgba(255,0,212,.06) 40px);background-size:40px 40px;transform:perspective(400px) rotateX(60deg);transform-origin:center top;animation:gridmove 8s linear infinite;opacity:.5}
+@keyframes gridmove{to{background-position:0 40px,40px 0}}
+.bg-glow{position:absolute;inset:0;z-index:0;background:radial-gradient(60% 50% at 30% 15%,rgba(255,0,212,.18),transparent),radial-gradient(60% 50% at 80% 85%,rgba(0,240,255,.18),transparent);animation:hue 12s linear infinite}
+@keyframes hue{to{filter:hue-rotate(360deg)}}
+.scanline{position:absolute;inset:0;z-index:90;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0,rgba(0,0,0,.12) 1px,transparent 2px,transparent 3px);mix-blend-mode:overlay;opacity:.45}
+.particles{position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none}
+.particles span{position:absolute;bottom:-20px;border-radius:50%;animation:rise linear infinite}
+@keyframes rise{to{transform:translateY(-110vh) scale(1.6);opacity:0}}
+
+.screen{position:absolute;inset:0;z-index:5;padding:24px 20px;display:none;flex-direction:column;overflow:hidden}
+.screen.show{display:flex;animation:scin .45s ease}
+@keyframes scin{from{opacity:0;transform:translateY(16px) scale(.98)}}
+.scr{overflow-y:auto;flex:1;margin:0 -6px;padding:0 6px}
+.scr::-webkit-scrollbar{width:5px}.scr::-webkit-scrollbar-thumb{background:rgba(0,240,255,.4);border-radius:5px}
+
+/* 共通 */
+.glitch{font-family:'Orbitron';font-weight:900;position:relative;display:inline-block}
+.glitch::before,.glitch::after{content:attr(data-t);position:absolute;left:0;top:0;width:100%}
+.glitch::before{color:var(--neon-m);animation:gl1 3s infinite}.glitch::after{color:var(--neon-c);animation:gl2 3s infinite}
+@keyframes gl1{0%,90%,100%{clip-path:inset(0 0 100% 0)}5%{clip-path:inset(20% 0 30% 0);transform:translate(-2px,-1px)}10%{clip-path:inset(60% 0 10% 0);transform:translate(2px,1px)}}
+@keyframes gl2{0%,88%,100%{clip-path:inset(100% 0 0 0)}6%{clip-path:inset(40% 0 40% 0);transform:translate(2px,0)}12%{clip-path:inset(10% 0 70% 0);transform:translate(-2px,1px)}}
+.nbtn{font-family:'Rajdhani';font-weight:700;letter-spacing:2px;font-size:16px;padding:14px;border-radius:10px;cursor:pointer;color:var(--txt);position:relative;overflow:hidden;border:1px solid var(--neon-c);background:rgba(0,240,255,.06);transition:.18s;text-align:center}
+.nbtn::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);transform:translateX(-100%);transition:.5s}
+.nbtn:active{transform:scale(.96)}.nbtn:hover{box-shadow:0 0 18px var(--neon-c),inset 0 0 14px rgba(0,240,255,.2);transform:translateY(-2px)}
+.nbtn:hover::after{transform:translateX(100%)}
+.nbtn.mag{border-color:var(--neon-m);background:rgba(255,0,212,.08)}.nbtn.mag:hover{box-shadow:0 0 18px var(--neon-m)}
+.nbtn.ylw{border-color:var(--neon-y);color:var(--neon-y)}.nbtn.ylw:hover{box-shadow:0 0 18px var(--neon-y)}
+.nbtn.lock{border-color:#555;color:#777;background:rgba(120,120,120,.08);cursor:not-allowed}
+.nbtn.lock:hover{box-shadow:none;transform:none}.nbtn.lock::after{display:none}
+.backbtn{position:absolute;top:18px;left:18px;z-index:30;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(0,0,0,.4);color:var(--neon-c);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}
+.backbtn:hover{box-shadow:0 0 14px var(--neon-c)}.backbtn:active{transform:scale(.9)}
+.sc-title{font-family:'Orbitron';font-size:16px;letter-spacing:3px;text-align:center;color:var(--neon-c);text-shadow:0 0 12px var(--neon-c);margin:4px 0 18px;padding-top:6px}
+
+/* TITLE */
+#title{justify-content:flex-start}
+.t-logo{font-family:'Orbitron';font-weight:900;font-size:30px;line-height:1.1;letter-spacing:1px;margin-top:6px;text-shadow:0 0 14px var(--neon-c),0 0 30px var(--neon-m)}
+.t-logo .sub{display:block;font-size:11px;letter-spacing:5px;color:var(--neon-y);margin-top:6px;text-shadow:0 0 10px var(--neon-y)}
+.t2-hero{position:relative;flex:1;min-height:180px;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:16px 0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,rgba(255,0,212,.18),rgba(0,0,0,.4))}
+.t2-hero .ringbg{position:absolute;width:260px;height:260px;border:2px dashed rgba(0,240,255,.3);border-radius:50%;animation:spin 16s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.t2-hero .char{font-size:96px;filter:drop-shadow(0 0 18px var(--neon-m));animation:bob 3s ease-in-out infinite;z-index:2}
+@keyframes bob{50%{transform:translateY(-12px) rotate(-3deg)}}
+.t2-hero .tagcopy{position:absolute;bottom:14px;width:100%;text-align:center;font-size:12px;letter-spacing:3px;color:#9bd}
+.t-menu{display:flex;flex-direction:column;gap:10px}
+.ver{text-align:center;font-size:10px;color:#567;letter-spacing:2px;margin-top:10px}
+
+/* MAIN */
+#main{justify-content:flex-start}
+.m-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-top:4px;padding-left:50px}
+.m-logo{font-family:'Orbitron';font-weight:900;font-size:15px;letter-spacing:2px;text-shadow:0 0 10px var(--neon-c)}
+.m-gem{font-family:'Orbitron';font-size:12px;color:var(--neon-y);border:1px solid rgba(250,255,0,.4);padding:5px 11px;border-radius:20px}
+.m-party{margin-bottom:14px}.m-party .nbtn{font-size:16px;padding:15px}
+.m-list-ttl{font-family:'Orbitron';font-size:11px;letter-spacing:2px;color:var(--neon-c);margin:6px 0 10px}
+.ep-card{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:9px;background:rgba(0,0,0,.3);cursor:pointer;transition:.18s;position:relative}
+.ep-card:hover{box-shadow:0 0 14px rgba(0,240,255,.4);transform:translateX(4px)}
+.ep-card .no{font-family:'Orbitron';font-size:18px;color:var(--neon-m);width:34px;text-shadow:0 0 8px var(--neon-m)}
+.ep-card .info{flex:1}.ep-card .info .t{font-weight:700;font-size:15px}.ep-card .info .s{font-size:11px;color:#9bd}
+.ep-card .go{font-family:'Orbitron';font-size:10px;color:var(--neon-c)}
+.ep-card.clear{border-color:rgba(0,255,157,.4)}.ep-card.clear .no{color:var(--neon-g);text-shadow:0 0 8px var(--neon-g)}
+.ep-card.locked{opacity:.45;border-style:dashed;cursor:default}.ep-card.locked .no{color:#567}
+.ep-card.soon{opacity:.6;border-style:dashed;border-color:var(--neon-y);cursor:default}
+.ep-card.soon .t{color:#cdb86a}.ep-card.soon .s{color:var(--neon-y)}.ep-card.soon .no{color:#8a7a3a}
+.ep-card.soon::after{content:"COMING SOON";position:absolute;top:8px;right:36px;font-family:'Orbitron';font-size:8px;letter-spacing:1px;color:var(--neon-y);border:1px solid rgba(250,255,0,.5);border-radius:8px;padding:2px 6px}
+.ep-card .lockicon{font-size:16px}
+
+/* PARTY */
+#party{justify-content:flex-start}
+.slots{display:flex;justify-content:center;gap:8px;margin-bottom:8px}
+.slot{width:72px;height:96px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:.2s;background:rgba(0,0,0,.4);overflow:hidden}
+.slot .f{font-size:34px;z-index:2}.slot .n{font-size:8px;font-family:'Orbitron';color:#bdf;margin-top:4px;z-index:2}
+.slot.empty{border:2px dashed #46506a;color:#46506a;font-size:30px}
+.slot .lead{position:absolute;top:-1px;font-family:'Orbitron';font-size:8px;background:var(--neon-y);color:#000;padding:2px 8px;border-radius:0 0 8px 8px;z-index:3;letter-spacing:1px}
+.slot .fixbadge{position:absolute;bottom:3px;left:5px;z-index:4;font-family:'Orbitron';font-size:7px;letter-spacing:1px;color:var(--neon-g);border:1px solid rgba(0,255,157,.5);border-radius:6px;padding:1px 5px;background:rgba(0,0,0,.55)}
+.slot.fixed{box-shadow:0 0 12px rgba(0,255,157,.3)}
+.slot .rm{position:absolute;top:3px;right:5px;z-index:4;font-size:13px;color:#fff;background:rgba(0,0,0,.5);border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.slot.drop{transform:scale(1.08)}
+.slot.drop::after{content:"";position:absolute;inset:0;border:2px solid var(--neon-y);border-radius:14px;animation:pulse .8s infinite;z-index:5}
+@keyframes pulse{50%{box-shadow:0 0 18px var(--neon-y)}}
+.slot-hint{text-align:center;font-size:10px;color:#789;letter-spacing:1px;margin-bottom:14px}
+/* レア度枠 */
+.rare-R{border:1.5px solid #6fd6ff;box-shadow:inset 0 0 10px rgba(0,180,255,.25)}
+.rare-SR{border:2px solid var(--neon-m);box-shadow:inset 0 0 14px rgba(255,0,212,.3),0 0 8px rgba(255,0,212,.3);background:linear-gradient(160deg,rgba(255,0,212,.12),rgba(0,0,0,.4))}
+.rare-SSR{border:2px solid transparent;position:relative;background:linear-gradient(#0a0a18,#0a0a18) padding-box,linear-gradient(125deg,#faff00,#ff00d4,#00f0ff,#faff00) border-box;box-shadow:0 0 14px rgba(250,255,0,.35)}
+.rare-SSR::before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:1;background:linear-gradient(125deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);background-size:250% 250%;animation:shine 3s linear infinite;pointer-events:none}
+@keyframes shine{to{background-position:-200% -200%}}
+.rare-UR{border:3px solid transparent;position:relative;background:linear-gradient(#0a0805,#0a0805) padding-box,linear-gradient(135deg,#5a4410 0%,#fff3a0 18%,#d4af37 34%,#8a6a16 50%,#ffe98a 66%,#d4af37 82%,#5a4410 100%) border-box;background-size:auto,300% 300%;box-shadow:0 0 16px rgba(212,175,55,.55),inset 0 0 18px rgba(0,0,0,.85),inset 0 0 6px rgba(255,215,100,.4);animation:urgold 4.5s linear infinite}
+@keyframes urgold{to{background-position:0 0,300% 300%}}
+.rare-UR::before{content:"";position:absolute;inset:3px;border-radius:11px;z-index:1;pointer-events:none;border:1px solid rgba(255,223,128,.55);box-shadow:inset 0 0 12px rgba(0,0,0,.9)}
+.rare-UR::after{content:"";position:absolute;inset:0;border-radius:inherit;z-index:1;pointer-events:none;background:linear-gradient(115deg,transparent 38%,rgba(255,240,180,.7) 50%,transparent 62%);background-size:240% 240%;animation:shine 2.6s linear infinite}
+.rrank{position:absolute;bottom:3px;right:5px;font-family:'Orbitron';font-size:8px;z-index:3;padding:1px 5px;border-radius:6px;background:rgba(0,0,0,.6)}
+.rrank.R{color:#6fd6ff}.rrank.SR{color:var(--neon-m)}.rrank.SSR{color:var(--neon-y);text-shadow:0 0 6px var(--neon-y)}
+.rrank.UR{color:#1a1200;background:linear-gradient(135deg,#fff3a0,#d4af37,#8a6a16);font-weight:900;box-shadow:0 0 8px rgba(212,175,55,.6)}
+.sortbar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.sortbar .lab{font-family:'Orbitron';font-size:9px;letter-spacing:1px;color:#9bd}
+.sortbar .opts{display:flex;gap:6px;flex:1}
+.sortbar .opt{font-family:'Rajdhani';font-weight:700;font-size:11px;letter-spacing:1px;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:rgba(0,0,0,.3);color:#bcd;cursor:pointer;transition:.15s}
+.sortbar .opt.on{background:linear-gradient(90deg,var(--neon-m),var(--neon-c));color:#04060f;border-color:transparent}
+.sortbar .opt:active{transform:scale(.95)}
+.bench-ttl{font-family:'Orbitron';font-size:10px;letter-spacing:2px;color:var(--neon-m);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.bench-ttl .cnt{color:#9bd;font-size:9px}
+.bench{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:2px;margin:0 -2px}
+.bench::-webkit-scrollbar{width:5px}.bench::-webkit-scrollbar-thumb{background:rgba(0,240,255,.4);border-radius:5px}
+.card{display:flex;align-items:center;flex-wrap:wrap;gap:13px;border-radius:14px;padding:11px 14px;position:relative;background:rgba(8,10,24,.85);cursor:grab;transition:transform .12s,box-shadow .15s;touch-action:pan-y}
+.card:active{cursor:grabbing}
+.card .f{font-size:38px;z-index:2;width:46px;text-align:center}
+.card .meta{flex:1;z-index:2}.card .meta .nm{font-weight:700;font-size:15px}.card .meta .role{font-size:10px;color:#9bd}
+.card .grip{z-index:2;color:#56688a;font-size:18px;padding-left:4px}
+.card .formbtn{position:absolute;top:6px;right:6px;z-index:5;font-size:10px;font-family:'Orbitron';letter-spacing:1px;color:#ffe98a;border:1px solid #ffe98a;border-radius:10px;padding:3px 7px;background:rgba(40,30,0,.6);cursor:pointer}
+.card .formbtn:active{transform:scale(.92)}
+.card .card-stats{width:100%;margin-top:6px;z-index:2}
+.card .cs-pw{font-family:'Orbitron';font-size:10px;color:var(--neon-y);text-align:center;margin-bottom:3px}
+.card .cs-pw b{color:#fff;font-size:13px;text-shadow:0 0 6px var(--neon-y)}
+.card .cs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px 8px;font-size:9px;color:#9bd}
+.card .cs-grid span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.party-power{text-align:center;font-family:'Orbitron';font-size:12px;letter-spacing:1px;color:var(--neon-c);margin:8px 0 4px;padding:7px;border:1px solid var(--line);border-radius:12px;background:rgba(0,240,255,.06)}
+.party-power b{font-size:18px;color:#fff;text-shadow:0 0 10px var(--neon-c);margin-left:6px}
+.cd-power{text-align:center;font-family:'Orbitron';font-size:12px;color:var(--neon-y);margin:4px 0 12px}
+.cd-power b{font-size:18px;color:#fff;text-shadow:0 0 10px var(--neon-y);margin-left:6px}
+.card .innow{position:absolute;top:8px;right:12px;z-index:3;font-family:'Orbitron';font-size:8px;color:var(--neon-g);border:1px solid rgba(0,255,157,.5);border-radius:8px;padding:1px 6px}
+.card .innow.fix{color:var(--neon-y);border-color:rgba(250,255,0,.5)}
+.card.in{opacity:.5}
+.card.dead-card{filter:grayscale(1) brightness(.4);border-color:#3a2030 !important;background:linear-gradient(160deg,#15090f,#0a0508) !important;opacity:1;cursor:not-allowed;position:relative}
+.card.dead-card .f{filter:grayscale(1)}
+.card.dead-card .nm{color:#a07080}
+.card.dead-card .role{color:#7a4555;font-size:11px}
+.card.dead-card .dead-tag{background:#5a1020;color:#ff8a9a;border:1px solid #7a2030}
+.card.dead-card .grip{color:#7a2030}
+.card.dragging{position:fixed;z-index:200;width:auto;left:0;top:0;pointer-events:none;box-shadow:0 12px 30px rgba(0,0,0,.6),0 0 20px rgba(0,240,255,.4);transform:scale(1.04)}
+.card .swipefx{position:absolute;right:14px;top:50%;transform:translateY(-50%);z-index:1;font-family:'Orbitron';font-size:10px;color:var(--neon-y);opacity:0}
+.decide{margin-top:12px;font-family:'Rajdhani';font-weight:700;letter-spacing:2px;font-size:16px;padding:14px;border-radius:10px;cursor:pointer;text-align:center;border:1px solid var(--neon-y);color:var(--neon-y);background:rgba(250,255,0,.06);transition:.18s}
+.decide:hover{box-shadow:0 0 18px var(--neon-y)}.decide:active{transform:scale(.97)}
+
+/* ADVENTURE */
+#adv{padding:0}
+.adv{position:absolute;inset:0;display:flex;flex-direction:column;z-index:6}
+.adv-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(circle at 50% 30%,rgba(0,240,255,.18),#06070f 70%)}
+.adv-stage{position:relative;z-index:1;flex:1;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px}
+.adv-char{font-size:120px;filter:drop-shadow(0 0 22px var(--neon-c));animation:bob 3s ease-in-out infinite;transition:.3s}
+.adv-char.right{align-self:flex-end}
+.adv-skip{position:absolute;top:16px;right:16px;z-index:5;font-family:'Orbitron';font-size:9px;letter-spacing:1px;color:#9bd;border:1px solid var(--line);border-radius:16px;padding:5px 12px;background:rgba(0,0,0,.4);cursor:pointer}
+.adv-prog{position:absolute;top:16px;left:16px;z-index:5;font-family:'Orbitron';font-size:9px;color:var(--neon-y);border:1px solid rgba(250,255,0,.4);border-radius:16px;padding:5px 12px;background:rgba(0,0,0,.4)}
+.adv-box{position:relative;z-index:2;margin:0 14px 16px;border:1px solid var(--neon-c);border-radius:14px;padding:14px 16px 14px;background:linear-gradient(180deg,rgba(8,10,26,.85),rgba(8,10,26,.96));box-shadow:0 0 20px rgba(0,240,255,.25);min-height:128px;cursor:pointer}
+.adv-name{display:inline-block;font-family:'Orbitron';font-size:12px;letter-spacing:2px;color:var(--neon-y);background:rgba(0,0,0,.5);border:1px solid rgba(250,255,0,.4);border-radius:8px;padding:3px 12px;margin-bottom:9px;text-shadow:0 0 8px var(--neon-y)}
+.adv-text{font-size:15px;line-height:1.65;color:#eef;min-height:48px}
+.adv-text .cur{display:inline-block;color:var(--neon-c);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.adv-tap{text-align:right;font-size:10px;color:#789;margin-top:6px;letter-spacing:1px}
+.adv-choices{position:relative;z-index:2;margin:0 14px 16px;display:flex;flex-direction:column;gap:9px}
+.adv-choices .nbtn{text-align:left;font-size:14px;padding:11px 14px}
+
+/* BATTLE */
+#battle{padding:14px 12px;justify-content:flex-start;overflow:hidden}
+.bt-turn{position:absolute;top:18px;left:50%;transform:translateX(-50%);z-index:8;font-family:'Orbitron';font-size:12px;letter-spacing:3px;color:var(--neon-y);text-shadow:0 0 10px var(--neon-y);border:1px solid rgba(250,255,0,.4);border-radius:16px;padding:4px 14px;background:rgba(0,0,0,.4)}
+.bt-enemies{display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:40px;margin-bottom:8px;min-height:120px}
+/* 上部固定ボスHPバー */
+.boss-hpbar-top{position:absolute;top:46px;left:18px;right:18px;z-index:65}
+.bhp{margin-bottom:6px}
+.bhp-nm{font-family:'Orbitron';font-size:12px;letter-spacing:1px;color:#fff;text-shadow:0 0 10px #ff0050,0 0 4px #000;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.bhp-buffs span{font-size:13px;margin-left:2px}
+.boss-hp{height:13px !important;border:1px solid rgba(255,0,80,.4);box-shadow:0 0 10px rgba(255,0,80,.3),inset 0 1px 2px rgba(0,0,0,.6)}
+.boss-hp .uhp-fill{background:linear-gradient(90deg,#ff0050,#ff7a18,#ff0050) !important;background-size:200% 100% !important;box-shadow:0 0 10px rgba(255,0,80,.7) !important}
+.boss-nums{display:flex;align-items:baseline;gap:5px;margin-top:2px}
+.boss-nums .unum{color:#ff9ac0;font-size:18px;text-shadow:0 0 8px rgba(255,0,80,.5)}
+.boss-nums .unum-max{font-family:'Rajdhani';font-size:10px;color:#a77}
+.boss-ten{height:5px !important;margin-top:3px}
+/* 巨大ボスを置くゾーン（Aレイアウト：見上げ構図） */
+.view-big{margin-top:96px}
+.view-big .mob-row{gap:14px;margin-bottom:0}
+.view-big .boss-row{margin-top:-10px;min-height:230px}
+/* half表示（Dレイアウト：右上から半身） */
+.view-half{align-items:stretch}
+.view-half .boss-row{position:absolute;top:-20px;right:-60px;z-index:8}
+.view-half .unit.boss .boss-av{font-size:300px !important;transform:rotate(-6deg)}
+.boss-av.zombie-frog{filter:drop-shadow(0 0 14px #6abf3a) drop-shadow(0 0 26px #1a3a08) hue-rotate(40deg) brightness(.74) contrast(1.3) saturate(1.45);animation:zombieIdle 3s ease-in-out infinite}
+@keyframes zombieIdle{0%,100%{transform:rotate(-2deg) scale(1)}50%{transform:rotate(2deg) scale(1.03)}}
+.view-half .boss-aura{left:62% !important}
+.view-half .unit.boss::before,.view-half .unit.boss::after{display:none}
+.view-half .mob-row{position:relative;z-index:12;margin-top:150px;justify-content:flex-start;padding-left:18px;max-width:60%}
+.mob-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;width:100%}
+.boss-row{display:flex;justify-content:center;width:100%}
+/* 雑魚 */
+.unit.mob{width:54px;cursor:pointer;position:relative}
+.mob-av{font-size:34px;text-align:center;filter:drop-shadow(0 0 8px rgba(255,0,120,.5));animation:mobfloat 3s ease-in-out infinite}
+.unit.mob:nth-child(2) .mob-av{animation-delay:.4s}.unit.mob:nth-child(3) .mob-av{animation-delay:.8s}.unit.mob:nth-child(4) .mob-av{animation-delay:1.2s}
+@keyframes mobfloat{50%{transform:translateY(-5px)}}
+.mob-hp{height:4px;margin-top:1px}
+.mob-num{font-size:10px;margin:0}
+.unit.mob.dead{opacity:.25;filter:grayscale(1)}
+/* ボス：巨大・禍々しい */
+.unit.boss{position:relative;width:100%;display:flex;flex-direction:column;align-items:center;padding-top:4px}
+.boss-aura{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:340px;height:340px;border-radius:50%;z-index:0;
+  background:radial-gradient(circle,rgba(255,0,80,.4),rgba(120,0,60,.16) 50%,transparent 72%);animation:bossaura 3.5s ease-in-out infinite}
+@keyframes bossaura{50%{transform:translateX(-50%) scale(1.12);opacity:.82}}
+.unit.boss .boss-av{font-size:280px;text-align:center;position:relative;z-index:2;line-height:1;
+  filter:drop-shadow(0 0 14px #ff0050) drop-shadow(0 0 36px #b3005f) drop-shadow(0 6px 12px #000);
+  animation:bossbreath 3.4s ease-in-out infinite}
+@keyframes bossbreath{0%,100%{transform:scale(1) rotate(-1deg)}50%{transform:scale(1.05) rotate(1deg)}}
+.unit.boss::before{content:"";position:absolute;top:30px;left:50%;transform:translateX(-50%);width:300px;height:300px;z-index:1;border-radius:50%;
+  border:2px dashed rgba(255,0,80,.4);animation:spin 16s linear infinite}
+.unit.boss::after{content:"";position:absolute;top:10px;left:50%;transform:translateX(-50%);width:340px;height:340px;z-index:1;border-radius:50%;
+  border:1px solid rgba(255,40,120,.3);animation:spin 11s linear reverse infinite}
+.boss-rare{font-size:9px;padding:1px 5px;border-radius:6px;background:rgba(0,0,0,.5)}
+.boss-rare.SR{color:var(--neon-m)}.boss-rare.SSR{color:var(--neon-y)}.boss-rare.UR{color:#ffe98a}
+.unit.boss.dead .boss-av{filter:grayscale(1) brightness(.4)}
+.unit.boss.dead .boss-aura,.unit.boss.dead::before,.unit.boss.dead::after{display:none}
+/* ボス被弾の揺れ */
+.boss-av.uhit{animation:bossHit .35s}
+@keyframes bossHit{0%,100%{transform:scale(1)}25%{transform:translateX(-14px) scale(1.04) rotate(-3deg)}75%{transform:translateX(14px) scale(1.04) rotate(3deg)}}
+.mob-av.uhit{animation:uhit .3s}
+.bt-allies{display:flex;justify-content:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.unit{width:88px;border-radius:12px;padding:6px 5px 7px;background:rgba(8,10,24,.7);position:relative;transition:.2s;cursor:pointer}
+.unit.rare-SSR::before,.unit.rare-UR::after{opacity:.5}
+.unit .uav,.unit .unm,.unit .uhp-track,.unit .unum,.unit .uten-track,.unit .ubuffs{position:relative;z-index:3}
+.unit.enemy{background:rgba(24,8,18,.7)}
+.unit.active{box-shadow:0 0 16px var(--neon-y);transform:translateY(-4px)}
+.unit.dead{opacity:.3;filter:grayscale(1)}
+.unit.target-sel{box-shadow:0 0 16px var(--neon-m);cursor:crosshair}
+.unit .uav{font-size:40px;text-align:center;filter:drop-shadow(0 0 8px rgba(0,240,255,.4));transition:.15s}
+.unit.enemy .uav{filter:drop-shadow(0 0 8px rgba(255,0,212,.4))}
+.unit .uhit{animation:uhit .3s}
+@keyframes uhit{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.unit .unm{font-family:'Orbitron';font-size:8px;text-align:center;color:#bdf;margin:2px 0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uhp-track{height:6px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden;margin-bottom:2px}
+.uhp-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--neon-g),var(--neon-c));transition:width .4s}
+.unit.enemy .uhp-fill{background:linear-gradient(90deg,var(--neon-m),#ff6a00)}
+.uten-track{height:4px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.unum{font-family:'Teko',sans-serif;font-weight:600;font-size:13px;line-height:.9;text-align:center;color:var(--neon-g);letter-spacing:.5px;margin:1px 0 2px;text-shadow:0 0 5px rgba(0,255,157,.4)}
+.unit.enemy .unum{color:#ff9adf;text-shadow:0 0 5px rgba(255,0,212,.4)}
+.uten-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#faff00,#ff8a00);transition:width .3s;box-shadow:0 0 6px rgba(250,255,0,.5)}
+.uten-ready{animation:tenrdy .8s infinite}
+@keyframes tenrdy{50%{box-shadow:0 0 12px var(--neon-y)}}
+.ubuffs{display:flex;flex-wrap:wrap;gap:1px;justify-content:center;margin-top:3px;min-height:12px}
+.ubuffs span{font-size:9px;line-height:1}
+.dmgpop{position:absolute;left:50%;top:24%;transform:translateX(-50%);z-index:30;font-family:'Teko',sans-serif;font-weight:700;font-size:30px;pointer-events:none;animation:dmgp 1.1s cubic-bezier(.2,.8,.3,1) forwards;text-shadow:0 0 10px #000,0 3px 6px #000,0 0 18px var(--neon-c);white-space:nowrap;color:#fff;line-height:.9}
+.dmgpop .lab{display:block;font-family:'Orbitron';font-size:8px;letter-spacing:1px;color:var(--neon-c);text-shadow:0 0 6px #000;margin-bottom:-3px}
+.dmgpop.crit{font-size:46px;color:var(--neon-y);text-shadow:0 0 14px var(--neon-y),0 3px 8px #000,0 0 30px var(--neon-o);animation:critp 1.3s cubic-bezier(.2,.8,.3,1) forwards}
+.dmgpop.crit .lab{color:var(--neon-y);font-size:10px}
+.dmgpop.heal{color:var(--neon-g);text-shadow:0 0 12px var(--neon-g),0 3px 6px #000;font-size:28px;animation:healp 1.3s ease-out forwards}
+.dmgpop.heal .lab{color:var(--neon-g)}
+.dmgpop.miss{font-family:'Orbitron';font-weight:700;font-size:22px;color:#9bd}
+@keyframes dmgp{0%{opacity:0;transform:translateX(-50%) translateY(12px) scale(.5)}18%{opacity:1;transform:translateX(-50%) translateY(-6px) scale(1.25)}30%{transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-50px) scale(1)}}
+@keyframes critp{0%{opacity:0;transform:translateX(-50%) translateY(18px) scale(.3) rotate(-8deg)}15%{opacity:1;transform:translateX(-50%) translateY(-10px) scale(1.5) rotate(4deg)}28%{transform:translateX(-50%) scale(1.1) rotate(-2deg)}38%{transform:translateX(-50%) scale(1.25)}100%{opacity:0;transform:translateX(-50%) translateY(-66px) scale(1.1)}}
+@keyframes healp{0%{opacity:0;transform:translateX(-50%) translateY(10px) scale(.6)}25%{opacity:1;transform:translateX(-50%) translateY(-8px) scale(1.1)}100%{opacity:0;transform:translateX(-50%) translateY(-44px) scale(1)}}
+/* 攻撃エフェクト */
+.fxlayer{position:absolute;inset:0;z-index:140;pointer-events:none;overflow:hidden}
+.fx-slash{position:absolute;width:120px;height:120px}
+.fx-slash::before{content:"";position:absolute;top:50%;left:0;width:100%;height:6px;background:linear-gradient(90deg,transparent,#fff,var(--neon-c),transparent);transform:translateY(-50%) rotate(-35deg);box-shadow:0 0 16px var(--neon-c);border-radius:6px;animation:slashGo .35s ease-out forwards}
+.fx-slash.y::before{background:linear-gradient(90deg,transparent,#fff,var(--neon-y),transparent);box-shadow:0 0 16px var(--neon-y)}
+@keyframes slashGo{0%{transform:translateY(-50%) rotate(-35deg) scaleX(0);opacity:0}30%{opacity:1;transform:translateY(-50%) rotate(-35deg) scaleX(1.1)}100%{opacity:0;transform:translateY(-50%) rotate(-35deg) scaleX(1.1)}}
+.fx-impact{position:absolute;width:20px;height:20px;border-radius:50%;border:3px solid var(--neon-y);animation:impactGo .45s ease-out forwards}
+@keyframes impactGo{0%{opacity:1;transform:scale(.2)}100%{opacity:0;transform:scale(5)}}
+.fx-spark{position:absolute;width:6px;height:6px;border-radius:50%;transition:transform .5s ease-out,opacity .5s}
+.fx-heal{position:absolute;width:80px;height:80px}
+.fx-heal span{position:absolute;font-size:16px;animation:healUp 1.2s ease-out forwards}
+@keyframes healUp{0%{opacity:0;transform:translateY(22px)}30%{opacity:1}100%{opacity:0;transform:translateY(-32px)}}
+.fx-eff{position:absolute;font-family:'Orbitron';font-size:11px;letter-spacing:1px;padding:3px 9px;border-radius:12px;white-space:nowrap;background:rgba(0,0,0,.6);text-shadow:0 0 6px #000;animation:efffloat 1.4s ease-out forwards}
+.fx-eff.up{color:var(--neon-g);border:1px solid var(--neon-g)}
+.fx-eff.down{color:var(--neon-m);border:1px solid var(--neon-m)}
+@keyframes efffloat{0%{opacity:0;transform:translateY(8px) scale(.7)}20%{opacity:1;transform:translateY(-4px) scale(1)}100%{opacity:0;transform:translateY(-36px)}}
+#battle.shake{animation:btshake .35s}
+@keyframes btshake{0%,100%{transform:translate(0)}20%{transform:translate(-5px,3px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-4px,-2px)}80%{transform:translate(4px,2px)}}
+#adv.quake{animation:advquake .9s}
+@keyframes advquake{0%,100%{transform:translate(0)}10%{transform:translate(-7px,4px)}20%{transform:translate(7px,-4px)}30%{transform:translate(-6px,3px)}40%{transform:translate(6px,-3px)}50%{transform:translate(-5px,2px)}60%{transform:translate(5px,-2px)}70%{transform:translate(-4px,2px)}80%{transform:translate(4px,-1px)}90%{transform:translate(-2px,1px)}}
+.bt-hitflash{position:absolute;inset:0;background:#fff;opacity:0;z-index:135;pointer-events:none}
+.bt-hitflash.on{animation:bthf .25s}
+@keyframes bthf{0%{opacity:.5}100%{opacity:0}}
+.unit .uav.lunge{transition:transform .18s cubic-bezier(.5,0,.9,.4);z-index:100;position:relative}
+.unit .uav.lungeback{transition:transform .28s cubic-bezier(.2,.8,.3,1)}
+/* HPゴースト残像 */
+.uhp-ghost{position:absolute;top:0;height:100%;background:rgba(255,255,255,.55);transition:width .8s ease .3s,left .8s ease .3s;border-radius:4px}
+.bt-mid{flex:1;display:flex;align-items:center;justify-content:center;min-height:30px}
+.bt-msg{font-family:'Orbitron';font-size:11px;letter-spacing:1px;color:#9bd;text-align:center;background:rgba(0,0,0,.4);border:1px solid var(--line);border-radius:10px;padding:8px 14px;max-width:90%}
+.bt-cmd{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:6px}
+.bt-cmd .cbtn{font-family:'Rajdhani';font-weight:700;letter-spacing:1px;font-size:15px;padding:13px;border-radius:11px;border:1px solid var(--neon-c);background:rgba(0,240,255,.06);color:var(--txt);cursor:pointer;text-align:center;transition:.15s;position:relative}
+.bt-cmd .cbtn:active{transform:scale(.96)}.bt-cmd .cbtn:hover{box-shadow:0 0 14px var(--neon-c)}
+.bt-cmd .cbtn.ult{border-color:var(--neon-y);color:var(--neon-y);background:rgba(250,255,0,.07)}
+.bt-cmd .cbtn.ult.rdy{animation:tenrdy .9s infinite}
+.bt-cmd .cbtn.guard{border-color:var(--neon-g);color:var(--neon-g)}
+.bt-cmd .cbtn.disabled{opacity:.4;pointer-events:none;border-color:#556}
+.bt-cmd .cbtn small{display:block;font-size:9px;color:#9bd;letter-spacing:0;margin-top:2px}
+.bt-sub{position:absolute;left:12px;right:12px;bottom:12px;z-index:12;background:rgba(6,8,20,.97);border:1px solid var(--neon-m);border-radius:14px;padding:14px;box-shadow:0 0 24px rgba(255,0,212,.3)}
+.bt-sub h4{font-family:'Orbitron';font-size:11px;letter-spacing:2px;color:var(--neon-m);margin-bottom:10px;display:flex;justify-content:space-between}
+.bt-sub h4 .x{cursor:pointer;color:#9bd}
+.skill-item{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:.15s;background:rgba(0,0,0,.3)}
+.skill-item:active{transform:scale(.98)}.skill-item:hover{box-shadow:0 0 12px rgba(0,240,255,.3)}
+.skill-item.nomp{opacity:.4;pointer-events:none}
+.skill-item .si-l .sn{font-weight:700;font-size:14px}.skill-item .si-l .sd{font-size:10px;color:#9bd;margin-top:2px}
+.skill-item .si-r{font-family:'Orbitron';font-size:10px;color:var(--neon-y);text-align:right;white-space:nowrap}
+.skill-item .si-r .mp{color:var(--neon-c)}
+/* 必殺ムービー */
+#ultFX{position:absolute;inset:0;z-index:200;display:none;background:radial-gradient(circle at 50% 45%,#1a0a24,#000 72%);overflow:hidden}
+#ultFX.on{display:block}
+#ultFX.shake{animation:ultshake .3s}
+#ultFX.shakehard{animation:ultshakeH .4s}
+@keyframes ultshake{0%,100%{transform:translate(0)}20%{transform:translate(-6px,3px)}40%{transform:translate(6px,-3px)}60%{transform:translate(-5px,-2px)}80%{transform:translate(5px,2px)}}
+@keyframes ultshakeH{0%,100%{transform:translate(0)}10%{transform:translate(-10px,6px)}30%{transform:translate(10px,-6px)}50%{transform:translate(-9px,-4px)}70%{transform:translate(9px,5px)}90%{transform:translate(-5px,3px)}}
+.ult-bgflash{position:absolute;inset:0;background:#fff;opacity:0;z-index:46;pointer-events:none}
+.ult-bgflash.go{animation:ultfl .35s}@keyframes ultfl{0%{opacity:.9}100%{opacity:0}}
+.ult-bgflash.col{background:var(--ucol,#fff)}
+.ult-fxL{position:absolute;inset:0;z-index:30;pointer-events:none}
+.ult-char{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);font-size:130px;z-index:20;filter:drop-shadow(0 0 26px var(--ucol,var(--neon-y)));opacity:0}
+.ult-char.in{animation:ultcharIn .5s ease forwards}
+@keyframes ultcharIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.ult-char.lunge{animation:ultcharLunge .5s ease}
+@keyframes ultcharLunge{0%{transform:translate(-50%,-50%)}45%{transform:translate(15%,-50%) scale(1.08)}100%{transform:translate(-50%,-50%)}}
+.ult-char.float{animation:ultcharFloat 1.4s ease-in-out}
+@keyframes ultcharFloat{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-50%,-58%)}}
+.ult-namecard{position:absolute;left:0;top:58%;width:100%;z-index:35;text-align:center;opacity:0}
+.ult-namecard.in{animation:ultnameIn .5s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes ultnameIn{0%{opacity:0;transform:translateX(-40px)}100%{opacity:1;transform:translateX(0)}}
+.ult-name{font-family:'Orbitron';font-size:11px;letter-spacing:3px;color:#cde;margin-bottom:4px}
+.ult-title{font-family:'Teko';font-weight:700;font-size:42px;line-height:.9;color:#fff;text-shadow:0 0 14px var(--ucol,var(--neon-c)),0 3px 8px #000;padding:0 16px}
+.ult-bar{height:2px;width:62%;margin:7px auto 0;background:linear-gradient(90deg,transparent,var(--ucol,var(--neon-c)),transparent)}
+.ult-cine{position:absolute;left:0;width:100%;height:9%;background:#000;z-index:34}
+.ult-cine.t{top:0;transform:translateY(-100%);animation:ultcineT .35s ease forwards}
+.ult-cine.b{bottom:0;transform:translateY(100%);animation:ultcineB .35s ease forwards}
+@keyframes ultcineT{to{transform:translateY(0)}}@keyframes ultcineB{to{transform:translateY(0)}}
+.ult-dmgL{position:absolute;inset:0;z-index:42;pointer-events:none;overflow:hidden}
+.udn{position:absolute;font-family:'Teko';font-weight:700;color:#fff;text-shadow:0 0 8px #000,0 2px 4px #000,0 0 14px var(--ucol,var(--neon-c));white-space:nowrap;line-height:.85}
+.udn.pop{animation:udnPop .7s ease-out forwards}
+@keyframes udnPop{0%{opacity:0;transform:scale(.3)}20%{opacity:1;transform:scale(1.15)}40%{transform:scale(1)}100%{opacity:0;transform:scale(1) translateY(-20px)}}
+.udn.heal{color:var(--neon-g);text-shadow:0 0 10px var(--neon-g),0 2px 6px #000}
+.uspk{position:absolute;font-size:24px;z-index:41;opacity:0}
+.uspk.go{animation:uspkGo .4s ease-out forwards}@keyframes uspkGo{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:scale(1.6)}}
+.ult-final{position:absolute;left:0;top:33%;width:100%;text-align:center;z-index:45;font-family:'Teko';font-weight:700;font-size:80px;color:var(--neon-y);text-shadow:0 0 22px var(--neon-o),0 4px 10px #000;opacity:0;line-height:.85}
+.ult-final.go{animation:ultfinalGo 1.3s cubic-bezier(.2,.8,.3,1)}
+@keyframes ultfinalGo{0%{opacity:0;transform:scale(3);letter-spacing:30px}25%{opacity:1;transform:scale(1);letter-spacing:1px}82%{opacity:1}100%{opacity:0;transform:scale(1.08)}}
+.ult-final small{display:block;font-family:'Orbitron';font-size:14px;letter-spacing:3px;color:#fff;margin-top:4px}
+.ult-final.heal{color:var(--neon-g);text-shadow:0 0 22px var(--neon-g),0 4px 10px #000}
+.ult-allies{position:absolute;left:0;bottom:9%;width:100%;display:flex;justify-content:center;gap:8px;z-index:44}
+.ult-allies .ally{width:60px;text-align:center;opacity:.9;position:relative}
+.ult-allies .ally .af{font-size:28px;filter:drop-shadow(0 0 6px var(--neon-g))}
+.ult-allies .ally .ah{height:5px;border-radius:3px;background:#0a0d16;border:1px solid rgba(255,255,255,.12);overflow:hidden;margin-top:2px}
+.ult-allies .ally .ah i{display:block;height:100%;background:linear-gradient(90deg,var(--neon-g),var(--neon-c));transition:width .8s ease}
+.ult-allies .ally .hp{position:absolute;font-family:'Teko';font-weight:700;font-size:18px;color:var(--neon-g);text-shadow:0 0 8px var(--neon-g),0 2px 4px #000;opacity:0;left:50%;transform:translateX(-50%);top:-18px;white-space:nowrap}
+.ult-allies .ally .hp.go{animation:ulthealUp 1.1s ease-out forwards}
+@keyframes ulthealUp{0%{opacity:0;transform:translateX(-50%) translateY(10px)}25%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-24px)}}
+.ult-healwave{position:absolute;left:50%;bottom:14%;width:30px;height:30px;border-radius:50%;border:3px solid var(--neon-g);transform:translateX(-50%) scale(.3);opacity:0;z-index:43}
+.ult-healwave.go{animation:ulthw 1s ease-out}@keyframes ulthw{0%{opacity:1;transform:translateX(-50%) scale(.3)}100%{opacity:0;transform:translateX(-50%) scale(10)}}
+/* 属性エフェクト */
+.u-bolt{position:absolute;top:0;width:14px;height:0;z-index:31;background:linear-gradient(180deg,#fff,#bfe0ff);box-shadow:0 0 22px #9bd0ff,0 0 40px #6fa0ff;opacity:0;clip-path:polygon(40% 0,60% 0,48% 40%,72% 40%,30% 100%,52% 55%,30% 55%)}
+.u-bolt.go{animation:uboltGo .3s steps(2)}@keyframes uboltGo{0%{opacity:0;height:0}25%{opacity:1;height:100%}100%{opacity:0;height:100%}}
+.u-rain{position:absolute;width:3px;height:60px;background:linear-gradient(180deg,transparent,#7fd0ff,#bfefff);z-index:31;top:-60px;border-radius:3px;opacity:.85}
+.u-rain.go{animation:urainGo linear forwards}@keyframes urainGo{to{transform:translateY(140vh)}}
+.u-firecol{position:absolute;bottom:0;width:100%;height:0;z-index:31;background:linear-gradient(0deg,#ff4d18,#ffd24a,transparent);opacity:.9;filter:blur(2px)}
+.u-firecol.go{animation:ufcGo 1s ease forwards}@keyframes ufcGo{0%{height:0;opacity:0}40%{height:85%;opacity:.9}100%{height:25%;opacity:0}}
+.u-zbeam{position:absolute;top:0;width:8px;height:100%;z-index:31;background:linear-gradient(180deg,var(--ucol),#fff,var(--ucol));box-shadow:0 0 16px var(--ucol);opacity:0;transform-origin:top}
+.u-zbeam.go{animation:uzb .4s ease-out}@keyframes uzb{0%{opacity:0;transform:scaleY(0)}40%{opacity:1;transform:scaleY(1)}100%{opacity:0}}
+.u-aquadome{position:absolute;left:50%;top:40%;width:120px;height:120px;border-radius:50%;transform:translate(-50%,-50%) scale(.4);z-index:18;opacity:0;background:radial-gradient(circle,rgba(127,208,255,.5),transparent 70%);border:2px solid #7fd0ff}
+.u-aquadome.go{animation:uaqua 1.2s ease forwards}@keyframes uaqua{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}50%{opacity:.9;transform:translate(-50%,-50%) scale(1.3)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6)}}
+.u-elec{position:absolute;left:50%;top:40%;width:150px;height:150px;border-radius:50%;transform:translate(-50%,-50%) scale(.5);z-index:19;opacity:0;border:2px dashed #bfe0ff;box-shadow:0 0 20px #6fa0ff,inset 0 0 20px #6fa0ff}
+.u-elec.go{animation:uelecGo .9s ease}@keyframes uelecGo{0%{opacity:0;transform:translate(-50%,-50%) scale(.5) rotate(0)}50%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.3) rotate(180deg)}}
+/* 2話：次元解放拳 */
+.u-fist{position:absolute;left:50%;top:42%;width:60px;height:60px;border-radius:50%;transform:translate(-50%,-50%) scale(.3);z-index:33;opacity:0;border:4px solid var(--ucol,#faff00);box-shadow:0 0 20px var(--ucol,#faff00)}
+.u-fist.go{animation:ufistGo .5s ease-out}@keyframes ufistGo{0%{opacity:1;transform:translate(-50%,-50%) scale(.3)}100%{opacity:0;transform:translate(-50%,-50%) scale(7)}}
+.u-rift{position:absolute;left:50%;top:42%;width:8px;height:0;transform:translate(-50%,-50%) rotate(var(--rr,0deg));z-index:31;background:linear-gradient(180deg,transparent,#00f0ff,#fff,#ff00d4,transparent);box-shadow:0 0 16px #00f0ff;opacity:0}
+.u-rift.go{animation:uriftGo .5s ease-out}@keyframes uriftGo{0%{opacity:0;height:0}40%{opacity:1;height:120%}100%{opacity:0;height:120%}}
+.u-guarddome{position:absolute;left:50%;top:40%;width:130px;height:130px;border-radius:50%;transform:translate(-50%,-50%) scale(.5);z-index:19;opacity:0;background:radial-gradient(circle,rgba(250,255,0,.35),transparent 70%);border:2px solid var(--ucol,#faff00)}
+.u-guarddome.go{animation:uguardGo 1.1s ease forwards}@keyframes uguardGo{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}50%{opacity:.9;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.4)}}
+/* 2話：無慈悲の雨（赤い雨・赤雷・血の背景） */
+#ultFX.blood{background:radial-gradient(circle at 50% 40%,#3a0810,#0a0306 72%)}
+.u-brain{position:absolute;width:3px;height:70px;background:linear-gradient(180deg,transparent,#ff3a4a,#c81e2e);z-index:31;top:-70px;border-radius:3px;opacity:.9;box-shadow:0 0 6px #c81e2e}
+.u-brain.go{animation:ubrainGo linear forwards}@keyframes ubrainGo{to{transform:translateY(150vh)}}
+.u-rbolt{position:absolute;top:0;width:16px;height:0;z-index:32;background:linear-gradient(180deg,#fff,#ffb0b8,#ff3a4a);box-shadow:0 0 22px #ff3a4a,0 0 44px #c81e2e;opacity:0;clip-path:polygon(40% 0,60% 0,48% 40%,72% 40%,30% 100%,52% 55%,30% 55%)}
+.u-rbolt.go{animation:urboltGo .3s steps(2)}@keyframes urboltGo{0%{opacity:0;height:0}25%{opacity:1;height:100%}100%{opacity:0;height:100%}}
+/* キャラ詳細 */
+#charDetail{position:absolute;inset:0;z-index:150;background:rgba(3,4,12,.85);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:24px}
+#charDetail.on{display:flex;animation:scin .25s ease}
+.cd-box{width:100%;max-width:330px;border:1px solid var(--neon-c);border-radius:16px;padding:18px;background:linear-gradient(160deg,var(--bg2),#10122e);box-shadow:0 0 30px rgba(0,240,255,.4)}
+.cd-box .cdh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.cd-box .cdh .f{font-size:46px}.cd-box .cdh .nm{font-family:'Orbitron';font-size:16px}.cd-box .cdh .rl{font-size:10px;color:var(--neon-y);margin-top:3px}
+.cd-stat{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.cd-stat .lab{color:#9bd}.cd-stat .v{font-family:'Orbitron';font-size:11px}
+.cd-stat .up{color:var(--neon-g)}.cd-stat .down{color:var(--neon-m)}
+.cd-eff{margin-top:10px}.cd-eff .et{font-family:'Orbitron';font-size:9px;color:var(--neon-m);letter-spacing:1px;margin-bottom:5px}
+.cd-eff .echip{display:inline-block;font-size:10px;border:1px solid var(--line);border-radius:12px;padding:2px 8px;margin:2px 3px 0 0;color:#cde}
+.cd-eff .echip.up{border-color:var(--neon-g);color:#9bffd0}
+.cd-eff .echip.down{border-color:var(--neon-m);color:#ff9adf}
+.cd-stat .v small{font-size:9px;opacity:.85}
+.cd-bars{margin:6px 0 10px}
+.cd-barrow{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.cd-barrow .bl{font-family:'Orbitron';font-size:9px;width:22px;color:#9bd}
+.cd-barrow .cd-bar{flex:1;height:8px;border-radius:4px;background:#0a0d16;border:1px solid rgba(255,255,255,.1);overflow:hidden}
+.cd-barrow .cd-bar i{display:block;height:100%;border-radius:4px}
+.cd-barrow .cd-bar i.hp{background:linear-gradient(90deg,var(--neon-g),var(--neon-c))}
+.cd-barrow .cd-bar i.mp{background:linear-gradient(90deg,#3a7bff,#00f0ff)}
+.cd-barrow .cd-bar i.tp{background:linear-gradient(90deg,#faff00,#ff8a00)}
+.cd-barrow .bn{font-family:'Teko';font-size:13px;color:#bdf;min-width:96px;text-align:right}
+.cd-chips{margin-top:4px}
+.cd-pas{font-size:11.5px;margin-bottom:4px}
+.cd-pas b{color:var(--neon-c);margin-right:5px}
+.cd-pas span{color:#9bd;font-size:10.5px}
+.cd-sk{display:flex;align-items:baseline;gap:7px;font-size:11.5px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.cd-sk .sn{font-weight:700;color:#eef;min-width:78px}
+.cd-sk .sd{color:#9bd;font-size:10px;flex:1}
+.cd-sk .smp{font-family:'Teko';font-size:12px;color:#7fd0ff}
+.cd-sk.no{opacity:.4}
+.cd-sk.ult .sn{color:var(--neon-y)}
+.cd-box{max-height:88vh;overflow-y:auto}
+.cd-close{margin-top:14px;text-align:center}
+/* リザルト */
+#btResult{justify-content:center;align-items:center;text-align:center}
+.btr-box{border:1px solid var(--neon-y);border-radius:18px;padding:30px 26px;max-width:360px;background:linear-gradient(160deg,var(--bg2),#1a0a24);box-shadow:0 0 36px rgba(250,255,0,.35)}
+.btr-box .res-ttl{font-family:'Orbitron';font-weight:900;font-size:30px;letter-spacing:3px;margin-bottom:14px}
+.btr-box.win .res-ttl{color:var(--neon-y);text-shadow:0 0 18px var(--neon-y)}
+.btr-box.lose .res-ttl{color:var(--neon-m);text-shadow:0 0 18px var(--neon-m)}
+.btr-box p{font-size:13px;color:#cde;line-height:1.6;margin-bottom:20px}
+
+/* GACHA */
+#gacha{justify-content:flex-start}
+.g-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-top:6px}
+.g-top .ttl{font-family:'Orbitron';font-size:15px;letter-spacing:3px;color:var(--neon-c);text-shadow:0 0 10px var(--neon-c)}
+.g-currency{font-family:'Orbitron';font-size:13px;color:var(--neon-y);border:1px solid rgba(250,255,0,.4);padding:6px 12px;border-radius:20px;text-shadow:0 0 8px var(--neon-y)}
+.g-banner{flex:1;min-height:240px;border:1px solid var(--neon-m);border-radius:16px;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 40%,rgba(255,0,212,.25),rgba(0,0,0,.4));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;margin-bottom:14px}
+.g-banner .ring{position:absolute;width:230px;height:230px;border:2px dashed rgba(0,240,255,.4);border-radius:50%;animation:spin 14s linear infinite}
+.g-banner .ring2{width:300px;height:300px;border-color:rgba(255,0,212,.3);animation-direction:reverse;animation-duration:20s}
+.g-orb{font-size:80px;filter:drop-shadow(0 0 22px var(--neon-c));animation:bob 3.4s ease-in-out infinite;z-index:2}
+.g-name{font-family:'Orbitron';font-size:18px;letter-spacing:3px;color:#fff;text-shadow:0 0 12px var(--neon-c);z-index:2}
+.g-rate{font-size:11px;color:#9bd;z-index:2;letter-spacing:1px;text-align:center;padding:0 16px}
+.g-pulls{display:flex;gap:12px}.g-pulls .nbtn{flex:1}
+#summonFX{position:absolute;inset:0;z-index:80;display:none;background:radial-gradient(circle at 50% 38%,#1a1430,#06060f 72%);overflow:hidden}
+#summonFX.on{display:block}
+#riceCv{position:absolute;inset:0;width:100%;height:100%;z-index:2}
+.sf-flash{position:absolute;inset:0;background:#fff;opacity:0;z-index:10;pointer-events:none}
+.sf-flash.on{animation:rffl .45s}
+@keyframes rffl{0%{opacity:.97}100%{opacity:0}}
+.rf-streaks{position:absolute;inset:-20%;z-index:6;opacity:0;pointer-events:none;background:repeating-conic-gradient(from 0deg at 50% 42%,rgba(255,255,255,.16) 0deg 3deg,transparent 3deg 9deg)}
+.rf-streaks.on{animation:rfstreak 1.4s ease forwards}
+@keyframes rfstreak{0%{opacity:0;transform:scale(.6) rotate(0)}30%{opacity:.9}100%{opacity:.5;transform:scale(1.1) rotate(40deg)}}
+.rf-streaks.gold{background:repeating-conic-gradient(from 0deg at 50% 42%,rgba(255,233,138,.22) 0deg 3deg,transparent 3deg 9deg)}
+.rf-pillar{position:absolute;left:50%;top:0;width:130px;height:100%;z-index:5;transform:translateX(-50%) scaleY(0);transform-origin:center 42%;background:linear-gradient(180deg,transparent,rgba(255,243,160,.55),transparent);filter:blur(7px);opacity:0;pointer-events:none}
+.rf-pillar.on{animation:rfpillar .8s ease forwards}
+@keyframes rfpillar{0%{opacity:0;transform:translateX(-50%) scaleY(0)}50%{opacity:1;transform:translateX(-50%) scaleY(1.3)}100%{opacity:.7;transform:translateX(-50%) scaleY(1)}}
+.rf-shock{position:absolute;left:50%;top:42%;width:20px;height:20px;border-radius:50%;border:4px solid var(--gold,#ffe98a);transform:translate(-50%,-50%) scale(.3);opacity:0;z-index:6;pointer-events:none}
+.rf-shock.on{animation:rfshock .8s ease-out}
+@keyframes rfshock{0%{opacity:1;transform:translate(-50%,-50%) scale(.3)}100%{opacity:0;transform:translate(-50%,-50%) scale(14)}}
+.rf-hero{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.rf-char{font-size:130px;opacity:0;filter:drop-shadow(0 0 30px var(--gold,#ffe98a))}
+.rf-char.show{animation:rfheroPop 1.2s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes rfheroPop{0%{opacity:0;transform:scale(.1) rotate(-30deg)}38%{opacity:1;transform:scale(1.3) rotate(8deg)}60%{transform:scale(.96) rotate(-2deg)}100%{opacity:1;transform:scale(1.05)}}
+.rf-rare{position:absolute;top:24%;font-family:'Orbitron';font-weight:900;font-size:46px;letter-spacing:8px;opacity:0}
+.rf-rare.show{animation:rfrareIn .9s cubic-bezier(.2,.8,.3,1) .15s forwards}
+.rf-rare.R{color:#9be3ff;text-shadow:0 0 14px #6fd6ff}
+.rf-rare.SR{color:var(--neon-m);text-shadow:0 0 16px var(--neon-m)}
+.rf-rare.SSR{color:var(--neon-y);text-shadow:0 0 18px var(--neon-y),0 0 40px var(--neon-o)}
+.rf-rare.UR{color:#ffe98a;text-shadow:0 0 18px #ffe98a,0 0 46px #d4af37}
+@keyframes rfrareIn{0%{opacity:0;transform:translateY(-30px) scale(.4);letter-spacing:30px}100%{opacity:1;transform:translateY(0) scale(1);letter-spacing:8px}}
+.rf-name{position:absolute;bottom:22%;font-family:'Orbitron';font-weight:700;font-size:19px;letter-spacing:3px;color:#fff;text-shadow:0 0 14px var(--neon-c);opacity:0}
+.rf-name.show{animation:rfnameIn .8s ease .45s forwards}
+@keyframes rfnameIn{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
+.rf-progress{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:14;font-family:'Orbitron';font-size:11px;letter-spacing:2px;color:var(--neon-y);opacity:.85}
+.rf-skip{position:absolute;bottom:16px;right:18px;z-index:14;font-family:'Orbitron';font-size:11px;letter-spacing:2px;color:#9bd;border:1px solid var(--line);border-radius:16px;padding:5px 14px;background:rgba(0,0,0,.4);cursor:pointer}
+#summonFX.shake{animation:rfshake .4s}
+@keyframes rfshake{0%,100%{transform:translate(0)}20%{transform:translate(-6px,4px)}40%{transform:translate(6px,-4px)}60%{transform:translate(-5px,-3px)}80%{transform:translate(5px,3px)}}
+#gachaResult{justify-content:flex-start}
+.gr-head{font-family:'Orbitron';font-size:16px;letter-spacing:4px;color:var(--neon-y);text-shadow:0 0 14px var(--neon-y);text-align:center;margin:6px 0 16px;padding-top:6px}
+.g2-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:auto}
+.g2-card{border-radius:12px;position:relative;overflow:hidden;aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:40px;border:1px solid var(--line);background:rgba(0,0,0,.35);opacity:0;transform:scale(.5);animation:cardpop .4s ease forwards}
+@keyframes cardpop{to{opacity:1;transform:scale(1)}}
+.g2-card .rank{position:absolute;top:5px;left:7px;font-family:'Orbitron';font-size:10px;letter-spacing:1px;color:var(--neon-c);z-index:3}
+.g2-card .cnm{font-size:9px;font-family:'Orbitron';color:#bdf;margin-top:6px;z-index:3}
+.gr-foot{display:flex;gap:12px;margin-top:16px}.gr-foot .nbtn{flex:1}
+
+/* ZUKAN */
+#zukan{justify-content:flex-start}
+.z-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;padding-bottom:20px}
+.z-cell{border:1px solid var(--line);border-radius:12px;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:4px;padding:18px 6px 8px;background:rgba(0,0,0,.3);cursor:pointer;transition:.18s;position:relative;overflow:hidden}
+.z-cell:hover{box-shadow:0 0 14px var(--neon-c);transform:translateY(-3px)}.z-cell:active{transform:scale(.95)}
+.z-cell .face{font-size:40px;z-index:2;line-height:1}.z-cell .cn{font-family:'Orbitron';font-size:9px;letter-spacing:.5px;color:#bdf;text-align:center;padding:0 2px;z-index:2;line-height:1.2}
+.z-cell.locked{border-style:dashed;opacity:.5;cursor:default}.z-cell.locked:hover{box-shadow:none;transform:none}
+.z-cell.locked .face{filter:grayscale(1) brightness(.4)}
+.z-cell .z-pw{z-index:2;font-family:'Orbitron';font-size:8.5px;color:var(--neon-y);margin-top:2px}.z-cell .z-pw b{font-size:11px;color:#fff;text-shadow:0 0 6px var(--neon-y)}
+.z-cell .z-stats{z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:1px 6px;font-size:7.5px;color:#9bd;width:100%;padding:0 6px;margin-top:1px}
+.z-cell .z-stats span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.z-rank{position:absolute;top:4px;right:6px;font-family:'Orbitron';font-weight:700;font-size:9px;z-index:3;padding:1px 5px;border-radius:6px}
+.z-rank.R{color:#9be3ff;border:1px solid #6fd6ff}.z-rank.SR{color:#ff7ae6;border:1px solid var(--neon-m)}
+.z-rank.SSR{color:var(--neon-y);border:1px solid var(--neon-y)}.z-rank.UR{color:#ffe98a;border:1px solid #ffe98a}
+.z-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 4px;margin-bottom:8px;flex-wrap:wrap}
+.z-count{font-family:'Orbitron';font-size:11px;color:var(--neon-c)}
+.z-sorts{display:flex;gap:6px}
+.z-sort{font-family:'Rajdhani';font-weight:700;font-size:11px;letter-spacing:.5px;color:#9bd;border:1px solid var(--line);border-radius:14px;padding:4px 11px;cursor:pointer;transition:.15s}
+.z-sort.on{background:linear-gradient(90deg,var(--neon-m),var(--neon-c));color:#04060f;border-color:transparent}
+.z-no{position:absolute;top:5px;left:7px;font-family:'Orbitron';font-size:8px;color:#567;z-index:3}
+.z-badge{position:absolute;top:5px;right:7px;font-family:'Orbitron';font-size:8px;color:var(--neon-y);z-index:3}
+#zDetail{position:absolute;inset:0;z-index:70;background:rgba(3,4,12,.85);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:24px}
+#zDetail.on{display:flex;animation:scin .35s ease}
+.zd-box{width:100%;max-width:400px;border:1px solid var(--neon-c);border-radius:18px;overflow:hidden;background:linear-gradient(160deg,var(--bg2),#10122e);box-shadow:0 0 36px rgba(0,240,255,.4);max-height:90%;overflow-y:auto}
+.zd-port{display:flex;align-items:center;gap:16px;padding:20px;background:radial-gradient(circle at 20% 30%,rgba(0,240,255,.18),rgba(0,0,0,.35))}
+.zd-port .big{font-size:72px;filter:drop-shadow(0 0 18px var(--neon-c))}
+.zd-port h3{font-family:'Orbitron';font-size:20px;letter-spacing:2px;text-shadow:0 0 10px var(--neon-c)}
+.zd-port .tag{font-size:11px;color:var(--neon-y);letter-spacing:2px;margin-top:4px}
+.zd-stats{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.zd-stats span{font-size:10px;border:1px solid var(--line);border-radius:14px;padding:3px 9px;color:#bdf}
+.zd-story{padding:18px 20px 22px}
+.zd-story h4{font-family:'Orbitron';font-size:10px;letter-spacing:2px;color:var(--neon-m);margin-bottom:9px}
+.zd-story p{font-size:13.5px;line-height:1.7;color:#cde}
+.zd-roles{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.zd-role{font-family:'Orbitron';font-size:9px;letter-spacing:.5px;padding:3px 8px;border-radius:12px;border:1px solid var(--line);color:#cde;background:rgba(0,0,0,.3)}
+.zd-role.role-アタッカー{border-color:#ff6a6a;color:#ff9a9a}
+.zd-role.role-タンク{border-color:#6fd6ff;color:#9be3ff}
+.zd-role.role-バフ{border-color:var(--neon-g);color:#9bffd0}
+.zd-role.role-デバフ{border-color:var(--neon-m);color:#ff9adf}
+.zd-role.role-トリッキー{border-color:var(--neon-y);color:#fff3a0}
+.zd-role.role-GOD{border-color:#ffe98a;color:#ffe98a;background:linear-gradient(90deg,rgba(255,233,138,.12),transparent)}
+.zd-section{padding:0 20px 6px}
+.zd-section h4{font-family:'Orbitron';font-size:10px;letter-spacing:2px;color:var(--neon-m);margin-bottom:8px}
+.zd-pas{margin-bottom:7px;font-size:12.5px}
+.zd-pas .pn{font-weight:700;color:var(--neon-c);margin-right:6px}
+.zd-pas .pd{color:#9bd;font-size:11.5px}
+.zd-sk{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.06);padding:6px 0}
+.zd-sk .sn{font-weight:700;font-size:13px;color:#eef;min-width:90px}
+.zd-sk .sd{font-size:11px;color:#9bd;flex:1}
+.zd-sk .smp{font-family:'Teko';font-size:13px;color:#7fd0ff}
+.zd-sk.ult .sn{color:var(--neon-y)}
+.zd-close{margin:0 20px 20px;text-align:center}
+
+/* SETTINGS */
+#settings{justify-content:flex-start}
+.set-row{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;background:rgba(0,0,0,.3)}
+.set-row .k{font-family:'Orbitron';font-size:12px;letter-spacing:1px;color:#cde}
+.set-row input[type=range]{-webkit-appearance:none;width:140px;height:5px;border-radius:5px;background:rgba(0,240,255,.2);outline:none}
+.set-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--neon-c);box-shadow:0 0 10px var(--neon-c);cursor:pointer}
+.set-row .val{font-family:'Orbitron';font-size:12px;color:var(--neon-y);width:42px;text-align:right}
+.toggle{width:52px;height:28px;border-radius:20px;border:1px solid var(--line);background:rgba(0,0,0,.4);position:relative;cursor:pointer;transition:.2s}
+.toggle::after{content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#667;transition:.2s}
+.toggle.on{background:rgba(0,255,157,.2);border-color:var(--neon-g)}
+.toggle.on::after{left:26px;background:var(--neon-g);box-shadow:0 0 10px var(--neon-g)}
+.set-note{font-size:10px;color:#567;text-align:center;margin-top:16px;letter-spacing:1px;line-height:1.6}
+
+/* STORY placeholder */
+#story{justify-content:center;align-items:center;text-align:center}
+.story-box{border:1px solid var(--line);border-radius:16px;padding:26px;max-width:380px;background:rgba(0,0,0,.35)}
+.story-box .ep{font-family:'Orbitron';color:var(--neon-y);font-size:13px;letter-spacing:3px;margin-bottom:10px}
+.story-box h2{font-family:'Orbitron';font-size:18px;margin-bottom:14px;text-shadow:0 0 10px var(--neon-c)}
+.story-box p{font-size:14px;line-height:1.7;color:#cde}
+
+/* MODAL */
+#modal{position:absolute;inset:0;z-index:100;background:rgba(3,4,12,.8);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:24px}
+#modal.on{display:flex;animation:scin .3s}
+.modal-box{width:100%;max-width:360px;border:1px solid var(--neon-c);border-radius:16px;padding:24px;text-align:center;background:linear-gradient(160deg,var(--bg2),#10122e);box-shadow:0 0 30px rgba(0,240,255,.4)}
+.modal-box h3{font-family:'Orbitron';font-size:16px;letter-spacing:2px;margin-bottom:10px;color:var(--neon-y);text-shadow:0 0 10px var(--neon-y)}
+.modal-box p{font-size:13.5px;line-height:1.6;color:#cde;margin-bottom:18px}
+.modal-row{display:flex;gap:10px}.modal-row .nbtn{flex:1;font-size:14px;padding:11px}
+
+/* UNLOCK modal */
+#unlock{position:absolute;inset:0;z-index:105;background:rgba(3,4,12,.85);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:22px}
+#unlock.on{display:flex;animation:scin .35s ease}
+.umb-box{width:100%;max-width:360px;border:1px solid var(--neon-c);border-radius:18px;padding:22px;background:linear-gradient(160deg,var(--bg2),#10122e);box-shadow:0 0 36px rgba(0,240,255,.4)}
+.umb-h{font-family:'Orbitron';font-size:15px;letter-spacing:2px;text-align:center;color:var(--neon-y);text-shadow:0 0 12px var(--neon-y);margin-bottom:4px}
+.umb-sub{text-align:center;font-size:11px;color:#9bd;margin-bottom:16px}
+.umb-item{display:flex;align-items:center;gap:13px;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:rgba(0,0,0,.3);animation:slidein .5s ease both}
+.umb-item:nth-child(3){animation-delay:.12s}.umb-item:nth-child(4){animation-delay:.24s}
+@keyframes slidein{from{opacity:0;transform:translateX(-16px)}}
+.umb-item .ic{font-size:32px;filter:drop-shadow(0 0 10px var(--neon-c))}
+.umb-item .tx .t{font-family:'Orbitron';font-size:12px;color:#fff}.umb-item .tx .d{font-size:11px;color:#9bd;margin-top:2px}
+.umb-item .new{margin-left:auto;font-family:'Orbitron';font-size:9px;color:#000;background:var(--neon-y);padding:2px 7px;border-radius:8px}
+.umb-box .nbtn{width:100%;margin-top:6px}
+
+/* sound toggle (right top, global) */
+.sound-fab{position:absolute;top:16px;right:16px;z-index:95;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(0,0,0,.45);color:var(--neon-c);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.sound-fab.off{color:#667;border-color:#445}
+
+#toast{position:absolute;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);z-index:110;background:rgba(0,0,0,.85);border:1px solid var(--neon-c);border-radius:10px;padding:10px 18px;font-size:13px;color:var(--txt);opacity:0;transition:.3s;pointer-events:none;box-shadow:0 0 16px rgba(0,240,255,.3);white-space:nowrap}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* 起動オーバーレイ（音声開始用） */
+#boot{position:absolute;inset:0;z-index:300;background:radial-gradient(circle at 50% 45%,#0a0e24,#05060f);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;cursor:pointer}
+#boot .bl{font-family:'Orbitron';font-weight:900;font-size:26px;letter-spacing:2px;text-shadow:0 0 14px var(--neon-c),0 0 30px var(--neon-m)}
+#boot .bs{font-family:'Orbitron';font-size:11px;letter-spacing:6px;color:var(--neon-y);text-shadow:0 0 10px var(--neon-y)}
+#boot .tapstart{margin-top:20px;font-size:14px;letter-spacing:3px;color:#9bd;animation:blink2 1.4s ease-in-out infinite}
+@keyframes blink2{50%{opacity:.3}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="bg-grid"></div><div class="bg-glow"></div>
+  <div class="particles" id="parts"></div>
+  <div class="scanline"></div>
+  <div class="sound-fab" id="soundFab">♪</div>
+
+  <!-- TITLE -->
+  <section class="screen show" id="title">
+    <div class="t-logo"><span class="glitch" data-t="開発者の現在 2">開発者の現在 2</span><span class="sub">THE RETURN OF FLAME WAR</span></div>
+    <div class="t2-hero"><div class="ringbg"></div><div class="char">🧑‍💻</div><div class="tagcopy">― 売り言葉に買い言葉、それが戦争。 ―</div></div>
+    <div class="t-menu">
+      <div class="nbtn" data-act="new">初めから</div>
+      <div class="nbtn" data-act="continue">続ける</div>
+      <div class="nbtn" data-act="zukan">キャラクター図鑑</div>
+      <div class="nbtn mag" id="gachaBtn" data-act="gacha">キャラクターガチャ</div>
+      <div class="nbtn ylw" data-act="settings">設定</div>
+    </div>
+    <div class="ver" id="verline">ver 1.0</div>
+  </section>
+
+  <!-- MAIN -->
+  <section class="screen" id="main">
+    <button class="backbtn" data-back="title">‹</button>
+    <div class="m-top"><div class="m-logo">開発者の現在 2</div><div class="m-gem" id="gemMain">🎟️ 0</div></div>
+    <div class="m-party"><div class="nbtn mag" data-act="party">⚔ パーティー編成</div></div>
+    <div class="m-list-ttl">― STORY / 話を選ぶ ―</div>
+    <div class="scr" id="epList"></div>
+  </section>
+
+  <!-- PARTY -->
+  <section class="screen" id="party">
+    <button class="backbtn" data-back="main">‹</button>
+    <div class="sc-title">PARTY EDIT</div>
+    <div class="slots" id="slots"></div>
+    <div class="party-power" id="partyPower">総戦力 <b id="ppVal">0</b></div>
+    <div class="slot-hint">↑ カードを上にスワイプ or ドラッグで編成・タップで外す ／ カード長押しで詳細</div>
+    <div class="sortbar"><span class="lab">並び替え</span>
+      <div class="opts" id="sortOpts">
+        <div class="opt on" data-sort="rare">レア度</div>
+        <div class="opt" data-sort="power">戦力</div>
+        <div class="opt" data-sort="get">取得順</div>
+        <div class="opt" data-sort="name">名前</div>
+      </div></div>
+    <div class="bench-ttl"><span>― 控えメンバー ―</span><span class="cnt" id="benchCnt"></span></div>
+    <div class="bench" id="bench"></div>
+    <div class="decide" id="decide">この編成で決定（<span id="dcount">2</span>/4）</div>
+  </section>
+
+  <!-- ADVENTURE -->
+  <section class="screen" id="adv">
+    <div class="adv">
+      <div class="adv-bg" id="advBg"></div>
+      <div class="adv-prog" id="advProg">第1話</div>
+      <div class="adv-skip" id="advSkip">SKIP ≫</div>
+      <div class="adv-stage"><div class="adv-char" id="advChar">😏</div></div>
+      <div class="adv-box" id="advBox">
+        <span class="adv-name" id="advName">？？？</span>
+        <div class="adv-text" id="advText"></div>
+        <div class="adv-tap">タップで次へ ▼</div>
+      </div>
+      <div class="adv-choices" id="advChoices" style="display:none"></div>
+    </div>
+  </section>
+
+  <!-- BATTLE -->
+  <section class="screen" id="battle">
+    <div class="bt-hitflash" id="btHitflash"></div>
+    <div class="fxlayer" id="fxLayer"></div>
+    <button class="backbtn" id="btFlee">‹</button>
+    <div class="bt-turn" id="btTurn">TURN 1</div>
+    <div class="boss-hpbar-top" id="bossHpTop"></div>
+    <div class="bt-enemies" id="btEnemies"></div>
+    <div class="bt-mid" id="btMid"></div>
+    <div class="bt-allies" id="btAllies"></div>
+    <div class="bt-cmd" id="btCmd"></div>
+    <div class="bt-sub" id="btSub" style="display:none"></div>
+    <!-- 必殺技ムービー -->
+    <div id="ultFX">
+      <div class="ult-bgflash" id="ultFlash"></div>
+      <div class="ult-fxL" id="ultFxL"></div>
+      <div class="ult-char" id="ultChar">👑</div>
+      <div class="ult-namecard"><div class="ult-name" id="ultName">必殺技</div><div class="ult-title" id="ultTitle">深夜の公開処刑</div><div class="ult-bar"></div></div>
+      <div class="ult-dmgL" id="ultDmgL"></div>
+      <div class="ult-final" id="ultFinal"></div>
+      <div class="ult-healwave" id="ultHealwave"></div>
+      <div class="ult-allies" id="ultAllies"></div>
+      <div class="ult-cine t" id="ultCineT"></div>
+      <div class="ult-cine b" id="ultCineB"></div>
+    </div>
+    <!-- キャラ詳細(長押し) -->
+    <div id="charDetail"><div class="cd-box" id="cdBox"></div></div>
+  </section>
+  <!-- リザルト -->
+  <section class="screen" id="btResult">
+    <div class="btr-box" id="btrBox"></div>
+  </section>
+
+  <!-- GACHA -->
+  <section class="screen" id="gacha">
+    <button class="backbtn" data-back="title">‹</button>
+    <div class="g-top"><div class="ttl">マルチバース召喚</div><div class="g-currency" id="gemDisp">🎟️ 0</div></div>
+    <div class="g-banner"><div class="ring"></div><div class="ring ring2"></div>
+      <div class="g-orb">🍣</div><div class="g-name">第一弾：原初の宇宙アース001</div>
+      <div class="g-rate" id="gRate">UR 2% / SSR 12% / SR 32% / R 54%　｜　初回10連はUR確定</div></div>
+    <div class="g-pulls"><div class="nbtn" data-pull="1">単発 (🎟️1)</div><div class="nbtn mag" data-pull="10">10連 (🎟️10)</div></div>
+    <div id="summonFX">
+      <canvas id="riceCv"></canvas>
+      <div class="rf-streaks" id="rfStreaks"></div>
+      <div class="rf-pillar" id="rfPillar"></div>
+      <div class="rf-shock" id="rfShock"></div>
+      <div class="sf-flash" id="sfFlash"></div>
+      <div class="rf-hero">
+        <div class="rf-rare" id="rfRare">SSR</div>
+        <div class="rf-char" id="rfChar">🍣</div>
+        <div class="rf-name" id="rfName">サーモン握り</div>
+      </div>
+      <div class="rf-progress" id="rfProgress"></div>
+      <div class="rf-skip" id="rfSkip">SKIP ≫</div>
+    </div>
+  </section>
+  <section class="screen" id="gachaResult">
+    <button class="backbtn" data-back="gacha">‹</button>
+    <div class="gr-head">✦ RESULT ✦</div>
+    <div class="g2-grid" id="grGrid"></div>
+    <div class="gr-foot"><div class="nbtn" data-act="gacha">もう一度</div><div class="nbtn ylw" data-act="zukan">図鑑で確認</div></div>
+  </section>
+
+  <!-- ZUKAN -->
+  <section class="screen" id="zukan">
+    <button class="backbtn" data-back="title">‹</button>
+    <div class="sc-title">CHARACTER FILE</div>
+    <div class="z-bar">
+      <div class="z-count" id="zCount">0 / 0 体</div>
+      <div class="z-sorts">
+        <span class="z-sort on" data-sort="no">No.順</span>
+        <span class="z-sort" data-sort="rare">レア度順</span>
+        <span class="z-sort" data-sort="power">戦力順</span>
+      </div>
+    </div>
+    <div class="z-grid scr" id="zGrid"></div>
+    <div id="zDetail"><div class="zd-box">
+      <div class="zd-port"><div class="big" id="zdFace">👑</div>
+        <div><h3 id="zdName">論破女王</h3><div class="tag" id="zdTag"></div>
+          <div class="zd-roles" id="zdRoles"></div>
+          <div class="zd-stats" id="zdStats"></div></div></div>
+      <div class="zd-story"><h4>STORY / 設定</h4><p id="zdStory"></p></div>
+      <div class="zd-section" id="zdPassives"></div>
+      <div class="zd-section" id="zdSkills"></div>
+      <div class="zd-close"><div class="nbtn" id="zdClose">閉じる</div></div>
+    </div></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="screen" id="settings">
+    <button class="backbtn" data-back="title">‹</button>
+    <div class="sc-title">SETTINGS</div>
+    <div class="set-row"><span class="k">BGM 音量</span><input type="range" id="bgmVol" min="0" max="100"><span class="val" id="bgmVal">70</span></div>
+    <div class="set-row"><span class="k">SE 音量</span><input type="range" id="seVol" min="0" max="100"><span class="val" id="seVal">80</span></div>
+    <div class="set-row"><span class="k">演出エフェクト</span><div class="toggle on" id="fxTog"></div></div>
+    <div class="set-row"><span class="k">テキスト速度</span><input type="range" id="txtSpd" min="1" max="5"><span class="val" id="txtVal">3</span></div>
+    <div style="margin-top:8px"><div class="nbtn mag" data-act="reset">セーブデータを初期化</div></div>
+  </section>
+
+  <!-- STORY placeholder -->
+  <section class="screen" id="story">
+    <button class="backbtn" data-back="main">‹</button>
+    <div class="story-box"><div class="ep" id="storyEp">第一話</div><h2 id="storyTtl">…</h2><p id="storyTxt">…</p></div>
+  </section>
+
+  <!-- shared modals -->
+  <div id="modal"><div class="modal-box"><h3 id="mTtl">確認</h3><p id="mMsg"></p>
+    <div class="modal-row"><div class="nbtn" id="mYes">はい</div><div class="nbtn mag" id="mNo">いいえ</div></div></div></div>
+  <div id="unlock"><div class="umb-box" id="umbBox"></div></div>
+  <div id="toast"></div>
+
+  <!-- boot overlay -->
+  <div id="boot">
+    <div class="bl glitch" data-t="開発者の現在 2">開発者の現在 2</div>
+    <div class="bs">RESUBA RPG</div>
+    <div class="tapstart">▶ TAP TO START</div>
+  </div>
+</div>
+<script>
+/* ============================================================
+   開発者の現在2 — ゲームロジック＋疑似BGM/SE（Web Audio合成）
+============================================================ */
+
+/* ===================== オーディオエンジン ===================== */
+const Audio = (()=>{
+  let ctx=null, master=null, bgmGain=null, seGain=null;
+  let bgmTimer=null, bgmNodes=[], currentBGM=null;
+  let enabled=true;
+
+  function init(){
+    if(ctx) return;
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value=0.9; master.connect(ctx.destination);
+    bgmGain = ctx.createGain(); bgmGain.connect(master);
+    seGain  = ctx.createGain(); seGain.connect(master);
+    setVol('bgm', S.settings.bgm); setVol('se', S.settings.se);
+  }
+  function resume(){ if(ctx&&ctx.state==='suspended') ctx.resume(); }
+  function setVol(kind,v){ if(!ctx)return; const g=(v/100); if(kind==='bgm')bgmGain.gain.value=g*0.5; else seGain.gain.value=g*0.7; }
+  function setEnabled(on){ enabled=on; if(!ctx)return; master.gain.value=on?0.9:0; }
+  function isEnabled(){ return enabled; }
+
+  /* --- SE（短い効果音） --- */
+  function blip(freq,dur,type='square',vol=0.5,slideTo=null){
+    if(!ctx||!enabled)return;
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type=type; o.frequency.setValueAtTime(freq,ctx.currentTime);
+    if(slideTo)o.frequency.exponentialRampToValueAtTime(slideTo,ctx.currentTime+dur);
+    g.gain.setValueAtTime(vol,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+    o.connect(g);g.connect(seGain);o.start();o.stop(ctx.currentTime+dur+0.02);
+  }
+  function noise(dur,vol=0.3){
+    if(!ctx||!enabled)return;
+    const buf=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate);
+    const d=buf.getChannelData(0); for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);
+    const src=ctx.createBufferSource();src.buffer=buf;
+    const g=ctx.createGain();g.gain.value=vol;
+    const f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=1200;
+    src.connect(f);f.connect(g);g.connect(seGain);src.start();
+  }
+  const SE={
+    tap:    ()=>blip(660,0.07,'square',0.35,880),
+    back:   ()=>blip(440,0.09,'square',0.3,330),
+    confirm:()=>{blip(523,0.08,'square',0.4);setTimeout(()=>blip(784,0.12,'square',0.4),70);},
+    cancel: ()=>blip(300,0.12,'sawtooth',0.3,180),
+    select: ()=>blip(880,0.06,'triangle',0.35),
+    equip:  ()=>{blip(700,0.06,'square',0.35);setTimeout(()=>blip(1046,0.1,'triangle',0.4),60);},
+    page:   ()=>blip(1200,0.04,'sine',0.18),
+    text:   ()=>blip(1400+Math.random()*300,0.02,'square',0.06),
+    error:  ()=>{blip(200,0.15,'sawtooth',0.35);},
+    gem:    ()=>{[988,1318,1568].forEach((f,i)=>setTimeout(()=>blip(f,0.12,'triangle',0.3),i*60));},
+    summon: ()=>{noise(0.5,0.25);blip(120,0.5,'sawtooth',0.3,600);},
+    flash:  ()=>{noise(0.25,0.4);},
+    rankR:  ()=>{[523,659].forEach((f,i)=>setTimeout(()=>blip(f,0.15,'triangle',0.35),i*90));},
+    rankSR: ()=>{[523,659,784].forEach((f,i)=>setTimeout(()=>blip(f,0.16,'square',0.35),i*80));},
+    rankSSR:()=>{[523,659,784,1046,1318].forEach((f,i)=>setTimeout(()=>blip(f,0.18,'square',0.4),i*75));},
+    rankUR: ()=>{[392,523,659,784,1046,1318,1568].forEach((f,i)=>setTimeout(()=>blip(f,0.2,'sawtooth',0.42),i*70));setTimeout(()=>noise(0.4,0.3),200);},
+    unlock: ()=>{[523,659,784,1046].forEach((f,i)=>setTimeout(()=>blip(f,0.25,'triangle',0.4),i*110));},
+    battle: ()=>{blip(150,0.3,'sawtooth',0.4,90);noise(0.3,0.25);},
+    hit:    ()=>{blip(320,0.09,'square',0.45,90);noise(0.08,0.3);},
+    hitHeavy:()=>{blip(180,0.16,'sawtooth',0.55,60);noise(0.14,0.4);setTimeout(()=>blip(110,0.12,'square',0.4,55),30);},
+    charge: (f)=>blip(f,0.16,'triangle',0.3),
+  };
+
+  /* --- BGM（画面ごとの疑似ループ） ---
+     簡単なシーケンサ：音名配列を一定テンポで鳴らしてループ */
+  const N={C3:130.8,D3:146.8,E3:164.8,F3:174.6,G3:196,A3:220,B3:246.9,
+    C4:261.6,D4:293.7,E4:329.6,F4:349.2,G4:392,A4:440,B4:493.9,
+    C5:523.3,D5:587.3,E5:659.3,G5:784,A5:880,0:0};
+  const TRACKS={
+    title:{ tempo:300, wave:'triangle', bass:'sine',
+      mel:['E4','G4','B4','A4','G4','E4','D4','E4','C4','E4','G4','E4','D4',0,'B3',0],
+      bs: ['C3',0,'G3',0,'A3',0,'E3',0,'F3',0,'C4',0,'G3',0,'E3',0] },
+    main:{ tempo:260, wave:'square', bass:'sine',
+      mel:['C4','E4','G4','C5','B4','G4','E4','G4','A4','C5','E5','D5','C5','G4','E4','C4'],
+      bs: ['C3',0,'C3',0,'A3',0,'A3',0,'F3',0,'F3',0,'G3',0,'G3',0] },
+    gacha:{ tempo:200, wave:'square', bass:'triangle',
+      mel:['E5','D5','C5','D5','E5','G5','E5','D5','C5','B4','C5','D5','E5','C5','G4',0],
+      bs: ['A3',0,'E3',0,'F3',0,'C3',0,'G3',0,'D3',0,'A3',0,'E3',0] },
+    adv:{ tempo:360, wave:'sine', bass:'sine',
+      mel:['A4',0,'G4',0,'E4',0,'G4','A4','C5',0,'B4',0,'A4',0,'G4',0,'E4',0],
+      bs: ['A3',0,0,0,'F3',0,0,0,'C3',0,0,0,'G3',0,0,0] },
+    battle:{ tempo:170, wave:'sawtooth', bass:'square',
+      mel:['E4','E4','G4','E4','D4','E4','A4','G4','E4','E4','C5','B4','A4','G4','E4','D4'],
+      bs: ['E3','E3','E3','E3','C3','C3','C3','C3','D3','D3','D3','D3','G3','G3','B3','B3'] },
+    zukan:{ tempo:340, wave:'triangle', bass:'sine',
+      mel:['C5','B4','A4','G4','E4','G4','A4','B4','C5','D5','E5','D5','C5','A4','G4',0],
+      bs: ['F3',0,'C3',0,'D3',0,'A3',0,'F3',0,'G3',0,'C3',0,'G3',0] },
+  };
+  function stopBGM(){ if(bgmTimer){clearInterval(bgmTimer);bgmTimer=null;} bgmNodes.forEach(n=>{try{n.stop()}catch(e){}}); bgmNodes=[]; }
+  function playNote(freq,dur,wave,vol){
+    if(!ctx||!enabled||!freq)return;
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type=wave;o.frequency.value=freq;
+    g.gain.setValueAtTime(0,ctx.currentTime);
+    g.gain.linearRampToValueAtTime(vol,ctx.currentTime+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+    o.connect(g);g.connect(bgmGain);o.start();o.stop(ctx.currentTime+dur+0.05);
+    bgmNodes.push(o); if(bgmNodes.length>40)bgmNodes=bgmNodes.slice(-40);
+  }
+  function playBGM(name){
+    if(currentBGM===name && bgmTimer) return;
+    currentBGM=name; stopBGM();
+    if(!ctx||!enabled)return;
+    const t=TRACKS[name]; if(!t)return;
+    const step=60000/t.tempo/2; let i=0;
+    const tick=()=>{
+      const m=t.mel[i%t.mel.length], b=t.bs[i%t.bs.length];
+      playNote(N[m]||0, step/1000*0.9, t.wave, 0.22);
+      playNote((N[b]||0)/1, step/1000*1.4, t.bass, 0.18);
+      i++;
+    };
+    tick(); bgmTimer=setInterval(tick,step);
+  }
+  return {init,resume,setVol,setEnabled,isEnabled,SE,playBGM,stopBGM,get currentBGM(){return currentBGM}};
+})();
+
+/* ===================== データ ===================== */
+const CHARS=[
+  {id:1,name:"開発者",face:"👨‍💻",rare:"SR",role:"勇者・アタッカー",age:"24",h:"172cm",w:"63kg",from:"自宅",gacha:false,
+   story:"趣味でゲーム開発をする主人公。1年前、世界を監視し統べる宇宙的存在『ウォッチャー』を仲間とともに撃退した英雄。平凡な日常を愛するが、再び世界は彼を放っておかない。"},
+  {id:2,name:"ねこ",face:"🐱",rare:"SR",role:"親友・回復",age:"??",h:"160cm",w:"秘密",from:"元・組事務所",gacha:false,
+   story:"主人公の親友にして去年世界を救った英雄の一人。元ヤクザという異色の経歴を持つ突っ込み役。口は悪いが情に厚く、仲間の傷を真っ先に気にかける。"},
+  {id:3,name:"かえる",face:"🐸",rare:"SR",role:"親友・タンク",age:"??",h:"155cm",w:"秘密",from:"沼のほとり",gacha:false,
+   story:"主人公の親友で世界を救った英雄の一人。一人称は『ぼく』。誰よりも優しく味方に寄り添う弱気な存在だが、その身体は誰よりも頑丈。UFO乗組員の言葉が分かる唯一の理解者。"},
+  {id:4,name:"UFO乗組員",face:"👽",rare:"SR",role:"親友・トリッキー",age:"???",h:"???",w:"???",from:"宇宙のどこか",gacha:false,
+   story:"主人公の親友で世界を救った英雄の一人。『あうー。』としか話さないが、一部の生物にだけ言葉が通じる。失った自分の宇宙船を探し続けている謎の人物。鋭い勘を持つ。"},
+  {id:5,name:"鬼大家",face:"👹",rare:"SR",role:"鬼の末裔",age:"402",h:"190cm",w:"110kg",from:"アパート1F",gacha:false,
+   story:"主人公たちが住むアパートの大家。鬼の末裔で、毎月家賃を怒りながら徴収しに来る名物キャラ。情に厚い一面もあるが、ある日謎のウィルスに侵され変わり果てた姿に……。"},
+  {id:6,name:"論破王マウント",face:"😏",rare:"SR",role:"自称・論破王",age:"31",h:"178cm",w:"70kg",from:"引用RT",gacha:true,
+   story:"『それってあなたの感想ですよね？』を口癖に持つ論客。論点をすり替える技術は一流だが、実は議論が終わると一人で反省会を開いている。"},
+  {id:7,name:"スパチャ神",face:"💸",rare:"SSR",role:"札束で殴る者",age:"45",h:"180cm",w:"88kg",from:"配信枠",gacha:true,
+   story:"論理より資本。どんな正論もスパチャの物量で押し流す。彼の前では正しさすら課金要素になる。座右の銘は『金は嘘をつかない』。"},
+  {id:8,name:"沈黙の賢者",face:"🧘",rare:"R",role:"既読スルー師",age:"50",h:"165cm",w:"60kg",from:"圏外",gacha:true,
+   story:"いかなる挑発にも反応しない。彼にとって最強の論破は『返信しないこと』。その既読スルーは時に相手を発狂させる。"},
+  {id:9,name:"言霊の化身",face:"🦾",rare:"UR",role:"伝説の存在",age:"∞",h:"???",w:"???",from:"電子の海",gacha:true,
+   story:"あらゆる論争を見守ってきたとされる存在。その一言は議論そのものを終わらせる。誰も姿を見た者はいないが、確かにそこにいる。"},
+  {id:10,name:"サーモン握り",face:"🍣",rare:"SR",role:"親友・タンク",age:"17",h:"158cm",w:"秘密",from:"???",gacha:false,
+   story:"2話から加わる謎の少女。見た目はギャル。英検4級なのでUFO乗組員の言葉が分かる。米一粒から別次元の英雄を呼び出す力を持つが、その正体・目的・なぜその姿なのかは、まだ何も明かされていない。"},
+  {id:11,name:"かつて友だった者",face:"🐸",rare:"SSR",role:"???・タンク/アタッカー",age:"-",h:"-",w:"-",from:"-",gacha:false,
+   story:"ウィルスに侵され変わり果てた、かつての親友の成れの果て。優しかった面影はもうない。緑黒く変色したその身体は、かつての仲間にすら牙をむく。"},
+  {id:12,name:"真・開発者",face:"🦸‍♂️",rare:"SSR",role:"覚醒の勇者・アタッカー",age:"24",h:"172cm",w:"63kg",from:"自宅",gacha:false,formOf:1,
+   story:"かつて世界を救った伝説の英雄、その真の姿。封印していたウォッチャー打倒の剣を再び手に取ったとき、平凡な開発者は覚醒する。非常に高い戦闘力を誇る。"},
+  // ===== 第一弾UR（ガチャ） =====
+  {id:101,name:"伝説の開発者",face:"🌟",rare:"UR",role:"原初の勇者・アタッカー",age:"???",h:"???",w:"???",from:"アース001",gacha:true,
+   story:"全宇宙最強の開発者。今作の主人公とは別人で、あらゆる宇宙の原点『アース001』から来た原初の存在。その指先は宇宙の理さえ書き換える。"},
+  {id:102,name:"伝説のねこ",face:"😺",rare:"UR",role:"原初の癒し・ヒーラー",age:"???",h:"???",w:"???",from:"アース001",gacha:true,
+   story:"全宇宙最強のねこ。今作のねことは別人で、アース001から来た原初の存在。その加護はあらゆる傷と災いを退ける。"},
+  {id:103,name:"伝説のかえる",face:"🐸",rare:"UR",role:"原初の守護・タンク",age:"???",h:"???",w:"???",from:"アース001",gacha:true,
+   story:"全宇宙最強のかえる。今作のかえるとは別人で、アース001から来た原初の存在。創造の雨を操り、あらゆる攻撃を無に帰す。"},
+  {id:104,name:"ウォッチャー",face:"👁️",rare:"UR",role:"監視者・トリッキー",age:"∞",h:"???",w:"???",from:"次元の狭間",gacha:true,
+   story:"前作のラスボス。世界を監視し統括する宇宙的存在。あらゆる事象を見届ける者であり、その気になれば次元ごと相手を幽閉する。"},
+  {id:105,name:"伝説のUFO乗組員",face:"🛸",rare:"UR",role:"原初の侵略者・トリッキー",age:"???",h:"???",w:"???",from:"アース001",gacha:true,
+   story:"全宇宙最強のUFO乗組員。今作の彼とは別人で、アース001から来た原初の存在。惑星を一撃で崩すビームを撃つ。"},
+  {id:106,name:"？？？",face:"🧍",rare:"UR",role:"ピエンターズ・アタッカー",age:"???",h:"???",w:"???",from:"???",gacha:true,
+   story:"ピエンターズと呼ばれる者。名も、来歴も、目的も、何ひとつ分かっていない。ただ、それが現れた宇宙は須らく消滅したという。"},
+];
+const ROLL=[{id:9,wt:1},{id:7,wt:2},{id:6,wt:14},{id:8,wt:83}];
+const EPS=[
+  {t:"終わりの始まり",s:"平和な日常は、一瞬で崩れ去った"},
+  {t:"親友",s:"さよならも、言えないまま"},
+  {t:"サーモン握り",s:"米一粒に、希望を込めて"},
+  {t:"研究所への道",s:"博士は、まだ生きているのか"},
+  {t:"侵食する街",s:"逃げ場など、どこにもない"},
+  {t:"裏切りの影",s:"信じられる者は誰だ"},
+  {t:"真実の断片",s:"ウィルスの起源に近づく"},
+  {t:"絶望の最深部",s:"すべてが、ここに集約する"},
+  {t:"英雄たちの黎明",s:"それでも、立ち上がる"},
+  {t:"現在 対 過去",s:"そして因縁の決着へ"},
+];
+/* アドベンチャー台本（前半→バトル→後半） */
+// 話数別の台本。pre=前半会話, choice=バトル直前の選択, post=後半会話
+const EPISODES={
+  1:{
+    pre:[
+      {who:"開発者",face:"👨‍💻",side:"left",t:"よーし、タコパの準備できたぞ！今日は集まってくれてありがとな。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"おう、たこ焼きとか何年ぶりだよ。元の稼業じゃ食う暇もなかったからな。"},
+      {who:"かえる",face:"🐸",side:"left",t:"わぁ、いい匂い…。ぼく、タコ多めがうれしいな。"},
+      {who:"UFO乗組員",face:"👽",side:"right",t:"あうー！（＝うまそう！）"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"はは、UFOも楽しみなんだな。ほら、焼けたぞ。熱いから気をつけろよ。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"つーかさ、世界救ってから一年か。早いもんだな。"},
+      {who:"かえる",face:"🐸",side:"left",t:"うん…。あのウォッチャーとの戦い、まだ夢に見るよ。でも今はこうして平和で…ぼく、しあわせ。"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"だな。もう厄介事はこりごりだ。これからはのんびりゲーム作って暮らすぞ。"},
+      {who:"UFO乗組員",face:"👽",side:"right",t:"あうー…（＝でも、宇宙船まだ見つからない…）"},
+      {who:"かえる",face:"🐸",side:"left",t:"大丈夫だよ。みんなで探そう？きっと見つかるって。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"おい、しんみりすんなって。せっかくのタコパだぞ。ほら、開発者もっと焼け焼け。"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"へいへい。…ん？なんか、揺れてないか？",fx:"quake"},
+      {who:"ねこ",face:"🐱",side:"right",t:"うおっ!?地震か!?",fx:"quake"},
+      {who:"かえる",face:"🐸",side:"left",t:"きゃっ…！皿、押さえて…！",fx:"quake"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"…おさまった。最近、地震多くないか？先週も揺れたよな。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"言われてみりゃそうだな。なーんか嫌な感じだ。…っと、誰か来たぞ?"},
+      {who:"鬼大家",face:"👹",side:"right",t:"おいィ！家賃だ家賃ェ！今月もきっちり耳をそろえて払ってもらうぞオラァ！",fx:"door"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"げっ、鬼大家さん…。今ちょうどタコパ中で…って、あれ？様子がおかしくないですか？"},
+      {who:"鬼大家",face:"👹",side:"right",t:"……ァ……ガ……ァァ……（呻き声）"},
+      {who:"かえる",face:"🐸",side:"left",t:"だ、大家さん…？顔色が、すごく…。目が、白い…"},
+      {who:"ねこ",face:"🐱",side:"right",t:"おい、なんかヤバいぞこれ。下がれ、お前ら！"},
+      {who:"鬼大家",face:"👹",side:"right",t:"ゴアアアアアッ！！",fx:"quake"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"襲ってきた!?くそっ、やるしかないのか…！みんな、戦闘準備だ！"},
+    ],
+    choice:{who:"開発者",face:"👨‍💻",t:"ゾンビみたいになった鬼大家が襲いかかってくる！どう対応する？",
+      options:[{label:"「正気に戻してやる、手加減はする！」",res:"仲間を守る構えを取った。"},
+               {label:"「悪いが…全力でいかせてもらう！」",res:"全員、臨戦態勢に入った！"}]},
+    post:[
+      {who:"ねこ",face:"🐱",side:"right",t:"はぁ…はぁ…。なんとか大家のジジイを伸したな。…って、笑えねえぞこれ。"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"とりあえず外の様子を見に行こう。これは普通じゃない。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――アパートの外に出た一同。そこに広がっていたのは、変わり果てた街の姿だった。",fx:"flash"},
+      {who:"ねこ",face:"🐱",side:"right",t:"……おい、嘘だろ。街中、あいつらだらけじゃねえか。"},
+      {who:"かえる",face:"🐸",side:"left",t:"み、みんな大家さんと同じ…。あちこちで、人が人を襲ってる…ひどいよ、こんなの…"},
+      {who:"ねこ",face:"🐱",side:"right",t:"待て、スマホに速報きてる。総理の緊急会見だ。LIVEやってる。"},
+      {who:"内閣総理大臣",face:"🎙️",side:"right",t:"国民の皆さん、落ち着いて聞いてください。現在、原因不明のウィルスが世界規模で拡散しています。"},
+      {who:"内閣総理大臣",face:"🎙️",side:"right",t:"感染者は自我を失い、全身の組織が壊死。にもかかわらず動き続け、『食べる』という本能のみで人を襲います。"},
+      {who:"内閣総理大臣",face:"🎙️",side:"right",t:"そして…噛まれた者もまた、同じ存在へと変貌します。決して、接触しないでください。以上です。"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"噛まれたら…感染する、だと…？冗談じゃない。これじゃまるで――"},
+      {who:"ねこ",face:"🐱",side:"right",t:"おい、かえる。さっきから腕どうした。押さえてんじゃねえか。"},
+      {who:"かえる",face:"🐸",side:"left",t:"えっ…あ、あはは。だ、大丈夫だよ。ちょっとかすっちゃっただけ。心配しないで?"},
+      {who:"UFO乗組員",face:"👽",side:"right",t:"……あう。（＝……かえる、おまえ……）"},
+      {who:"ナレーション",face:"📜",side:"left",t:"かえるの腕には、にじむ血。それは確かに――鬼大家に、噛まれた痕だった。UFO乗組員だけが、静かにそれに気づいていた。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"第一話 完。――終わらない悪夢は、ここから始まる。"},
+    ]
+  },
+  2:{
+    pre:[
+      {who:"ナレーション",face:"📜",side:"left",t:"――第二話。これは、かえるの物語。"},
+      {who:"かえる",face:"🐸",side:"left",t:"…あれ。ぼく、なにを、しようと…。えっと、開発者くん、おはよ…ええと、いま、朝？夜？"},
+      {who:"開発者",face:"👨‍💻",side:"right",t:"かえる…昨日からずっとそんな調子じゃないか。少し休んだ方がいい。"},
+      {who:"かえる",face:"🐸",side:"left",t:"だい、じょうぶ。ぼくは、げんき。ほら、こんなに…うっ…ごめん、ちょっと、ことばが、でて、こなくて。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"…おい。顔色、緑がかってきてるぞ。腕の傷も、広がってる。…なあ、まさか。"},
+      {who:"かえる",face:"🐸",side:"left",t:"ねこ、くん…？きみ、だれ、だっけ…。あれ、おかしいな。しってる、はずなのに。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"…っ。俺だよ。ねこだ。お前が『元ヤクザなのに優しいね』って笑ってくれた、ねこだよ。"},
+      {who:"かえる",face:"🐸",side:"left",t:"…ごめん、ね。あたまの、なかが、きりみたいで。みんなの、こと、わすれて、いっちゃう。"},
+      {who:"UFO乗組員",face:"👽",side:"right",t:"あう…（＝かえる、しっかりしろ…）"},
+      {who:"かえる",face:"🐸",side:"left",t:"UFOくんの、ことばだけ、なぜか、まだ、わかる、よ。ふしぎ、だね。…ぼく、たち、ともだち、だったよね。"},
+      {who:"開発者",face:"👨‍💻",side:"right",t:"『だった』なんて言うな。今も、これからも、ずっと友達だ。なあ、かえる。"},
+      {who:"開発者",face:"👨‍💻",side:"right",t:"…忘れたっていい。何度だって思い出させてやる。去年、みんなでウォッチャーを倒して、屋上で朝日を見たろ。"},
+      {who:"かえる",face:"🐸",side:"left",t:"…あさひ。…あ、おもいだした。きみが、ないて、た。せかいが、たすかったって、こどもみたいに。"},
+      {who:"開発者",face:"👨‍💻",side:"right",t:"…っ、そうだ。そうだよ。ちゃんと覚えてるじゃないか。"},
+      {who:"かえる",face:"🐸",side:"left",t:"でも、もう、その、かおが、おもいだせない。きみの、かお。ぼやけて、いく。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"…おい、かえる。俺の手、握ってみろ。ほら。…まだ、あったかいだろ。お前はまだ、ここにいる。"},
+      {who:"かえる",face:"🐸",side:"left",t:"ねこくんの、て。おおきくて、ごつごつ、してる。…やくざ、だったのに、すごく、やさしい、て。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"…ばか野郎。今さらそれ言うなよ。…泣けてくるだろうが。"},
+      {who:"かえる",face:"🐸",side:"left",t:"ねえ、ぼく、みんなと、であえて、ほんとうに、よかった。さみしがりやの、ぼくを、ひとりに、しないで、くれて。"},
+      {who:"UFO乗組員",face:"👽",side:"right",t:"あう…あうー…（＝ぼくらは、ずっと、ともだち。きみが、わすれても、ぼくらが、おぼえてる）"},
+      {who:"かえる",face:"🐸",side:"left",t:"…ありがとう。その、ことばだけで、ぼく、もう、じゅうぶん、しあわせ、だよ。"},
+      {who:"開発者",face:"👨‍💻",side:"right",t:"…泣くなよ、俺。しっかりしろ。…かえる、まだ何か、できることはないのか。"},
+      {who:"かえる",face:"🐸",side:"left",t:"…ごめん。もう、その『これから』に、ぼくは、いけない、みたい。",fx:"quake"},
+      {who:"かえる",face:"🐸",side:"left",t:"…からだが、おもい。さむい。ねむい。でも、ねむったら、ぼく、ぼくじゃ、なくなる、きが、する。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"くそっ…何かないのか。薬でも、なんでも。なんで誰も、こいつを助けられねえんだよ…！"},
+      {who:"かえる",face:"🐸",side:"left",t:"いいんだ、ねこくん。だれの、せいでも、ないよ。ぼくが、みんなを、かばって、かまれた。それだけ。こうかい、してない。"},
+      {who:"開発者",face:"👨‍💻",side:"right",t:"…っ。かえる、お前ってやつは、最後まで…。"},
+      {who:"かえる",face:"🐸",side:"left",t:"ねえ、みんな。さいごに、おねがいが、あるんだ。きいて、くれる…？"},
+      {who:"かえる",face:"🐸",side:"left",t:"ぼくを、ころして。ぼくが、ぼくで、あるうちに。…おねがい。"},
+      {who:"開発者",face:"👨‍💻",side:"right",t:"…っ!? なに言ってるんだ。できるわけ、ないだろ。そんなこと…！"},
+      {who:"かえる",face:"🐸",side:"left",t:"おねがい。もうすぐ、ぼくは、みんなを、おそう。きみたちを、たべて、しまう。そのまえに。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"ふざけんな…！俺は、仲間に手なんてかけねえ。死んでも、やらねえぞ…！"},
+      {who:"かえる",face:"🐸",side:"left",t:"ぼくが、ぼくで、いられる、さいごの、じかんなんだ。たのむ、よ。ともだち、だから。たのめるんだ。"},
+      {who:"UFO乗組員",face:"👽",side:"right",t:"あ…う……（＝そんなの、できないよ……）"},
+      {who:"開発者",face:"👨‍💻",side:"right",t:"…無理だ。できない。お前を傷つけるなんて、絶対に。たとえお前が望んでも…俺たちには、できないんだ。"},
+      {who:"かえる",face:"🐸",side:"left",t:"…ありがとう。やさしいね、みんな。ほんとうに、だいすき、だよ。…あ、れ。め、が、み、え……",fx:"flash"},
+      {who:"ナレーション",face:"📜",side:"left",t:"かえるの瞳から、光が消えた。緑黒く変色した身体が、ゆっくりと立ち上がる。"},
+      {who:"かえる",face:"🐸",side:"left",t:"……ガ……ァ……ァァァ……",fx:"quake"},
+      {who:"ねこ",face:"🐱",side:"right",t:"…かえる…。…すまねえ。お前の願い、最後まで聞いてやれなくて。"},
+      {who:"開発者",face:"👨‍💻",side:"right",t:"…来るぞ。…せめて、苦しまないように。…いくぞ、みんな。",fx:"quake"},
+    ],
+    choice:{who:"開発者",face:"👨‍💻",t:"変わり果てたかえるが、牙をむいて迫る。どんな想いで剣を取る？",
+      options:[{label:"「お前の願い、別の形で叶える」",res:"涙をこらえ、構えた。"},
+               {label:"「ごめん、かえる…ごめん…」",res:"震える手で、武器を握った。"}]},
+    post:[
+      {who:"ナレーション",face:"📜",side:"left",t:"かえる――『かつて友だった者』は、静かに倒れた。その身体から、ぬくもりが消えていく。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"……っ、う……。なんでだよ…。なんで、こいつが…こんな目に…！"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"…かえる。今度こそ、ゆっくり休め。…俺たちが、必ずこの世界を、元に…"},
+      {who:"ナレーション",face:"📜",side:"left",t:"その時――冷たくなったはずのかえるの血管が、どくん、と脈打った。",fx:"quake"},
+      {who:"かえる",face:"🐸",side:"left",t:"……ヴ……ァァァ……ガアアアッ！！",fx:"quake"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"…そんな。まだ、立つのか…。もう、やめてくれ…これ以上は…！"},
+      {who:"ねこ",face:"🐱",side:"right",t:"くそっ、武器が…体が動かねえ…！もう、こいつに刃を向けられねえよ…！"},
+      {who:"サーモン握り",face:"🍣",side:"right",t:"――あんたたち！なにしてるの！来るわよ！",fx:"flash"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"…!? だ、誰だ君は…！?お寿司…？いや、女の子…？こんな時に、どこから…！"},
+      {who:"サーモン握り",face:"🍣",side:"right",t:"説明はあと！…ったく、しけたツラしちゃって。あんたたち、このままじゃ、あの子をちゃんと弔ってあげれないでしょ…！"},
+      {who:"ねこ",face:"🐱",side:"right",t:"…なに者だお前。なんで、かえるのことを…。"},
+      {who:"サーモン握り",face:"🍣",side:"right",t:"いいから見てなさいよ。…そうだ、私の力で…英雄を、呼び出す！！この一粒の米から、別の宇宙の、ほんものの英雄たちをね！",fx:"flash"},
+      {who:"UFO乗組員",face:"👽",side:"right",t:"あう！？（＝この子の言葉、わかる…！英検4級…！？）"},
+      {who:"ナレーション",face:"📜",side:"left",t:"少女が握った米の一粒が、まばゆく光る。次元の扉が、開かれようとしていた。"},
+      {who:"サーモン握り",face:"🍣",side:"right",t:"私はサーモン握り。…あんたたちの新しい仲間よ。さあ、召喚を始めましょ。この絶望、ひっくり返してやるんだから。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――第二話 完。『マルチバース召喚』が解禁された。米の一粒から、無限の英雄が、いま召喚される。"},
+    ]
+  },
+  3:{
+    pre:[
+      {who:"ナレーション",face:"📜",side:"left",t:"――第三話。変わり果てたかえるは、もう完全に正気を失っていた。"},
+      {who:"かえる",face:"🐸",side:"left",t:"……ガアアア……アァァ……",fx:"quake"},
+      {who:"ねこ",face:"🐱",side:"right",t:"…もう、あいつの中に、かえるは居ねえんだな。…わかってる。わかってるんだ、頭では。"},
+      {who:"サーモン握り",face:"🍣",side:"right",t:"…つらいよね。でも、このまま彷徨わせ続けるほうが、ずっと残酷よ。あの子を、解放してあげなきゃ。"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"…ああ。わかってる。…かえる。お前の願い、別の形になっちまったけど。今度こそ、ちゃんと終わらせる。"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"かえる。…ごめん。あの時、お前の手を握り返してやれなくて。守るって言ったのに、守れなくて。本当に、ごめん。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"…すまねえ、かえる。お前を一人で逝かせる。…でも、お前が守ったこの世界、俺たちが必ず取り戻す。"},
+      {who:"UFO乗組員",face:"👽",side:"right",t:"あう…（＝ありがとう、かえる。さようなら）"},
+      {who:"かえる",face:"🐸",side:"left",t:"グ……ルアアアアアアッ！！！",fx:"quake"},
+      {who:"ナレーション",face:"📜",side:"left",t:"かえるの咆哮が街に響く。すると、四方の闇から――無数のゾンビが、呼ばれるように集まってきた。",fx:"flash"},
+      {who:"ねこ",face:"🐱",side:"right",t:"…っ、まずい。あの咆哮で、街中のゾンビが寄ってきやがった。囲まれるぞ…！"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"…これだけの数。生半可な力じゃ、かえるを弔うどころか、こっちが飲まれる。…やるしかないか。"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"…封印してた、あの剣。ウォッチャーを討ったときの、相棒。…もう二度と抜かないと、誓ってたんだけどな。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"開発者は棚の奥から、古びた剣を取り出した。柄を握った瞬間――彼の全身を、かつての力が駆け巡る。",fx:"flash"},
+      {who:"真・開発者",face:"🦸‍♂️",side:"left",t:"――思い出した。この感覚。世界を背負って戦った、あの日の俺を。",fx:"quake"},
+      {who:"ねこ",face:"🐱",side:"right",t:"…おいおい。その姿、一年前の…。『真・開発者』、伝説の英雄様のお出ましかよ。"},
+      {who:"サーモン握り",face:"🍣",side:"right",t:"…これが、世界を救った英雄の本気。…へえ。これは、頼もしいじゃない。"},
+      {who:"真・開発者",face:"🦸‍♂️",side:"left",t:"いくぞ、みんな！ゾンビどもを蹴散らして――かえるを、ちゃんと弔ってやろう！",fx:"flash"},
+    ],
+    choice:{who:"真・開発者",face:"🦸‍♂️",t:"覚醒した力で、押し寄せるゾンビの群れに立ち向かう。どう戦う？",
+      options:[{label:"「全部、俺が引き受ける」",res:"英雄が前線に立った。"},
+               {label:"「かえるのため、全力でいく」",res:"覚醒の刃が輝く。"}]},
+    post:[
+      {who:"ナレーション",face:"📜",side:"left",t:"群れを退け、かつて友だった者も、ついに完全に沈黙した。戦いは、終わった。"},
+      {who:"真・開発者",face:"🦸‍♂️",side:"left",t:"…終わった。…かえる。今度こそ、ゆっくり眠ってくれ。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"一同は、静かにかえるを弔った。優しかった親友に、せめてもの別れを告げて。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"…さて。それで、サーモン握り、だったか。お前、何者だ。なんで俺たちのこと、こんなに気にかける。"},
+      {who:"サーモン握り",face:"🍣",side:"right",t:"…話すわ。私が来たのは、助けてほしいから。博士の――おじいちゃんの研究所が、ゾンビだらけになっちゃったの。"},
+      {who:"サーモン握り",face:"🍣",side:"right",t:"おじいちゃんは、このウィルスを研究してた。たぶん、世界でいちばん詳しい。だから、世界を救った英雄のあんたたちに、助けてほしくて。"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"（※戦闘後、姿は元に戻っている）研究所…ウィルスの研究。それが本当なら、事態を変える鍵になるかもしれない。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"…で、もう一個。お前、なんで寿司の見た目なんだ。米から英雄呼ぶとか、明らかに普通じゃねえだろ。"},
+      {who:"サーモン握り",face:"🍣",side:"right",t:"…これも、おじいちゃんなの。私、もとは普通の17歳の女の子だった。でも、おじいちゃんの人体実験で…この姿に、変えられちゃった。"},
+      {who:"ねこ",face:"🐱",side:"right",t:"…人体実験、だと。実の孫を…？お前、それでよく――"},
+      {who:"サーモン握り",face:"🍣",side:"right",t:"…それでもね。私、おじいちゃんのこと、好きなの。きっと理由があったって、信じてる。だから、助けたい。…だめ、かな。"},
+      {who:"真・開発者",face:"🦸‍♂️",side:"left",t:"…いや。十分だ。困ってる奴を助ける、それに理由なんていらない。"},
+      {who:"開発者",face:"👨‍💻",side:"left",t:"よし。決まりだ。――博士を、救いに行こう。それが、この悪夢を終わらせる第一歩になる。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――第三話 完。少女の願いを胸に、英雄たちは研究所を目指す。ウィルスの真実は、その先に。"},
+    ]
+  }
+};
+// 後方互換：未定義の話はデフォルト台本
+const DEFAULT_SCRIPT={
+  pre:[{who:"ナレーション",face:"📜",side:"left",t:"敵が立ちはだかる。戦闘準備だ！"}],
+  choice:{who:"開発者",face:"👨‍💻",t:"どう動く？",options:[{label:"慎重にいく",res:"構えた。"},{label:"一気に攻める",res:"突撃！"}]},
+  post:[{who:"ナレーション",face:"📜",side:"left",t:"敵を退けた。だが戦いは続く――。"}]
+};
+function epScript(ep){return EPISODES[ep]||DEFAULT_SCRIPT;}
+const SCRIPT=epScript(1);
+
+/* ===================== ステート ===================== */
+const KEY="kaihatsu2_save_v2";
+const def={gems:0,tickets:0,story:1,owned:[1,2,3,4],party:[1,2,3,4],
+  gachaUnlocked:false,gachaTotal:0,gachaFirst10Done:false,ticketLog:{unlock:false,eps:[]},
+  kaeruDead:false,forms:{},formUnlocked:{},
+  settings:{bgm:70,se:80,fx:true,txt:3}};
+let S=load();
+function load(){try{return Object.assign({},def,JSON.parse(localStorage.getItem(KEY))||{})}catch(e){return JSON.parse(JSON.stringify(def))}}
+function save(){localStorage.setItem(KEY,JSON.stringify(S))}
+const byId=id=>CHARS.find(c=>c.id===id);
+const rareN=r=>({UR:4,SSR:3,SR:2,R:1}[r]||0);
+// フォルムチェンジ：base id → [base, 別形態…]。切替で別キャラ扱い。
+const FORMS={ 1:[1,12] }; // 開発者 ⇄ 真・開発者
+// あるbaseキャラについて、現在選択中の形態idを返す
+function curForm(baseId){ return (S.forms&&S.forms[baseId]) || baseId; }
+// 任意のid（形態含む）からbase idを返す
+function baseOf(id){ const c=byId(id); return (c&&c.formOf)?c.formOf:id; }
+// 編成・バトルで使う実効id（baseが指定されたら現在形態へ）
+function effId(id){ const b=baseOf(id); return FORMS[b]?curForm(b):id; }
+
+/* ===================== 画面遷移 ===================== */
+const BGM_OF={title:'title',main:'main',party:'main',gacha:'gacha',gachaResult:'gacha',
+  zukan:'zukan',settings:'main',adv:'adv',battle:'battle',story:'adv',btResult:'main'};
+function scr(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+  const b=BGM_OF[id]; if(b)Audio.playBGM(b);
+}
+function refresh(){
+  const g='🎟️ '+(S.tickets||0).toLocaleString();
+  const gd=document.getElementById('gemDisp');if(gd)gd.textContent=g;
+  const gm=document.getElementById('gemMain');if(gm)gm.textContent=g;
+  const gb=document.getElementById('gachaBtn');
+  if(S.gachaUnlocked){gb.classList.remove('lock');gb.textContent='マルチバース召喚 🎟️'+(S.tickets||0);}
+  else{gb.classList.add('lock');gb.textContent='🔒 召喚（2話クリアで解放）';}
+  document.getElementById('verline').textContent='ver 1.0 / 第'+S.story+'話到達';
+}
+
+/* ===================== モーダル ===================== */
+let pendingYes=null;
+function ask(ttl,msg,onYes){document.getElementById('mTtl').textContent=ttl;
+  document.getElementById('mMsg').innerHTML=msg;pendingYes=onYes;document.getElementById('modal').classList.add('on');}
+document.getElementById('mYes').onclick=()=>{Audio.SE.confirm();document.getElementById('modal').classList.remove('on');pendingYes&&pendingYes();};
+document.getElementById('mNo').onclick=()=>{Audio.SE.cancel();document.getElementById('modal').classList.remove('on');};
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1700);}
+
+/* ===================== タイトル／共通アクション ===================== */
+document.querySelectorAll('[data-act]').forEach(el=>el.addEventListener('click',()=>{
+  const a=el.dataset.act;
+  if(el.classList.contains('lock')){Audio.SE.error();return;}
+  Audio.SE.tap();
+  if(a==='new') ask('確認','はじめからゲームを開始しますか？<br>（アチーブメントは保持されます）',()=>{S.story=1;save();refresh();gotoMain();});
+  else if(a==='continue') ask('確認','続きからゲームを再開しますか？',()=>gotoMain());
+  else if(a==='party'){buildParty();scr('party');}
+  else if(a==='zukan'){buildZukan();scr('zukan');}
+  else if(a==='gacha'){if(!S.gachaUnlocked){toast('2話クリアで解放されます');Audio.SE.error();return;}scr('gacha');refresh();}
+  else if(a==='settings'){loadSettingsUI();scr('settings');}
+  else if(a==='reset') ask('セーブ初期化','本当に全データを初期化しますか？<br>この操作は元に戻せません。',()=>{localStorage.removeItem(KEY);S=load();refresh();buildEps();toast('初期化しました');scr('title');});
+}));
+document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{Audio.SE.back();scr(b.dataset.back);refresh();});
+function gotoMain(){buildEps();refresh();scr('main');}
+
+/* ===================== メイン（話リスト） ===================== */
+const MAX_EP=3; // 実装済みの最終話。これを超える話は「アップデートを待て」表示
+function buildEps(){const box=document.getElementById('epList');box.innerHTML='';
+  EPS.forEach((e,i)=>{const ep=i+1;
+    let st=ep<S.story?'clear':ep===S.story?'now':'lock';
+    // 未実装の話（実装済み最終話より先）は到達していても「準備中」ロック
+    const soon=(ep>MAX_EP);
+    if(soon)st='soon';
+    const cls=(st==='clear')?'clear':(st==='lock'||st==='soon')?'locked':'';
+    const d=document.createElement('div');d.className='ep-card '+cls;
+    let right,ttl,sub;
+    if(st==='soon'){
+      right='<span class="lockicon">🔒</span>';ttl='第'+ep+'話「？？？」';sub='——アップデートを待て';
+    } else if(st==='lock'){
+      right='<span class="lockicon">🔒</span>';ttl='第'+ep+'話「？？？」';sub='——？？？';
+    } else {
+      right='<span class="go">PLAY ▶</span>';ttl='第'+ep+'話「'+e.t+'」';sub=e.s;
+    }
+    d.innerHTML=`<div class="no">${(st==='lock'||st==='soon')?'??':String(ep).padStart(2,'0')}</div>
+      <div class="info"><div class="t">${ttl}</div><div class="s">${sub}</div></div>${right}`;
+    if(st==='clear'||st==='now')d.onclick=()=>{Audio.SE.select();startEpisode(ep);};
+    box.appendChild(d);});
+}
+
+/* ===================== アドベンチャー進行 ===================== */
+let advQueue=[],advIdx=0,advTyping=false,advTimer=null,curEp=1,advPhase='pre',curSc=null;
+function startEpisode(ep){
+  // 3話：開発者が覚醒（真・開発者へフォルムチェンジ解禁＆選択）
+  if(ep>=3){ S.formUnlocked=S.formUnlocked||{}; S.formUnlocked[1]=true; S.forms=S.forms||{}; if(!S.forms[1])S.forms[1]=12; save(); }
+  curEp=ep;curSc=epScript(ep);advPhase='pre';advQueue=curSc.pre;advIdx=0;
+  scr('adv');showLine();}
+function typeLine(text,cb){const el=document.getElementById('advText');el.innerHTML='';advTyping=true;
+  const spd=[0,55,40,28,16,8][S.settings.txt]||28;let i=0;
+  clearInterval(advTimer);
+  advTimer=setInterval(()=>{
+    if(i>=text.length){clearInterval(advTimer);advTyping=false;el.innerHTML=text+'<span class="cur">▍</span>';cb&&cb();return;}
+    el.textContent=text.slice(0,++i);if(i%2===0)Audio.SE.text();
+  },spd);
+}
+function showLine(){
+  const ln=advQueue[advIdx];
+  document.getElementById('advChoices').style.display='none';
+  document.getElementById('advBox').style.display='';
+  document.getElementById('advProg').textContent='第'+curEp+'話 ▸ '+(advPhase==='pre'?'序盤':'終盤');
+  document.getElementById('advName').textContent=ln.who;
+  const ch=document.getElementById('advChar');ch.textContent=ln.face;
+  ch.className='adv-char'+(ln.side==='right'?' right':'');
+  document.getElementById('advBg').style.background = advPhase==='pre'
+    ? 'radial-gradient(circle at 50% 30%,rgba(0,240,255,.18),#06070f 70%)'
+    : 'radial-gradient(circle at 60% 35%,rgba(0,255,157,.16),#06070f 70%)';
+  if(ln.fx)playAdvFx(ln.fx);
+  typeLine(ln.t);
+}
+function playAdvFx(fx){
+  const sc=document.getElementById('adv');
+  if(fx==='quake'){sc.classList.remove('quake');void sc.offsetWidth;sc.classList.add('quake');
+    Audio.SE.battle&&Audio.SE.battle();setTimeout(()=>sc.classList.remove('quake'),900);}
+  else if(fx==='door'){Audio.SE.error&&Audio.SE.error();}
+  else if(fx==='flash'){const f=document.getElementById('btHitflash');if(f){f.classList.add('on');setTimeout(()=>f.classList.remove('on'),250);}
+    Audio.SE.flash&&Audio.SE.flash();}
+}
+function advNext(){
+  if(advTyping){ // 早送り
+    clearInterval(advTimer);advTyping=false;
+    const ln=advQueue[advIdx];document.getElementById('advText').innerHTML=ln.t+'<span class="cur">▍</span>';return;
+  }
+  Audio.SE.page();
+  advIdx++;
+  if(advIdx<advQueue.length){showLine();return;}
+  // フェーズ終了処理
+  if(advPhase==='pre'){showChoice();}
+  else if(advPhase==='post'){endEpisode();}
+}
+document.getElementById('advBox').onclick=()=>{ if(document.getElementById('advChoices').style.display==='none')advNext(); };
+document.getElementById('advSkip').onclick=()=>{Audio.SE.tap();
+  if(advPhase==='pre'){showChoice();}else{endEpisode();}};
+
+function showChoice(){
+  const c=curSc.choice;
+  document.getElementById('advName').textContent=c.who;
+  document.getElementById('advChar').textContent=c.face;
+  document.getElementById('advText').innerHTML=c.t;
+  const box=document.getElementById('advChoices');box.innerHTML='';box.style.display='flex';
+  c.options.forEach((o,i)=>{const b=document.createElement('div');b.className='nbtn'+(i===1?' mag':'');
+    b.textContent='▶ '+o.label;
+    b.onclick=()=>{Audio.SE.select();toast(o.res);toBattle();};
+    box.appendChild(b);});
+}
+function toBattle(){Audio.SE.battle();startBattle(curEp,()=>{advPhase='post';advQueue=curSc.post;advIdx=0;scr("adv");showLine();});}
+
+function endEpisode(){
+  // クリア記録
+  const before=S.story;
+  if(curEp>=S.story)S.story=curEp+1;
+  // 敵キャラ図鑑登録：このエピのボスを加える
+  (STAGE_BOSS[curEp]||[]).forEach(id=>{if(!S.owned.includes(id))S.owned.push(id);});
+  // チケット付与（各話クリアで10枚・重複防止）
+  let gained=0;
+  if(!S.ticketLog.eps.includes(curEp)){S.ticketLog.eps.push(curEp);S.tickets+=10;gained+=10;}
+  // 2話クリアでガチャ解禁＋20枚
+  let justUnlockedGacha=false;
+  if(curEp>=2 && !S.gachaUnlocked){S.gachaUnlocked=true;justUnlockedGacha=true;
+    if(!S.ticketLog.unlock){S.ticketLog.unlock=true;S.tickets+=20;gained+=20;}}
+  // 2話クリア：かえる死亡確定＋サーモン握り加入
+  if(curEp===2 && !S.kaeruDead){
+    S.kaeruDead=true;
+    // かえるをパーティから外す
+    S.party=S.party.filter(id=>id!==3);
+    // サーモン握りを入手＆加入（空きがあればパーティ、無ければBOX）
+    if(!S.owned.includes(10))S.owned.push(10);
+    if(S.party.length<4 && !S.party.includes(10))S.party.push(10);
+  }
+  save(); refresh(); buildEps();
+  scr('main');
+  showUnlock(curEp, justUnlockedGacha, gained);
+}
+
+/* ===================== 機能解放モーダル ===================== */
+function showUnlock(ep,gachaUnlocked,gained){
+  const items=[];
+  if(gachaUnlocked)items.push({ic:'🍣',t:'マルチバース召喚',d:'サーモン握りの力で仲間を呼べる',badge:'NEW'});
+  if(gained)items.push({ic:'🎟️',t:'ガチャチケット ×'+gained,d:'クリア報酬を受け取った',badge:'GET'});
+  items.push({ic:'📚',t:'図鑑に新規追加',d:'登場キャラが登録された',badge:'+1'});
+  const box=document.getElementById('umbBox');
+  box.innerHTML=`<div class="umb-h">✦ 第${ep}話 クリア ✦</div>
+    <div class="umb-sub">${gachaUnlocked?'新機能が解放されました！':'報酬を獲得しました'}</div>`+
+    items.map(it=>`<div class="umb-item"><div class="ic">${it.ic}</div>
+      <div class="tx"><div class="t">${it.t}</div><div class="d">${it.d}</div></div>
+      <div class="new">${it.badge}</div></div>`).join('')+
+    `<div class="nbtn ylw" id="umbOk">受け取る</div>`;
+  document.getElementById('unlock').classList.add('on');
+  Audio.SE.unlock();
+  document.getElementById('umbOk').onclick=()=>{Audio.SE.confirm();document.getElementById('unlock').classList.remove('on');};
+}
+
+/* ===================== パーティー編成 ===================== */
+const MAX=4, FIXED=1;
+let sortKey='rare';
+function ownedChars(){return CHARS.filter(c=>S.owned.includes(c.id));}
+function sortedRoster(){const a=ownedChars();const lv=getUserLevel();
+  if(sortKey==='rare')a.sort((x,y)=>rareN(y.rare)-rareN(x.rare)||x.id-y.id);
+  if(sortKey==='get')a.sort((x,y)=>S.owned.indexOf(x.id)-S.owned.indexOf(y.id));
+  if(sortKey==='name')a.sort((x,y)=>x.name.localeCompare(y.name,'ja'));
+  if(sortKey==='power')a.sort((x,y)=>unitPower(effId(y.id),lv)-unitPower(effId(x.id),lv)||x.id-y.id);
+  return a;}
+function buildParty(){ if(S.kaeruDead)S.party=S.party.filter(id=>id!==3); if(!S.party.includes(FIXED))S.party.unshift(FIXED); drawSlots();drawBench(); }
+function toggleForm(baseId){
+  if(!FORMS[baseId]||!(S.formUnlocked&&S.formUnlocked[baseId]))return;
+  const list=FORMS[baseId];const cur=curForm(baseId);
+  const idx=list.indexOf(cur);const next=list[(idx+1)%list.length];
+  S.forms=S.forms||{};S.forms[baseId]=next;save();
+  Audio.SE.equip();const c=byId(next);toast(c.name+' に切り替えました');
+  drawSlots();drawBench();
+}
+// 編成カード長押し → 詳細モーダル
+function bindLongPress(card,id){
+  let timer=null,moved=false,sx=0,sy=0;
+  const start=e=>{moved=false;const t=e.touches?e.touches[0]:e;sx=t.clientX;sy=t.clientY;
+    timer=setTimeout(()=>{if(!moved){Audio.SE.select();openCharDetailById(effId(id));}},420);};
+  const move=e=>{const t=e.touches?e.touches[0]:e;if(Math.hypot(t.clientX-sx,t.clientY-sy)>8){moved=true;clearTimeout(timer);}};
+  const end=()=>clearTimeout(timer);
+  card.addEventListener('touchstart',start,{passive:true});card.addEventListener('touchmove',move,{passive:true});card.addEventListener('touchend',end);
+  card.addEventListener('mousedown',start);card.addEventListener('mousemove',move);card.addEventListener('mouseup',end);card.addEventListener('mouseleave',end);
+}
+// CHARS idから詳細モーダル（編成・図鑑共用）。基準レベルの疑似ユニットを生成してshowCharDetailへ
+function openCharDetailById(id){
+  const u=makeUnit(id,getUserLevel(),false);
+  showCharDetail(u);
+}
+function drawSlots(){const el=document.getElementById('slots');el.innerHTML='';
+  for(let i=0;i<MAX;i++){const id=S.party[i];const d=document.createElement('div');
+    if(id==null){d.className='slot empty';d.textContent='＋';}
+    else{const c=byId(effId(id));const fx=(baseOf(id)===FIXED);d.className='slot rare-'+c.rare+(fx?' fixed':'');
+      d.innerHTML=(i===0?'<span class="lead">LEADER</span>':'')+
+        `<div class="f">${c.face}</div><div class="n">${c.name}</div><span class="rrank ${c.rare}">${c.rare}</span>`+
+        (fx?'<span class="fixbadge">固定</span>':`<span class="rm" data-rm="${id}">×</span>`);}
+    el.appendChild(d);}
+  document.getElementById('dcount').textContent=S.party.length;
+  const pp=document.getElementById('ppVal');if(pp)pp.textContent=disp(partyPower());
+  document.querySelectorAll('[data-rm]').forEach(b=>b.onclick=e=>{e.stopPropagation();Audio.SE.back();
+    S.party=S.party.filter(x=>x!=b.dataset.rm);save();drawSlots();drawBench();toast('編成から外しました');});
+}
+function drawBench(){const el=document.getElementById('bench');el.innerHTML='';
+  sortedRoster().forEach(c0=>{
+    const baseId=baseOf(c0.id);
+    const c=(FORMS[baseId]&&S.formUnlocked&&S.formUnlocked[baseId])?byId(curForm(baseId)):c0;
+    const inP=S.party.includes(c0.id)||S.party.includes(baseId),fx=(baseId===FIXED);
+    const dead=(baseId===3 && S.kaeruDead);
+    const d=document.createElement('div');d.className='card rare-'+c.rare+(inP?' in':'')+(dead?' dead-card':'');d.dataset.id=c.id;
+    if(dead){
+      d.innerHTML=`<div class="f">💀</div>
+        <div class="meta"><div class="nm">${c.name}</div><div class="role">死亡したため編成不可</div></div>
+        <span class="innow dead-tag">DEAD</span><div class="grip">✖</div>`;
+      el.appendChild(d); // ドラッグ無効（bindDragしない）
+      return;
+    }
+    d.innerHTML=`<div class="f">${c.face}</div>
+      <div class="meta"><div class="nm">${c.name}</div><div class="role">${c.role}</div></div>
+      ${fx?'<span class="innow fix">主人公・固定</span>':inP?'<span class="innow">編成中</span>':''}
+      <span class="swipefx">▲ 編成</span><div class="grip">${fx?'🔒':'⠿'}</div>`;
+    // 戦力＋ステータス
+    const lv=getUserLevel();const st=unitStats(c.id,lv);const pw=unitPower(c.id,lv);
+    if(st){const sb=document.createElement('div');sb.className='card-stats';
+      sb.innerHTML=`<div class="cs-pw">⚔ 戦力 <b>${disp(pw)}</b></div>
+        <div class="cs-grid"><span>HP ${disp(st.HP)}</span><span>ATK ${disp(st.ATK)}</span><span>DEF ${disp(st.DEF)}</span><span>SPD ${disp(st.SPD)}</span></div>`;
+      d.appendChild(sb);}
+    // 長押しで詳細モーダル
+    bindLongPress(d,c.id);
+    // フォルムチェンジ可能（解禁済み）なら切替ボタン
+    const b=baseOf(c.id);
+    if(FORMS[b] && S.formUnlocked && S.formUnlocked[b]){
+      const fb=document.createElement('div');fb.className='formbtn';fb.textContent='⇄ 形態';
+      fb.onclick=(e)=>{e.stopPropagation();toggleForm(b);};
+      d.appendChild(fb);
+    }
+    el.appendChild(d);bindDrag(d,c.id);});
+  document.getElementById('benchCnt').textContent=ownedChars().length+'体';
+}
+function bindDrag(card,id){
+  let sx,sy,dragging=false,clone=null,moved=false;
+  const start=e=>{const t=e.touches?e.touches[0]:e;sx=t.clientX;sy=t.clientY;dragging=true;moved=false;
+    document.addEventListener('mousemove',move);document.addEventListener('mouseup',end);
+    document.addEventListener('touchmove',move,{passive:false});document.addEventListener('touchend',end);};
+  const move=e=>{if(!dragging)return;const t=e.touches?e.touches[0]:e;const dx=t.clientX-sx,dy=t.clientY-sy;
+    if(!moved&&Math.hypot(dx,dy)>8){moved=true;clone=card.cloneNode(true);clone.classList.add('dragging');
+      clone.style.width=card.offsetWidth+'px';document.getElementById('app').appendChild(clone);card.style.opacity=.25;}
+    if(moved){e.preventDefault();clone.style.left=(t.clientX-card.offsetWidth/2)+'px';clone.style.top=(t.clientY-30)+'px';hlSlot(t.clientY);}};
+  const end=e=>{dragging=false;
+    document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',end);
+    document.removeEventListener('touchmove',move);document.removeEventListener('touchend',end);
+    if(moved){const t=e.changedTouches?e.changedTouches[0]:e;
+      const r=document.getElementById('slots').getBoundingClientRect();clone.remove();card.style.opacity='';clearHL();
+      if(t.clientY<r.bottom+30)addToParty(id);
+    }else{ if(id===FIXED){toast('主人公は外せません');Audio.SE.error();return;}
+      if(S.party.includes(id)){S.party=S.party.filter(x=>x!=id);Audio.SE.back();save();drawSlots();drawBench();}else addToParty(id);}
+  };
+  card.addEventListener('mousedown',start);card.addEventListener('touchstart',start,{passive:true});
+}
+function hlSlot(y){const r=document.getElementById('slots').getBoundingClientRect();
+  document.querySelectorAll('.slot').forEach(s=>s.classList.toggle('drop',y<r.bottom+30));}
+function clearHL(){document.querySelectorAll('.slot').forEach(s=>s.classList.remove('drop'));}
+function addToParty(id){if(S.party.includes(id)){toast('すでに編成中です');return;}
+  if(S.party.length>=MAX){toast('スロットがいっぱいです');Audio.SE.error();return;}
+  S.party.push(id);Audio.SE.equip();save();drawSlots();drawBench();toast(byId(id).name+' を編成！');}
+document.querySelectorAll('#sortOpts .opt').forEach(o=>o.onclick=()=>{Audio.SE.tap();
+  document.querySelectorAll('#sortOpts .opt').forEach(x=>x.classList.remove('on'));o.classList.add('on');sortKey=o.dataset.sort;drawBench();});
+document.getElementById('decide').onclick=()=>{Audio.SE.confirm();save();toast('編成を決定（リーダー：'+byId(S.party[0]).name+'）');setTimeout(()=>{scr('main');refresh();},600);};
+
+/* ===================== ガチャ ===================== */
+// ガチャ対象プール（第一弾：gacha:trueのキャラ）
+function gachaPool(){return CHARS.filter(c=>c.gacha);}
+// レア別の確率（%）
+const GACHA_RATE={UR:2,SSR:12,SR:32,R:54};
+// レア度を抽選 → そのレアの未所持から1体（無ければ所持済みでもOK＝実質コンプ後）
+function rollByRare(forceRare){
+  let rare=forceRare;
+  if(!rare){let r=Math.random()*100;
+    if((r-=GACHA_RATE.UR)<0)rare='UR'; else if((r-=GACHA_RATE.SSR)<0)rare='SSR'; else if((r-=GACHA_RATE.SR)<0)rare='SR'; else rare='R';}
+  const pool=gachaPool().filter(c=>c.rare===rare);
+  if(!pool.length)return rollByRare(); // そのレアがいなければ引き直し
+  const unowned=pool.filter(c=>!S.owned.includes(c.id)&&!pendingNew.includes(c.id));
+  const pick=(unowned.length?unowned:pool)[Math.floor(Math.random()*(unowned.length?unowned.length:pool.length))];
+  return pick;
+}
+let pendingNew=[]; // 同一ガチャ内での重複防止（天井式：同キャラ排出なし）
+function doPull(n){
+  pendingNew=[];
+  const results=[];
+  // 初回10連はUR確定（1体目をURに）
+  const firstFree = (n===10 && !S.gachaFirst10Done);
+  for(let i=0;i<n;i++){
+    let c;
+    if(firstFree && i===0) c=rollByRare('UR');
+    else c=rollByRare();
+    results.push(c);
+    if(!S.owned.includes(c.id))pendingNew.push(c.id);
+  }
+  if(firstFree)S.gachaFirst10Done=true;
+  S.gachaTotal+=n;
+  return results;
+}
+document.querySelectorAll('[data-pull]').forEach(b=>b.onclick=()=>{
+  const n=+b.dataset.pull,cost=n;
+  if((S.tickets||0)<cost){toast('チケットが足りません（🎟️'+cost+'必要）');Audio.SE.error();return;}
+  Audio.SE.tap();S.tickets-=cost;save();refresh();
+  const results=doPull(n);
+  playSummonQueue(results,()=>showResult(results));
+});
+
+/* ===== 3D米演出エンジン（⑥カメラ回転×爆発ベース・レア度別） ===== */
+let riceScene,riceCam,riceRenderer,riceGrain,riceSeed,riceShell=[],riceParts=[],riceSplit=[],riceRaf=null,riceInited=false,riceW,riceH,riceCamAng=0;
+function riceInit(){
+  const box=document.getElementById('summonFX');const cv=document.getElementById('riceCv');
+  riceW=box.clientWidth||box.offsetWidth||(box.parentElement&&box.parentElement.clientWidth)||400;
+  riceH=box.clientHeight||box.offsetHeight||(box.parentElement&&box.parentElement.clientHeight)||700;
+  riceScene=new THREE.Scene();
+  riceCam=new THREE.PerspectiveCamera(45,riceW/riceH,0.1,100);riceCam.position.set(0,0,9);
+  riceRenderer=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});
+  riceRenderer.setSize(riceW,riceH);riceRenderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  riceScene.add(new THREE.AmbientLight(0xffffff,0.7));
+  const dir=new THREE.DirectionalLight(0xffffff,0.9);dir.position.set(3,5,4);riceScene.add(dir);
+  const pl1=new THREE.PointLight(0x00f0ff,0.6,30);pl1.position.set(-4,2,4);riceScene.add(pl1);
+  const pl2=new THREE.PointLight(0xff00d4,0.5,30);pl2.position.set(4,-2,3);riceScene.add(pl2);
+  const pl3=new THREE.PointLight(0xffe98a,0.8,30);pl3.position.set(0,0,5);riceScene.add(pl3);
+  riceInited=true;
+  riceLoop();
+}
+function riceGrainMesh(s){const geo=new THREE.SphereGeometry(0.5,28,20);geo.scale(0.55,1,0.55);
+  const mat=new THREE.MeshPhysicalMaterial({color:0xfdfdf5,roughness:0.28,metalness:0.0,clearcoat:0.8,clearcoatRoughness:0.25,reflectivity:0.6});
+  const m=new THREE.Mesh(geo,mat);m.scale.setScalar(s||1);return m;}
+function riceShellChunk(){const geo=new THREE.SphereGeometry(0.5,14,7,Math.random()*6,Math.PI*0.8,Math.random()*2,Math.PI*0.6);geo.scale(0.56,1.02,0.56);
+  return new THREE.Mesh(geo,new THREE.MeshPhysicalMaterial({color:0xfdfdf5,roughness:0.3,clearcoat:0.6,side:THREE.DoubleSide}));}
+function riceParticle(c,sz){return new THREE.Mesh(new THREE.SphereGeometry(sz||0.07,6,6),new THREE.MeshBasicMaterial({color:c,transparent:true}));}
+function riceClear(){[riceGrain,riceSeed,...riceShell,...riceParts,...riceSplit].forEach(o=>{if(o)riceScene.remove(o);});
+  riceGrain=riceSeed=null;riceShell=[];riceParts=[];riceSplit=[];}
+function riceLoop(){riceRaf=requestAnimationFrame(riceLoop);if(riceState)riceStep(performance.now());if(riceRenderer&&riceScene&&riceCam)riceRenderer.render(riceScene,riceCam);}
+
+// レア度別の演出パラメータ
+function riceTuning(rare){
+  return ({
+    R:  {fall:1.0,split:0,shell:8, part:30,zoom:3.5,opts:{}},
+    SR: {fall:1.1,split:0,shell:12,part:55,zoom:4.5,opts:{streaks:true}},
+    SSR:{fall:1.2,split:3,shell:16,part:85,zoom:5,  opts:{streaks:true,shock:true,shake:true}},
+    UR: {fall:1.3,split:5,shell:22,part:120,zoom:5.5,opts:{streaks:true,gold:true,pillar:true,shock:true,shake:true}}
+  })[rare]||{fall:1.0,split:0,shell:8,part:30,zoom:3.5,opts:{}};
+}
+
+let riceState=null;
+function playOneRice(ch,done){
+  if(!riceInited)riceInit();
+  riceClear();
+  // HTML演出リセット
+  ['rfChar','rfName','rfRare'].forEach(id=>{const e=document.getElementById(id);e.className=id==='rfChar'?'rf-char':id==='rfName'?'rf-name':'rf-rare';});
+  document.getElementById('rfStreaks').className='rf-streaks';
+  document.getElementById('rfPillar').className='rf-pillar';
+  document.getElementById('rfShock').className='rf-shock';
+  document.getElementById('sfFlash').className='sf-flash';
+  const tune=riceTuning(ch.rare);
+  riceGrain=riceGrainMesh(1);riceScene.add(riceGrain);
+  riceSeed=new THREE.Mesh(new THREE.SphereGeometry(0.24,14,14),new THREE.MeshBasicMaterial({color:0xfff3a0,transparent:true}));
+  riceSeed.visible=false;riceScene.add(riceSeed);
+  riceCamAng=0;
+  riceState={ch,tune,t0:performance.now(),phase:'fall',done,skipped:false};
+}
+function riceStep(now){
+  if(!riceState)return;
+  const st=riceState,e=(now-st.t0)/1000,tn=st.tune,g=riceGrain;
+  const eo=t=>1-Math.pow(1-t,3);
+  if(st.phase==='fall'){
+    const p=Math.min(1,e/tn.fall);
+    g.position.y=5.5-eo(p)*5.5;g.rotation.y=e*8;g.rotation.x=e*6;
+    if(!riceSeed.visible&&e>0.25)riceSeed.visible=true;
+    if(riceSeed.visible){riceSeed.position.copy(g.position);riceSeed.scale.setScalar(0.6+Math.sin(e*16)*0.3);}
+    // カメラ旋回して寄る
+    riceCamAng+=0.045;const r=9-eo(p)*tn.zoom;
+    riceCam.position.set(Math.sin(riceCamAng)*r,0,Math.cos(riceCamAng)*r);riceCam.lookAt(g.position);
+    // 分裂（SSR/UR）
+    if(tn.split&&p>0.5){
+      if(riceSplit.length<tn.split){for(let i=0;i<tn.split;i++){const sg=riceGrainMesh(0.7);riceSplit.push(sg);riceScene.add(sg);sg.userData={ang:i/tn.split*6.28};}}
+      riceSplit.forEach((sg)=>{sg.userData.ang+=0.2;const rr=1.4*(1-Math.max(0,(p-0.5))*1.6);
+        sg.position.set(g.position.x+Math.cos(sg.userData.ang)*rr,g.position.y,Math.sin(sg.userData.ang)*rr);sg.rotation.y+=0.2;});
+      g.visible=p<0.55;
+    }
+    if(p>=1){st.phase='burst';st.t0=performance.now();riceBurst();}
+  } else if(st.phase==='burst'){
+    riceCamAng+=0.02;const r=(9-tn.zoom)+eo(Math.min(1,e/0.6))*tn.zoom;
+    riceCam.position.set(Math.sin(riceCamAng)*r,0,Math.cos(riceCamAng)*r);riceCam.lookAt(0,0,0);
+    riceUpdateDebris(0.02);
+    riceSplit.forEach(sg=>sg.scale.multiplyScalar(0.9));
+    if(riceSeed.visible){riceSeed.scale.multiplyScalar(1.12);riceSeed.material.opacity=Math.max(0,1-e*1.6);}
+    if(e>0.4){st.phase='hero';riceHeroAppear();}
+  } else if(st.phase==='hero'){
+    riceCam.position.set(0,0,9);riceCam.lookAt(0,0,0);
+    riceUpdateDebris(0.02);
+    const wait=rareN(st.ch.rare)>=3?2.4:1.6;
+    if(e>wait){st.phase='end';finishOneRice();}
+  }
+}
+function riceBurst(){
+  const g=riceGrain,tn=riceState.tune;g.visible=false;
+  const gold=[0xffe98a,0xfff3a0,0xffd24a],neon=[0x00f0ff,0xff00d4,0xfaff00,0x00ff9d];
+  const cols=tn.opts.gold?gold:gold.concat(neon);
+  for(let i=0;i<tn.shell;i++){const c=riceShellChunk();c.position.copy(g.position);
+    const a=Math.random()*6.28,e2=(Math.random()-0.5)*Math.PI,sp=0.22;
+    c.userData={vx:Math.cos(a)*sp*(0.6+Math.random()),vy:Math.sin(e2)*sp+0.05,vz:Math.sin(a)*sp*0.6,rx:Math.random()*0.3,ry:Math.random()*0.3};
+    riceShell.push(c);riceScene.add(c);}
+  for(let i=0;i<tn.part;i++){const p=riceParticle(cols[i%cols.length],0.05+Math.random()*0.08);p.position.copy(g.position);
+    const a=Math.random()*6.28,el=(Math.random()-0.3)*Math.PI,sp=0.5*(0.5+Math.random());
+    p.userData={vx:Math.cos(a)*Math.cos(el)*sp,vy:Math.abs(Math.sin(el))*sp+0.05,vz:Math.sin(a)*Math.cos(el)*sp,life:1};
+    riceParts.push(p);riceScene.add(p);}
+}
+function riceUpdateDebris(grav){
+  riceShell.forEach(c=>{c.position.x+=c.userData.vx;c.position.y+=c.userData.vy;c.position.z+=c.userData.vz;c.userData.vy-=grav;c.rotation.x+=c.userData.rx;c.rotation.y+=c.userData.ry;c.scale.multiplyScalar(0.97);});
+  riceParts.forEach(p=>{p.position.x+=p.userData.vx;p.position.y+=p.userData.vy;p.position.z+=p.userData.vz;p.userData.vy-=grav*0.7;p.userData.life-=0.02;p.scale.multiplyScalar(0.97);p.material.opacity=Math.max(0,p.userData.life);});
+}
+function riceHeroAppear(){
+  const st=riceState,o=st.tune.opts;
+  document.getElementById('sfFlash').className='sf-flash on';
+  document.getElementById('rfRare').textContent=st.ch.rare;
+  document.getElementById('rfRare').className='rf-rare show '+st.ch.rare;
+  document.getElementById('rfChar').textContent=st.ch.face;
+  document.getElementById('rfChar').className='rf-char show';
+  document.getElementById('rfName').textContent=st.ch.name;
+  document.getElementById('rfName').className='rf-name show';
+  if(o.streaks)document.getElementById('rfStreaks').className='rf-streaks on'+(o.gold?' gold':'');
+  if(o.pillar)document.getElementById('rfPillar').className='rf-pillar on';
+  if(o.shock)document.getElementById('rfShock').className='rf-shock on';
+  if(o.shake){const s=document.getElementById('summonFX');s.classList.add('shake');setTimeout(()=>s.classList.remove('shake'),400);}
+  if(riceGrain)riceGrain.visible=false;
+  // 音
+  Audio.SE.flash();
+  ({R:Audio.SE.rankR,SR:Audio.SE.rankSR,SSR:Audio.SE.rankSSR,UR:Audio.SE.rankUR})[st.ch.rare]();
+}
+function finishOneRice(){const d=riceState&&riceState.done;riceState=null;d&&d();}
+
+// 1体ずつ順番に演出（テンポ良く連続）
+function playSummonQueue(results,allDone){
+  const fx=document.getElementById('summonFX');fx.classList.add('on');
+  if(!riceInited)riceInit();
+  let idx=0,skipAll=false;
+  const prog=document.getElementById('rfProgress');
+  const skip=document.getElementById('rfSkip');
+  skip.onclick=()=>{skipAll=true;Audio.SE.tap();};
+  function next(){
+    if(skipAll||idx>=results.length){ end(); return; }
+    prog.textContent=results.length>1?('召喚 '+(idx+1)+' / '+results.length):'';
+    const ch=results[idx++];
+    Audio.SE.summon();
+    playOneRice(ch,()=>{ setTimeout(next, 250); });
+  }
+  function end(){
+    fx.classList.remove('on');riceClear();riceState=null;
+    prog.textContent='';allDone&&allDone();
+  }
+  next();
+}
+function rareCls(r){return r==='UR'?'rare-UR':r==='SSR'?'rare-SSR':r==='SR'?'rare-SR':'rare-R';}
+function showResult(results){
+  results.forEach(c=>{if(!S.owned.includes(c.id))S.owned.push(c.id);});save();
+  const g=document.getElementById('grGrid');g.innerHTML='';
+  results.forEach((c,i)=>{const d=document.createElement('div');d.className='g2-card '+rareCls(c.rare);
+    d.style.animationDelay=(i*0.09)+'s';
+    d.innerHTML=`<span class="rank ${c.rare}">${c.rare}</span>${c.face}<span class="cnm">${c.name}</span>`;
+    g.appendChild(d);});
+  scr('gachaResult');refresh();
+}
+
+/* ===================== 図鑑 ===================== */
+let zukanSort='no';
+function buildZukan(){const g=document.getElementById('zGrid');g.innerHTML='';
+  const lv=getUserLevel();
+  let list=[...CHARS];
+  if(zukanSort==='rare')list.sort((a,b)=>rareN(b.rare)-rareN(a.rare)||a.id-b.id);
+  else if(zukanSort==='power')list.sort((a,b)=>unitPower(b.id,lv)-unitPower(a.id,lv)||a.id-b.id);
+  else list.sort((a,b)=>a.id-b.id);
+  list.forEach(c=>{const owned=S.owned.includes(c.id);const d=document.createElement('div');
+    d.className='z-cell rare-'+c.rare+(owned?'':' locked');
+    const pw=unitPower(c.id,lv);const st=unitStats(c.id,lv);
+    const statsHTML=owned&&st?`<div class="z-pw">⚔ 戦力 <b>${disp(pw)}</b></div>
+      <div class="z-stats"><span>HP ${disp(st.HP)}</span><span>ATK ${disp(st.ATK)}</span><span>DEF ${disp(st.DEF)}</span><span>SPD ${disp(st.SPD)}</span></div>`:'';
+    d.innerHTML=`<span class="z-no">No.${String(c.id).padStart(3,'0')}</span>
+      <span class="z-rank ${c.rare}">${c.rare}</span>
+      <div class="face">${owned?c.face:'❔'}</div><div class="cn">${owned?c.name:'？？？'}</div>
+      ${statsHTML}`;
+    if(owned)d.onclick=()=>{Audio.SE.select();openDetail(c);};g.appendChild(d);});
+  const ownN=CHARS.filter(c=>S.owned.includes(c.id)).length;
+  document.getElementById('zCount').textContent=ownN+' / '+CHARS.length+' 体';
+}
+document.querySelectorAll('.z-sort').forEach(s=>s.onclick=()=>{
+  document.querySelectorAll('.z-sort').forEach(x=>x.classList.remove('on'));s.classList.add('on');
+  zukanSort=s.dataset.sort;Audio.SE.tap();buildZukan();
+});
+function openDetail(c){document.getElementById('zdFace').textContent=c.face;
+  document.getElementById('zdName').textContent=c.name;
+  document.getElementById('zdTag').textContent=(c.rare!=='R'||c.gacha?c.rare+' / ':'')+c.role;
+  document.getElementById('zdStats').innerHTML=`<span>年齢 ${c.age}</span><span>身長 ${c.h}</span><span>体重 ${c.w}</span><span>出身 ${c.from}</span>`;
+  document.getElementById('zdStory').textContent=c.story;
+  const b=BD[c.id];
+  // ロール
+  const rolesEl=document.getElementById('zdRoles');
+  if(b){rolesEl.innerHTML=b.roles.map(r=>`<span class="zd-role role-${r}">${ROLE_ICON[r]||''} ${r}</span>`).join('');}
+  else rolesEl.innerHTML='';
+  // パッシブ
+  const pasEl=document.getElementById('zdPassives');
+  if(b){pasEl.innerHTML=`<h4>PASSIVE / 特性</h4>`+b.passives.map(p=>{
+    const [name,desc]=p.split('：');
+    return `<div class="zd-pas"><span class="pn">${name}</span>${desc?`<span class="pd">${desc}</span>`:''}</div>`;}).join('');}
+  else pasEl.innerHTML='';
+  // 技＋必殺
+  const skEl=document.getElementById('zdSkills');
+  if(b){
+    let h=`<h4>SKILL / 技</h4>`;
+    h+=b.skills.map(s=>`<div class="zd-sk"><span class="sn">${s.n}</span><span class="sd">${s.d}</span>${s.mp?`<span class="smp">MP ${disp(s.mp)}</span>`:''}</div>`).join('');
+    h+=`<h4 style="margin-top:12px">SPECIAL / 必殺技</h4>`;
+    h+=b.ults.map(u=>`<div class="zd-sk ult"><span class="sn">⚡${u.n}</span><span class="sd">${u.d}</span></div>`).join('');
+    skEl.innerHTML=h;
+  } else skEl.innerHTML='';
+  document.getElementById('zDetail').classList.add('on');}
+document.getElementById('zdClose').onclick=()=>{Audio.SE.back();document.getElementById('zDetail').classList.remove('on');};
+
+/* ===================== 設定 ===================== */
+function loadSettingsUI(){const st=S.settings;
+  bgmVol.value=st.bgm;bgmVal.textContent=st.bgm;seVol.value=st.se;seVal.textContent=st.se;
+  txtSpd.value=st.txt;txtVal.textContent=st.txt;fxTog.classList.toggle('on',st.fx);}
+bgmVol.oninput=()=>{S.settings.bgm=+bgmVol.value;bgmVal.textContent=bgmVol.value;Audio.setVol('bgm',S.settings.bgm);save();};
+seVol.oninput=()=>{S.settings.se=+seVol.value;seVal.textContent=seVol.value;Audio.setVol('se',S.settings.se);save();};
+seVol.onchange=()=>Audio.SE.select();
+txtSpd.oninput=()=>{S.settings.txt=+txtSpd.value;txtVal.textContent=txtSpd.value;save();};
+fxTog.onclick=()=>{Audio.SE.tap();S.settings.fx=!S.settings.fx;fxTog.classList.toggle('on',S.settings.fx);save();applyFX();};
+function applyFX(){document.querySelector('.particles').style.display=S.settings.fx?'block':'none';
+  document.querySelector('.bg-grid').style.display=S.settings.fx?'block':'none';}
+
+/* サウンドON/OFF（右上） */
+document.getElementById('soundFab').onclick=function(){
+  const on=!Audio.isEnabled();Audio.setEnabled(on);
+  this.classList.toggle('off',!on);this.textContent=on?'♪':'🔇';
+  if(on)Audio.playBGM(BGM_OF[[...document.querySelectorAll('.screen')].find(s=>s.classList.contains('show')).id]||'title');
+};
+
+/* ===================== パーティクル ===================== */
+const p=document.getElementById('parts'),pcols=['#00f0ff','#ff00d4','#faff00','#00ff9d'];
+for(let i=0;i<26;i++){const s=document.createElement('span');s.style.left=Math.random()*100+'%';
+  const d=4+Math.random()*8;s.style.animationDuration=d+'s';s.style.animationDelay=-Math.random()*d+'s';
+  const c=pcols[i%4];s.style.background=c;s.style.boxShadow='0 0 10px '+c;
+  const sz=(2+Math.random()*4)+'px';s.style.width=sz;s.style.height=sz;p.appendChild(s);}
+
+/* ===================== 起動（音声はユーザー操作後に開始） ===================== */
+document.getElementById('boot').onclick=function(){
+  Audio.init();Audio.resume();this.style.display='none';
+  refresh();buildEps();applyFX();Audio.playBGM('title');
+};
+/* 初期描画（音は鳴らさない） */
+refresh();buildEps();applyFX();
+
+/* ===== BATTLE ENGINE ===== */
+/* ============================================================
+   バトルシステム
+============================================================ */
+
+/* ---- レベル取得（ShiftMemo連携 or 手動） ---- */
+function expForLevel(lv){return lv*100;}
+function totalExpToReach(lv){let t=0;for(let i=1;i<lv;i++)t+=expForLevel(i);return t;}
+function getUserLevel(){
+  // ShiftMemoのexpがあれば自動算出
+  const raw=localStorage.getItem('exp');
+  if(raw!==null && !isNaN(parseInt(raw))){
+    const exp=parseInt(raw);let lv=1;while(lv<100&&exp>=totalExpToReach(lv+1))lv++;return lv;
+  }
+  // 無ければゲーム内手動値（デフォルト1）
+  return S.userLv||1;
+}
+
+/* ---- 計算式 ---- */
+const DISP=19999;
+const growth=lv=>1+(lv-1)*0.10;
+const disp=v=>Math.round(v*DISP).toLocaleString();
+// ユニットの表示補正（ボスは内部値を半分にしているので、見かけはdmul倍で据え置き表示）
+const dispU=(u,v)=>Math.round(v*DISP*((u&&u.dmul)||1)).toLocaleString();
+const POOL={R:1000,SR:1300,SSR:1700,UR:5000};
+
+/* ---- バトル用キャラデータ（idで紐付け） ---- */
+// alloc:[ATK,DEF,SPD,MP] baseHP, roles[], passives[3], skills[4], ults[]
+const BD={
+  // ===== 味方4体（全員SR） =====
+  1:{alloc:[460,260,300,280],baseHP:1700,roles:["アタッカー"],
+     passives:["勇者の覚悟：HP30%以下でATK+25%","開発者の閃き：ターン開始時たまにテンション+10","ウォッチャー撃退者：与ダメージ+10%"],
+     skills:[
+       {n:"渾身のコード",d:"単体にATK130%",pow:1.3,mp:60,tgt:"one"},
+       {n:"デバッグソード",d:"ATK100%+相手DEF-15%",pow:1.0,mp:90,tgt:"one",deb:{DEF:-0.15,t:3}},
+       {n:"連続コミット",d:"ATK80%×2回",pow:0.8,mp:110,tgt:"one",hits:2},
+       {n:"全力リリース",d:"単体にATK170%",pow:1.7,mp:150,tgt:"one"}],
+     ults:[{n:"勇者の連撃 -ウォッチャー断ち-",d:"敵全体ATK330%",pow:3.3,tgt:"all",ultfx:"thunder"}]},
+  2:{alloc:[340,300,360,420],baseHP:1700,roles:["バフ"],
+     passives:["元ヤクザの義理：味方が倒れそうな時たまに庇う","姉御肌：味方への回復+15%","ドスの効いた一喝：ターン開始時味方MP小回復"],
+     skills:[
+       {n:"おらっ！",d:"単体にATK110%",pow:1.1,mp:60,tgt:"one"},
+       {n:"傷の手当て",d:"対象1体のHPを中回復",pow:0,mp:90,tgt:"ally1",healOne:0.30},
+       {n:"みんな下がれ",d:"味方全体HP小回復",pow:0,mp:130,tgt:"allyAll",healAll:0.18},
+       {n:"喝！",d:"味方全体ATK+15%",pow:0,mp:110,tgt:"allyAll",buf:{ATK:0.15,t:3}}],
+     ults:[{n:"仁義なきカチコミ",d:"敵全体ATK180%＋味方全体を大回復＋ATK+20%",pow:1.8,tgt:"all",healAll:0.4,allybuf:{ATK:0.2,t:3},ultfx:"fire_heal"}]},
+  3:{alloc:[240,520,200,340],baseHP:3000,roles:["タンク"],
+     passives:["がんばる：HP40%以下でDEF+40%","みんなのために：味方全体DEF+8%常時","ぼくが盾になるよ：被弾時テンション+50%増"],
+     skills:[
+       {n:"たいあたり",d:"単体にATK90%",pow:0.9,mp:50,tgt:"one"},
+       {n:"ぼくにまかせて",d:"敵の攻撃を自分に集中＋自分DEF+30%",pow:0,mp:80,tgt:"self",taunt:true,selfbuf:{DEF:0.3,t:3}},
+       {n:"ふんばる",d:"このターン被ダメ大幅減＋テンション+25",pow:0,mp:60,tgt:"self",guard:true,ten:25},
+       {n:"やさしいバリア",d:"味方全体DEF+25%",pow:0,mp:120,tgt:"allyAll",buf:{DEF:0.25,t:3}}],
+     ults:[{n:"やさしい雨",d:"3ターン味方全体被ダメ-50%＋大回復＋自分に反射",pow:0,tgt:"self",selfbuf:{DEF:0.5,t:3},reflect:true,allybuf:{DEF:0.3,t:3},healAll:0.3,ultfx:"rain_heal"}]},
+  4:{alloc:[300,300,380,500],baseHP:1600,roles:["トリッキー","デバフ"],
+     passives:["異星の知覚：敵の弱点をたまに見抜きデバフ強化","あうー（理解者）：かえると共闘時SPD+10%","謎の勘：被デバフをたまに無効化"],
+     skills:[
+       {n:"あうー！",d:"ATK100%+相手SPD-20%",pow:1.0,mp:70,tgt:"one",deb:{SPD:-0.2,t:3}},
+       {n:"未知の電波",d:"相手の全能力-15%",pow:0,mp:110,tgt:"one",deb:{ATK:-0.15,DEF:-0.15,SPD:-0.15,t:3}},
+       {n:"時空のゆらぎ",d:"味方全体SPD+25%",pow:0,mp:120,tgt:"allyAll",buf:{SPD:0.25,t:3}},
+       {n:"記憶混濁",d:"相手MP-25%＋30%で沈黙",pow:0,mp:100,tgt:"one",mpdmg:0.25,silence:0.3}],
+     ults:[{n:"あうー！（全弾照準）",d:"敵全体ATK230%＋全能力-20%",pow:2.3,tgt:"all",deb:{ATK:-0.2,DEF:-0.2,SPD:-0.2,t:3},ultfx:"alien"}]},
+  // ===== 鬼大家（1話ボス・ゾンビ化） =====
+  5:{alloc:[420,340,260,200],baseHP:2200,roles:["タンク","アタッカー"],
+     passives:["鬼の末裔：被ダメ-10%","怒りの徴収：HP50%以下でATK+30%","ゾンビ化：戦闘不能時たまにHP20%で復活"],
+     skills:[
+       {n:"家賃を払えェ！",d:"単体にATK130%",pow:1.3,mp:60,tgt:"one"},
+       {n:"鬼の形相",d:"相手ATK-20%",pow:0,mp:70,tgt:"one",deb:{ATK:-0.2,t:3}},
+       {n:"噛みつき",d:"ATK120%＋30%で相手SPD-20%",pow:1.2,mp:90,tgt:"one",deb:{SPD:-0.2,t:2,p:0.3}},
+       {n:"咆哮",d:"自分ATK+20%＋テンション+20",pow:0,mp:80,tgt:"self",selfbuf:{ATK:0.2,t:3},ten:20}],
+     ults:[{n:"家賃滞納者破壊攻撃！",d:"敵全体ATK300%",pow:3.0,tgt:"all",ultfx:"rent"}]},
+  10:{alloc:[600,1500,500,800],baseHP:4200,roles:["タンク"],
+     passives:["英雄の依代：被ダメージ-25%・敵に狙われやすい","米の加護：毎ターンHP10%回復"],
+     skills:[
+       {n:"握り拳",d:"単体ATK130%",pow:1.3,mp:70,tgt:"one"},
+       {n:"わさびの一撃",d:"単体ATK110%＋相手DEF-20%",pow:1.1,mp:90,tgt:"one",deb:{DEF:-0.2,t:3}},
+       {n:"挑発のポーズ",d:"敵の攻撃を集中＋自分DEF+30%",pow:0,mp:70,tgt:"self",taunt:true,selfbuf:{DEF:0.3,t:3}},
+       {n:"米の握り",d:"味方全体を小回復",pow:0,mp:120,tgt:"allyAll",healAll:0.18}],
+     ults:[{n:"次元解放拳",d:"敵全体に攻撃力10%×66回＋自身に挑発＆被ダメ80%軽減(3T)",pow:0.1,tgt:"all",hits:66,selfDmgReduce:0.8,reduceT:3,taunt:true,ultfx:"salmon_fist"}]},
+  11:{alloc:[1300,1100,700,500],baseHP:9000,roles:["タンク","アタッカー"],
+     passives:["変わり果てた身体：HP50%以下で被ダメージ-30%","ウィルスの侵食：攻撃時たまに相手に継続デバフ"],
+     skills:[
+       {n:"喰らいつき",d:"単体ATK140%",pow:1.4,mp:0,tgt:"one"},
+       {n:"腐食の爪",d:"単体ATK110%＋相手DEF-25%",pow:1.1,mp:0,tgt:"one",deb:{DEF:-0.25,t:3}},
+       {n:"咆哮",d:"敵全体ATK-15%",pow:0,mp:0,tgt:"all",deb:{ATK:-0.15,t:3}},
+       {n:"暴走",d:"敵全体ATK120%",pow:1.2,mp:0,tgt:"all"}],
+     ults:[{n:"無慈悲の雨",d:"敵全体に攻撃力66%×10回＋自身3ターン被ダメ50%軽減",pow:0.66,tgt:"all",hits:10,selfDmgReduce:0.5,reduceT:3,ultfx:"mercy_rain"}]},
+  12:{alloc:[1500,700,1000,500],baseHP:3200,roles:["アタッカー"],
+     passives:["英雄の覚醒：与ダメージ+35%・会心率上昇","不撓不屈：HP30%以下で被ダメージ-30%"],
+     skills:[
+       {n:"覚醒の刃",d:"単体ATK180%",pow:1.8,mp:80,tgt:"one"},
+       {n:"時空断ち",d:"敵全体ATK140%",pow:1.4,mp:150,tgt:"all"},
+       {n:"英雄の咆哮",d:"自分ATK+30%＋テンション+30",pow:0,mp:70,tgt:"self",selfbuf:{ATK:0.3,t:3},ten:30},
+       {n:"連牙斬",d:"ATK90%×4回",pow:0.9,mp:160,tgt:"one",hits:4}],
+     ults:[{n:"世界を断つ一閃",d:"敵全体に攻撃力80%×20回＋自身に英雄の闘志(ATK+50%・2T)",pow:0.8,tgt:"all",hits:20,selfbuf:{ATK:0.5,t:2},ultfx:"true_dev"}]},
+  // ===== ガチャ産キャラ =====
+  6:{alloc:[420,260,320,300],baseHP:1700,roles:["アタッカー","デバフ"],
+     passives:["論点ずらし：攻撃時20%で相手の守るを無効","自称No.1：先制時ATK+15%","マウント体質：相手バフを稀に奪う"],
+     skills:[
+       {n:"それってあなたの感想",d:"ATK130%+相手ATK-10%",pow:1.3,mp:80,tgt:"one",deb:{ATK:-0.10,t:3}},
+       {n:"ソースは?",d:"相手MP-20%",pow:0,mp:50,tgt:"one",mpdmg:0.2},
+       {n:"論破宣言",d:"ATK110%+自分ATK+10%",pow:1.1,mp:70,tgt:"one",selfbuf:{ATK:0.10,t:3}},
+       {n:"藁人形論法",d:"ATK160%(命中やや低)",pow:1.6,mp:120,tgt:"one",acc:0.8}],
+     ults:[{n:"論破王のマウントタイム",d:"単体ATK400%+全能力-15%",pow:4.0,tgt:"one",deb:{ATK:-0.15,DEF:-0.15,SPD:-0.15,t:3}}]},
+  7:{alloc:[420,560,300,420],baseHP:2600,roles:["タンク","バフ"],
+     passives:["札束の壁：DEF+15%常時","資本の力：HP満タン時ATK+15%","投げ銭：ターン開始時味方MP小回復"],
+     skills:[
+       {n:"札束ビンタ",d:"単体ATK130%",pow:1.3,mp:80,tgt:"one"},
+       {n:"スパチャバリア",d:"味方全体DEF+25%",pow:0,mp:120,tgt:"allyAll",buf:{DEF:0.25,t:3}},
+       {n:"物量作戦",d:"ATK110%×2回",pow:1.1,mp:100,tgt:"one",hits:2},
+       {n:"挑発",d:"敵攻撃を集中+自分DEF+30%",pow:0,mp:70,tgt:"self",taunt:true,selfbuf:{DEF:0.3,t:2}}],
+     ults:[{n:"桁が違うんだよ",d:"敵全体ATK300%+味方HP回復",pow:3.0,tgt:"all",heal:0.2}]},
+  8:{alloc:[260,480,220,340],baseHP:2800,roles:["タンク"],
+     passives:["既読スルー：被デバフ確率半減","鉄の心：テンション被弾獲得+50%","無の境地：HP30%以下でDEF+40%"],
+     skills:[
+       {n:"無言の圧力",d:"ATK90%+相手SPD-15%",pow:0.9,mp:60,tgt:"one",deb:{SPD:-0.15,t:3}},
+       {n:"既読スルー",d:"守り+テンション+25",pow:0,mp:40,tgt:"self",guard:true,ten:25},
+       {n:"瞑想",d:"自分HP回復+MP回復",pow:0,mp:0,tgt:"self",selfheal:0.18,mpheal:0.3},
+       {n:"静かなる一撃",d:"ATK160%",pow:1.6,mp:120,tgt:"one"}],
+     ults:[{n:"沈黙は金なり",d:"3T被ダメ-70%+反射",pow:0,tgt:"self",selfbuf:{DEF:0.7,t:3},reflect:true}]},
+  9:{alloc:[1400,1300,1200,1100],baseHP:4000,roles:["GOD"],
+     passives:["全知：全ロール効果を内包","言霊：攻撃時必ず弱デバフ付与","不滅：戦闘不能時1度だけHP30%復活"],
+     skills:[
+       {n:"言葉の刃",d:"敵全体ATK160%",pow:1.6,mp:200,tgt:"all"},
+       {n:"概念破壊",d:"全バフ解除+DEF-25%",pow:0,mp:150,tgt:"one",strip:true,deb:{DEF:-0.25,t:3}},
+       {n:"時の言霊",d:"味方SPD+30%+自分テンション+30",pow:0,mp:160,tgt:"allyAll",buf:{SPD:0.3,t:3},ten:30},
+       {n:"真理",d:"ATK200%+相手MP全消し",pow:2.0,mp:250,tgt:"one",mpdmg:1.0}],
+     ults:[{n:"沈黙せよ",d:"敵全体ATK500%+沈黙",pow:5.0,tgt:"all",silenceAll:true},
+           {n:"議論の終焉",d:"単体ATK650%+確率即死",pow:6.5,tgt:"one",execute:0.3}]},
+  // ===== 第一弾UR =====
+  101:{alloc:[2200,800,1400,600],baseHP:3200,roles:["アタッカー"],
+     passives:["原初の権能：与ダメージ+40%・会心率大幅上昇"],
+     skills:[
+       {n:"創世のコード",d:"単体ATK180%",pow:1.8,mp:80,tgt:"one"},
+       {n:"次元斬",d:"敵全体ATK140%",pow:1.4,mp:140,tgt:"all"},
+       {n:"加速",d:"自分SPD+40%＋テンション+30",pow:0,mp:70,tgt:"self",selfbuf:{SPD:0.4,t:3},ten:30},
+       {n:"星屑連撃",d:"ATK90%×4回",pow:0.9,mp:160,tgt:"one",hits:4}],
+     ults:[{n:"伝説の降臨",d:"単体に現在HPの3500%固定ダメージ→テンション90%回復し再行動",pow:0,tgt:"one",fixedSelfHP:35.0,refund:0.9,ultfx:"legend_dev"}]},
+  102:{alloc:[900,900,1100,1500],baseHP:3000,roles:["バフ"],
+     passives:["原初の慈愛：味方への回復効果+60%・毎ターン味方全体小回復"],
+     skills:[
+       {n:"癒しの光",d:"対象1体を大回復",pow:0,mp:90,tgt:"ally1",healOne:0.5},
+       {n:"守りの加護",d:"味方全体DEF+30%",pow:0,mp:120,tgt:"allyAll",buf:{DEF:0.3,t:3}},
+       {n:"浄化",d:"味方全体のデバフ解除＋小回復",pow:0,mp:110,tgt:"allyAll",healAll:0.2,cleanse:true},
+       {n:"猫パンチ",d:"単体ATK120%",pow:1.2,mp:60,tgt:"one"}],
+     ults:[{n:"究極のヒーリング",d:"味方全員を全回復＋状態異常全回復＋猫の加護(1T無敵)",pow:0,tgt:"allyAll",fullHeal:true,cleanseAll:true,catGuard:true,ultfx:"legend_neko"}]},
+  103:{alloc:[700,2000,600,900],baseHP:5000,roles:["タンク"],
+     passives:["原初の護り：被ダメージ-30%・HP最大値+50%"],
+     skills:[
+       {n:"鉄壁",d:"自分DEF+50%",pow:0,mp:80,tgt:"self",selfbuf:{DEF:0.5,t:3}},
+       {n:"挑発",d:"敵の攻撃を集中＋自分DEF+30%",pow:0,mp:70,tgt:"self",taunt:true,selfbuf:{DEF:0.3,t:3}},
+       {n:"守護の波",d:"味方全体DEF+25%",pow:0,mp:120,tgt:"allyAll",buf:{DEF:0.25,t:3}},
+       {n:"重い一撃",d:"単体ATK130%",pow:1.3,mp:80,tgt:"one"}],
+     ults:[{n:"人智を超えた創造の雨",d:"自身に『創造の雨』(5T・被ダメ70%無効)を付与",pow:0,tgt:"self",rainGuard:5,ultfx:"legend_kaeru"}]},
+  104:{alloc:[1600,1200,1800,1400],baseHP:3600,roles:["トリッキー","デバフ"],
+     passives:["全知の観測：敵の全行動を見切り被ダメージ-25%・与ダメージ+25%"],
+     skills:[
+       {n:"監視の眼",d:"敵単体の全能力-20%",pow:0,mp:90,tgt:"one",deb:{ATK:-0.2,DEF:-0.2,SPD:-0.2,t:3}},
+       {n:"事象改変",d:"敵全体ATK150%",pow:1.5,mp:160,tgt:"all"},
+       {n:"沈黙の宣告",d:"敵単体を沈黙",pow:0,mp:100,tgt:"one",silence:1.0},
+       {n:"観測者の威圧",d:"敵全体SPD-25%",pow:0,mp:120,tgt:"all",deb:{SPD:-0.25,t:3}}],
+     ults:[{n:"次元幽閉",d:"敵全体に100%×50回＋最大級デバフ＋敵のバフ全奪取(3T)",pow:1.0,tgt:"all",hits:50,maxDebuff:true,stealBuffs:true,ultfx:"watcher"}]},
+  105:{alloc:[1900,900,1700,800],baseHP:3100,roles:["トリッキー"],
+     passives:["異星の超技術：与ダメージ+30%・攻撃時たまに追撃"],
+     skills:[
+       {n:"レーザー乱射",d:"ATK70%×3回",pow:0.7,mp:120,tgt:"one",hits:3},
+       {n:"重力場",d:"敵全体SPD-30%",pow:0,mp:110,tgt:"all",deb:{SPD:-0.3,t:3}},
+       {n:"アブダクト",d:"敵単体ATK160%＋MP-30%",pow:1.6,mp:140,tgt:"one",mpdmg:0.3},
+       {n:"未知の波動",d:"敵全体ATK120%",pow:1.2,mp:150,tgt:"all"}],
+     ults:[{n:"惑星崩壊ビーム",d:"敵全体に攻撃力100%×60回＋蜃気楼デバフ",pow:1.0,tgt:"all",hits:60,mirage:true,ultfx:"legend_ufo"}]},
+  106:{alloc:[2600,1000,2000,1000],baseHP:4000,roles:["アタッカー"],
+     passives:["無限：被ダメージ時80%を敵に反射","時間操作：味方の被ダメを50%確率で術者へ100%反射","マルチバース：被弾時60%でテンション全回復"],
+     skills:[
+       {n:"消去",d:"単体ATK200%",pow:2.0,mp:100,tgt:"one"},
+       {n:"確率収束",d:"敵全体ATK150%",pow:1.5,mp:160,tgt:"all"},
+       {n:"次元の歪み",d:"敵単体の全能力-25%",pow:0,mp:110,tgt:"one",deb:{ATK:-0.25,DEF:-0.25,SPD:-0.25,t:3}},
+       {n:"虚無",d:"ATK110%×3回",pow:1.1,mp:180,tgt:"one",hits:3}],
+     ults:[{n:"マルチバースの消滅",d:"敵1〜2体をランダムで一撃必殺",pow:0,tgt:"randomKill",killCount:2,ultfx:"pienters"}]},
+};
+const ROLE_ICON={"アタッカー":"⚔️","タンク":"🛡️","バフ":"⬆️","デバフ":"⬇️","トリッキー":"🎲","ヒーラー":"💚","GOD":"🌌"};
+
+/* ===================== ガチャ産キャラ自動生成（第一弾・150種） ===================== */
+// 汎用技プール（約30種）。ガチャ産は各キャラここから4つ使い回し。
+const SKILL_POOL=[
+  {n:"痛烈な一言",d:"単体ATK130%",pow:1.3,mp:70,tgt:"one"},
+  {n:"二の矢",d:"ATK80%×2回",pow:0.8,mp:90,tgt:"one",hits:2},
+  {n:"渾身の主張",d:"単体ATK170%",pow:1.7,mp:130,tgt:"one"},
+  {n:"切り返し",d:"単体ATK110%＋相手ATK-10%",pow:1.1,mp:80,tgt:"one",deb:{ATK:-0.10,t:3}},
+  {n:"連続論証",d:"ATK70%×3回",pow:0.7,mp:120,tgt:"one",hits:3},
+  {n:"全体論破",d:"敵全体ATK120%",pow:1.2,mp:150,tgt:"all"},
+  {n:"なで斬り",d:"敵全体ATK90%",pow:0.9,mp:110,tgt:"all"},
+  {n:"急所突き",d:"単体ATK150%(命中やや低)",pow:1.5,mp:110,tgt:"one",acc:0.85},
+  {n:"防御崩し",d:"単体ATK100%＋相手DEF-20%",pow:1.0,mp:90,tgt:"one",deb:{DEF:-0.20,t:3}},
+  {n:"足払い",d:"単体ATK90%＋相手SPD-20%",pow:0.9,mp:80,tgt:"one",deb:{SPD:-0.20,t:3}},
+  {n:"威圧",d:"敵全体ATK-15%",pow:0,mp:90,tgt:"all",deb:{ATK:-0.15,t:3}},
+  {n:"翻弄",d:"敵全体SPD-20%",pow:0,mp:100,tgt:"all",deb:{SPD:-0.20,t:3}},
+  {n:"気合い",d:"自分ATK+20%",pow:0,mp:60,tgt:"self",selfbuf:{ATK:0.20,t:3}},
+  {n:"集中",d:"自分SPD+25%＋テンション+20",pow:0,mp:60,tgt:"self",selfbuf:{SPD:0.25,t:3},ten:20},
+  {n:"守りの構え",d:"このターン被ダメ減＋テンション+20",pow:0,mp:40,tgt:"self",guard:true,ten:20},
+  {n:"鼓舞",d:"味方全体ATK+15%",pow:0,mp:110,tgt:"allyAll",buf:{ATK:0.15,t:3}},
+  {n:"陣形",d:"味方全体DEF+20%",pow:0,mp:110,tgt:"allyAll",buf:{DEF:0.20,t:3}},
+  {n:"加速の号令",d:"味方全体SPD+20%",pow:0,mp:110,tgt:"allyAll",buf:{SPD:0.20,t:3}},
+  {n:"手当て",d:"対象1体を回復",pow:0,mp:90,tgt:"ally1",healOne:0.25},
+  {n:"応援歌",d:"味方全体を小回復",pow:0,mp:130,tgt:"allyAll",healAll:0.15},
+  {n:"沈黙させる",d:"単体を沈黙(確率)",pow:0,mp:100,tgt:"one",silence:0.5},
+  {n:"MP破壊",d:"単体MP-25%",pow:0,mp:70,tgt:"one",mpdmg:0.25},
+  {n:"テンション削り",d:"単体テンション-30",pow:0,mp:70,tgt:"one",tendmg:30},
+  {n:"挑発",d:"敵の攻撃を集中＋自分DEF+25%",pow:0,mp:70,tgt:"self",taunt:true,selfbuf:{DEF:0.25,t:3}},
+  {n:"裂帛の一撃",d:"単体ATK140%",pow:1.4,mp:100,tgt:"one"},
+  {n:"嵐の連撃",d:"ATK85%×3回",pow:0.85,mp:140,tgt:"one",hits:3},
+  {n:"全力斬り",d:"単体ATK190%(命中低)",pow:1.9,mp:140,tgt:"one",acc:0.75},
+  {n:"乱れ突き",d:"ATK60%×4回",pow:0.6,mp:150,tgt:"one",hits:4},
+  {n:"弱体の霧",d:"敵全体DEF-18%",pow:0,mp:110,tgt:"all",deb:{DEF:-0.18,t:3}},
+  {n:"奮起",d:"自分ATK+15%＋DEF+15%",pow:0,mp:80,tgt:"self",selfbuf:{ATK:0.15,DEF:0.15,t:3}},
+];
+// 強力パッシブプール（低レアでも採用したくなる強さ）。1キャラ1つ。
+const PASSIVE_POOL=[
+  "一騎当千：与ダメージ+25%",
+  "鉄壁：被ダメージ-20%",
+  "韋駄天：SPD+30%・先制発動率上昇",
+  "不屈：HP30%以下で被ダメージ-40%",
+  "吸収：与ダメージの15%だけ自己回復",
+  "連撃マスター：多段技のヒットごとにダメージ+8%",
+  "クリティカル体質：会心発生率＋会心ダメージ大幅増",
+  "覚醒：ターン開始時テンション+15",
+  "守護者：味方全体の被ダメージ-10%",
+  "戦巧者：MP消費-30%",
+  "再生：毎ターンHP8%回復",
+  "逆境：HP半分以下でATK+40%",
+];
+// レア度ごとのステ配分倍率・基礎HP
+const RARE_BASE={R:{pool:900,hp:1300},SR:{pool:1300,hp:1700},SSR:{pool:1700,hp:2200}};
+const RARE_ROLES=["アタッカー","タンク","バフ","デバフ","トリッキー","ヒーラー"];
+const GACHA_FACES=["🦊","🐺","🐯","🦁","🐮","🐷","🐭","🐹","🐰","🐻","🐼","🐨","🐸","🐲","🦄","🐔","🐧","🦅","🦉","🦇","🐗","🐴","🦓","🦒","🐙","🦑","🦀","🐡","🐢","🦎","🐍","🦖","🦕","🤖","👻","👾","💀","🤡","👹","👺","🧟","🧛","🧙","🧜","🧚","🦹","🦸","🥷","👨‍🚀","👨‍🔬","🧑‍🎤","🕵️","💂","🤴","👸","🧝","🧞","🐉","🦣"];
+const GACHA_NAMES_A=["闇の","紅の","蒼き","白銀の","黄金の","深淵の","疾風の","業火の","氷結の","雷鳴の","幻影の","不屈の","孤高の","狂乱の","静寂の","真紅の","漆黒の","蒼天の","烈火の","極光の","虚無の","千変の","無双の","終焉の","暁の","宵闇の","紺碧の","灼熱の","凍て","煌めく"];
+const GACHA_NAMES_B=["論客","狂信者","賢者","剣士","守護者","破壊者","旅人","商人","道化","predator","occultist","語り部","審判者","挑戦者","求道者","暴君","隠者","魔術師","狙撃手","拳闘士","策士","歌い手","occulist","遊撃手","重騎士","刺客","predикт","観測者","祈祷師","炎使い"];
+// 生成：id 200〜（144体）
+(function genGacha(){
+  const rng=(seed=>()=>(seed=(seed*1103515245+12345)&0x7fffffff)/0x7fffffff)(20240601);
+  const counts={SSR:18,SR:46,R:80}; // 計144 ＋ UR6 = 150
+  let id=200, nameI=0;
+  Object.entries(counts).forEach(([rare,num])=>{
+    for(let k=0;k<num;k++){
+      const role=RARE_ROLES[Math.floor(rng()*RARE_ROLES.length)];
+      const face=GACHA_FACES[(id-200)%GACHA_FACES.length];
+      const name=GACHA_NAMES_A[Math.floor(rng()*GACHA_NAMES_A.length)]+GACHA_NAMES_B[Math.floor(rng()*GACHA_NAMES_B.length)];
+      const passive=PASSIVE_POOL[Math.floor(rng()*PASSIVE_POOL.length)];
+      // ステ配分（ロールで寄せる）
+      const base=RARE_BASE[rare];const w={ATK:1,DEF:1,SPD:1,MP:1};
+      if(role==='アタッカー')w.ATK=2.2; else if(role==='タンク'){w.DEF=2.4;w.MP=1.3;}
+      else if(role==='バフ'||role==='ヒーラー'){w.MP=2;w.DEF=1.2;} else if(role==='デバフ'){w.MP=1.8;w.SPD=1.4;} else if(role==='トリッキー'){w.SPD=2;w.MP=1.4;}
+      const wsum=w.ATK+w.DEF+w.SPD+w.MP;
+      const alloc=[Math.round(base.pool*w.ATK/wsum),Math.round(base.pool*w.DEF/wsum),Math.round(base.pool*w.SPD/wsum),Math.round(base.pool*w.MP/wsum)];
+      // 汎用技4つ（ロールに合いそうなものを優先しつつランダム）
+      const picks=[];const poolCopy=[...SKILL_POOL];
+      while(picks.length<4&&poolCopy.length){const i=Math.floor(rng()*poolCopy.length);picks.push(poolCopy.splice(i,1)[0]);}
+      // ガチャ産の必殺技（汎用）
+      const ult=role==='ヒーラー'||role==='バフ'
+        ? {n:"全力の采配",d:"味方全体を大回復＋ATK+20%",pow:0,tgt:"allyAll",healAll:0.35,buf:{ATK:0.2,t:3}}
+        : role==='タンク'
+        ? {n:"鉄壁の宣言",d:"味方全体DEF+40%＋自分挑発",pow:0,tgt:"self",selfbuf:{DEF:0.4,t:3},taunt:true,allybuf:{DEF:0.25,t:3}}
+        : {n:"必殺の一撃",d:"敵全体ATK"+(rare==='SSR'?280:rare==='SR'?230:190)+"%",pow:rare==='SSR'?2.8:rare==='SR'?2.3:1.9,tgt:"all"};
+      CHARS.push({id,name,face,rare,role:role,age:"?",h:"?",w:"?",from:"電子の海",gacha:true,
+        story:name+"。電子の海より召喚された"+rare+"の使い手。"+passive.split("：")[0]+"の力を持つ。"});
+      BD[id]={alloc,baseHP:base.hp,roles:[role],passives:[passive],skills:picks.map(s=>({...s})),ults:[ult],gachaGen:true};
+      id++;
+    }
+  });
+})();
+
+/* ---- 雑魚（モブ）データ：個別HP/行動あり・ボスより弱い ---- */
+// ステージごとの雑魚テーマ（face/名前）。4体分。
+const STAGE_MOBS={
+  1:{name:"通知の群れ",faces:["🔔","💬","📣","🔁"]},
+  2:{name:"森のざわめき",faces:["🌫️","🍂","🐛","🦗"]},
+  3:{name:"ゾンビの群れ",faces:["🧟","🧟‍♂️","🧟‍♀️","👹"]},
+  4:{name:"煽りの残響",faces:["🔥","😡","💢","👿"]},
+  5:{name:"平原の沈黙",faces:["🌬️","🌾","🕳️","🦴"]},
+  6:{name:"渓谷の逆張り",faces:["🙃","🌀","↩️","🐍"]},
+  7:{name:"札束の使い",faces:["💴","💳","🪙","💰"]},
+  8:{name:"自演の影",faces:["👥","🎭","🪞","🌑"]},
+  9:{name:"凍結の番人",faces:["❄️","🧊","🔒","⛓️"]},
+  10:{name:"過去の亡霊",faces:["👻","🕯️","💀","🌫️"]},
+};
+// 雑魚の基礎データ（弱め・ロールは適当に散らす）
+const MOB_KIT={
+  alloc:[260,180,300,200], baseHP:900,
+  roles:["アタッカー"], passives:["雑魚の意地","数の力","捨て身"],
+  skills:[{n:"野次",d:"ATK90%",pow:0.9,mp:40,tgt:"one"},
+          {n:"つるみ",d:"ATK110%",pow:1.1,mp:70,tgt:"one"}],
+  ults:[]
+};
+function makeMob(face,name,lv){
+  const g=growth(lv), k=MOB_KIT;
+  const st={ATK:Math.round(k.alloc[0]*g),DEF:Math.round(k.alloc[1]*g),SPD:Math.round(k.alloc[2]*g),MP:Math.round(k.alloc[3]*g)};
+  const maxHP=Math.round(k.baseHP*g*2.6);
+  return {uid:'M_'+Math.random().toString(36).slice(2,6),cid:0,name,face,rare:"R",roles:k.roles,
+    passives:k.passives,skills:k.skills,ults:[],base:{...st},maxHP,hp:maxHP,maxMP:st.MP,mp:st.MP,dmul:1,
+    tension:0,isEnemy:true,isMob:true,alive:true,buffs:[],guard:false,taunt:false,reflect:false,revived:false};
+}
+
+/* ---- ステージのボス編成 ---- */
+function bossLevel(ep){return ep*5;}
+const STAGE_BOSS={
+  1:[5], 2:[11], 3:[11], 4:[6,8], 5:[8],
+  6:[6,7], 7:[7], 8:[6,8], 9:[7,9], 10:[9,7]
+};
+// 雑魚を出さないステージ（1対1のボス戦）
+const STAGE_NO_MOBS={ 1:true, 2:true };
+// 1話ボスは体力を激低に（チュートリアル的に）
+const STAGE_BOSS_HPMUL={ 1:0.25 };
+// ボス表示タイプ：'big'=見上げ巨大(A) / 'half'=画面端半身(D)。未指定はbig。
+const STAGE_BOSS_VIEW={ 10:'half' };
+
+/* ---- ユニット生成 ---- */
+/* 表示用：指定レベルでのステータスと戦力（全合計） */
+function unitStats(charId,lv){
+  const b=BD[charId]; if(!b)return null;
+  const g=growth(lv||getUserLevel());
+  const ATK=Math.round(b.alloc[0]*g),DEF=Math.round(b.alloc[1]*g),SPD=Math.round(b.alloc[2]*g),MP=Math.round(b.alloc[3]*g);
+  const HP=Math.round(b.baseHP*g*2.6);
+  return {ATK,DEF,SPD,MP,HP};
+}
+// 戦力＝ATK+DEF+SPD+MP+HP/10（インフレ表示はdisp）
+function unitPower(charId,lv){const s=unitStats(charId,lv);if(!s)return 0;return s.ATK+s.DEF+s.SPD+s.MP+Math.round(s.HP/10);}
+function partyPower(){return S.party.reduce((a,id)=>a+unitPower(effId(id)),0);}
+function makeUnit(charId,lv,isEnemy){
+  const c=byId(charId), b=BD[charId];
+  const g=growth(lv);
+  const st={
+    ATK:Math.round(b.alloc[0]*g), DEF:Math.round(b.alloc[1]*g),
+    SPD:Math.round(b.alloc[2]*g), MP:Math.round(b.alloc[3]*g)
+  };
+  let maxHP=Math.round(b.baseHP*g*2.6);
+  // 難易度調整：ボス（敵）は内部HP・ATKを実質半分に。ただし表示は据え置き（dmul=2で見かけ補正）
+  let dmul=1;
+  if(isEnemy){ maxHP=Math.round(maxHP*0.5); st.ATK=Math.round(st.ATK*0.5); dmul=2; }
+  return {
+    uid:(isEnemy?'E':'A')+charId+'_'+Math.random().toString(36).slice(2,6),
+    cid:charId, name:c.name, face:c.face, rare:c.rare, roles:b.roles,
+    passives:b.passives, skills:b.skills, ults:b.ults,
+    base:{...st}, maxHP, hp:maxHP, maxMP:st.MP, mp:st.MP, dmul,
+    tension:0, isEnemy, isBoss:isEnemy, alive:true, buffs:[], guard:false, taunt:false,
+    reflect:false, revived:false
+  };
+}
+/* バフ込みの実効ステータス */
+function eff(u,key){
+  let v=u.base[key], mult=1;
+  u.buffs.forEach(bf=>{ if(bf.s&&bf.s[key]!=null) mult+=bf.s[key]; });
+  // 常時パッシブ
+  if(key==='DEF'&&u.cid===3) mult+=0.08;                                   // かえる：味方全体DEF+8%(簡易=自分DEF)
+  if(key==='DEF'&&u.cid===3&&u.hp/u.maxHP<=0.40) mult+=0.40;               // かえる：HP40%以下でDEF+40%
+  if(key==='ATK'&&u.cid===1&&u.hp/u.maxHP<=0.30) mult+=0.25;               // 開発者：HP30%以下でATK+25%
+  if(key==='ATK'&&u.cid===1) mult+=0.10;                                   // 開発者：与ダメ+10%相当
+  if(key==='DEF'&&u.cid===5) mult+=0.10;                                   // 鬼大家：被ダメ-10%相当(DEF底上げ)
+  if(key==='ATK'&&u.cid===5&&u.hp/u.maxHP<=0.50) mult+=0.30;               // 鬼大家：HP50%以下でATK+30%
+  if(key==='DEF'&&u.cid===7) mult+=0.15;                                   // スパチャ神：DEF+15%
+  if(key==='DEF'&&u.cid===8&&u.hp/u.maxHP<=0.30) mult+=0.40;               // 沈黙の賢者：HP30%以下でDEF+40%
+  // ガチャ産＆UR：パッシブ文字列ベースの汎用効果
+  const pas=(u.passives||[]).join('|');
+  const lowHP=u.hp/u.maxHP<=0.5;
+  if(key==='ATK'){
+    if(pas.includes('一騎当千')) mult+=0.25;
+    if(pas.includes('逆境')&&lowHP) mult+=0.40;
+    if(pas.includes('原初の権能')) mult+=0.40;     // 伝説の開発者
+    if(pas.includes('全知の観測')) mult+=0.25;     // ウォッチャー
+    if(pas.includes('異星の超技術')) mult+=0.30;   // 伝説UFO
+  }
+  if(key==='DEF'){
+    if(pas.includes('原初の護り')) mult+=0.0; // 被ダメ軽減はapplyDmg側で処理
+  }
+  if(key==='SPD'){
+    if(pas.includes('韋駄天')) mult+=0.30;
+  }
+  return Math.max(1,Math.round(v*mult));
+}
+
+/* ---- バトル状態 ---- */
+let B=null;
+function startBattle(ep,onWin){
+  const lv=getUserLevel();
+  // 2話：かえる(id3)は強制離脱。それ以降は死亡扱いでパーティから除外
+  let partyIds=(S.party.length?S.party:[1]).slice();
+  if((ep===2 || S.kaeruDead) ){partyIds=partyIds.filter(id=>id!==3);}
+  if(!partyIds.length)partyIds=[1];
+  const allies=partyIds.map(id=>makeUnit(effId(id),lv,false));
+  const bl=bossLevel(ep);
+  // ボス（巨大・禍々しい）
+  const bosses=(STAGE_BOSS[ep]||[5]).map(id=>makeUnit(id,bl,true));
+  // ボスHP倍率（チュートリアル等で激低化）
+  const hpMul=STAGE_BOSS_HPMUL[ep];
+  if(hpMul)bosses.forEach(b=>{b.maxHP=Math.max(1,Math.round(b.maxHP*hpMul));b.hp=b.maxHP;});
+  // 雑魚4体（個別HP/行動あり）※雑魚なしステージは出さない
+  let mobs=[];
+  if(!STAGE_NO_MOBS[ep]){
+    const mobTheme=STAGE_MOBS[ep]||STAGE_MOBS[1];
+    const mobLv=Math.max(1,bl-2);
+    mobs=mobTheme.faces.map((f,i)=>makeMob(f,mobTheme.name+(i+1),mobLv));
+  }
+  const enemies=[...bosses,...mobs];
+  const bossView=STAGE_BOSS_VIEW[ep]||'big';
+  B={ep,lv,allies,enemies,turn:1,order:[],oi:0,onWin,acting:null,bossOpened:false,over:false,bossView};
+  scr('battle');
+  renderBattle();
+  setTimeout(bossOpening,500);
+}
+/* ボス開幕必殺(ダメージ90%減) */
+function bossOpening(){
+  const boss=B.enemies.find(e=>e.alive&&e.ults&&e.ults.length);
+  if(!boss){startTurn();return;}
+  setMsg(boss.name+' は先制の必殺技を放った…！');
+  playUlt(boss,boss.ults[0],()=>{ resolveUlt(boss,boss.ults[0],0.1); B.bossOpened=true; setTimeout(startTurn,600); });
+}
+
+/* ---- ターン管理 ---- */
+function startTurn(){
+  if(checkEnd())return;
+  document.getElementById('btTurn').textContent='TURN '+B.turn;
+  // バフ残ターン減算 & パッシブ
+  [...B.allies,...B.enemies].forEach(u=>{
+    if(!u.alive)return;
+    u.guard=false;
+    u.buffs=u.buffs.filter(bf=>{bf.t--;return bf.t>0;});
+    // ターン開始MP回復系パッシブ
+    if(u.cid===1&&Math.random()<0.4)u.tension=Math.min(100,u.tension+10);     // 開発者：たまにテンション+10
+    if(u.cid===2)B.allies.forEach(a=>{if(a.alive)a.mp=Math.min(a.maxMP,a.mp+Math.round(a.maxMP*0.04));}); // ねこ：味方MP回復
+    if(u.cid===7)B.allies.forEach(a=>{if(a.alive)a.mp=Math.min(a.maxMP,a.mp+Math.round(a.maxMP*0.04));}); // スパチャ神：味方MP回復
+    if(u.cid===10)u.hp=Math.min(u.maxHP,u.hp+Math.round(u.maxHP*0.10));         // サーモン握り：米の加護 HP10%回復
+    if(u.cid===102){const side=u.isEnemy?B.enemies:B.allies;side.forEach(a=>{if(a.alive)a.hp=Math.min(a.maxHP,a.hp+Math.round(a.maxHP*0.05));});} // 伝説ねこ：原初の慈愛
+    const pa=(u.passives||[]).join('|');
+    if(pa.includes('再生'))u.hp=Math.min(u.maxHP,u.hp+Math.round(u.maxHP*0.08));   // ガチャ産：再生
+    if(pa.includes('覚醒'))u.tension=Math.min(100,u.tension+15);                    // ガチャ産：覚醒
+  });
+  // 行動順=SPD降順
+  B.order=[...B.allies,...B.enemies].filter(u=>u.alive).sort((a,b)=>eff(b,'SPD')-eff(a,'SPD'));
+  B.oi=0; renderBattle(); nextActor();
+}
+function nextActor(){
+  if(checkEnd())return;
+  while(B.oi<B.order.length && !B.order[B.oi].alive)B.oi++;
+  if(B.oi>=B.order.length){B.turn++;setTimeout(startTurn,400);return;}
+  const u=B.order[B.oi];B.acting=u;renderBattle();
+  if(u.isEnemy){ setMsg(u.name+' のターン'); setTimeout(()=>enemyAct(u),700); }
+  else{ setMsg(u.name+' のターン ▸ コマンドを選べ'); showCommands(u); }
+}
+function endAct(){ B.oi++; B.acting=null; hideSub(); setTimeout(nextActor,350); }
+
+/* ---- コマンドUI ---- */
+function showCommands(u){
+  const cmd=document.getElementById('btCmd');cmd.style.display='grid';
+  const ultReady=u.tension>=100 && u.ults.length;
+  const silenced=u.buffs.some(b=>b.silence);
+  cmd.innerHTML='';
+  const mk=(label,sub,cls,fn)=>{const d=document.createElement('div');d.className='cbtn '+(cls||'');
+    d.innerHTML=label+(sub?`<small>${sub}</small>`:'');d.onclick=()=>{Audio.SE.tap();fn();};return d;};
+  cmd.appendChild(mk('通常口撃','ATK100%','',()=>selectTarget(u,(t)=>{doNormal(u,t);})));
+  cmd.appendChild(mk('ガチレス',silenced?'沈黙中':'固有技/MP消費',silenced?'disabled':'',()=>{if(!silenced)showSkills(u);}));
+  cmd.appendChild(mk('守る','被ダメ-50%','guard',()=>{doGuard(u);}));
+  cmd.appendChild(mk('必殺技',ultReady?'発動可能!':'テンション '+Math.floor(u.tension)+'%','ult'+(ultReady?' rdy':' disabled'),()=>{if(ultReady)showUlts(u);}));
+}
+function showSkills(u){
+  const sub=document.getElementById('btSub');sub.style.display='block';
+  let h=`<h4><span>ガチレス — 技を選ぶ</span><span class="x" onclick="hideSub()">✕</span></h4>`;
+  u.skills.forEach((sk,i)=>{const cost=Math.round(sk.mp*(1));
+    const no=u.mp<cost;
+    h+=`<div class="skill-item ${no?'nomp':''}" data-sk="${i}">
+      <div class="si-l"><div class="sn">${sk.n}</div><div class="sd">${sk.d}</div></div>
+      <div class="si-r"><span class="mp">MP ${disp(cost)}</span></div></div>`;});
+  sub.innerHTML=h;
+  sub.querySelectorAll('[data-sk]').forEach(el=>el.onclick=()=>{Audio.SE.select();
+    const sk=u.skills[+el.dataset.sk];const cost=Math.round(sk.mp*(1));
+    hideSub();
+    if(sk.tgt==='self'||sk.tgt==='allyAll'){u.mp-=cost;doSkill(u,sk,null);}
+    else if(sk.tgt==='all'){u.mp-=cost;doSkill(u,sk,null);}
+    else if(sk.tgt==='ally1'){selectAlly(u,(t)=>{u.mp-=cost;doSkill(u,sk,t);});}
+    else selectTarget(u,(t)=>{u.mp-=cost;doSkill(u,sk,t);});
+  });
+}
+function showUlts(u){
+  if(u.ults.length===1){castUlt(u,u.ults[0]);return;}
+  const sub=document.getElementById('btSub');sub.style.display='block';
+  let h=`<h4><span>必殺技を選ぶ</span><span class="x" onclick="hideSub()">✕</span></h4>`;
+  u.ults.forEach((ul,i)=>h+=`<div class="skill-item" data-ul="${i}">
+    <div class="si-l"><div class="sn">⚡${ul.n}</div><div class="sd">${ul.d}</div></div></div>`);
+  sub.innerHTML=h;
+  sub.querySelectorAll('[data-ul]').forEach(el=>el.onclick=()=>{Audio.SE.select();hideSub();castUlt(u,u.ults[+el.dataset.ul]);});
+}
+function hideSub(){document.getElementById('btSub').style.display='none';}
+
+/* ---- ターゲット選択 ---- */
+let targetCb=null;
+function selectTarget(u,cb){
+  const foes=B.enemies.filter(e=>e.alive);
+  if(foes.length===1){cb(foes[0]);return;}
+  // 挑発チェック
+  const taunter=foes.find(f=>f.taunt);
+  setMsg('対象を選べ（敵をタップ）');targetCb=cb;
+  document.querySelectorAll('.unit.enemy').forEach(el=>{
+    const uid=el.dataset.uid;const t=foes.find(f=>f.uid===uid);
+    if(t){el.classList.add('target-sel');el.onclick=()=>{Audio.SE.select();clearTargetSel();cb(t);};}
+  });
+}
+function clearTargetSel(){document.querySelectorAll('.unit').forEach(el=>{el.classList.remove('target-sel');});targetCb=null;bindLongPress();}
+function selectAlly(u,cb){
+  const mates=B.allies.filter(a=>a.alive);
+  if(mates.length===1){cb(mates[0]);return;}
+  setMsg('回復する味方を選べ（味方をタップ）');
+  document.querySelectorAll('#btAllies .unit').forEach(el=>{
+    const uid=el.dataset.uid;const t=mates.find(m=>m.uid===uid);
+    if(t){el.classList.add('target-sel');el.onclick=()=>{Audio.SE.select();clearTargetSel();cb(t);};}
+  });
+}
+
+/* ---- アクション処理 ---- */
+function rand(){return 0.92+Math.random()*0.16;} // ±8%
+/* ---- 演出ヘルパー ---- */
+function uavEl(u){const el=document.querySelector(`.unit[data-uid="${u.uid}"] .uav`);return el;}
+function centerOf(u){const el=document.querySelector(`.unit[data-uid="${u.uid}"]`);
+  const fx=document.getElementById('fxLayer');if(!el||!fx)return{x:0,y:0};
+  const r=el.getBoundingClientRect(),s=fx.getBoundingClientRect();
+  return{x:r.left-s.left+r.width/2,y:r.top-s.top+r.height/2};}
+function fxSpawn(cls,html,x,y,life){const fx=document.getElementById('fxLayer');if(!fx)return null;
+  const e=document.createElement('div');e.className=cls;if(html)e.innerHTML=html;
+  e.style.position='absolute';e.style.left=x+'px';e.style.top=y+'px';fx.appendChild(e);
+  setTimeout(()=>e.remove(),life||1400);return e;}
+function btShake(){const b=document.getElementById('battle');b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),350);}
+function btFlash(){const h=document.getElementById('btHitflash');h.classList.add('on');setTimeout(()=>h.classList.remove('on'),250);}
+function sparksAt(x,y,color){for(let i=0;i<10;i++){const s=fxSpawn('fx-spark','',x,y,600);if(!s)return;
+  s.style.background=color;s.style.boxShadow='0 0 6px '+color;
+  const ang=Math.random()*6.28,d=26+Math.random()*46;
+  requestAnimationFrame(()=>{s.style.transform=`translate(${Math.cos(ang)*d}px,${Math.sin(ang)*d}px) scale(0)`;s.style.opacity=0;});}}
+function impactAt(tgt,crit){const p=centerOf(tgt);
+  if(crit)Audio.SE.hitHeavy(); else Audio.SE.hit();
+  fxSpawn('fx-slash'+(crit?' y':''),'',p.x-60,p.y-60,500);
+  fxSpawn('fx-impact','',p.x-10,p.y-10,500);
+  sparksAt(p.x,p.y,crit?'#faff00':'#00f0ff');
+  btFlash();btShake();
+  const ev=uavEl(tgt);if(ev){ev.classList.add('uhit');setTimeout(()=>ev.classList.remove('uhit'),300);}}
+// 突進: srcがtgtへ寄って体当たり、ヒット時にcb、戻る。timesで連続。
+function lungeAttack(src,tgt,times,crit,cb){
+  const sEl=uavEl(src);if(!sEl){for(let i=0;i<times;i++)cb&&cb();return;}
+  const sp=centerOf(src),tp=centerOf(tgt);
+  const dx=tp.x-sp.x, dy=tp.y-sp.y+ (src.isEnemy?40:-40);
+  let i=0;
+  (function go(){
+    sEl.classList.remove('lungeback');sEl.classList.add('lunge');
+    sEl.style.transform=`translate(${dx}px,${dy}px) scale(1.12)`;
+    setTimeout(()=>{
+      impactAt(tgt,crit); cb&&cb();
+      sEl.classList.remove('lunge');sEl.classList.add('lungeback');
+      sEl.style.transform='translate(0,0) scale(1)';
+      i++; if(i<times){setTimeout(go,200);} else {setTimeout(()=>sEl.classList.remove('lungeback'),300);}
+    },200);
+  })();
+}
+function healFx(u,amount){const p=centerOf(u);
+  fxSpawn('fx-heal','<span style="left:8%">✨</span><span style="left:46%;animation-delay:.18s">💚</span><span style="left:82%;animation-delay:.36s">✨</span>',p.x-40,p.y-40,1300);
+  popDmg(u,amount,false,true);}
+function effFx(u,label,up){const p=centerOf(u);fxSpawn('fx-eff '+(up?'up':'down'),label,p.x-28,p.y-12,1400);}
+
+function calcDmg(atk,def,pow){return Math.max(1,Math.round(atk*pow*(atk/(atk+def*0.5))*rand()));}
+function applyDmg(src,tgt,raw,opt={}){
+  let d=raw;
+  // 猫の加護：1ターン完全無敵
+  if(tgt.buffs.some(b=>b.catGuard)){popDmg(tgt,0,false);renderHP();return 0;}
+  // 創造の雨：被ダメ70%無効（固定ダメージは除く）
+  if(!opt.fixed && tgt.buffs.some(b=>b.rainGuard))d=Math.round(d*0.3);
+  // 被ダメ軽減バフ（サーモン握り/ボス等。複数あれば最大のものを採用）
+  const red=Math.max(0,...tgt.buffs.filter(b=>b.dmgReduce).map(b=>b.dmgReduce),0);
+  if(red>0)d=Math.round(d*(1-red));
+  // パッシブ被ダメ軽減
+  if(tgt.cid===10)d=Math.round(d*0.75);                                  // サーモン握り：英雄の依代 被ダメ-25%
+  if(tgt.cid===11&&tgt.hp/tgt.maxHP<=0.5)d=Math.round(d*0.70);           // ボス：変わり果てた身体 HP50%以下で被ダメ-30%
+  if((tgt.passives||[]).join('').includes('鉄壁'))d=Math.round(d*0.80);  // ガチャ産：鉄壁 被ダメ-20%
+  if((tgt.passives||[]).join('').includes('原初の護り'))d=Math.round(d*0.70); // 伝説かえる：被ダメ-30%
+  if(tgt.guard)d=Math.round(d*0.5);
+  tgt.hp=Math.max(0,tgt.hp-d);
+  tgt.tension=Math.min(100,tgt.tension+ ((tgt.cid===3||tgt.cid===8)?15:10));
+  const dmul=Math.max((src&&src.dmul)||1,(tgt&&tgt.dmul)||1); // ボスが絡む表示は据え置き(×2)
+  popDmg(tgt,d,opt.crit,false,dmul);
+  // 通常の反射(賢者など)
+  if(tgt.reflect&&src&&src.alive){const rf=Math.round(d*0.3);src.hp=Math.max(0,src.hp-rf);popDmg(src,rf,false,false,Math.max((src.dmul||1),(tgt.dmul||1)));}
+  // ピエンターズ「無限」：被ダメ80%反射
+  if(tgt.cid===106&&src&&src.alive){const rf=Math.round(d*0.8);src.hp=Math.max(0,src.hp-rf);popDmg(src,rf,false,false,(src.dmul||1));if(src.hp<=0)killUnit(src,tgt);}
+  // ピエンターズ「マルチバース」：被弾時60%でテンション全回復
+  if(tgt.cid===106&&Math.random()<0.6)tgt.tension=100;
+  if(tgt.hp<=0)killUnit(tgt,src);
+  renderHP();
+  return d;
+}
+function killUnit(u,src){
+  // 不滅(言霊)
+  if(u.cid===9&&!u.revived){u.revived=true;u.hp=Math.round(u.maxHP*0.3);setMsg(u.name+' は不滅の力で復活した！');return;}
+  u.alive=false;
+}
+function doNormal(u,t){
+  setMsg(u.name+' の通常口撃！');
+  document.getElementById('btCmd').style.display='none';
+  lungeAttack(u,t,1,false,()=>{
+    const d=calcDmg(eff(u,'ATK'),eff(t,'DEF'),1.0);
+    applyDmg(u,t,d);
+    if(u.cid===9)addBuff(t,{s:{ATK:-0.05},t:2});
+  });
+  u.tension=Math.min(100,u.tension+15);
+  setTimeout(()=>{renderBattle();endAct();},700);
+}
+function doGuard(u){ setMsg(u.name+' は身構えた（被ダメ-50%）'); u.guard=true; u.tension=Math.min(100,u.tension+5); renderBattle();endAct(); }
+function doSkill(u,sk,t){
+  setMsg(u.name+' ▸ '+sk.n+'！');
+  document.getElementById('btCmd').style.display='none';
+  const hits=sk.hits||1;
+  const crit=sk.pow>=1.5;
+  let delay=700;
+  if(sk.pow>0&&t&&(sk.tgt==='one')){
+    // 単体攻撃：hits回ぶん突進
+    let hi=0;
+    lungeAttack(u,t,hits,crit,()=>{
+      hi++;
+      if(sk.acc&&Math.random()>sk.acc){popMiss(t);}
+      else{const d=calcDmg(eff(u,'ATK'),eff(t,'DEF'),sk.pow);applyDmg(u,t,d,{crit});}
+      if(hi===hits)applyEffects(u,sk,t);
+    });
+    delay=200*hits+400;
+  } else if(sk.tgt==='all'){
+    // 全体攻撃：各敵に斬撃
+    B.enemies.filter(e=>e.alive).forEach((e,idx)=>{setTimeout(()=>{
+      if(sk.pow>0){impactAt(e,crit);const d=calcDmg(eff(u,'ATK'),eff(e,'DEF'),sk.pow);applyDmg(u,e,d,{crit});}
+      applyEffects(u,sk,e);},idx*120);});
+    btShake();delay=700;
+  } else if(sk.tgt==='allyAll'){
+    B.allies.filter(a=>a.alive).forEach(a=>{applyEffects(u,sk,a,true);
+      if(sk.buf){const k=Object.keys(buffPart(sk.buf))[0];effFx(a,buffIcon(k,true),true);}
+      if(sk.healAll)healFx(a,healAmt(u,a,sk.healAll));});
+    delay=650;
+  } else if(sk.tgt==='ally1'&&t){
+    applyEffects(u,sk,t,true);
+    if(sk.healOne)healFx(t,healAmt(u,t,sk.healOne));
+    delay=650;
+  } else if(sk.tgt==='self'){
+    applyEffects(u,sk,u,true);
+    if(sk.selfheal)healFx(u,Math.round(u.maxHP*sk.selfheal));
+    if(sk.selfbuf){const k=Object.keys(buffPart(sk.selfbuf))[0];effFx(u,buffIcon(k,buffPart(sk.selfbuf)[k]>0),buffPart(sk.selfbuf)[k]>0);}
+    if(sk.guard)effFx(u,'🛡️ GUARD',true);
+    delay=600;
+  } else if(t){
+    applyEffects(u,sk,t);
+    // 非ダメージのデバフ技も軽く演出
+    if(sk.deb){const k=Object.keys(sk.deb).filter(x=>x!=='t'&&x!=='p')[0];if(k)effFx(t,buffIcon(k,sk.deb[k]>0),sk.deb[k]>0);}
+    delay=600;
+  }
+  u.tension=Math.min(100,u.tension+15);
+  setTimeout(()=>{renderBattle();endAct();},delay);
+}
+function buffIcon(k,up){return ({ATK:'⚔️ ATK',DEF:'🛡️ DEF',SPD:'💨 SPD'}[k]||'✦')+(up?' ↑':' ↓');}
+function applyEffects(u,sk,t,ally){
+  if(sk.deb&&(!sk.deb.p||Math.random()<sk.deb.p)){const{t:dur,p,...s}=sk.deb;addBuff(t,{s,t:dur});}
+  if(sk.buf){addBuff(t,{s:{...buffPart(sk.buf)},t:sk.buf.t});}
+  if(sk.selfbuf){addBuff(u,{s:{...buffPart(sk.selfbuf)},t:sk.selfbuf.t});}
+  if(sk.mpdmg){t.mp=Math.max(0,Math.round(t.mp*(1-sk.mpdmg)));}
+  if(sk.tendmg){t.tension=Math.max(0,t.tension-sk.tendmg);}
+  if(sk.ten){u.tension=Math.min(100,u.tension+sk.ten);}
+  if(sk.strip){t.buffs=t.buffs.filter(b=>{const pos=Object.values(b.s||{}).some(v=>v>0);return !pos;});}
+  if(sk.strip1){const i=t.buffs.findIndex(b=>Object.values(b.s||{}).some(v=>v>0));if(i>=0)t.buffs.splice(i,1);}
+  if(sk.guard){u.guard=true;}
+  if(sk.taunt){u.taunt=true;}
+  if(sk.selfheal){u.hp=Math.min(u.maxHP,u.hp+Math.round(u.maxHP*sk.selfheal));}
+  if(sk.healOne){const r=healAmt(u,t,sk.healOne);t.hp=Math.min(t.maxHP,t.hp+r);}
+  if(sk.healAll&&ally){const r=healAmt(u,t,sk.healAll);t.hp=Math.min(t.maxHP,t.hp+r);}
+  if(sk.mpheal){u.mp=Math.min(u.maxMP,u.mp+Math.round(u.maxMP*sk.mpheal));}
+  if(sk.silence&&Math.random()<sk.silence){addBuff(t,{silence:true,t:2,icon:'🤐'});}
+}
+function healAmt(src,tgt,ratio){let r=Math.round(tgt.maxHP*ratio);if(src&&src.cid===2)r=Math.round(r*1.15);return r;}
+function buffPart(o){const{t,...s}=o;return s;}
+function addBuff(u,bf){
+  // アイコン付与
+  if(!bf.icon){const k=Object.keys(bf.s||{})[0];const up=bf.s&&bf.s[k]>0;
+    bf.icon=({ATK:up?'⚔️↑':'⚔️↓',DEF:up?'🛡️↑':'🛡️↓',SPD:up?'💨↑':'💨↓'})[k]||'✦';}
+  u.buffs.push(bf);
+}
+
+/* ---- 必殺技 ---- */
+function castUlt(u,ul){ u.tension=0; playUlt(u,ul,()=>{resolveUlt(u,ul,1);renderBattle();endAct();}); }
+function playUlt(u,ul,done){
+  const fx=document.getElementById('ultFX');
+  const col={thunder:'#00f0ff',fire_heal:'#ff7a18',rain_heal:'#3a7bff',alien:'#a855f7',rent:'#ff2d55',
+    salmon_fist:'#faff00',mercy_rain:'#c81e2e',true_dev:'#ffe98a',
+    legend_dev:'#ffe98a',legend_neko:'#00ff9d',legend_kaeru:'#3a7bff',watcher:'#a855f7',legend_ufo:'#a855f7',pienters:'#ffffff'}[ul.ultfx]||'#faff00';
+  fx.style.setProperty('--ucol',col);
+  // リセット
+  ['ultFlash','ultChar','ultName','ultFinal','ultHealwave','ultCineT','ultCineB'].forEach(id=>{const e=document.getElementById(id);if(e)e.className=e.className.replace(/\b(go|in|lunge|float)\b/g,'').trim();});
+  document.getElementById('ultFxL').innerHTML='';document.getElementById('ultDmgL').innerHTML='';document.getElementById('ultAllies').innerHTML='';
+  fx.classList.remove('shake','shakehard');
+  const final=document.getElementById('ultFinal');final.style.animation='';final.style.opacity='';final.style.fontSize='';
+  document.getElementById('ultChar').textContent=u.face;
+  document.getElementById('ultName').textContent=u.name;
+  document.getElementById('ultTitle').textContent=ul.n;
+  // 必殺の名前カードは下半分（namecardのstyleはCSS）。タイトルを技名カードに合わせる
+  fx.classList.add('on');Audio.SE.battle();
+  document.getElementById('ultCineT').classList.add('go');document.getElementById('ultCineB').classList.add('go');
+  setTimeout(()=>document.getElementById('ultChar').classList.add('in'),200);
+  const nc=document.querySelector('.ult-namecard');nc.classList.remove('in');void nc.offsetWidth;
+  setTimeout(()=>nc.classList.add('in'),380);
+  runUltFx(u,ul,col,done);
+}
+// 属性演出ヘルパー
+function uRnd(a,b){return a+Math.random()*(b-a);}
+function uFlash(col){const f=document.getElementById('ultFlash');f.className='ult-bgflash'+(col?' col':'');if(col)document.getElementById('ultFX').style.setProperty('--ucol',col);f.classList.add('go');setTimeout(()=>f.classList.remove('go'),360);}
+function uShake(hard){const fx=document.getElementById('ultFX');fx.classList.add(hard?'shakehard':'shake');setTimeout(()=>fx.classList.remove('shake','shakehard'),400);}
+function uDmg(x,y,opt){opt=opt||{};const d=document.createElement('div');d.className='udn '+(opt.cls||'pop')+(opt.heal?' heal':'');
+  d.textContent=opt.text||Math.floor(uRnd(800000,9900000)).toLocaleString();d.style.left=x+'%';d.style.top=y+'%';d.style.fontSize=(opt.size||(26+Math.random()*16))+'px';
+  document.getElementById('ultDmgL').appendChild(d);setTimeout(()=>d.remove(),1000);}
+function uSpark(x,y,emo){const s=document.createElement('div');s.className='uspk';s.textContent=emo||'💥';s.style.left=x+'%';s.style.top=y+'%';document.getElementById('ultFxL').appendChild(s);requestAnimationFrame(()=>s.classList.add('go'));setTimeout(()=>s.remove(),420);}
+function uEl(cls,styleText){const e=document.createElement('div');e.className=cls;if(styleText)e.style.cssText+=styleText;document.getElementById('ultFxL').appendChild(e);return e;}
+function uSetupAllies(){const box=document.getElementById('ultAllies');box.innerHTML='';
+  B.allies.forEach(a=>{const d=document.createElement('div');d.className='ally';const pct=Math.max(5,a.hp/a.maxHP*100);
+    d.innerHTML=`<div class="hp"></div><div class="af">${a.alive?a.face:'💀'}</div><div class="ah"><i style="width:${pct}%"></i></div>`;box.appendChild(d);});}
+function uHealAllies(){const box=document.getElementById('ultAllies');[...box.children].forEach((el,i)=>{const a=B.allies[i];setTimeout(()=>{
+  const hp=el.querySelector('.hp'),bar=el.querySelector('.ah i');
+  if(a&&a.alive){hp.textContent='+'+disp(Math.round(a.maxHP*0.3));hp.className='hp';void hp.offsetWidth;hp.classList.add('go');bar.style.width=Math.max(5,a.hp/a.maxHP*100)+'%';}
+  },i*120);});document.getElementById('ultHealwave').classList.add('go');uFlash('#00ff9d');}
+
+function runUltFx(u,ul,col,done){
+  let type=ul.ultfx||'default';
+  // 固有演出は本人(cid)のみ。流用は不可（不一致ならデフォルトに落とす）
+  const OWNER={thunder:1,fire_heal:2,rain_heal:3,alien:4,rent:5,salmon_fist:10,mercy_rain:11,true_dev:12,
+    legend_dev:101,legend_neko:102,legend_kaeru:103,watcher:104,legend_ufo:105,pienters:106};
+  if(OWNER[type]!==undefined && u.cid!==OWNER[type]) type='default';
+  const END=()=>{ setTimeout(()=>{document.getElementById('ultFX').classList.remove('on');done&&done();}, 700); };
+  if(type==='thunder'){
+    const e=uEl('u-elec');requestAnimationFrame(()=>e.classList.add('go'));setTimeout(()=>e.remove(),900);
+    let n=0;const iv=setInterval(()=>{const b=uEl('u-bolt',`left:${uRnd(20,75)}%;`);requestAnimationFrame(()=>b.classList.add('go'));setTimeout(()=>b.remove(),320);
+      uDmg(uRnd(22,72),uRnd(28,60),{size:30});uSpark(uRnd(25,70),uRnd(30,58),'⚡');uShake();n++;
+      if(n>=12){clearInterval(iv);setTimeout(()=>{const f=document.getElementById('ultFinal');f.innerHTML='FINISH!';f.className='ult-final go';uFlash('#bfe0ff');uShake(true);},170);}},95);
+    setTimeout(()=>document.getElementById('ultChar').classList.add('lunge'),800);
+    setTimeout(END,2600);
+  } else if(type==='fire_heal'){
+    uSetupAllies();const fc=uEl('u-firecol');setTimeout(()=>fc.classList.add('go'),700);
+    let n=0;const iv=setInterval(()=>{uDmg(uRnd(22,72),uRnd(28,56),{size:30});uSpark(uRnd(25,70),uRnd(30,56),'🔥');uShake();n++;
+      if(n>=12){clearInterval(iv);setTimeout(()=>{uFlash(col);uShake(true);uHealAllies();
+        const f=document.getElementById('ultFinal');f.innerHTML='治療費はこっち持ちだ<small>ALL HEAL</small>';f.className='ult-final heal go';f.style.fontSize='40px';},220);}},85);
+    setTimeout(END,2900);
+  } else if(type==='rain_heal'){
+    uSetupAllies();let rc=0;const rain=setInterval(()=>{for(let k=0;k<2;k++){const r=uEl('u-rain',`left:${uRnd(2,96)}%;animation-duration:${uRnd(.5,1)}s;`);requestAnimationFrame(()=>r.classList.add('go'));setTimeout(()=>r.remove(),1000);}rc++;if(rc>20)clearInterval(rain);},60);
+    const dirs=[[50,18],[22,42],[78,42],[50,60]];let w=0;const iv=setInterval(()=>{dirs.forEach(p=>{uDmg(p[0]+uRnd(-3,3),p[1]+uRnd(-3,3),{size:24});uSpark(p[0],p[1],'💧');});w++;
+      if(w>=2){clearInterval(iv);setTimeout(()=>{const aq=uEl('u-aquadome');requestAnimationFrame(()=>aq.classList.add('go'));setTimeout(()=>aq.remove(),1200);uHealAllies();
+        const f=document.getElementById('ultFinal');f.innerHTML='ぼくが、まもるから<small>RAIN & HEAL</small>';f.className='ult-final heal go';f.style.fontSize='38px';uFlash(col);},250);}},260);
+    setTimeout(()=>document.getElementById('ultChar').classList.add('float'),700);
+    setTimeout(END,3000);
+  } else if(type==='alien'){
+    let n=0;const iv=setInterval(()=>{if(n%3===0){const b=uEl('u-zbeam',`left:${uRnd(15,80)}%;`);requestAnimationFrame(()=>b.classList.add('go'));setTimeout(()=>b.remove(),420);}
+      const ang=n*0.7,r=8+n*1.5;const x=50+Math.cos(ang)*r,y=44+Math.sin(ang)*r*0.8;uDmg(x,y,{size:24+n*0.6});if(n%2===0)uSpark(x,y,'✦');if(n%3===0)uShake();n++;
+      if(n>=16){clearInterval(iv);setTimeout(()=>{const f=document.getElementById('ultFinal');f.innerHTML='ALL HIT!';f.className='ult-final go';uFlash(col);uShake(true);},150);}},80);
+    setTimeout(END,2900);
+  } else if(type==='rent'){
+    let total=0,n=0;const f=document.getElementById('ultFinal');f.className='ult-final';f.style.opacity='1';f.style.animation='none';f.innerHTML='0円<small>延滞金 加算中…</small>';
+    const iv=setInterval(()=>{const v=Math.floor(uRnd(60000,400000));total+=v;n++;uDmg(uRnd(20,75),uRnd(46,64),{size:24,text:'+'+v.toLocaleString()+'円'});uSpark(uRnd(25,70),uRnd(40,60),'💢');f.innerHTML=total.toLocaleString()+'円<small>延滞金 加算中…</small>';
+      if(n>=16){clearInterval(iv);f.style.animation='';f.className='ult-final go';f.innerHTML=total.toLocaleString()+'円<small>耳をそろえて払えェ！</small>';uFlash(col);uShake(true);}},90);
+    setTimeout(END,2900);
+  } else if(type==='legend_dev'){ // 伝説の開発者：金色の超巨大一撃＋再行動
+    const e=uEl('u-elec');e.style.borderColor='#ffe98a';requestAnimationFrame(()=>e.classList.add('go'));setTimeout(()=>e.remove(),900);
+    let n=0;const iv=setInterval(()=>{uDmg(uRnd(20,75),uRnd(26,60),{size:32});uSpark(uRnd(25,70),uRnd(30,58),'✨');uShake();n++;
+      if(n>=10){clearInterval(iv);setTimeout(()=>{const f=document.getElementById('ultFinal');f.innerHTML=Math.floor(uRnd(80000000,99000000)).toLocaleString()+'<small>伝説の降臨 ／ 再行動！</small>';f.className='ult-final go';f.style.fontSize='64px';uFlash('#ffe98a');uShake(true);},150);}},80);
+    setTimeout(()=>document.getElementById('ultChar').classList.add('lunge'),700);
+    setTimeout(END,3000);
+  } else if(type==='legend_neko'){ // 伝説のねこ：全回復＋猫の加護
+    uSetupAllies();
+    setTimeout(()=>{for(let k=0;k<5;k++)setTimeout(()=>uSpark(uRnd(20,80),uRnd(25,60),'😺'),k*100);},500);
+    setTimeout(()=>{uHealAllies();const f=document.getElementById('ultFinal');f.innerHTML='究極のヒーリング<small>ALL HEAL ＋ 猫の加護🐾</small>';f.className='ult-final heal go';f.style.fontSize='40px';uFlash('#00ff9d');},900);
+    setTimeout(END,2900);
+  } else if(type==='legend_kaeru'){ // 伝説のかえる：創造の雨（雨アニメ）
+    let rc=0;const rain=setInterval(()=>{for(let k=0;k<3;k++){const r=uEl('u-rain',`left:${uRnd(2,96)}%;animation-duration:${uRnd(.4,.9)}s;`);requestAnimationFrame(()=>r.classList.add('go'));setTimeout(()=>r.remove(),900);}rc++;if(rc>26)clearInterval(rain);},55);
+    setTimeout(()=>document.getElementById('ultChar').classList.add('float'),600);
+    setTimeout(()=>{const aq=uEl('u-aquadome');aq.style.width='180px';aq.style.height='180px';requestAnimationFrame(()=>aq.classList.add('go'));setTimeout(()=>aq.remove(),1300);
+      const f=document.getElementById('ultFinal');f.innerHTML='人智を超えた創造の雨<small>被ダメ70%無効 ／ 5ターン</small>';f.className='ult-final go';f.style.fontSize='34px';f.style.color='#7fd0ff';uFlash('#3a7bff');},1200);
+    setTimeout(END,3100);
+  } else if(type==='watcher'){ // ウォッチャー：次元幽閉 50回
+    let n=0;const iv=setInterval(()=>{uDmg(uRnd(15,82),uRnd(22,66),{size:20+Math.random()*14});if(n%3===0)uSpark(uRnd(20,80),uRnd(25,62),'👁️');if(n%4===0)uShake();n++;
+      if(n>=28){clearInterval(iv);setTimeout(()=>{const f=document.getElementById('ultFinal');f.innerHTML='次元幽閉<small>50 HITS ／ 全デバフ＆バフ奪取</small>';f.className='ult-final go';f.style.fontSize='48px';uFlash('#a855f7');uShake(true);},120);}},55);
+    setTimeout(END,3100);
+  } else if(type==='legend_ufo'){ // 伝説のUFO：惑星崩壊ビーム 60回
+    let n=0;const iv=setInterval(()=>{if(n%2===0){const b=uEl('u-zbeam',`left:${uRnd(12,84)}%;`);requestAnimationFrame(()=>b.classList.add('go'));setTimeout(()=>b.remove(),420);}
+      uDmg(uRnd(15,82),uRnd(22,66),{size:20+Math.random()*12});if(n%3===0)uSpark(uRnd(20,80),uRnd(25,62),'🛸');if(n%4===0)uShake();n++;
+      if(n>=30){clearInterval(iv);setTimeout(()=>{const f=document.getElementById('ultFinal');f.innerHTML='惑星崩壊ビーム<small>60 HITS ／ 蜃気楼</small>';f.className='ult-final go';f.style.fontSize='44px';uFlash('#a855f7');uShake(true);},120);}},50);
+    setTimeout(END,3200);
+  } else if(type==='pienters'){ // ピエンターズ：マルチバースの消滅（一撃必殺）
+    document.getElementById('ultFX').style.filter='grayscale(1)';
+    setTimeout(()=>{document.getElementById('ultFX').style.transition='filter .2s';document.getElementById('ultFX').style.filter='grayscale(0)';
+      uFlash('#fff');uShake(true);for(let k=0;k<6;k++)setTimeout(()=>uSpark(uRnd(20,80),uRnd(25,60),'🧍'),k*70);
+      const f=document.getElementById('ultFinal');f.innerHTML='消滅<small>マルチバースの消滅</small>';f.className='ult-final go';f.style.fontSize='72px';},1400);
+    setTimeout(()=>{document.getElementById('ultFX').style.filter='';document.getElementById('ultFX').style.transition='';},2200);
+    setTimeout(END,2900);
+  } else if(type==='salmon_fist'){ // サーモン握り：次元解放拳 66連
+    let n=0;const total=66;const iv=setInterval(()=>{
+      if(n%6===0){const r=uEl('u-rift',`left:${uRnd(20,80)}%;--rr:${uRnd(-20,20)}deg;`);requestAnimationFrame(()=>r.classList.add('go'));setTimeout(()=>r.remove(),500);}
+      if(n%4===0){const fi=uEl('u-fist',`left:${uRnd(30,70)}%;top:${uRnd(30,55)}%;`);requestAnimationFrame(()=>fi.classList.add('go'));setTimeout(()=>fi.remove(),500);}
+      uDmg(uRnd(15,82),uRnd(22,66),{size:18+Math.random()*10});if(n%3===0)uSpark(uRnd(20,80),uRnd(25,62),'✊');if(n%5===0)uShake();n++;
+      if(n>=total){clearInterval(iv);setTimeout(()=>{const gd=uEl('u-guarddome');requestAnimationFrame(()=>gd.classList.add('go'));setTimeout(()=>gd.remove(),1100);
+        const f=document.getElementById('ultFinal');f.innerHTML='次元解放拳<small>66 HITS ／ 被ダメ80%軽減＋挑発</small>';f.className='ult-final go';f.style.fontSize='40px';uFlash(col);uShake(true);},200);}
+    },45);
+    setTimeout(()=>document.getElementById('ultChar').classList.add('lunge'),700);
+    setTimeout(END,4000);
+  } else if(type==='mercy_rain'){ // ボス：無慈悲の雨（赤い雨＋雷＋天候崩壊）
+    document.getElementById('ultFX').classList.add('blood');
+    let rc=0;const rain=setInterval(()=>{for(let k=0;k<3;k++){const r=uEl('u-brain',`left:${uRnd(2,96)}%;animation-duration:${uRnd(.5,1)}s;`);requestAnimationFrame(()=>r.classList.add('go'));setTimeout(()=>r.remove(),1000);}rc++;if(rc>26)clearInterval(rain);},55);
+    let n=0;const total=10;const iv=setInterval(()=>{const b=uEl('u-rbolt',`left:${uRnd(15,82)}%;`);requestAnimationFrame(()=>b.classList.add('go'));setTimeout(()=>b.remove(),320);
+      uDmg(uRnd(15,82),uRnd(22,64),{size:26+Math.random()*12,cls:'pop'});uSpark(uRnd(20,80),uRnd(25,62),'🩸');uShake(true);n++;
+      if(n>=total){clearInterval(iv);setTimeout(()=>{const f=document.getElementById('ultFinal');f.innerHTML='無慈悲の雨<small>66%×10 HITS ／ 3T 被ダメ50%減</small>';f.className='ult-final go';f.style.fontSize='38px';f.style.color='#ff5a6a';uFlash('#c81e2e');uShake(true);},200);}
+    },150);
+    setTimeout(()=>document.getElementById('ultFX').classList.remove('blood'),3000);
+    setTimeout(END,3200);
+  } else if(type==='true_dev'){ // 真・開発者：世界を断つ一閃 20連（時空歪み）
+    let n=0;const total=20;const iv=setInterval(()=>{
+      const sl=uEl('u-rift',`left:${uRnd(15,85)}%;--rr:${uRnd(-50,50)}deg;`);sl.style.background='linear-gradient(180deg,transparent,#ffe98a,#fff,#ffe98a,transparent)';sl.style.boxShadow='0 0 16px #ffe98a';requestAnimationFrame(()=>sl.classList.add('go'));setTimeout(()=>sl.remove(),500);
+      uDmg(uRnd(15,82),uRnd(22,64),{size:24+Math.random()*12});if(n%2===0)uSpark(uRnd(20,80),uRnd(25,62),'⚔️');uShake(n%3===0);n++;
+      if(n>=total){clearInterval(iv);setTimeout(()=>{const f=document.getElementById('ultFinal');f.innerHTML='世界を断つ一閃<small>20 HITS ／ 英雄の闘志 ATK+50%</small>';f.className='ult-final go';f.style.fontSize='40px';f.style.color='#ffe98a';uFlash('#ffe98a');uShake(true);},150);}
+    },70);
+    setTimeout(()=>document.getElementById('ultChar').classList.add('lunge'),700);
+    setTimeout(END,3300);
+  } else {
+    // デフォルト：従来のシンプル演出
+    let n=0;const iv=setInterval(()=>{uDmg(uRnd(22,72),uRnd(28,60),{size:30});uSpark(uRnd(25,70),uRnd(30,58));uShake();n++;
+      if(n>=10){clearInterval(iv);const f=document.getElementById('ultFinal');f.innerHTML='HIT!';f.className='ult-final go';uFlash(col);uShake(true);}},90);
+    setTimeout(END,2400);
+  }
+}
+function resolveUlt(u,ul,mult){
+  const foeSide = u.isEnemy?B.allies:B.enemies;
+  const healSide = u.isEnemy?B.enemies:B.allies;
+  // --- UR固有：ランダム一撃必殺（ピエンターズ） ---
+  if(ul.tgt==='randomKill'){
+    const pool=foeSide.filter(e=>e.alive);
+    const n=Math.min(ul.killCount||1, pool.length);
+    // ランダムにn体（最低1体）即死
+    const picks=pool.sort(()=>Math.random()-0.5).slice(0,Math.max(1,Math.floor(Math.random()*n)+1));
+    picks.forEach((t,idx)=>{setTimeout(()=>impactAt(t,true),idx*120);t.hp=0;killUnit(t,u);});
+    return;
+  }
+  const targets= u.isEnemy
+    ? (ul.tgt==='all'?B.allies.filter(a=>a.alive):[B.allies.filter(a=>a.alive).sort((a,b)=>b.hp-a.hp)[0]].filter(Boolean))
+    : (ul.tgt==='all'?B.enemies.filter(e=>e.alive):ul.tgt==='one'?[B.enemies.filter(e=>e.alive)[0]].filter(Boolean):[u]);
+  // --- self系（伝説かえる/ねこの全体効果含む） ---
+  if(ul.tgt==='self'){
+    applyEffects(u,ul,u,true);
+    if(ul.rainGuard){addBuff(u,{rainGuard:true,t:ul.rainGuard,icon:'🌧️'});}
+    if(ul.allybuf)healSide.filter(a=>a.alive&&a.uid!==u.uid).forEach(a=>addBuff(a,{s:buffPart(ul.allybuf),t:ul.allybuf.t}));
+    if(ul.healAll)healSide.filter(a=>a.alive).forEach(a=>{const r=healAmt(u,a,ul.healAll);a.hp=Math.min(a.maxHP,a.hp+r);});
+    if(ul.reflect)u.reflect=true;
+    return;
+  }
+  // --- 味方全体への特殊効果（伝説ねこ：全回復・浄化・無敵） ---
+  if(ul.tgt==='allyAll'){
+    healSide.filter(a=>a.alive).forEach(a=>{
+      if(ul.fullHeal)a.hp=a.maxHP;
+      else if(ul.healAll){const r=healAmt(u,a,ul.healAll);a.hp=Math.min(a.maxHP,a.hp+r);}
+      if(ul.cleanseAll||ul.cleanse)a.buffs=a.buffs.filter(b=>{const neg=b.silence||Object.values(b.s||{}).some(v=>v<0);return !neg;});
+      if(ul.catGuard)addBuff(a,{catGuard:true,t:1,icon:'🐾'});
+      if(ul.buf)addBuff(a,{s:{...buffPart(ul.buf)},t:ul.buf.t});
+    });
+    if(ul.reflect)u.reflect=true;
+    return;
+  }
+  // --- 攻撃系（固定回数hits・固定%ダメージ対応） ---
+  const hits=ul.hits||1;
+  targets.forEach((t,idx)=>{
+    if(ul.fixedSelfHP){ // 自分の現在HP×倍率の固定ダメージ
+      const fd=Math.round(u.hp*ul.fixedSelfHP);
+      setTimeout(()=>impactAt(t,true),idx*100);applyDmg(u,t,fd,{crit:true,fixed:true});
+    } else if(ul.pow>0){
+      for(let h=0;h<hits;h++){const d=calcDmg(eff(u,'ATK'),eff(t,'DEF'),ul.pow*mult);applyDmg(u,t,d,{crit:true});}
+      setTimeout(()=>impactAt(t,true),idx*80);
+    }
+    // デバフ類
+    if(ul.deb){const{t:dur,...s}=ul.deb;addBuff(t,{s,t:dur});}
+    if(ul.maxDebuff){addBuff(t,{s:{ATK:-0.5,DEF:-0.5,SPD:-0.5},t:3});}
+    if(ul.mirage){addBuff(t,{s:{ATK:-0.3},miss:0.5,t:3,icon:'🌫️'});}
+    if(ul.silenceAll||ul.confuseAll){addBuff(t,{silence:true,t:2,icon:'🤐'});}
+    if(ul.execute&&Math.random()<ul.execute&&!t.isEnemy){t.hp=0;killUnit(t,u);}
+  });
+  // ウォッチャー：敵のバフを全奪取して自分へ
+  if(ul.stealBuffs){foeSide.filter(e=>e.alive).forEach(e=>{const pos=e.buffs.filter(b=>Object.values(b.s||{}).some(v=>v>0));e.buffs=e.buffs.filter(b=>!pos.includes(b));pos.forEach(b=>addBuff(u,{s:b.s,t:3}));});}
+  // 自身に被ダメ軽減バフ＋挑発（サーモン握り/ボス）
+  if(ul.selfDmgReduce){addBuff(u,{dmgReduce:ul.selfDmgReduce,t:ul.reduceT||3,icon:'🛡️'});}
+  if(ul.taunt){u.taunt=true;}
+  if(ul.allybuf)healSide.filter(a=>a.alive&&a.uid!==u.uid).forEach(a=>addBuff(a,{s:buffPart(ul.allybuf),t:ul.allybuf.t}));
+  if(ul.heal)healSide.filter(a=>a.alive).forEach(a=>{a.hp=Math.min(a.maxHP,a.hp+Math.round(a.maxHP*ul.heal));});
+  if(ul.healAll)healSide.filter(a=>a.alive).forEach(a=>{const r=healAmt(u,a,ul.healAll);a.hp=Math.min(a.maxHP,a.hp+r);});
+  if(ul.reflect)u.reflect=true;
+  // 伝説の開発者：テンション払い戻して再行動
+  if(ul.refund){u.tension=Math.min(100,Math.round((ul.refund)*100));}
+}
+function STAGE_BOSS_FLAG(u){return u.isEnemy;} // 敵はボス扱い→即死無効
+
+/* ---- 敵AI ---- */
+function enemyAct(u){
+  const foes=B.allies.filter(a=>a.alive);
+  if(!foes.length){endAct();return;}
+  // テンション満タンなら必殺
+  if(u.tension>=100&&u.ults.length){castUlt(u,u.ults[Math.floor(Math.random()*u.ults.length)]);return;}
+  const target=foes.find(f=>f.taunt)||foes.sort((a,b)=>eff(a,'DEF')-eff(b,'DEF'))[0];
+  // 30%でスキル
+  const usable=u.skills.filter(s=>u.mp>=s.mp&&s.pow>0);
+  if(usable.length&&Math.random()<0.45){const sk=usable[Math.floor(Math.random()*usable.length)];u.mp-=sk.mp;
+    if(sk.tgt==='all'||sk.tgt==='allyAll'||sk.tgt==='self'||sk.tgt==='ally1')doSkill(u,sk,null);else doSkill(u,sk,target);return;}
+  doNormal(u,target);
+}
+
+/* ---- 終了判定 ---- */
+function checkEnd(){
+  if(B.over)return true;
+  if(B.allies.every(a=>!a.alive)){B.over=true;setTimeout(()=>battleResult(false),500);return true;}
+  if(B.enemies.every(e=>!e.alive)){B.over=true;setTimeout(()=>battleResult(true),500);return true;}
+  return false;
+}
+function battleResult(win){
+  const box=document.getElementById('btrBox');
+  box.className='btr-box '+(win?'win':'lose');
+  box.innerHTML=`<div class="res-ttl">${win?'WIN':'LOSE'}</div>
+    <p>${win?'レスバを制した！<br>相手は黙り込んでしまった…':'言い負かされてしまった…<br>体勢を立て直そう。'}</p>
+    <div class="nbtn ${win?'ylw':'mag'}" id="btrOk">${win?'勝利を収める ▶':'メインに戻る'}</div>`;
+  scr('btResult');
+  win?Audio.SE.unlock():Audio.SE.error();
+  document.getElementById('btrOk').onclick=()=>{Audio.SE.confirm();
+    if(win&&B.onWin)B.onWin(); else {scr('main');refresh();}};
+}
+document.getElementById('btFlee').onclick=()=>{Audio.SE.back();
+  ask('撤退','バトルから撤退しますか？<br>進行状況は保存されません。',()=>{scr('main');refresh();});};
+
+/* ---- 描画 ---- */
+function setMsg(t){const m=document.getElementById('btMid');m.innerHTML=`<div class="bt-msg">${t}</div>`;}
+function unitHTML(u){
+  const hpp=Math.max(0,u.hp/u.maxHP*100), tp=u.tension;
+  const buffs=u.buffs.map(b=>`<span title="${b.icon}">${b.icon}</span>`).join('');
+  return `<div class="unit ${u.isEnemy?'enemy':''} ${u.isEnemy?'':'rare-'+u.rare} ${u.alive?'':'dead'} ${B&&B.acting===u?'active':''}" data-uid="${u.uid}">
+    <div class="uav">${u.alive?u.face:'💀'}</div>
+    <div class="unm">${u.name}</div>
+    <div class="uhp-track"><div class="uhp-ghost"></div><div class="uhp-fill" style="width:${hpp}%"></div></div>
+    <div class="unum">${dispU(u,u.hp)}</div>
+    <div class="uten-track"><div class="uten-fill ${tp>=100?'uten-ready':''}" style="width:${tp}%"></div></div>
+    <div class="ubuffs">${buffs}</div></div>`;
+}
+function renderBattle(){
+  renderEnemies();
+  document.getElementById('btAllies').innerHTML=B.allies.map(unitHTML).join('');
+  document.getElementById('btCmd').style.display = (B.acting&&!B.acting.isEnemy)?'grid':'none';
+  bindLongPress();
+}
+function renderEnemies(){
+  const box=document.getElementById('btEnemies');
+  const bosses=B.enemies.filter(e=>e.isBoss);
+  const mobs=B.enemies.filter(e=>e.isMob);
+  // 雑魚は上段に小さく、ボスは中央に巨大
+  const mobHTML=mobs.map(mobHTMLfn).join('');
+  const bossHTML=bosses.map(bossHTMLfn).join('');
+  box.className='bt-enemies view-'+(B.bossView||'big');
+  box.innerHTML=`<div class="mob-row">${mobHTML}</div><div class="boss-row">${bossHTML}</div>`;
+  // 上部固定のボスHPバー
+  document.getElementById('bossHpTop').innerHTML=bosses.map(bossHpBarHTML).join('');
+}
+function bossHTMLfn(u){
+  const buffs=u.buffs.map(b=>`<span title="${b.icon}">${b.icon}</span>`).join('');
+  const zomb=u.cid===11?' zombie-frog':'';
+  return `<div class="unit boss enemy ${u.alive?'':'dead'} ${B&&B.acting===u?'active':''}" data-uid="${u.uid}">
+    <div class="boss-aura"></div>
+    <div class="uav boss-av${zomb}">${u.alive?u.face:'💀'}</div>
+    </div>`;
+}
+function bossHpBarHTML(u){
+  const hpp=Math.max(0,u.hp/u.maxHP*100), tp=u.tension;
+  const buffs=u.buffs.map(b=>`<span title="${b.icon}">${b.icon}</span>`).join('');
+  return `<div class="bhp" data-hpfor="${u.uid}">
+    <div class="bhp-nm"><span>${u.name} <span class="boss-rare ${u.rare}">${u.rare}</span></span><span class="bhp-buffs">${buffs}</span></div>
+    <div class="uhp-track boss-hp" data-uid="${u.uid}"><div class="uhp-ghost"></div><div class="uhp-fill" style="width:${hpp}%"></div></div>
+    <div class="boss-nums"><span class="unum" data-numfor="${u.uid}">${dispU(u,u.hp)}</span><span class="unum-max">/ ${dispU(u,u.maxHP)}</span></div>
+    <div class="uten-track boss-ten"><div class="uten-fill ${tp>=100?'uten-ready':''}" data-tenfor="${u.uid}" style="width:${tp}%"></div></div>
+  </div>`;
+}
+function mobHTMLfn(u){
+  const hpp=Math.max(0,u.hp/u.maxHP*100);
+  const buffs=u.buffs.map(b=>`<span title="${b.icon}">${b.icon}</span>`).join('');
+  return `<div class="unit mob enemy ${u.alive?'':'dead'} ${B&&B.acting===u?'active':''}" data-uid="${u.uid}">
+    <div class="uav mob-av">${u.alive?u.face:'💀'}</div>
+    <div class="uhp-track mob-hp"><div class="uhp-ghost"></div><div class="uhp-fill" style="width:${hpp}%"></div></div>
+    <div class="unum mob-num">${dispU(u,u.hp)}</div>
+    <div class="ubuffs">${buffs}</div></div>`;
+}
+// 突進アニメ中はDOM再生成せずHP/MP/ゲージ/数値だけ更新（残像つき）
+function renderHP(){
+  [...B.allies,...B.enemies].forEach(u=>{
+    const np=Math.max(0,u.hp/u.maxHP*100);
+    const unitEl=document.querySelector(`.unit[data-uid="${u.uid}"]`);
+    const trk=document.querySelector(`.uhp-track[data-uid="${u.uid}"]`) || (unitEl&&unitEl.querySelector('.uhp-track'));
+    if(trk){const fill=trk.querySelector('.uhp-fill'),ghost=trk.querySelector('.uhp-ghost');
+      if(fill){const old=parseFloat(fill.style.width)||np;
+        if(ghost&&old>np){ghost.style.left=np+'%';ghost.style.width=(old-np)+'%';setTimeout(()=>{ghost.style.width='0';},40);}
+        fill.style.width=np+'%';}}
+    // 数値
+    const num=document.querySelector(`.unum[data-numfor="${u.uid}"]`) || (unitEl&&unitEl.querySelector('.unum'));
+    if(num)num.textContent=dispU(u,u.hp);
+    // テンション
+    const ten=document.querySelector(`.uten-fill[data-tenfor="${u.uid}"]`) || (unitEl&&unitEl.querySelector('.uten-fill'));
+    if(ten){ten.style.width=u.tension+'%';ten.classList.toggle('uten-ready',u.tension>=100);}
+    // 死亡表現
+    if(unitEl){unitEl.classList.toggle('dead',!u.alive);const av=unitEl.querySelector('.uav');if(av&&!u.alive)av.textContent='💀';}
+  });
+}
+function popDmg(u,d,crit,heal,mul){
+  const el=document.querySelector(`.unit[data-uid="${u.uid}"]`);if(!el)return;
+  const p=document.createElement('div');p.className='dmgpop'+(crit?' crit':'')+(heal?' heal':'');
+  const lab=heal?'HEAL':crit?'CRITICAL!':'';
+  const shown=Math.round(d*((mul)||1));
+  p.innerHTML=(lab?`<span class="lab">${lab}</span>`:'')+(heal?'+':'')+disp(shown);
+  el.appendChild(p);setTimeout(()=>p.remove(),1300);
+}
+function popMissOld(){}
+function popMiss(u){const el=document.querySelector(`.unit[data-uid="${u.uid}"]`);if(!el)return;
+  const p=document.createElement('div');p.className='dmgpop miss';p.textContent='MISS';el.appendChild(p);setTimeout(()=>p.remove(),1100);}
+function shake(u){const el=document.querySelector(`.unit[data-uid="${u.uid}"] .uav`);if(el){el.classList.add('uhit');setTimeout(()=>el.classList.remove('uhit'),300);}}
+
+/* ---- 長押しで詳細 ---- */
+function bindLongPress(){
+  document.querySelectorAll('.unit').forEach(el=>{
+    const uid=el.dataset.uid;const u=[...B.allies,...B.enemies].find(x=>x.uid===uid);if(!u)return;
+    let timer=null;
+    const start=()=>{timer=setTimeout(()=>{Audio.SE.select();showCharDetail(u);},450);};
+    const cancel=()=>clearTimeout(timer);
+    el.onmousedown=start;el.onmouseup=cancel;el.onmouseleave=cancel;
+    el.ontouchstart=e=>{start();};el.ontouchend=cancel;el.ontouchmove=cancel;
+  });
+}
+function showCharDetail(u){
+  const box=document.getElementById('cdBox');
+  const row=(lab,key)=>{const base=u.base[key],now=eff(u,key);const diff=now-base;
+    const cls=diff>0?'up':diff<0?'down':'';const sign=diff>0?'▲':diff<0?'▼':'';
+    const pct=diff!==0?` (${diff>0?'+':''}${Math.round(diff/base*100)}%)`:'';
+    return `<div class="cd-stat"><span class="lab">${lab}</span><span class="v ${cls}">${disp(now)} <small>${sign}${pct}</small></span></div>`;};
+  // バフ/デバフを上昇/下降で色分け、残ターン表示
+  let effChips='<span class="echip">なし</span>';
+  if(u.buffs.length){effChips=u.buffs.map(b=>{
+    if(b.silence)return `<span class="echip down">🤐 沈黙 ${b.t}T</span>`;
+    const k=Object.keys(b.s||{})[0];const up=b.s&&b.s[k]>0;
+    const label=({ATK:'攻撃',DEF:'防御',SPD:'速さ'})[k]||'効果';
+    const val=b.s?Math.round(b.s[k]*100):0;
+    return `<span class="echip ${up?'up':'down'}">${b.icon} ${label}${val>0?'+':''}${val}% ・${b.t}T</span>`;
+  }).join('');}
+  const hpp=Math.round(u.hp/u.maxHP*100), mpp=Math.round(u.mp/u.maxMP*100);
+  // 技一覧
+  const skills=(u.skills||[]).map(s=>{const cost=Math.round(s.mp);
+    const ok=u.mp>=cost;
+    return `<div class="cd-sk ${ok?'':'no'}"><span class="sn">${s.n}</span><span class="sd">${s.d}</span>${s.mp?`<span class="smp">MP ${disp(cost)}</span>`:''}</div>`;}).join('');
+  const ults=(u.ults||[]).map(x=>`<div class="cd-sk ult"><span class="sn">⚡${x.n}</span><span class="sd">${x.d}</span></div>`).join('');
+  box.innerHTML=`<div class="cdh"><div class="f">${u.face}</div>
+    <div><div class="nm">${u.name}</div><div class="rl">${u.roles.map(r=>ROLE_ICON[r]+r).join(' / ')} ・ ${u.rare}</div></div></div>
+    <div class="cd-power">⚔ 戦力 <b>${disp(u.base.ATK+u.base.DEF+u.base.SPD+u.base.MP+Math.round(u.maxHP/10))}</b></div>
+    <div class="cd-bars">
+      <div class="cd-barrow"><span class="bl">HP</span><div class="cd-bar"><i class="hp" style="width:${hpp}%"></i></div><span class="bn">${disp(u.hp)} / ${disp(u.maxHP)}</span></div>
+      <div class="cd-barrow"><span class="bl">MP</span><div class="cd-bar"><i class="mp" style="width:${mpp}%"></i></div><span class="bn">${disp(u.mp)} / ${disp(u.maxMP)}</span></div>
+      <div class="cd-barrow"><span class="bl">TP</span><div class="cd-bar"><i class="tp" style="width:${u.tension}%"></i></div><span class="bn">${Math.floor(u.tension)}%${u.tension>=100?' ⚡READY':''}</span></div>
+    </div>
+    ${row('攻撃力','ATK')}${row('防御力','DEF')}${row('スピード','SPD')}
+    <div class="cd-eff"><div class="et">バフ / デバフ</div><div class="cd-chips">${effChips}</div></div>
+    <div class="cd-eff"><div class="et">パッシブ</div>${u.passives.map(p=>{const[n,d]=p.split('：');return `<div class="cd-pas"><b>${n}</b>${d?`<span>${d}</span>`:''}</div>`;}).join('')}</div>
+    <div class="cd-eff"><div class="et">技</div>${skills}${ults}</div>
+    <div class="cd-close"><div class="nbtn" onclick="document.getElementById('charDetail').classList.remove('on')">閉じる</div></div>`;
+  document.getElementById('charDetail').classList.add('on');
+}
+
+</script>
+</body>
+</html>
