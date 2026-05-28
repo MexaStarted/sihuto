@@ -8,7 +8,52 @@
 <meta http-equiv="Expires" content="0">
 <title>開発者の現在</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZETCCQQ8M3"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-ZETCCQQ8M3');</script>
+<script>
+// ===== グローバルエラーハンドラ（デバッグ用：画面にエラー詳細を表示）=====
+(function(){
+  function showErr(title, detail){
+    try{
+      var box=document.getElementById('__errbox');
+      if(!box){
+        box=document.createElement('div');
+        box.id='__errbox';
+        box.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:99999;max-height:45vh;overflow-y:auto;background:rgba(30,0,0,.97);color:#ff9b9b;font-family:monospace;font-size:11px;padding:10px 12px;border-top:2px solid #ff3a3a;box-shadow:0 -4px 20px rgba(0,0,0,.6);white-space:pre-wrap;word-break:break-word';
+        document.body.appendChild(box);
+      }
+      var time=new Date().toLocaleTimeString();
+      var entry=document.createElement('div');
+      entry.style.cssText='margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #552';
+      entry.innerHTML='<div style="color:#ff5a5a;font-weight:bold">⚠ '+time+' '+title+'</div><div style="color:#ffcc99;margin-top:3px">'+detail+'</div>';
+      box.insertBefore(entry, box.firstChild);
+      // 閉じるボタン
+      if(!document.getElementById('__errclose')){
+        var btn=document.createElement('button');
+        btn.id='__errclose';btn.textContent='✕ エラーログを閉じる';
+        btn.style.cssText='position:fixed;right:8px;bottom:calc(45vh + 4px);z-index:100000;background:#ff3a3a;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:bold';
+        btn.onclick=function(){var b=document.getElementById('__errbox');if(b)b.remove();this.remove();};
+        document.body.appendChild(btn);
+      }
+    }catch(e){
+      // フォールバック：alert
+      alert('エラー: '+title+'\n'+detail);
+    }
+  }
+  window.addEventListener('error', function(ev){
+    var msg=ev.message||'(no message)';
+    var src=(ev.filename||'').split('/').pop()||'?';
+    var line=ev.lineno||'?';var col=ev.colno||'?';
+    var stack=ev.error&&ev.error.stack?String(ev.error.stack).split('\n').slice(0,4).join('\n'):'(スタックなし)';
+    showErr(msg, '場所: '+src+' '+line+':'+col+'\n'+stack);
+  });
+  window.addEventListener('unhandledrejection', function(ev){
+    var reason=ev.reason;
+    var msg=(reason&&reason.message)?reason.message:String(reason);
+    var stack=(reason&&reason.stack)?String(reason.stack).split('\n').slice(0,4).join('\n'):'';
+    showErr('Promise reject: '+msg, stack);
+  });
+  window.__showErr=showErr; // 手動でも呼べる
+})();
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-ZETCCQQ8M3');</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -46,7 +91,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 /* TITLE */
 #screen-title{align-items:center;justify-content:center;text-align:center;padding:30px 20px;position:relative}
 .title-bg{position:absolute;inset:0;background:#0a0a14;display:flex;align-items:center;justify-content:center;color:#444;font-size:11px;z-index:0}
-.title-content{position:relative;z-index:1}
+.title-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
 .title-logo{font-size:34px;font-weight:800;letter-spacing:-1px;margin-bottom:6px;color:var(--accent);animation:glow 3s infinite}
 .title-sub{font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:40px}
 .title-btn{display:block;width:220px;padding:14px;margin:8px auto;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
@@ -328,7 +373,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 @keyframes tfxLogoShine{0%{background-position:0% center}100%{background-position:240% center}}
 .title-btn-pulse{animation:tfxBtnPulse 2s ease-in-out infinite;box-shadow:0 0 0 rgba(200,240,96,0.6)}
 @keyframes tfxBtnPulse{0%,100%{box-shadow:0 0 4px rgba(200,240,96,0.4);transform:scale(1)}50%{box-shadow:0 0 18px rgba(200,240,96,0.8);transform:scale(1.03)}}
-.title-badge{display:inline-flex;align-items:center;gap:5px;margin:0 auto 18px;padding:6px 14px;border-radius:20px;background:rgba(60,30,80,0.7);border:1.5px solid #ff6bca;cursor:pointer;animation:tfxBadge 1.6s ease-in-out infinite;position:relative}
+.title-badge{display:inline-flex;align-items:center;gap:5px;margin:0 0 18px;padding:6px 14px;border-radius:20px;background:rgba(60,30,80,0.7);border:1.5px solid #ff6bca;cursor:pointer;animation:tfxBadge 1.6s ease-in-out infinite;position:relative}
 @keyframes tfxBadge{0%,100%{transform:scale(1);box-shadow:0 0 6px rgba(255,107,202,0.5)}50%{transform:scale(1.06);box-shadow:0 0 18px rgba(255,107,202,0.9)}}
 .title-badge-icon{font-size:15px;animation:tfxBell 1.6s ease-in-out infinite}
 @keyframes tfxBell{0%,100%{transform:rotate(0)}10%{transform:rotate(-18deg)}20%{transform:rotate(15deg)}30%{transform:rotate(-10deg)}40%{transform:rotate(6deg)}50%{transform:rotate(0)}}
@@ -626,7 +671,11 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 @keyframes fbUltNum{0%{opacity:0;transform:translateY(20px) scale(.4)}20%{opacity:1;transform:translateY(0) scale(1.2)}40%{transform:translateY(-10px) scale(1)}100%{opacity:0;transform:translateY(-80px) scale(.6)}}
 </style>
 
-</head>
+<style>
+@keyframes s2ModalFade{from{opacity:0}to{opacity:1}}
+@keyframes s2ModalPop{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+</style>
+<style>@keyframes zombiePulse{0%,100%{filter:hue-rotate(80deg) saturate(2) brightness(0.7) drop-shadow(0 0 14px #6a0dad)}50%{filter:hue-rotate(120deg) saturate(2.5) brightness(0.5) drop-shadow(0 0 22px #9a0dad) drop-shadow(0 0 12px #ff0040)}}</style></head>
 <body>
 <div class="game">
 
@@ -650,7 +699,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     <div id="hidden-boss-slot"></div>
     <button class="title-btn link" onclick="backToShiftMemo()">← ShiftMemoに戻る</button>
   </div>
-  <div class="title-foot" id="title-foot">v2.10.0 — シネマティックUI・画像組込</div>
+  <div class="title-foot" id="title-foot">v2.13.2 — 7話バトルキー修正（歪みの番人）・巨人の王の絵文字変更</div>
 </div>
 
 <!-- ===== ADVENTURE (会話ラリー) ===== -->
@@ -830,6 +879,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
       <button class="cmd-btn ult" id="ult-btn" onclick="cmdUltimate()">✨ 神ジョーク</button>
     </div>
     <div style="font-size:9px;color:var(--muted);text-align:center;margin-top:5px">敵/味方を長押しで詳細・パッシブ確認</div>
+    <button onclick="debugInstantKill()" style="width:100%;margin-top:8px;padding:9px;border-radius:8px;border:1px dashed #ff5a5a;background:rgba(60,10,10,.6);color:#ff9b9b;font-size:11px;font-weight:700;cursor:pointer">💀 [デバッグ] 一撃必殺（敵1体撃破）</button>
   </div>
 </div>
 
@@ -1226,7 +1276,9 @@ function ownedSkills(){
   // RPGで追加解放した分があれば合流（後方互換）
   const p=rpgLoad();
   let extra=(p&&p.ownedSkills)?p.ownedSkills:[];
-  let all=Array.from(new Set([...INITIAL_SKILLS,...ids,...extra]));
+  // ★デバッグ用：☆10ジョークを2つ初期所持（本番では撤廃予定）
+  const DEBUG_SKILLS=['j130','j150'];
+  let all=Array.from(new Set([...INITIAL_SKILLS,...DEBUG_SKILLS,...ids,...extra]));
   // 星の低い順に並べる
   all.sort((a,b)=>{const sa=getSkill(a),sb=getSkill(b);return (sa?sa.star:0)-(sb?sb.star:0);});
   return all.length?all:INITIAL_SKILLS.slice();
@@ -1244,8 +1296,12 @@ const ROLE_INFO={
   attacker:{icon:'⚔',name:'アタッカー',desc:'敵にレスバでダメージ。☆が高いほど火力UP'},
   healer:{icon:'💚',name:'ヒーラー',desc:'味方のHPを回復。☆が高いほど回復量UP'},
   tank:{icon:'🛡',name:'タンク',desc:'敵の攻撃を引き受け、味方の被ダメを軽減。☆が高いほど防御UP'},
-  buffer:{icon:'⤴',name:'バッファー',desc:'味方の攻撃力UP＋テンション上昇。☆が高いほど効果UP'}
+  buffer:{icon:'⤴',name:'バッファー',desc:'味方の攻撃力UP＋テンション上昇。☆が高いほど効果UP'},
+  debuffer:{icon:'⤵',name:'デバッファー',desc:'敵の能力を下げる。☆が高いほど効果UP'},
+  trickster:{icon:'🎭',name:'トリックスター',desc:'多彩な小技で敵を翻弄。☆が高いほど効果UP'}
 };
+// roleType未定義キャラ用の安全取得
+function roleInfo(rt){return ROLE_INFO[rt]||ROLE_INFO.attacker;}
 
 // ステータス計算：ShiftMemoレベル基準
 function calcStats(charId){
@@ -1255,6 +1311,10 @@ function calcStats(charId){
   const baseDef=5+Math.floor(lv*1.2);
   const baseSpd=8+Math.floor(lv*0.8);
   const def=PARTY_DEF.find(c=>c.id===charId);
+  if(!def){
+    // PARTY_DEFにいないキャラ（ガチャ等）：標準ステータスを返す
+    return {hp:baseHP,maxhp:baseHP,atk:baseAtk,def:baseDef,spd:baseSpd,sup:10,roleType:'attacker'};
+  }
   const rt=def.roleType;
   const pe=(typeof getActivePassiveEffects==='function')?getActivePassiveEffects(charId):{};
   const applyP=(s)=>{
@@ -1315,18 +1375,22 @@ function hasStar10(charId,exceptSlot){
 // ============ スキル効果計算（ロール別・☆で強化） ============
 // 戻り値: {type:'damage'|'heal'|'buff'|'taunt', amount, scope:'single'|'all', desc}
 function skillEffect(charId,skill){
-  const rt=PARTY_DEF.find(c=>c.id===charId).roleType;
+  var pdef=PARTY_DEF.find(c=>c.id===charId);
+  // PARTY_DEFにいない場合（ガチャキャラ等）はG.partyから、それもなければattacker
+  var rt='attacker';
+  if(pdef){rt=pdef.roleType;}
+  else if(typeof G!=='undefined'&&G.party){var gc=G.party.find(c=>c.id===charId);if(gc&&gc.roleType)rt=gc.roleType;}
   const star=skill.star;
   const st=calcStats(charId);
   // 全体化: ☆7以上は全体対象
   const scope=star>=7?'all':'single';
   if(rt==='attacker'){
     let amt=st.atk+skill.pow;
-    return {type:'damage',amount:amt,scope:scope,desc:(scope==='all'?'敵全体':'敵単体')+'に'+amt+'前後のダメージ'};
+    return {type:'damage',amount:amt,scope:scope,desc:(scope==='all'?'敵全体':'敵単体')+'に'+fmtNum(amt)+'前後のダメージ'};
   }
   if(rt==='healer'){
     const amt=Math.round(st.maxhp*(0.25+star*0.05)); // ☆で回復量UP
-    return {type:'heal',amount:amt,scope:star>=5?'all':'single',desc:(star>=5?'味方全体':'味方1人')+'のHPを'+amt+'回復'};
+    return {type:'heal',amount:amt,scope:star>=5?'all':'single',desc:(star>=5?'味方全体':'味方1人')+'のHPを'+fmtNum(amt)+'回復'};
   }
   if(rt==='tank'){
     const reduce=Math.min(60,20+star*4); // ☆で軽減率UP
@@ -1374,6 +1438,49 @@ const ENEMIES=[
   {id:10,name:'ウォッチャー',title2:'マルチバースの観測者',emoji:'🕳️',hp:675,atk:30,def:18,spd:13,weak:'meta',bg:'cosmos',bubble:'rainbow',cutin:'b10',talk:22,ult:'万象観測',ultEmoji:'👁️',ultFx:'cosmic',boss:true,
     profile:[['正体','宇宙的存在'],['目的','つまらぬ世界の消去'],['ひとこと','「面白さを、観測する」']]}
 ];
+window.ENEMIES=ENEMIES;
+
+// ============ Season2 ボス定義（s2_chap指定） ============
+const ENEMIES_S2={
+  1:{id:'s2_1',name:'鬼大家',title2:'伝説の鬼の末裔',emoji:'👹',hp:240,atk:18,def:10,spd:8,weak:'jigyaku',bg:'town',bubble:'anger',cutin:'s2_1',talk:22,ult:'滞納者死刑執行',ultEmoji:'📜',ultFx:'slam',boss:true,
+    profile:[['好きなもの','家賃の振込通知'],['嫌いなもの','言い訳'],['ひとこと','「来月まで」は3回まで']]},
+  2:{id:'s2_2',name:'侵食されていく親友 カエル',title2:'微ゾンビ化',emoji:'🐸',hp:280,atk:20,def:12,spd:11,weak:'meta',bg:'town',bubble:'star',cutin:'s2_2',talk:18,ult:'優しい心の雨',ultEmoji:'🌧️',ultFx:'wave',boss:true,isSolo:true,
+    profile:[['好きなもの','親友','過去の通訳'],['嫌いなもの','自分の身体の異常'],['ひとこと','「ごめん…止まらない…」']],
+    forms:[
+      {name:'腐りかけの友',emoji:'🐸',col:'#5dca8a',hpThreshold:1.0,img:null},
+      {name:'冷たくなった親友',emoji:'💀',col:'#888',hpThreshold:0.5,atkBoost:1.4,specialFx:'zombie',ult:'冷たい爪',ultEmoji:'🩶'}
+    ]},
+  '2b':{id:'s2_2b',name:'冷たくなった親友',title2:'完全ゾンビ化',emoji:'🐸',hp:340,atk:25,def:14,spd:13,weak:'meta',bg:'forest',bubble:'hex',cutin:'s2_2b',talk:14,ult:'死と絶望の雨',ultEmoji:'🌧️',ultFx:'cosmic',boss:true,isSolo:true,zombieFx:true,
+    profile:[['正体','闇堕ちした親友'],['特徴','記憶も声も失った'],['ひとこと','「…………」']]},
+  3:{id:'s2_3',name:'巨大チワワ',title2:'寿司爺の遺した魂の犬',emoji:'🐶',hp:320,atk:22,def:14,spd:13,weak:'jigyaku',bg:'sns',bubble:'rotate',cutin:'s2_3',talk:14,ult:'寿司の怨念',ultEmoji:'🍣',ultFx:'multi',boss:true,img:'boss_chihuahua.png',
+    profile:[['好きなもの','寿司'],['嫌いなもの','回らない寿司屋'],['ひとこと','ワン！（じいちゃんのため）']]},
+  4:{id:'s2_4',name:'巨人の王',title2:'あうーの王国の支配者',emoji:'🧌',hp:380,atk:25,def:16,spd:9,weak:'hiniku',bg:'town',bubble:'hex',cutin:'s2_4',talk:14,ult:'王の怒号',ultEmoji:'⚡',ultFx:'wave',boss:true,img:'boss_king_giant.jpg',
+    profile:[['好きなもの','静寂'],['嫌いなもの','UFO'],['ひとこと','「あうー、と言うな！」']]},
+  5:{id:'s2_5',name:'暴走実験体',title2:'米の中の宇宙より',emoji:'🧪',hp:450,atk:28,def:18,spd:15,weak:'meta',bg:'lab',bubble:'glitch',cutin:'s2_5',talk:14,ult:'実験開始',ultEmoji:'💉',ultFx:'glitch',boss:true,
+    profile:[['好きなもの','実験データ'],['嫌いなもの','倫理'],['ひとこと','「素晴らしい異常値だ」']]},
+  6:{id:'s2_6',name:'風呂将軍ふろしき',title2:'宇宙船泥棒',emoji:'🛁',hp:520,atk:31,def:20,spd:12,weak:'jigyaku',bg:'desert',bubble:'flame',cutin:'s2_6',talk:14,ult:'湯気の刃',ultEmoji:'💨',ultFx:'flame',boss:true,
+    profile:[['好きなもの','風呂'],['嫌いなもの','寒さ'],['ひとこと','「湯けむり一閃」']],
+    forms:[
+      {name:'風呂将軍ふろしき',emoji:'🛁',col:'#5d9eff',hpThreshold:1.0},
+      {name:'フンドシ将軍ふろしき',emoji:'🩲',col:'#ff8b3b',hpThreshold:0.5,atkBoost:1.5,specialFx:'transform',ult:'裸の刃',ultEmoji:'⚔'}
+    ]},
+  7:{id:'s2_7',name:'歪みの番人',title2:'空間を歪ませる守護者',emoji:'🌀',hp:600,atk:35,def:22,spd:18,weak:'meta',bg:'cosmos',bubble:'star',cutin:'s2_7',talk:14,ult:'次元断裂',ultEmoji:'🌀',ultFx:'wave',boss:true,isSolo:true,
+    profile:[['正体','開発者本人'],['特徴','ステ・装備・パッシブ完全同一'],['ひとこと','「俺の弱点は、俺が知ってる」']]},
+  8:{id:'s2_8',name:'神',title2:'言葉の神格',emoji:'✨',hp:750,atk:40,def:25,spd:20,weak:'meta',bg:'cosmos',bubble:'rainbow',cutin:'s2_8',talk:14,ult:'万象解釈',ultEmoji:'🌟',ultFx:'cosmic',boss:true,isSolo:true,
+    profile:[['正体','神'],['目的','言葉の試練'],['ひとこと','「面白い…」']]},
+  9:{id:'s2_9',name:'核の主',title2:'田村くん・人型',emoji:'🕴️',hp:9999999,atk:9999,def:9999,spd:99,weak:'meta',bg:'cosmos',bubble:'hex',cutin:'s2_9',talk:14,ult:'原初の鼓動',ultEmoji:'💢',ultFx:'cosmic',boss:true,isSolo:true,forcedLose:true,
+    profile:[['正体','田村くんの本体'],['特性','倍率99倍'],['ひとこと','『これは、敗北のための戦い』']]},
+  10:{id:'s2_10',name:'田村くん・地球',title2:'地球第1形態',emoji:'🌍',hp:880,atk:42,def:28,spd:14,weak:'meta',bg:'final',bubble:'rainbow',cutin:'s2_10',talk:14,ult:'万有引力',ultEmoji:'🌌',ultFx:'cosmic',boss:true,isSolo:true,bgImg:'finalbattle_bg.jpg',img:'boss_tamura_earth.jpg',
+    profile:[['形態','地球第1形態'],['属性','重力・引力'],['ひとこと','『…始まりだ』']]},
+  // 10-2: 怪物第2形態（10話バトル2回目）
+  '10b':{id:'s2_10b',name:'田村くん・怪物',title2:'怪物第2形態',emoji:'👁️',hp:1100,atk:50,def:32,spd:18,weak:'meta',bg:'final',bubble:'glitch',cutin:'s2_10b',talk:14,ult:'万眼凝視',ultEmoji:'👁',ultFx:'cosmic',boss:true,isSolo:true,bgImg:'finalbattle_bg.jpg',
+    profile:[['形態','怪物第2形態'],['属性','凝視・侵食'],['ひとこと','『…見ろ、世界の真実を』']]},
+  // 10-3: ピエンターズ第3形態
+  '10c':{id:'s2_10c',name:'ピエンターズ滲出',title2:'第3形態・滲み出る恐怖',emoji:'🕳️',hp:1400,atk:60,def:36,spd:22,weak:'meta',bg:'final',bubble:'rainbow',cutin:'s2_10c',talk:14,ult:'存在抹消',ultEmoji:'🕳',ultFx:'cosmic',boss:true,isSolo:true,bgImg:'finalbattle_bg.jpg',
+    profile:[['形態','ピエンターズ滲出'],['属性','虚無'],['ひとこと','『…ぴえん』']]}
+};
+window.ENEMIES_S2=ENEMIES_S2;
+
 
 // 雑魚敵プール（通常戦でボスの周りに出る。ロール持ち）
 // roleType: zako_atk(攻撃) / zako_heal(回復) / zako_def(盾)
@@ -3028,12 +3135,22 @@ function isBossStoryUnlocked(){const p=rpgLoad()||{};return !!p.gameCleared;}
 
 // ============ サイドストーリー画面 ============
 let SS={cat:'ally',char:'dev',bossId:1};
-function openSideStory(){SS.cat='ally';SS.char='dev';renderSideStory();showScreen('sidestory');}
+function openSideStory(){SS.cat='ally';SS.char='dev';window._ssSeason=window._ssSeason||1;renderSideStory();showScreen('sidestory');if(typeof maybeShowTutorial==='function')maybeShowTutorial('sidestory');}
+function ssSwitchSeason(s){window._ssSeason=s;renderSideStory();if(typeof sfx==='function')sfx('select');}
 function ssSetCat(c){SS.cat=c;if(c==='boss')SS.bossId=1;else SS.char='dev';renderSideStory();sfx&&sfx('select');}
 function ssSetChar(id){SS.char=id;renderSideStory();sfx&&sfx('select');}
 function ssSetBoss(id){SS.bossId=id;renderSideStory();sfx&&sfx('select');}
 
 function renderSideStory(){
+  const season=window._ssSeason||1;
+  const seasonTabs=`<div style="display:flex;gap:6px;margin-bottom:8px">
+    <div onclick="ssSwitchSeason(1)" style="flex:1;text-align:center;padding:7px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;${season===1?'background:#1a2030;border:1px solid #5d9eff;color:#5d9eff':'background:#15161a;border:1px solid #333;color:#888'}">SEASON 1</div>
+    <div onclick="ssSwitchSeason(2)" style="flex:1;text-align:center;padding:7px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;${season===2?'background:#2a1a20;border:1px solid #ff8b8b;color:#ff8b8b':'background:#15161a;border:1px solid #333;color:#888'}">SEASON 2 🔒</div>
+  </div>`;
+  if(season===2){
+    document.getElementById('sidestory-content').innerHTML=seasonTabs+'<div style="background:#15151f;border:1px dashed #555;border-radius:12px;padding:30px 20px;text-align:center;margin-top:20px"><div style="font-size:54px;margin-bottom:14px;opacity:.5">🔒</div><div style="font-size:13px;color:#ff8b8b;font-weight:900;letter-spacing:2px;margin-bottom:8px">SEASON 2 サイドストーリー</div><div style="font-size:11px;color:#cde;line-height:1.8">次回アップデートで公開予定。<br>Season2 のキャラ・ボスの物語が<br>収録される予定です。</div><div style="font-size:9px;color:#888;margin-top:14px">Coming in next update...</div></div>';
+    return;
+  }
   const bossUnlocked=isBossStoryUnlocked();
   // カテゴリタブ
   const catTabs=`<div style="display:flex;gap:6px;margin-bottom:10px">
@@ -3058,19 +3175,19 @@ function renderSideStory(){
     const list=stories.map((s,i)=>`<div onclick="playStory('boss',${SS.bossId},${i})" style="display:flex;align-items:center;gap:8px;background:#12121c;border:1px solid #2a2a2a;border-radius:8px;padding:8px 10px;margin-bottom:5px;cursor:pointer"><div style="font-size:18px">📖</div><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#fff">${s.title}</div><div style="font-size:8px;color:#888">${s.sub}</div></div><div style="font-size:9px;color:#ff6b6b">読む ▶</div></div>`).join('');
     body=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:10px">${bossList}</div>`+header+list;
   }
-  document.getElementById('sidestory-content').innerHTML=catTabs+body;
+  document.getElementById('sidestory-content').innerHTML=seasonTabs+catTabs+body;
 }
 
 // ============ ストーリー再生（会話ラリー） ============
-let STORY={lines:[],idx:0};
+let SIDE_STORY={lines:[],idx:0};
 function playStory(cat,id,epIdx){
   const arr=(cat==='ally')?SIDE_STORIES[id][epIdx].lines:BOSS_STORIES[id][epIdx].lines;
-  STORY={lines:arr.slice(),idx:0,returnScreen:'sidestory'};
+  SIDE_STORY={lines:arr.slice(),idx:0,returnScreen:'sidestory'};
   showScreen('storyplay');
   renderStoryLine();
 }
 function renderStoryLine(){
-  const L=STORY.lines[STORY.idx];if(!L){ssFinish();return;}
+  const L=SIDE_STORY.lines[SIDE_STORY.idx];if(!L){ssFinish();return;}
   const field=document.getElementById('storyplay-field');
   const sepia=L.sepia;
   if(field)field.className='story-field'+(sepia?' sepia':'');
@@ -3092,8 +3209,8 @@ function storyNext(){
   // タイプ中なら全部出す
   const textEl=document.getElementById('story-text');
   if(textEl&&textEl._typing){finishTypeWriter(textEl);return;}
-  STORY.idx++;
-  if(STORY.idx>=STORY.lines.length){ssFinish();return;}
+  SIDE_STORY.idx++;
+  if(SIDE_STORY.idx>=SIDE_STORY.lines.length){ssFinish();return;}
   renderStoryLine();
 }
 function ssFinish(){showScreen('sidestory');renderSideStory();}
@@ -3118,11 +3235,23 @@ const WATCHER_FORMS=[
   {emoji:'🌌',name:'真・観測者',sub:'第二形態：宇宙の眼',desc:'「面白い」と認めた者にのみ見せる真の姿。無数の宇宙を同時に見つめる眼となり、観測対象すべての可能性を演算する。全能力が飛躍的に上昇する。',weak:'—',ult:'次元断裂',color:'#9d6bff'},
   {emoji:'✨',name:'究極観測者',sub:'最終形態：万象の終焉',desc:'マルチバースそのものと一体化した最終形態。もはや個ではなく現象。あらゆる「面白さ」を超えようとする者だけが辿り着ける、宇宙の真理との対話。',weak:'—',ult:'終焉の光',color:'#FFD700'}
 ];
-function openCodex(){renderCodex();showScreen('codex');}
+function openCodex(){window._codexSeason=window._codexSeason||1;renderCodex();showScreen('codex');if(typeof maybeShowTutorial==='function')maybeShowTutorial('codex');}
+function codexSwitchSeason(s){window._codexSeason=s;renderCodex();if(typeof sfx==='function')sfx('select');}
 function renderCodex(){
+  const season=window._codexSeason||1;
+  const tabs=`<div style="display:flex;gap:6px;margin-bottom:10px">
+    <div onclick="codexSwitchSeason(1)" style="flex:1;text-align:center;padding:7px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;${season===1?'background:#1a2030;border:1px solid #5d9eff;color:#5d9eff':'background:#15161a;border:1px solid #333;color:#888'}">SEASON 1</div>
+    <div onclick="codexSwitchSeason(2)" style="flex:1;text-align:center;padding:7px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;${season===2?'background:#2a1a20;border:1px solid #ff8b8b;color:#ff8b8b':'background:#15161a;border:1px solid #333;color:#888'}">SEASON 2 🔒</div>
+  </div>`;
+  if(season===2){
+    // Season2はロック画面
+    document.getElementById('codex-content').innerHTML=tabs+'<div style="background:#15151f;border:1px dashed #555;border-radius:12px;padding:30px 20px;text-align:center;margin-top:20px"><div style="font-size:54px;margin-bottom:14px;opacity:.5">🔒</div><div style="font-size:13px;color:#ff8b8b;font-weight:900;letter-spacing:2px;margin-bottom:8px">SEASON 2 観測記録</div><div style="font-size:11px;color:#cde;line-height:1.8">次回アップデートで公開予定。<br>Season2 の敵情報・形態変化・パッシブを<br>収録した完全図鑑が解放されます。</div><div style="font-size:9px;color:#888;margin-top:14px">Coming in next update...</div></div>';
+    return;
+  }
+  // Season1の既存処理
   const p=rpgLoad()||{};const defeated=(p.defeated)||[];
   const total=ENEMIES.length;
-  let cards='';
+  let cards=tabs;
   ENEMIES.forEach(e=>{
     const beaten=defeated.includes(e.id);
     const isWatcher=(e.id===10);
@@ -3146,7 +3275,7 @@ function renderCodex(){
   if(p.theDevCleared){
     cards+=`<div style="background:radial-gradient(ellipse at 50% 30%,#1a0a2a,#12121c);border:1px solid #cb8aff;border-radius:10px;padding:11px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:9px;margin-bottom:6px"><div style="font-size:34px">🐉</div><div><div style="font-size:8px;color:#cb8aff">ゲームの管理者</div><div style="font-size:13px;font-weight:800;color:#cb8aff">THE 開発者</div></div></div><div style="font-size:9px;color:#aaa;line-height:1.55">この世界（ゲーム）を創った開発者そのもの。全知全能の管理者権限を持ち、ソースコードを書き換えて干渉する。現実からゲーム内に降臨した、最強の隠しボス。</div></div>`;
   }
-  document.getElementById('codex-content').innerHTML=`<div style="font-size:10px;color:#888;text-align:center;margin-bottom:10px">観測：${defeated.length} / ${total}${p.theDevCleared?' ＋隠しボス':''}</div>`+cards;
+  document.getElementById('codex-content').innerHTML=tabs+`<div style="font-size:10px;color:#888;text-align:center;margin-bottom:10px">観測：${defeated.length} / ${total}${p.theDevCleared?' ＋隠しボス':''}</div>`+cards;
 }
 function openCodexFromTitle(){openCodex();}
 </script>
@@ -3575,10 +3704,17 @@ function recordUraClear(id){
 <script>
 // ============ STATE ============
 let G={enemyIdx:0,party:[],enemy:null,tension:0,turnIdx:0,defending:{},battleOver:false};
+window.G=G;
 let ADV={lines:[],idx:0,afterFn:null};
 const SHIFTMEMO_URL='https://mexastarted.github.io/sihuto/';
 
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');if(id==='title'&&typeof renderHiddenBossSlot==='function')renderHiddenBossSlot();if(id==='title'&&typeof mvUpdateUnlocks==='function')mvUpdateUnlocks();}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');if(id==='title'&&typeof renderHiddenBossSlot==='function')renderHiddenBossSlot();if(id==='title'&&typeof mvUpdateUnlocks==='function')mvUpdateUnlocks();
+  // 各画面の初回チュートリアル
+  if(typeof maybeShowTutorial==='function'){
+    if(id==='title')maybeShowTutorial('title');
+    // バトルチュートリアルはbossUltimate（開幕必殺）終了後に発火（startBattle側で処理）
+  }
+}
 // 進行度に応じて新システムの解放を反映（2話クリアで編成／5話クリアで召喚）
 function mvGetCleared(){try{return parseInt(localStorage.getItem('rpg_cleared_chapters')||'0',10)||0;}catch(e){return 0;}}
 function mvUpdateUnlocks(){
@@ -3694,7 +3830,7 @@ function init(){
   if(typeof mvUpdateUnlocks==='function')mvUpdateUnlocks();
 }
 // タイトル演出：星・コード・流れ星・お知らせバッジ
-const RPG_VERSION='2.10.0';
+const RPG_VERSION='2.13.2';
 function initTitleFx(){
   // 星
   const stars=document.getElementById('tfx-stars');
@@ -3867,7 +4003,87 @@ function startBattle(){
   sfx('select');
   const e=ENEMIES[G.enemyIdx];
   const isBoss=!!e.boss;
-  G.party=PARTY_DEF.map(def=>{const st=calcStats(def.id);return {...def,...st,emoji:(typeof getCharEmoji==='function'?getCharEmoji(def.id):def.emoji),alive:true,buffAtk:0,guardReduce:0,stealBonus:0,statuses:[],_guarded:false,_dmgTaken:0,awakened:false};});
+  // Season2モード：MVの編成（ガチャ含む）からG.party構成
+  if(G._s2mode){
+    var mvPartyIds=[];
+    var mvStoryState={};
+    try{
+      var raw=localStorage.getItem('mv_data'); // 正しいキー
+      if(raw){
+        var s=JSON.parse(raw);
+        if(s){
+          if(s.partyIds && Array.isArray(s.partyIds))mvPartyIds=s.partyIds;
+          if(s.storyState)mvStoryState=s.storyState;
+        }
+      }
+    }catch(err){console.warn('MV data load fail:',err);}
+    // partyIds: ['s:dev','g:xxx',null,...] 形式。s=物語キャラ, g=ガチャ
+    var builtParty=[];
+    mvPartyIds.forEach(function(pid){
+      if(!pid)return;
+      var isGacha=pid.indexOf('g:')===0;
+      var realId=pid.substring(2);
+      if(!isGacha){
+        // 物語キャラ：PARTY_DEFから。フォルム(cur)も反映
+        var def=PARTY_DEF.find(function(p){return p.id===realId;});
+        if(def){
+          var st=calcStats(def.id);
+          var charObj=Object.assign({},def,st,{
+            emoji:(typeof getCharEmoji==='function'?getCharEmoji(def.id):def.emoji),
+            alive:true,buffAtk:0,guardReduce:0,stealBonus:0,statuses:[],_guarded:false,_dmgTaken:0,awakened:false
+          });
+          // フォルム状態を反映（覚醒など）
+          if(mvStoryState[realId] && typeof mvStoryState[realId].cur==='number'){
+            charObj._formIdx=mvStoryState[realId].cur;
+          }
+          builtParty.push(charObj);
+        }
+      }else{
+        // ガチャキャラ：簡易ステータス
+        var hp=Math.round(80+Math.random()*40);
+        builtParty.push({
+          id:realId, name:'英雄'+realId.substring(0,4), emoji:'⭐',
+          color:'#c8a0ff', roleType:'attacker',
+          hp:hp, maxhp:hp, atk:Math.round(15+Math.random()*10), def:Math.round(8+Math.random()*5), spd:Math.round(8+Math.random()*7),
+          alive:true,buffAtk:0,guardReduce:0,stealBonus:0,statuses:[],_guarded:false,_dmgTaken:0,awakened:false,
+          isGacha:true
+        });
+      }
+    });
+    if(builtParty.length>0){
+      G.party=builtParty;
+      // 4人未満なら PARTY_DEF から補充
+      var fillIdx=0;
+      while(G.party.length<4 && fillIdx<PARTY_DEF.length){
+        var pdf=PARTY_DEF[fillIdx];fillIdx++;
+        if(G.party.find(function(p){return p.id===pdf.id;}))continue;
+        var st2=calcStats(pdf.id);
+        G.party.push(Object.assign({},pdf,st2,{
+          emoji:(typeof getCharEmoji==='function'?getCharEmoji(pdf.id):pdf.emoji),
+          alive:true,buffAtk:0,guardReduce:0,stealBonus:0,statuses:[],_guarded:false,_dmgTaken:0,awakened:false
+        }));
+      }
+    }else{
+      // フォールバック：物語キャラ固定
+      G.party=PARTY_DEF.map(def=>{const st=calcStats(def.id);return {...def,...st,emoji:(typeof getCharEmoji==='function'?getCharEmoji(def.id):def.emoji),alive:true,buffAtk:0,guardReduce:0,stealBonus:0,statuses:[],_guarded:false,_dmgTaken:0,awakened:false};});
+    }
+    // ★カエル戦（2話）：かえるは敵なので、開発者・ねこ・UFOの3人を強制編成（1vs3）
+    if(G._s2chap===2){
+      var forcedIds=['dev','cat','ufo'];
+      G.party=forcedIds.map(function(fid){
+        var def=PARTY_DEF.find(function(p){return p.id===fid;});
+        if(!def)return null;
+        var st=calcStats(def.id);
+        return Object.assign({},def,st,{
+          emoji:(typeof getCharEmoji==='function'?getCharEmoji(def.id):def.emoji),
+          alive:true,buffAtk:0,guardReduce:0,stealBonus:0,statuses:[],_guarded:false,_dmgTaken:0,awakened:false
+        });
+      }).filter(Boolean);
+    }
+  }else{
+    // Season1モード：従来通り
+    G.party=PARTY_DEF.map(def=>{const st=calcStats(def.id);return {...def,...st,emoji:(typeof getCharEmoji==='function'?getCharEmoji(def.id):def.emoji),alive:true,buffAtk:0,guardReduce:0,stealBonus:0,statuses:[],_guarded:false,_dmgTaken:0,awakened:false};});
+  }
   if(isBoss){
     const bhp=Math.round(e.hp*1.6*5);
     G.enemies=[{...e,curhp:bhp,maxhp:bhp,alive:true,isBoss:true,bars:5,form:1,statuses:[],stealBonus:0,actions:4}];
@@ -3905,9 +4121,23 @@ function startBattle(){
   const opener=G.enemies.find(x=>x.isBoss&&x.cutin);
   if(opener&&typeof playBossCutin==='function'){
     G._openingUlt=true;
-    setTimeout(()=>{bossUltimate(opener,()=>{G._openingUlt=false;buildQueue();nextInQueue();});},600);
+    setTimeout(()=>{bossUltimate(opener,()=>{G._openingUlt=false;
+      // 開幕必殺終了後にバトルチュートリアル発火（初回のみ）→閉じてからターン開始
+      var proceed=function(){buildQueue();nextInQueue();};
+      if(typeof maybeShowTutorial==='function'){
+        setTimeout(function(){maybeShowTutorial('battle', proceed);},400);
+      }else{
+        proceed();
+      }
+    });},600);
   }else{
-    buildQueue();nextInQueue();
+    // 開幕必殺なし → チュートリアル→ターン開始
+    var proceed=function(){buildQueue();nextInQueue();};
+    if(typeof maybeShowTutorial==='function'){
+      setTimeout(function(){maybeShowTutorial('battle', proceed);},400);
+    }else{
+      proceed();
+    }
   }
 }
 
@@ -4003,14 +4233,14 @@ function renderBattle(){
     const roleIcon=e.roleType==='zako_heal'?'💚':e.roleType==='zako_def'?'🛡':'';
     return `<div class="enemy-unit ${big?'boss':''} ${td?'thedev':''}" id="enemy-unit-${i}" data-ei="${i}" onclick="onEnemyTap(${i})" oncontextmenu="return showUnitDetail(event,'enemy',${i})" ontouchstart="lpStart('enemy',${i})" ontouchend="lpEnd()" ontouchmove="lpCancel()">
       ${td?'<div class="td-aura"></div><div class="td-ring"></div>':''}
-      <div class="enemy-em" style="font-size:${e._bigBoss?'110':td?'108':big?'96':'26'}px;position:relative;z-index:2">${e.emoji}</div>
+      <div class="enemy-em" style="font-size:${e._bigBoss?'110':td?'108':big?'96':'26'}px;position:relative;z-index:2${e.zombieFx?';filter:hue-rotate(80deg) saturate(2) brightness(0.7) drop-shadow(0 0 14px #6a0dad) drop-shadow(0 0 8px #2a0a0a);animation:zombiePulse 1.4s ease-in-out infinite':''}">${e.emoji}</div>
       <div class="enemy-unit-name" style="font-size:${big?'9':'7'}px;color:${big?'#ff3b3b':'#ff8c8c'};position:relative;z-index:2">${roleIcon}${e.name}</div>
       <div class="status-icons">${statusIconsHtml(e)}</div>
       ${hpbars}
     </div>`;
   }).join('');
   document.getElementById('party-zone').innerHTML=G.party.map((c,i)=>{
-    const ri=ROLE_INFO[c.roleType];
+    const ri=roleInfo(c.roleType);
     return `<div class="char ${i%2===0?'bobbing':'bobbing2'} ${c.alive?'':'dead'} ${c.awakened?'awakened':''}" id="char-${c.id}" onclick="onAllyTap('${c.id}')" oncontextmenu="return showUnitDetail(event,'ally','${c.id}')" ontouchstart="lpStart('ally','${c.id}')" ontouchend="lpEnd()" ontouchmove="lpCancel()">
       ${c.awakened?'<div class="aura-ring"></div>':''}
       <div class="char-sprite" style="border:none;background:transparent;font-size:30px">${c.emoji}</div>
@@ -4019,7 +4249,7 @@ function renderBattle(){
   }).join('');
   document.getElementById('party-hp-grid').innerHTML=G.party.map(c=>`
     <div class="php">
-      <div class="php-top"><span class="php-name" style="color:${c.color}">${ROLE_INFO[c.roleType].icon}${c.name} ${statusIconsHtml(c)}</span><span class="php-val">${typeof fmtNum==="function"?fmtNum(Math.max(0,c.hp))+'/'+fmtNum(c.maxhp):Math.max(0,c.hp)+'/'+c.maxhp}</span></div>
+      <div class="php-top"><span class="php-name" style="color:${c.color}">${roleInfo(c.roleType).icon}${c.name} ${statusIconsHtml(c)}</span><span class="php-val">${typeof fmtNum==="function"?fmtNum(Math.max(0,c.hp))+'/'+fmtNum(c.maxhp):Math.max(0,c.hp)+'/'+c.maxhp}</span></div>
       <div class="php-track"><div class="php-fill" style="width:${Math.max(0,c.hp/c.maxhp*100)}%;background:${c.color}"></div></div>
     </div>`).join('');
   document.getElementById('tension-fill').style.width=G.tension+'%';
@@ -4040,10 +4270,12 @@ function setMsg(speaker,text,color){const m=document.getElementById('battle-msg'
 // ============ プレイヤーターン ============
 function startPlayerTurn(c){
   if(G.battleOver)return;
+  // Season2: 守るクールダウンを毎ターンデクリメント
+  if(c._defendCooldown && c._defendCooldown>0){c._defendCooldown--;}
   G._climaxThisTurn=false;
   document.querySelectorAll('.char').forEach(el=>el.classList.remove('active-turn'));
   const el=document.getElementById('char-'+c.id);if(el)el.classList.add('active-turn');
-  const ri=ROLE_INFO[c.roleType];
+  const ri=roleInfo(c.roleType);
   document.getElementById('cmd-label').innerHTML=`<span style="color:${c.color};font-weight:700">${ri.icon}${c.name}</span>（${ri.name}）のターン`;
   // 役割技ボタンのラベルをロールで変える
   const rb=document.getElementById('role-btn');
@@ -4053,6 +4285,40 @@ function startPlayerTurn(c){
 function setCmdEnabled(b){document.querySelectorAll('.cmd-btn').forEach(btn=>{if(btn.id==='ult-btn'){const omni=(typeof canOmnislash==='function'&&canOmnislash()&&currentChar()&&currentChar().id==='dev');btn.disabled=!b||(G.tension<100&&!omni);}else btn.disabled=!b;});}
 function currentChar(){return G.activeChar;}
 function afterPlayerAction(){G.queuePos++;nextInQueue();}
+
+// ★デバッグ用：一撃必殺（敵1体を倒す。形態変化・bars・勝敗判定は既存ロジックに委ねる）
+function debugInstantKill(){
+  if(G.battleOver){toast('バトルは終了しています');return;}
+  var alive=aliveEnemies();
+  if(!alive.length){toast('敵がいません');return;}
+  // ボスを優先、いなければ先頭
+  var target=alive.find(function(e){return e.isBoss;})||alive[0];
+  var ei=G.enemies.indexOf(target);
+  // ダメージ表示
+  if(typeof showDmgAt==='function')showDmgAt('enemy-unit-'+ei,target.curhp,'crit','一撃必殺!');
+  // HPを0に
+  target.curhp=0;
+  // THE開発者のロールバック対応：それも無視して確実に倒す
+  target._rollback=true;
+  target.alive=false;
+  var elK=document.getElementById('enemy-unit-'+ei);
+  if(elK)elK.classList.add('ko-fade');
+  if(typeof sfx==='function')sfx('ko');
+  setMsg('','💀 [デバッグ] '+(target.name||'敵')+' を一撃で倒した！','#ff5a5a');
+  if(typeof renderBattle==='function')renderBattle();
+  // 勝敗チェック＝既存のnextInQueueに委ねる（形態変化があればそこで発火）
+  setTimeout(function(){
+    // setCmdEnabledを無効化してから次へ
+    if(typeof setCmdEnabled==='function')setCmdEnabled(false);
+    // 残り敵がいなければwinBattle、いれば次のキューへ
+    if(aliveEnemies().length===0){
+      if(typeof winBattle==='function')winBattle();
+    }else{
+      // まだ敵がいる（雑魚や次形態）→プレイヤーの次行動へ
+      if(typeof afterPlayerAction==='function')afterPlayerAction();
+    }
+  },800);
+}
 
 // ============ コマンド ============
 let pendingSkill=null;
@@ -4071,12 +4337,29 @@ function cmdUltimate(){
   document.getElementById('ult-choice-modal').classList.add('show');
 }
 function closeUltChoice(){document.getElementById('ult-choice-modal').classList.remove('show');}
-function cmdDefend(){const c=currentChar();c.guardReduce=50;setMsg(c.name,'は身を守っている（被ダメ50%減）',c.color);sfx('select');setTimeout(afterPlayerAction,700);}
+function cmdDefend(){
+  const c=currentChar();
+  // Season2モード：99%軽減・2ターンクールダウン
+  if(G._s2mode){
+    if(c._defendCooldown && c._defendCooldown>0){
+      toast('守るはクールダウン中（あと'+c._defendCooldown+'ターン）');
+      return;
+    }
+    c.guardReduce=99;
+    c._defendCooldown=2;
+    setMsg(c.name,'は完全防御の構え！（被ダメ99%減・2ターンCD）',c.color);
+  }else{
+    c.guardReduce=50;
+    setMsg(c.name,'は身を守っている（被ダメ50%減）',c.color);
+  }
+  sfx('select');
+  setTimeout(afterPlayerAction,700);
+}
 
 // mode: 'attack'(全員ダメージ) / 'role'(固有役割技) / 'ult'(神ジョーク)
 function openSkillPick(char,mode){
   const equipped=getEquipped(char.id);
-  const ri=ROLE_INFO[char.roleType];
+  const ri=roleInfo(char.roleType);
   const modeLabel=mode==='attack'?'攻撃':mode==='ult'?'神ジョーク':'役割技';
   document.getElementById('joke-pick-name').textContent=char.name+'｜'+modeLabel;
   document.getElementById('joke-pick-list').innerHTML=equipped.map(sid=>{
@@ -4108,7 +4391,7 @@ function resolveEffect(char,skill,mode){
     if(!char.full&&mode==='attack')amt=Math.round(amt*0.5); // 仲間の攻撃は半分
     if(mode==='ult')amt=Math.round(amt*2.2);
     if(star>=10)amt=Math.round(amt*0.8); // ☆10は全体技ぶっぱ抑制のため0.8倍
-    return {type:'damage',amount:amt,scope:scope,desc:(scope==='all'?'敵全体':'敵単体')+'に'+amt+'前後のダメージ'+(mode==='ult'?'（神ジョーク）':'')};
+    return {type:'damage',amount:amt,scope:scope,desc:(scope==='all'?'敵全体':'敵単体')+'に'+(typeof fmtNum==='function'?fmtNum(amt):amt)+'前後のダメージ'+(mode==='ult'?'（神ジョーク）':'')};
   }
   // role: キャラのロール固有技
   return skillEffect(char.id,skill);
@@ -4338,7 +4621,7 @@ function lpCancel(){if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}}
 function showUnitDetail(ev,side,key){if(ev&&ev.preventDefault)ev.preventDefault();openUnitDetail(side,key);return false;}
 function openUnitDetail(side,key){
   let u,desc,passives=[],roleLabel='',weakLabel='';
-  if(side==='ally'){u=G.party.find(c=>c.id===key);desc=CHAR_DESC[u.awakened?'shin':u.id];roleLabel=ROLE_INFO[u.roleType].icon+ROLE_INFO[u.roleType].name;
+  if(side==='ally'){u=G.party.find(c=>c.id===key);desc=CHAR_DESC[u.awakened?'shin':u.id];roleLabel=roleInfo(u.roleType).icon+roleInfo(u.roleType).name;
     const pid=u.awakened?['shin1','shin2','shin3','shin4']:[u.id];pid.forEach(p=>{if(PASSIVES[p])passives.push([PASSIVES[p].icon+' '+PASSIVES[p].name,PASSIVES[p].desc]);});}
   else{u=G.enemies[key];if(!u)return;
     if(u.isTheDev){THE_DEV_PASSIVES.forEach(p=>passives.push(['🐉 '+p[0],p[1]]));desc=THE_DEVELOPER.desc;roleLabel='??? 隠しボス';weakLabel='弱点：なし';}
@@ -4374,6 +4657,14 @@ function closeStatusList(){document.getElementById('status-list-modal').classLis
 // ============ 勝敗 ============
 function winBattle(){
   if(G.battleOver)return;G.battleOver=true;sfx('win');clearTargets();
+  // Season2モード：Season1のリザルト処理をスキップ（フックのafterWinがコールバック処理）
+  if(G._s2mode){
+    if(typeof fxConfetti==='function')fxConfetti();
+    // 勝利フラグを立てて、afterWinに委ねる
+    G._s2mode_winFlag=true;
+    setTimeout(function(){ if(typeof afterWin==='function')afterWin(); },800);
+    return;
+  }
   // 裏の脅威ボスの勝利
   if(G.uraBoss){
     const b=G.uraBoss;G.uraBoss=null;
@@ -5014,7 +5305,20 @@ const CUTIN_DEFS={
   b8:{name:'承認の飢餓地獄',color:'#ff6bca',bg:'radial-gradient(ellipse at 50% 40%,#2a0a22,#0a0008)',se:'bolt'},
   b9:{name:'虚無還元',color:'#9d6bff',bg:'radial-gradient(circle at 50% 50%,#0a0218,#000)',se:'void'},
   b10:{name:'万象観測',color:'#b388ff',bg:'radial-gradient(circle at 50% 50%,#1a0a3a,#000)',se:'cosmic'}
-};
+,
+  s2_1:{name:'滞納者最終通告',color:'#ff8b3b',bg:'radial-gradient(ellipse at 50% 30%,#2a1505,#0a0500)',se:'slam'},
+  s2_2:{name:'優しい心の雨',color:'#5dca8a',bg:'radial-gradient(ellipse at 50% 30%,#0a2518,#040a06)',se:'wave'},
+  s2_2b:{name:'もう還らない慟哭',color:'#888',bg:'radial-gradient(ellipse at 50% 30%,#1a1a1a,#000)',se:'ice'},
+  s2_3:{name:'寿司の怨念',color:'#ff6b9d',bg:'radial-gradient(ellipse at 50% 30%,#2a0a18,#0a0006)',se:'multi'},
+  s2_4:{name:'王の大号令',color:'#FFD700',bg:'radial-gradient(ellipse at 50% 30%,#2a2005,#0a0800)',se:'wave'},
+  s2_5:{name:'禁断の実験',color:'#9dff6b',bg:'radial-gradient(ellipse at 50% 30%,#0a2a0a,#040a04)',se:'glitch'},
+  s2_6:{name:'湯けむり一閃',color:'#5d9eff',bg:'radial-gradient(ellipse at 50% 30%,#0a1a2a,#04060a)',se:'flame'},
+  s2_7:{name:'次元断裂',color:'#c8a0ff',bg:'radial-gradient(ellipse at 50% 30%,#1a0a2a,#06040a)',se:'wave'},
+  s2_8:{name:'万象解釈',color:'#FFD700',bg:'radial-gradient(ellipse at 50% 30%,#1a1a2a,#04040a)',se:'cosmic'},
+  s2_9:{name:'原初の鼓動',color:'#ff3a6b',bg:'radial-gradient(ellipse at 50% 30%,#2a0008,#0a0002)',se:'cosmic'},
+  s2_10:{name:'万有引力',color:'#5d9eff',bg:'radial-gradient(ellipse at 50% 30%,#0a1530,#04060f)',se:'cosmic'},
+  s2_10b:{name:'万眼凝視',color:'#ff6b6b',bg:'radial-gradient(ellipse at 50% 30%,#2a0a0a,#0a0404)',se:'cosmic'},
+  s2_10c:{name:'存在抹消',color:'#fff',bg:'radial-gradient(ellipse at 50% 30%,#1a1a1a,#000)',se:'cosmic'}};
 
 // ボス必殺カットイン（味方が食らう）。done()で戦闘続行
 function playBossCutin(type,enemyName,victims,dmgList,done){
@@ -5299,7 +5603,16 @@ function closeMenu(){document.getElementById('rpg-menu').classList.remove('show'
 function menuAction(act){
   closeMenu();
   if(act==='shiftmemo'){if(getActiveScreen()==='battle'){if(!confirm('バトル中です。中断してShiftMemoに戻りますか？（この戦闘の進行は失われます）'))return;}backToShiftMemo();}
-  else if(act==='title'){if(getActiveScreen()==='battle'){if(!confirm('バトル中です。中断してタイトルに戻りますか？'))return;}stopBgm();playBgm('title');showScreen('title');}
+  else if(act==='title'){if(getActiveScreen()==='battle'){if(!confirm('バトル中です。中断してタイトルに戻りますか？'))return;}
+    // Season2バトル中断時の後始末
+    if(typeof G!=='undefined'&&G._s2mode){
+      G._s2mode=false;G._s2mode_winFlag=false;G.battleOver=true;
+      window.__mvtS2Playing=false;window.__mvtS2Chap=0;window.__s2battleStarting=false;
+      // シネマ画面を消す
+      var mvsRoot=document.getElementById('mvs-root');if(mvsRoot){mvsRoot.classList.remove('on');}
+      var mvtMap=document.getElementById('mvt-map');if(mvtMap){mvtMap.classList.remove('on');}
+    }
+    stopBgm();playBgm('title');showScreen('title');}
   else if(act==='notebook'){if(getActiveScreen()==='battle'){toast('バトル中は技を変更できません');return;}openNotebook();}
   else if(act==='status'){openStatus();}
   else if(act==='log'){openLog();}
@@ -5420,6 +5733,134 @@ function mvUnlockNotice(title,body){
   if(typeof sfx==='function')try{sfx('select');}catch(e){}
 }
 
+// ============ チュートリアルシステム ============
+// 各画面の初回表示・機能解放時にリッチモーダル。一度見たら記録（localStorage）して再表示しない
+window._tutorialShown=null;
+function tutGetShown(){
+  if(window._tutorialShown)return window._tutorialShown;
+  try{
+    var raw=localStorage.getItem('tut_shown');
+    window._tutorialShown=raw?JSON.parse(raw):{};
+  }catch(e){window._tutorialShown={};}
+  return window._tutorialShown;
+}
+function tutMarkShown(key){
+  var s=tutGetShown();s[key]=Date.now();
+  window._tutorialShown=s;
+  try{localStorage.setItem('tut_shown',JSON.stringify(s));}catch(e){}
+}
+function showTutorial(key, config, onClose){
+  // config = {title, subtitle, icon, body[], color, force}
+  // onClose = 「理解した」を押した後のコールバック
+  var shown=tutGetShown();
+  if(shown[key] && !config.force){if(onClose)onClose();return false;}
+  var col=config.color||'#5d9eff';
+  var ov=document.createElement('div');
+  ov.id='tut-modal-'+key;
+  ov.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(3,3,10,.92);display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(8px);animation:s2ModalFade .4s ease-out';
+  var bodyHtml=(config.body||[]).map(function(item){
+    // item={icon, label, desc}
+    return '<div style="display:flex;align-items:flex-start;gap:10px;padding:9px 11px;background:rgba(20,30,55,.4);border-radius:9px;margin-bottom:7px;border-left:3px solid '+col+'">'+
+      '<div style="font-size:24px;flex-shrink:0;filter:drop-shadow(0 0 6px '+col+')">'+(item.icon||'▸')+'</div>'+
+      '<div style="flex:1"><div style="font-size:12px;font-weight:900;color:#fff;margin-bottom:3px">'+(item.label||'')+'</div><div style="font-size:10px;color:#cde;line-height:1.6">'+(item.desc||'')+'</div></div></div>';
+  }).join('');
+  ov.innerHTML='<div style="max-width:380px;width:100%;background:radial-gradient(ellipse at 50% 0%,#1a1a30,#08080f);border:2px solid '+col+';border-radius:18px;padding:22px 18px;position:relative;overflow:hidden;animation:s2ModalPop .5s cubic-bezier(.3,1.4,.5,1);box-shadow:0 0 40px '+col+'66">'+
+    '<div style="position:absolute;left:50%;top:0;transform:translate(-50%,-50%);width:300px;height:300px;border-radius:50%;background:conic-gradient(from 0deg,transparent,'+col+'33,transparent,#fff2,transparent,'+col+'33,transparent);animation:fbUltSpin 12s linear infinite;pointer-events:none"></div>'+
+    '<div style="position:relative;z-index:2">'+
+      '<div style="text-align:center;font-size:48px;margin-bottom:4px;filter:drop-shadow(0 0 14px '+col+')">'+(config.icon||'📖')+'</div>'+
+      '<div style="text-align:center;font-size:10px;color:'+col+';letter-spacing:3px;font-weight:900;margin-bottom:3px">'+(config.subtitle||'TUTORIAL')+'</div>'+
+      '<div style="text-align:center;font-size:16px;font-weight:900;color:#fff;margin-bottom:14px;letter-spacing:1px">'+(config.title||'')+'</div>'+
+      bodyHtml+
+      '<button id="tut-ok-'+key+'" style="width:100%;margin-top:14px;padding:12px;border-radius:10px;border:none;background:linear-gradient(180deg,'+col+',#000);color:#fff;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.5);letter-spacing:2px">▶ 理解した</button>'+
+    '</div></div>';
+  document.body.appendChild(ov);
+  document.getElementById('tut-ok-'+key).onclick=function(){
+    tutMarkShown(key);
+    ov.style.transition='opacity .3s';ov.style.opacity='0';
+    setTimeout(function(){ov.remove();if(onClose)onClose();},300);
+  };
+  if(typeof sfx==='function')try{sfx('select');}catch(e){}
+  return true;
+}
+
+// 各画面の初回チュートリアル定義
+window.TUTORIALS={
+  title:{
+    title:'開発者の現在へようこそ', subtitle:'WELCOME', icon:'🌌', color:'#5d9eff',
+    body:[
+      {icon:'⚔', label:'物語を進める', desc:'シーズン1・2の本編を遊べる。シーズン2は地図からステージを選ぶ方式。'},
+      {icon:'🎯', label:'編成画面', desc:'物語キャラ＋ガチャキャラを4人編成。ジョーク装備もここから。'},
+      {icon:'🍣', label:'マルチバース召喚', desc:'コインを使ってキャラ・ジョーク・パッシブを獲得。'},
+      {icon:'📖', label:'観測記録／サイドストーリー', desc:'敵情報・仲間とボスの物語が閲覧可能。'}
+    ]
+  },
+  formation:{
+    title:'パーティ編成', subtitle:'FORMATION', icon:'⚔', color:'#5d9eff',
+    body:[
+      {icon:'1', label:'4人まで編成', desc:'物語キャラ・ガチャキャラから自由に4人を選ぶ。'},
+      {icon:'🎤', label:'ジョーク装備', desc:'キャラ詳細→「ジョーク付け替え」から、所持ジョーク150種より4つ装備。重複不可。'},
+      {icon:'✨', label:'パッシブ付替', desc:'物語キャラのみ、6種のパッシブから3つ装備可能。'},
+      {icon:'🔄', label:'フォルムチェンジ', desc:'一部キャラは形態を切り替えてバトルできる。'}
+    ]
+  },
+  summon:{
+    title:'マルチバース英雄召喚', subtitle:'GACHA', icon:'🍣', color:'#FFD700',
+    body:[
+      {icon:'🪙', label:'コインで召喚', desc:'1回 100コイン、10連 1000コインで実行。'},
+      {icon:'⭐', label:'レアリティ', desc:'N／R／SR／SSR／UR の5段階。UR は別次元の強さ。'},
+      {icon:'🎯', label:'重複時', desc:'同じキャラが出たら強化スキルに変換される。'},
+      {icon:'🌟', label:'固有技', desc:'UR キャラには専用の固有技4つが付く（付替不可）。'}
+    ]
+  },
+  s2map:{
+    title:'シーズン2 マップ', subtitle:'SEASON 2', icon:'🗺', color:'#ffb84d',
+    body:[
+      {icon:'📍', label:'ステージ選択', desc:'地図上のアイコンをタップで章を選択。1話から順に解放される。'},
+      {icon:'✦', label:'章の流れ', desc:'前半シネマ→バトル→後半シネマ→クリア！モーダル→地図に戻る。'},
+      {icon:'🏆', label:'クリア後', desc:'次のステージが解放される。形態変化のあるボスもいる。'},
+      {icon:'🔒', label:'未解放章', desc:'前の章をクリアしないとプレイできない。'}
+    ]
+  },
+  battle:{
+    title:'レスバトル', subtitle:'BATTLE', icon:'⚔', color:'#ff8b8b',
+    body:[
+      {icon:'🎤', label:'たたかう', desc:'装備中のジョーク4つから1つ選んで使う。'},
+      {icon:'✨', label:'必殺技', desc:'キャラ個別ゲージMAXで発動。専用8秒アニメ付き。'},
+      {icon:'🎯', label:'固有技（UR/物語キャラ）', desc:'付替不可の固定4スロット。ロール別の特殊効果。'},
+      {icon:'🛡', label:'守る', desc:'99%ダメージ軽減。2ターンに1度だけ使える。'},
+      {icon:'👆', label:'長押しで詳細', desc:'味方キャラを長押しでバフ込み実値を確認。'}
+    ]
+  },
+  codex:{
+    title:'観測記録（敵図鑑）', subtitle:'CODEX', icon:'📖', color:'#c8a0ff',
+    body:[
+      {icon:'👁', label:'撃破した敵を記録', desc:'倒した敵の情報・特性・必殺技が閲覧できる。'},
+      {icon:'🔒', label:'未撃破', desc:'未遭遇の敵は「？？？」表示。'},
+      {icon:'🌟', label:'特殊敵', desc:'形態変化を持つボスは形態別に記録される。'}
+    ]
+  },
+  sidestory:{
+    title:'サイドストーリー', subtitle:'SIDE STORY', icon:'📖', color:'#5de5ff',
+    body:[
+      {icon:'👥', label:'仲間の物語', desc:'各キャラの背景や日常を描いた短編。10話ずつ。'},
+      {icon:'👹', label:'ボスの物語', desc:'バトルでは見えなかった敵の事情も読める（解放条件あり）。'}
+    ]
+  },
+  threat:{
+    title:'世界の脅威（再戦）', subtitle:'THREAT', icon:'🌍', color:'#ff6b6b',
+    body:[
+      {icon:'⚔', label:'クリア済みボスと再戦', desc:'惑星上のアイコンをタップで挑める。'},
+      {icon:'📈', label:'難易度補正', desc:'再戦は数値補正により本来より強い。'},
+      {icon:'🎁', label:'報酬', desc:'勝利でコイン獲得（実装中の機能あり）。'}
+    ]
+  }
+};
+window.maybeShowTutorial=function(key, onClose){
+  var conf=window.TUTORIALS[key];if(!conf){if(onClose)onClose();return;}
+  setTimeout(function(){showTutorial(key, conf, onClose);},150);
+};
+
+
 // ============ PANELS ============
 let panelReturn='title';
 function openStatus(){panelReturn=getActiveScreen();renderStatus();showScreen('status');}
@@ -5450,7 +5891,7 @@ let nbSubView='skill';
 function renderNotebook(){
   const tabs=PARTY_DEF.map(def=>`<div class="nb-tab ${nbActiveChar===def.id?'active':''}" onclick="nbActiveChar='${def.id}';renderNotebook();sfx&&sfx('select')" style="${nbActiveChar===def.id?'border-color:'+def.color+';color:'+def.color:''}">${(typeof getCharEmoji==="function"?getCharEmoji(def.id):def.emoji)} ${def.name}</div>`).join('');
   const def=PARTY_DEF.find(c=>c.id===nbActiveChar);
-  const ri=(typeof ROLE_INFO!=='undefined')?ROLE_INFO[def.roleType]:{icon:'',label:def.role};
+  const ri=(typeof roleInfo==='function')?roleInfo(def.roleType):{icon:'',name:def.role};
   const st=(typeof calcStats==='function')?calcStats(def.id):{hp:0,atk:0,def:0,spd:0};
   const eq=getEquipped(def.id);
   const pas=getEquippedPassives(def.id);
@@ -5635,7 +6076,7 @@ window.onload=function(){
   <div id="mv-sorts"></div>
   <div class="mv-secttl" id="mv-rtitle">📒 ネタ帳</div>
   <div id="mv-roster"></div>
-  <button onclick="MV.startBattle()" style="width:100%;margin-top:16px;padding:14px;border-radius:13px;border:none;background:linear-gradient(180deg,#ff6b6b,#a83232);color:#fff;font-weight:900;font-size:15px;box-shadow:0 4px 0 #6a1e1e">⚔ このパーティで腕試し（パッシブ検証）</button>
+  <button onclick="MV.saveFormationManual()" style="width:100%;margin-top:16px;padding:14px;border-radius:13px;border:none;background:linear-gradient(180deg,#5d9eff,#2a5dca);color:#fff;font-weight:900;font-size:15px;box-shadow:0 4px 0 #1a3a8a">💾 編成を保存</button>
 </div></div>
 
 <!-- 召喚画面 -->
@@ -5660,146 +6101,7 @@ window.onload=function(){
 <div id="mv-result"><div style="text-align:center;font-size:14px;font-weight:800;color:#FFD700;margin-bottom:14px">✦ 召喚結果 ✦</div><div id="mv-resbig"></div><div id="mv-resgrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:420px;margin:0 auto"></div><button onclick="MV.closeResult()" style="display:block;margin:18px auto 0;padding:12px 30px;border-radius:10px;border:none;background:#5d9eff;color:#fff;font-weight:800">とじる</button></div>
 <div id="mv-toast"></div>
 
-<style>
-  /* ============ シネマティックバトル UI (v2.10.0) ============ */
-  #mv-fbattle{position:fixed;inset:0;z-index:1615;display:none;color:#fff;font-family:-apple-system,'Hiragino Sans','Segoe UI',sans-serif;overflow:hidden}
-  #mv-fbattle.on{display:block}
-  .fb-bg-layer{position:absolute;inset:0;pointer-events:none}
-  .fb-bg-deep{background:radial-gradient(ellipse at 50% 30%,#2a0848 0%,#1a0530 30%,#0a0218 60%,#000 100%);transition:background .6s}
-  .fb-bg-deep.bg-town{background:radial-gradient(ellipse at 50% 30%,#3a2010 0%,#1a0a08 50%,#000 100%)}
-  .fb-bg-deep.bg-forest{background:radial-gradient(ellipse at 50% 30%,#0a3a1a 0%,#051508 50%,#000 100%)}
-  .fb-bg-deep.bg-castle{background:radial-gradient(ellipse at 50% 30%,#3a3050 0%,#1a1428 50%,#000 100%)}
-  .fb-bg-deep.bg-lab{background:radial-gradient(ellipse at 50% 30%,#103a4a 0%,#051a24 50%,#000 100%)}
-  .fb-bg-deep.bg-desert{background:radial-gradient(ellipse at 50% 30%,#5a3a10 0%,#2a1808 50%,#000 100%)}
-  .fb-bg-deep.bg-mental{background:radial-gradient(ellipse at 50% 30%,#1a1a1a 0%,#0a0a0a 50%,#000 100%)}
-  .fb-bg-deep.bg-space{background:radial-gradient(ellipse at 50% 30%,#0a1030 0%,#06081a 50%,#000 100%)}
-  .fb-bg-deep.bg-final{background:#000}
-  .fb-bg-image{background-size:cover;background-position:center;opacity:0;transition:opacity 1s}
-  .fb-bg-image.on{opacity:.55}
-  .fb-bg-nebula{background:radial-gradient(ellipse 40% 30% at 25% 30%,#5d3a8a40 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 75% 70%,#a8324a40 0%,transparent 60%),radial-gradient(ellipse 60% 20% at 50% 90%,#5d9eff30 0%,transparent 60%);animation:fbNebulaShift 12s ease-in-out infinite alternate;mix-blend-mode:screen}
-  @keyframes fbNebulaShift{0%{transform:scale(1) translateY(0)}100%{transform:scale(1.1) translateY(-10px)}}
-  .fb-bg-stars{background-image:radial-gradient(1px 1px at 8% 12%,#fff,transparent),radial-gradient(1px 1px at 23% 47%,#fff8,transparent),radial-gradient(2px 2px at 41% 22%,#fffe,transparent),radial-gradient(1px 1px at 57% 71%,#fff8,transparent),radial-gradient(1px 1px at 76% 31%,#ffe,transparent),radial-gradient(2px 2px at 89% 64%,#fff,transparent),radial-gradient(1px 1px at 14% 82%,#fff8,transparent),radial-gradient(1px 1px at 36% 91%,#fff,transparent),radial-gradient(1px 1px at 68% 13%,#ffe,transparent),radial-gradient(2px 2px at 92% 88%,#fff,transparent);animation:fbTwinkle 4s ease-in-out infinite alternate}
-  @keyframes fbTwinkle{from{opacity:.4}to{opacity:1}}
-  .fb-bg-grid{background:linear-gradient(180deg,transparent 0%,transparent 70%,#5d9eff20 100%),repeating-linear-gradient(90deg,transparent 0,transparent 39px,#5d9eff15 39px,#5d9eff15 40px),repeating-linear-gradient(0deg,transparent 0,transparent 39px,#5d9eff10 39px,#5d9eff10 40px);transform:perspective(400px) rotateX(60deg);transform-origin:center bottom;height:60%;top:auto;bottom:0;animation:fbGridScan 3s linear infinite}
-  @keyframes fbGridScan{from{background-position:0 0,0 0,0 0}to{background-position:0 0,0 0,0 40px}}
-  .fb-bg-scan{background:repeating-linear-gradient(0deg,transparent 0px,transparent 3px,rgba(255,255,255,.02) 3px,rgba(255,255,255,.02) 4px);mix-blend-mode:overlay;animation:fbScanShift .15s linear infinite}
-  @keyframes fbScanShift{from{background-position:0 0}to{background-position:0 4px}}
-  .fb-cine-bar{position:absolute;left:0;right:0;height:6%;background:#000;z-index:50;pointer-events:none;box-shadow:0 0 20px #000}
-  .fb-cine-top{top:0}.fb-cine-bot{bottom:0}
-  .fb-wrap{position:absolute;inset:0;display:flex;flex-direction:column;z-index:20;padding:8vh 14px 8vh;max-width:440px;margin:0 auto}
-  #fb-enemy-stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;min-height:180px;max-height:220px}
-  .fb-enemy-aura{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:200px;height:200px;border-radius:50%;background:conic-gradient(from 0deg,transparent,#ff3a6b22,transparent,#ff3a6b44,transparent,#ff3a6b22,transparent);animation:fbAuraSpin 8s linear infinite;pointer-events:none;filter:blur(6px)}
-  @keyframes fbAuraSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
-  .fb-enemy-ring{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:170px;height:170px;border-radius:50%;border:2px solid #ff3a6b88;box-shadow:0 0 20px #ff3a6b66,inset 0 0 30px #ff3a6b33;animation:fbRingPulse 2s ease-in-out infinite}
-  @keyframes fbRingPulse{0%,100%{transform:translate(-50%,-50%) scale(1);box-shadow:0 0 20px #ff3a6b66,inset 0 0 30px #ff3a6b33}50%{transform:translate(-50%,-50%) scale(1.05);box-shadow:0 0 40px #ff3a6b,inset 0 0 40px #ff3a6b55}}
-  .fb-enemy-emoji{font-size:90px;position:relative;z-index:5;filter:drop-shadow(0 0 18px #ff3a6b) drop-shadow(0 4px 8px #000);animation:fbEnemyFloat 3s ease-in-out infinite}
-  @keyframes fbEnemyFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
-  .fb-enemy-img{max-width:140px;max-height:140px;position:relative;z-index:5;filter:drop-shadow(0 0 18px #ff3a6b) drop-shadow(0 4px 8px #000);animation:fbEnemyFloat 3s ease-in-out infinite;border-radius:8px}
-  .fb-enemy-name{font-size:14px;font-weight:900;color:#ff5b6e;text-shadow:0 0 12px #ff3a6b,0 2px 4px #000;letter-spacing:2px;margin-top:6px;text-align:center;position:relative;z-index:6}
-  .fb-hp-wrap{width:80%;max-width:300px;margin:8px auto 0;position:relative;z-index:6}
-  .fb-hp-bg{height:11px;background:#1a0a14;border:1px solid #3a1a24;border-radius:6px;overflow:hidden;position:relative}
-  .fb-hp-fill{height:100%;background:linear-gradient(90deg,#ff3a6b,#a8324a 70%,#5a1a2a);box-shadow:inset 0 -2px 0 #00000055,0 0 12px #ff3a6b88;transition:width .8s cubic-bezier(.5,0,.5,1);position:relative}
-  .fb-hp-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,#fff8 50%,transparent);animation:fbHpShine 2s linear infinite}
-  @keyframes fbHpShine{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
-  .fb-hp-num{font-size:10px;color:#caa;font-family:monospace;letter-spacing:1px;margin-top:3px;text-align:center;text-shadow:0 1px 2px #000;position:relative;z-index:6}
-  #fb-log{height:18vh;min-height:120px;max-height:140px;overflow-y:auto;background:linear-gradient(180deg,rgba(10,5,20,.85),rgba(20,5,30,.7));border:1px solid #3a2a55;border-radius:10px;padding:9px 11px;margin:8px 0;font-size:11px;line-height:1.6;color:#cde;backdrop-filter:blur(6px);box-shadow:0 0 12px #5d9eff22,inset 0 0 12px #00000055;position:relative;z-index:10}
-  #fb-log::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#5d9eff,transparent);animation:fbLogBeam 3s linear infinite;border-radius:10px 10px 0 0}
-  @keyframes fbLogBeam{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
-  #fb-log > div{animation:fbLogFadeIn .3s ease-out;margin-bottom:3px}
-  @keyframes fbLogFadeIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
-  #fb-party{display:flex;gap:5px;margin-bottom:8px;position:relative;z-index:10}
-  .fb-ally{flex:1;text-align:center;background:linear-gradient(180deg,rgba(20,30,55,.85),rgba(10,15,30,.95));border:1px solid #3a3a5a;border-radius:9px;padding:6px 3px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .3s;backdrop-filter:blur(4px)}
-  .fb-ally.active{border-color:#5d9eff;box-shadow:0 0 18px #5d9eff,inset 0 0 14px #5d9eff33;transform:translateY(-3px);background:linear-gradient(180deg,rgba(40,55,90,.9),rgba(15,25,50,.95))}
-  .fb-ally.active::before{content:'';position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:8px;height:8px;background:#5d9eff;border-radius:50%;box-shadow:0 0 10px #5d9eff;animation:fbCursorPulse 1s ease-in-out infinite}
-  @keyframes fbCursorPulse{0%,100%{opacity:1;transform:translateX(-50%) scale(1)}50%{opacity:.5;transform:translateX(-50%) scale(1.3)}}
-  .fb-ally.dead{opacity:.3;filter:grayscale(.8)}
-  .fb-ally-emoji{font-size:24px;filter:drop-shadow(0 2px 4px #000);position:relative;z-index:2}
-  .fb-ally.active .fb-ally-emoji{animation:fbAllyBob 1.2s ease-in-out infinite}
-  @keyframes fbAllyBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-  .fb-ally-name{font-size:9px;color:#cde;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
-  .fb-bar-mini{height:3px;border-radius:2px;background:#1a1a26;overflow:hidden;margin:2px 4px;position:relative}
-  .fb-bar-mini > div{height:100%;transition:width .5s cubic-bezier(.5,0,.5,1)}
-  .fb-hp-mini-fill{background:linear-gradient(90deg,#5dca8a,#3a8a5a)}
-  .fb-hp-mini-fill.low{background:linear-gradient(90deg,#ff5b6e,#a83232)}
-  .fb-tp-mini-fill{background:linear-gradient(90deg,#FFD700,#ff8b3b);box-shadow:0 0 4px #FFD700}
-  .fb-tp-max{animation:fbTpMaxPulse 1s ease-in-out infinite}
-  @keyframes fbTpMaxPulse{0%,100%{box-shadow:0 0 4px #FFD700}50%{box-shadow:0 0 12px #FFD700,0 0 18px #ff8b3b}}
-  .fb-tp-label{font-size:7px;color:#FFD700;margin-top:1px;font-weight:700;letter-spacing:.5px}
-  .fb-tp-label.ready{color:#fff;text-shadow:0 0 8px #FFD700;animation:fbTpLabelPulse 1s ease-in-out infinite}
-  @keyframes fbTpLabelPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
-  #fb-action{background:linear-gradient(180deg,rgba(15,15,30,.95),rgba(5,5,15,.98));border:1px solid #3a3a5a;border-radius:10px;padding:10px;backdrop-filter:blur(8px);box-shadow:0 -4px 16px #00000088,inset 0 0 14px #5d9eff11;position:relative;overflow:hidden;min-height:120px;z-index:10}
-  #fb-action::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#5d9eff,transparent)}
-  .fb-cmd-actor{font-size:10px;color:#9ab;margin-bottom:7px}
-  .fb-cmd-actor b{color:#5d9eff;font-size:12px;text-shadow:0 0 6px #5d9eff}
-  .fb-cmd-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .fb-cmd-btn{padding:11px 8px;border-radius:9px;border:1px solid;background:rgba(0,0,0,.4);color:#fff;font-weight:800;font-size:12px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s,box-shadow .2s;text-align:left;display:flex;align-items:center;gap:7px}
-  .fb-cmd-btn:active{transform:scale(.96)}
-  .fb-cmd-btn .fb-ico{font-size:18px;flex-shrink:0}
-  .fb-cmd-btn .fb-lbl{flex:1}
-  .fb-cmd-btn .fb-sub{font-size:8px;color:#aab;display:block;margin-top:1px;font-weight:500}
-  .fb-cmd-joke{border-color:#5d9eff;background:linear-gradient(180deg,rgba(20,40,80,.6),rgba(10,20,50,.7));color:#aacfff}
-  .fb-cmd-ult{border-color:#FFD700;background:linear-gradient(180deg,rgba(60,40,5,.7),rgba(30,20,5,.8));color:#FFD700;box-shadow:0 0 12px #FFD70044,inset 0 0 10px #FFD70022;animation:fbUltGlow 1.5s ease-in-out infinite}
-  .fb-cmd-ult.disabled{border-color:#333;background:rgba(20,20,30,.5);color:#556;animation:none;box-shadow:none;cursor:not-allowed}
-  @keyframes fbUltGlow{0%,100%{box-shadow:0 0 12px #FFD70044,inset 0 0 10px #FFD70022}50%{box-shadow:0 0 20px #FFD70088,inset 0 0 16px #FFD70044}}
-  .fb-cmd-def{border-color:#5dca8a;background:linear-gradient(180deg,rgba(10,50,30,.6),rgba(5,30,15,.7));color:#7fe5a8}
-  .fb-cmd-skip{border-color:#666;background:rgba(20,20,28,.6);color:#aab}
-  #fb-title{position:absolute;top:7%;left:0;right:0;text-align:center;z-index:25;pointer-events:none}
-  #fb-title-chap{font-size:9px;color:#ff8b3b;font-weight:900;letter-spacing:4px;text-shadow:0 0 8px #ff8b3b,0 1px 3px #000}
-  #fb-title-name{font-size:11px;color:#fff;letter-spacing:2px;margin-top:2px;text-shadow:0 0 8px #5d9eff,0 1px 3px #000}
-  .fb-turn-ind{position:absolute;top:7%;right:14px;z-index:25;font-size:8px;color:#9ab;letter-spacing:2px;background:rgba(0,0,0,.5);padding:3px 9px;border-radius:11px;border:1px solid #3a3a55}
-  .fb-turn-ind b{color:#5d9eff}
-  .fb-dmg-num{position:absolute;font-size:32px;font-weight:900;color:#FFD700;text-shadow:0 0 12px #FFD700,0 0 24px #ff8b3b,0 2px 4px #000;font-family:Impact,monospace;pointer-events:none;z-index:60;animation:fbDmgPop 1.4s cubic-bezier(.3,1.4,.5,1) forwards;will-change:transform,opacity}
-  @keyframes fbDmgPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-15deg)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.3) rotate(8deg)}40%{transform:translate(-50%,-60%) scale(1) rotate(-3deg)}100%{opacity:0;transform:translate(-50%,-200px) scale(.6)}}
-  .fb-dmg-num.crit{color:#ff3a6b;text-shadow:0 0 14px #ff3a6b,0 0 28px #ff0044,0 2px 4px #000;font-size:42px}
-  .fb-dmg-num.heal{color:#5dca8a;text-shadow:0 0 12px #5dca8a,0 0 24px #3afa6a,0 2px 4px #000}
-  .fb-hit-fx{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%);width:0;height:0;pointer-events:none;z-index:30}
-  .fb-hit-fx::before,.fb-hit-fx::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;animation:fbHitBoom .6s ease-out forwards}
-  .fb-hit-fx::before{width:80px;height:80px;background:radial-gradient(circle,#fff 0%,#FFD700 30%,transparent 70%)}
-  .fb-hit-fx::after{width:140px;height:140px;border:3px solid #FFD700;box-shadow:0 0 20px #FFD700;background:transparent;animation-delay:.05s}
-  @keyframes fbHitBoom{0%{opacity:1;transform:translate(-50%,-50%) scale(0)}100%{opacity:0;transform:translate(-50%,-50%) scale(2)}}
-  @keyframes fbShake{0%,100%{transform:translate(0,0)}10%{transform:translate(-4px,-2px)}20%{transform:translate(4px,2px)}30%{transform:translate(-3px,3px)}40%{transform:translate(3px,-1px)}50%{transform:translate(-2px,2px)}60%{transform:translate(2px,-3px)}70%{transform:translate(-1px,1px)}80%{transform:translate(1px,-2px)}90%{transform:translate(-2px,1px)}}
-  .fb-shake{animation:fbShake .4s linear}
-</style>
-<div id="mv-fbattle">
-  <div class="fb-bg-layer fb-bg-deep" id="fb-bg-deep"></div>
-  <div class="fb-bg-layer fb-bg-image" id="fb-bg-image"></div>
-  <div class="fb-bg-layer fb-bg-nebula"></div>
-  <div class="fb-bg-layer fb-bg-stars"></div>
-  <div class="fb-bg-layer fb-bg-grid"></div>
-  <div class="fb-bg-layer fb-bg-scan"></div>
-  <div class="fb-cine-bar fb-cine-top"></div>
-  <div class="fb-cine-bar fb-cine-bot"></div>
-  <div id="fb-title">
-    <div id="fb-title-chap"></div>
-    <div id="fb-title-name"></div>
-  </div>
-  <div class="fb-turn-ind">TURN <b id="fb-turn">1</b></div>
-  <div class="fb-wrap" id="fb-wrap">
-    <div id="fb-enemy-stage">
-      <div class="fb-enemy-aura"></div>
-      <div class="fb-enemy-ring"></div>
-      <div id="fb-enemy"></div>
-    </div>
-    <div id="fb-log"></div>
-    <div id="fb-party"></div>
-    <div id="fb-action"></div>
-  </div>
-</div>
-<!-- ジョーク選択モーダル -->
-<div id="fb-jokepick" style="position:fixed;inset:0;z-index:1620;display:none;background:rgba(0,0,0,.85);align-items:flex-end;justify-content:center">
-  <div style="width:100%;max-width:440px;background:#13131f;border-top:2px solid #ff8b8b;border-radius:14px 14px 0 0;padding:14px;max-height:80vh;overflow-y:auto">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span id="fb-jokepick-name" style="font-size:13px;font-weight:800">ジョークを選ぶ</span><span onclick="MV.fbClosePick()" style="cursor:pointer;color:#9ab;font-size:18px">✕</span></div>
-    <div id="fb-jokepick-list"></div>
-  </div>
-</div>
-<!-- 必殺技選択モーダル（複数所持時のみ）-->
-<div id="fb-ultpick" style="position:fixed;inset:0;z-index:1620;display:none;background:rgba(0,0,0,.85);align-items:center;justify-content:center;padding:20px">
-  <div style="width:100%;max-width:340px;background:#1a0a30;border:2px solid #FFD700;border-radius:14px;padding:18px;text-align:center">
-    <div style="font-size:14px;font-weight:900;color:#FFD700;margin-bottom:14px">✨ 必殺技を選ぶ</div>
-    <div id="fb-ultpick-list"></div>
-    <button onclick="MV.fbCloseUltPick()" style="margin-top:10px;padding:9px 22px;border-radius:9px;border:1px solid #445;background:#15151f;color:#9ab;font-weight:700;cursor:pointer">キャンセル</button>
-  </div>
-</div>
+
 <div id="mv-battle" style="position:fixed;inset:0;z-index:1610;display:none;background:radial-gradient(ellipse at 50% 30%,#1a0a18,#0a0512 70%,#05030a);color:#fff;font-family:-apple-system,'Hiragino Sans',sans-serif">
   <div style="max-width:440px;margin:0 auto;padding:14px;position:relative;height:100%;display:flex;flex-direction:column">
     <div style="text-align:center;font-size:12px;color:#ff8b8b;font-weight:800;letter-spacing:2px">⚔ パーティ腕試し</div>
@@ -6262,23 +6564,23 @@ var GACHA_RARITY_MULT={N:1.0,R:1.6,SR:2.6,SSR:4.2,UR:7.0};
 var STORY_CHARS=[
  {id:'dev',role:'attacker',fixed:true,cur:0,lv:30,gacha:false,
   forms:[{e:'🧑‍💻',n:'開発者',r:'SR',alloc:{hp:20,atk:45,def:15,spd:15,sup:5},unlocked:true,ult:['ult_dev_sr']},
-         {e:'🧑‍💻',n:'真・開発者',r:'SSR',alloc:{hp:25,atk:50,def:15,spd:15,sup:5},unlocked:true,ult:['ult_dev_ssr']},
-         {e:'🧑‍💻',n:'絶・開発者',r:'UR',alloc:{hp:30,atk:55,def:20,spd:25,sup:10},unlocked:true,ult:['ult_dev_ur']}],
+         {e:'🧑‍💻',n:'真・開発者',r:'SSR',alloc:{hp:25,atk:50,def:15,spd:15,sup:5},unlocked:false,ult:['ult_dev_ssr']},
+         {e:'🧑‍💻',n:'絶・開発者',r:'UR',alloc:{hp:30,atk:55,def:20,spd:25,sup:10},unlocked:false,ult:['ult_dev_ur']}],
   equip:['【観測完了】与ダメージが防御を無視し必ずクリティカル','【神コミット】毎ターン必殺ゲージが満タンになる'],slots:2},
  {id:'cat',role:'healer',cur:0,lv:30,gacha:false,
   forms:[{e:'🐱',n:'ねこ',r:'SR',alloc:{hp:20,atk:10,def:15,spd:20,sup:35},unlocked:true,ult:['ult_cat_sr']},
-         {e:'🐱',n:'覚醒ねこ',r:'SSR',alloc:{hp:20,atk:5,def:15,spd:15,sup:45},unlocked:true,ult:['ult_cat_ssr','ult_cat_nine']}],
+         {e:'🐱',n:'覚醒ねこ',r:'SSR',alloc:{hp:20,atk:5,def:15,spd:15,sup:45},unlocked:false,ult:['ult_cat_ssr','ult_cat_nine']}],
   equip:['【全体大回復】毎ターン味方全体を大きく回復'],slots:2},
  {id:'sal',role:'tank',cur:0,lv:30,gacha:false,
   forms:[{e:'🍣',n:'サーモン握り',r:'SSR',alloc:{hp:45,atk:10,def:35,spd:5,sup:5},unlocked:true,ult:['ult_sal']}],
   equip:['【絶対防壁】味方全体をかばい致死をHP1で耐える'],slots:2},
  {id:'frog',role:'tank',cur:0,lv:30,gacha:false,
   forms:[{e:'🐸',n:'記憶のかえる',r:'SSR',alloc:{hp:50,atk:5,def:35,spd:5,sup:5},unlocked:true,ult:['ult_frog']},
-         {e:'🐸',n:'真・かえる／盾の王',r:'UR',alloc:{hp:55,atk:10,def:30,spd:0,sup:5},unlocked:true,ult:['ult_frog_ur']}],
+         {e:'🐸',n:'真・かえる／盾の王',r:'UR',alloc:{hp:55,atk:10,def:30,spd:0,sup:5},unlocked:false,ult:['ult_frog_ur']}],
   equip:['【想いの盾】味方が倒れそうな時必ずかばう'],slots:2},
  {id:'ufo',role:'buffer',cur:0,lv:30,gacha:false,
   forms:[{e:'👽',n:'UFO乗組員',r:'SR',alloc:{hp:20,atk:15,def:20,spd:20,sup:25},unlocked:true,ult:['ult_ufo']},
-         {e:'🛸',n:'乗組員ver.2',r:'SSR',alloc:{hp:20,atk:15,def:20,spd:15,sup:30},unlocked:true,ult:['ult_v2']}],
+         {e:'🛸',n:'乗組員ver.2',r:'SSR',alloc:{hp:20,atk:15,def:20,spd:15,sup:30},unlocked:false,ult:['ult_v2']}],
   equip:['【星の祝福】味方全体の全能力を底上げ'],slots:2},
  {id:'rev',role:'debuffer',cur:0,lv:30,gacha:false,
   forms:[{e:'🧑‍🎨',n:'☆1レビュアー',r:'SR',alloc:{hp:15,atk:30,def:10,spd:25,sup:20},unlocked:true,ult:['ult_rev']}],
@@ -6311,10 +6613,34 @@ var MV_KEY='mv_data';
 function loadMV(){try{return JSON.parse(localStorage.getItem(MV_KEY)||'null');}catch(e){return null;}}
 function saveMV(){try{
   var gachaOwned=owned.filter(function(c){return c.gacha;}).map(function(c){return c.id;});
-  var storyState={};STORY_CHARS.forEach(function(c){storyState[c.id]={cur:c.cur,equip:c.equip};});
+  var storyState={};STORY_CHARS.forEach(function(c){
+    var unlockedForms=[];
+    if(c.forms)c.forms.forEach(function(f,fi){if(f.unlocked)unlockedForms.push(fi);});
+    storyState[c.id]={cur:c.cur,equip:c.equip,unlockedForms:unlockedForms};
+  });
   var partyIds=party.map(function(c){return c?(c.gacha?'g:'+c.id:'s:'+c.id):null;});
   localStorage.setItem(MV_KEY,JSON.stringify({gachaOwned:gachaOwned,storyState:storyState,partyIds:partyIds}));
 }catch(e){}}
+
+// 手動保存（保存ボタン）：確認モーダル付き
+function saveFormationManual(){
+  saveMV();
+  // 編成中のメンバーを集計
+  var members=party.filter(function(c){return c;}).map(function(c){return gE(c)+' '+gN(c);});
+  var memberList=members.length?members.join('、'):'（未編成）';
+  var modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;z-index:2200;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);animation:s2ModalFade .3s ease-out';
+  modal.innerHTML='<div style="max-width:340px;width:100%;background:linear-gradient(180deg,#13233a,#0a1420);border:2px solid #5d9eff;border-radius:16px;padding:24px 20px;text-align:center;color:#fff;box-shadow:0 0 36px #5d9eff66;animation:s2ModalPop .4s cubic-bezier(.3,1.4,.5,1)">'+
+    '<div style="font-size:46px;margin-bottom:8px;filter:drop-shadow(0 0 14px #5d9eff)">💾</div>'+
+    '<div style="font-size:17px;font-weight:900;color:#5d9eff;letter-spacing:2px;margin-bottom:10px;text-shadow:0 0 12px #5d9eff">保存しました！</div>'+
+    '<div style="font-size:11px;color:#9ab;margin-bottom:6px">編成・ジョーク・形態を保存しました</div>'+
+    '<div style="font-size:11px;color:#cde;line-height:1.7;background:rgba(93,158,255,.1);border-radius:9px;padding:10px;margin-bottom:16px">'+memberList+'</div>'+
+    '<button id="mv-save-ok" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(180deg,#5d9eff,#2a5dca);color:#fff;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 4px 0 #1a3a8a">OK</button>'+
+  '</div>';
+  document.body.appendChild(modal);
+  document.getElementById('mv-save-ok').onclick=function(){modal.remove();};
+  if(typeof sfx==='function')try{sfx('select');}catch(e){}
+}
 
 // ===== 状態 =====
 var owned=[],party=[null,null,null,null];
@@ -6325,7 +6651,15 @@ function initData(){
     // ガチャ所持を復元
     (d.gachaOwned||[]).forEach(function(id){var base=GACHA_CHARS.find(function(x){return x.id===id;});if(base){var inst=Object.assign({},base,{gacha:true,lv:30});owned.push(inst);}});
     // 物語キャラ状態
-    if(d.storyState)STORY_CHARS.forEach(function(c){var st=d.storyState[c.id];if(st){if(typeof st.cur==='number')c.cur=st.cur;if(st.equip)c.equip=st.equip;}});
+    if(d.storyState)STORY_CHARS.forEach(function(c){var st=d.storyState[c.id];if(st){
+      if(st.equip)c.equip=st.equip;
+      if(st.unlockedForms&&Array.isArray(st.unlockedForms)&&c.forms){st.unlockedForms.forEach(function(fi){if(c.forms[fi])c.forms[fi].unlocked=true;});}
+      // cur復元：ただしロック中フォルムを指していたら0に戻す（不整合防止）
+      if(typeof st.cur==='number'){
+        if(c.forms&&c.forms[st.cur]&&c.forms[st.cur].unlocked){c.cur=st.cur;}
+        else{c.cur=0;}
+      }
+    }});
     // パーティ復元
     if(d.partyIds){party=d.partyIds.map(function(pid){if(!pid)return null;var t=pid.slice(0,1),id=pid.slice(2);return owned.find(function(c){return c.id===id&&((t==='g')===!!c.gacha);})||null;});}
     else party=[owned[0],owned[1],owned[2],owned[3]];
@@ -6380,7 +6714,19 @@ function renderSorts(){document.getElementById('mv-sorts').innerHTML=SORTS.map(f
 function renderRoster(){document.getElementById('mv-rtitle').textContent='📒 ネタ帳（所持 '+owned.length+'体）';
   document.getElementById('mv-roster').innerHTML=sortedOwned().map(function(c,i){var r=gR(c);var col=RC[r];var inP=party.indexOf(c)>=0;
     return '<div class="mv-card" style="--c:'+col+';background:'+cardBG(r)+';animation-delay:'+(i*0.02)+'s;'+((r==='UR'||r==='SSR')?'box-shadow:0 0 10px '+col+'66':'')+'" onclick="MV.detail(\''+c.id+'\','+(c.gacha?1:0)+')">'+cardFX(r)+'<div class="top" style="color:'+col+'">'+r+'</div>'+(hasForms(c)?'<div class="reload">🔄</div>':'')+(inP?'<div class="chk" style="color:'+col+'">✓</div>':'')+'<div class="emo">'+gE(c)+'</div><div class="foot"><div class="nm">'+gN(c)+'</div><div class="pw">⚔'+dispNum(bp(c))+'</div></div></div>';}).join('');}
-function renderTeam(){document.getElementById('mv-lvshow').textContent=playerLv;renderTotal();renderSlots();renderSorts();renderRoster();}
+function renderTeam(){
+  var stage='start';
+  try{
+    stage='lvshow'; document.getElementById('mv-lvshow').textContent=playerLv;
+    stage='renderTotal'; renderTotal();
+    stage='renderSlots'; renderSlots();
+    stage='renderSorts'; renderSorts();
+    stage='renderRoster'; renderRoster();
+  }catch(err){
+    if(window.__showErr){window.__showErr('renderTeam失敗 @'+stage+': '+err.message,(err.stack||'').split('\n').slice(0,6).join('\n'));}
+    else{throw err;}
+  }
+}
 
 // ===== 詳細・装備・入替・フォルム =====
 function findChar(id,isG){return owned.find(function(c){return c.id===id&&(!!c.gacha===!!isG);});}
@@ -6389,7 +6735,14 @@ function detail(id,isG){var c=findChar(id,isG);if(!c)return;
   var bars=STAT_KEYS.map(function(k){return '<div class="stat"><span class="lab">'+k[1]+'</span><div class="track"><div class="fillb" style="width:'+Math.min(100,gAlloc(c)[k[0]])+'%;background:'+k[2]+'"></div></div><span class="num" style="color:'+k[2]+'">'+fmt(s[k[0]]*DISP)+'</span></div>';}).join('');
   var pas=gPassives(c).map(function(p){return '<div style="font-size:9px;color:#cde;margin-top:3px;position:relative;z-index:3">▸ '+p+'</div>';}).join('');
   var formsHTML='';
-  if(hasForms(c)){formsHTML='<div style="font-size:9px;color:#9ab;margin-top:10px;position:relative;z-index:3">🔄 フォルムチェンジ</div><div id="mv-forms">'+c.forms.map(function(f,fi){return '<div class="fopt '+(fi===c.cur?'cur':'')+'" style="--fc:'+RC[f.r]+'" onclick="'+(f.unlocked?'MV.form(\''+id+'\','+(c.gacha?1:0)+','+fi+')':'')+'"><div class="fe">'+f.e+'</div><div class="fr" style="color:'+RC[f.r]+'">'+f.r+'</div><div class="fn">'+f.n+'</div></div>';}).join('')+'</div>';}
+  if(hasForms(c)){formsHTML='<div style="font-size:9px;color:#9ab;margin-top:10px;position:relative;z-index:3">🔄 フォルムチェンジ</div><div id="mv-forms">'+c.forms.map(function(f,fi){
+    var locked=!f.unlocked;
+    if(locked){
+      // 未開放：黒塗り・？？？・ロック
+      return '<div class="fopt" style="--fc:#444;cursor:not-allowed;position:relative;opacity:.85"><div class="fe" style="filter:brightness(0) saturate(0);opacity:.5">'+f.e+'</div><div class="fr" style="color:#666">???</div><div class="fn" style="color:#666">？？？</div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:22px">🔒</div></div>';
+    }
+    return '<div class="fopt '+(fi===c.cur?'cur':'')+'" style="--fc:'+RC[f.r]+'" onclick="MV.form(\''+id+'\','+(c.gacha?1:0)+','+fi+')"><div class="fe">'+f.e+'</div><div class="fr" style="color:'+RC[f.r]+'">'+f.r+'</div><div class="fn">'+f.n+'</div></div>';
+  }).join('')+'</div><div style="font-size:8px;color:#667;margin-top:5px;line-height:1.5">🔒 ストーリーを進めると新しいフォルムが解放されます</div>';}
   var btns='';
   if(!c.gacha)btns+='<div class="btn" style="background:#1a1a2a;color:'+col+'" onclick="MV.equip(\''+id+'\')">装備（パッシブ付替）</div>';
   if(c.fixed)btns+='<div style="text-align:center;font-size:10px;color:#9ab;margin-top:8px;position:relative;z-index:3">🔒 主人公（編成固定）</div>';
@@ -6404,17 +6757,183 @@ function detail(id,isG){var c=findChar(id,isG);if(!c)return;
       return '<div style="margin-top:6px;padding:9px 11px;border-radius:9px;border:1px solid '+col+';background:linear-gradient(135deg,'+col+'18,transparent);position:relative;z-index:3"><div style="font-size:11px;font-weight:900;color:'+col+'"><span style="font-size:13px;margin-right:4px">'+(u.icon||'✨')+'</span>'+u.name+'</div><div style="font-size:9px;color:#cde;margin-top:3px;line-height:1.5">'+u.desc+'</div></div>';}).join('');
     return '<div style="font-size:9px;color:#9ab;margin-top:10px;position:relative;z-index:3">✨ 必殺技'+(ults.length>1?'（'+ults.length+'種・テンションMAXで選択）':'')+'</div>'+rows;
   })()+(function(){
-    // 装備ジョーク表示
-    var jokes=c.gacha?['j1','j5','j10','j15']:(c._equippedJokes||['j1','j2','j3','j4']);
+    // 装備ジョーク表示（実データ：getEquipped使用）
+    var jokes;
+    if(typeof getEquipped==='function'){
+      try{jokes=getEquipped(c.id);}catch(e){jokes=null;}
+    }
     if(!jokes||!jokes.length)return '';
     var rows=jokes.map(function(jid){var sk=SKILLS.find(function(x){return x.id===jid;});if(!sk)return '';
       var ef=SKILL_EFFECTS[jid];var efDef=ef?EFFECT_DEFS[ef.type]:null;
       var icon=efDef?efDef.icon:'⚔';var label=efDef?efDef.label:'通常攻撃';
-      return '<div style="margin-top:5px;padding:7px 9px;border-radius:7px;background:rgba(93,158,255,.08);border-left:2px solid #5d9eff;position:relative;z-index:3"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px;flex-shrink:0">'+icon+'</span><div style="flex:1;min-width:0"><div style="font-size:9px;color:#cde;line-height:1.4;overflow:hidden;text-overflow:ellipsis">'+sk.ja+'</div><div style="font-size:8px;color:#8ad;margin-top:2px">★'+sk.star+' ／ '+label+(ef?' ×'+ef.mul:'')+'</div></div></div></div>';}).join('');
-    return '<div style="font-size:9px;color:#9ab;margin-top:10px;position:relative;z-index:3">🎤 装備ジョーク（4種）</div>'+rows;
+      var star10=(sk.star>=10)?' <span style="color:#FFD700;font-weight:900">★10</span>':'';
+      return '<div style="margin-top:5px;padding:7px 9px;border-radius:7px;background:rgba(93,158,255,.08);border-left:2px solid #5d9eff;position:relative;z-index:3"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px;flex-shrink:0">'+icon+'</span><div style="flex:1;min-width:0"><div style="font-size:9px;color:#cde;line-height:1.4;overflow:hidden;text-overflow:ellipsis">'+sk.ja+'</div><div style="font-size:8px;color:#8ad;margin-top:2px">★'+sk.star+star10+' ／ '+label+(ef?' ×'+ef.mul:'')+'</div></div></div></div>';}).join('');
+    var equipBtn='<div class="btn" style="background:#1a3050;color:#5d9eff;margin-top:6px" onclick="MV.openJokeEquip(\''+id+'\','+(c.gacha?1:0)+')">🎤 ジョーク付け替え</div>';
+    return '<div style="font-size:9px;color:#9ab;margin-top:10px;position:relative;z-index:3">🎤 装備ジョーク（4種）</div>'+rows+equipBtn;
   })()+formsHTML+btns;
   document.getElementById('mv-modal').classList.add('on');}
+
+// ジョーク装備UI
+var _jokeEquipCharId=null, _jokeEquipIsGacha=false, _jokeEquipSelected=[];
+function openJokeEquip(charId, isG){
+  _jokeEquipCharId=charId;
+  _jokeEquipIsGacha=!!isG;
+  // 現在の装備を読み込み
+  if(typeof getEquipped==='function'){_jokeEquipSelected=getEquipped(charId).slice();}
+  else{_jokeEquipSelected=[];}
+  // モーダルを開く
+  var modal=document.getElementById('joke-equip-modal');
+  if(!modal){
+    modal=document.createElement('div');
+    modal.id='joke-equip-modal';
+    modal.style.cssText='position:fixed;inset:0;z-index:1750;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;padding:14px;backdrop-filter:blur(6px)';
+    document.body.appendChild(modal);
+  }
+  renderJokeEquip();
+  modal.style.display='flex';
+}
+function closeJokeEquip(){
+  var m=document.getElementById('joke-equip-modal');
+  if(m)m.style.display='none';
+}
+function renderJokeEquip(){
+  var modal=document.getElementById('joke-equip-modal');if(!modal)return;
+  var c=findChar(_jokeEquipCharId, _jokeEquipIsGacha);
+  if(!c){modal.style.display='none';return;}
+  // 所持中の全ジョーク（プレイヤー所持）
+  var allOwned=(typeof ownedSkills==='function')?ownedSkills():SKILLS.map(function(s){return s.id;});
+  // 既装備中のジョーク（他キャラ含む、初期☆1は除外）
+  var usedByOthers={};
+  if(typeof rpgLoad==='function'){
+    try{
+      var p=rpgLoad()||{};
+      if(p.equipped){
+        Object.keys(p.equipped).forEach(function(cid){
+          if(cid===_jokeEquipCharId)return;
+          (p.equipped[cid]||[]).forEach(function(jid){
+            if(typeof isInitialSkill==='function'&&isInitialSkill(jid))return;
+            usedByOthers[jid]=cid;
+          });
+        });
+      }
+    }catch(e){}
+  }
+  // ☆別グループ
+  var byStar={};
+  allOwned.forEach(function(jid){
+    var sk=SKILLS.find(function(x){return x.id===jid;});if(!sk)return;
+    if(!byStar[sk.star])byStar[sk.star]=[];
+    byStar[sk.star].push(sk);
+  });
+  // ソートキー（10→9→...→1）
+  var stars=Object.keys(byStar).map(Number).sort(function(a,b){return b-a;});
+  // 装備中4枠の表示
+  var slots='';
+  for(var i=0;i<4;i++){
+    var jid=_jokeEquipSelected[i];
+    var sk=jid?SKILLS.find(function(x){return x.id===jid;}):null;
+    var ef=jid?SKILL_EFFECTS[jid]:null;
+    var efDef=ef?EFFECT_DEFS[ef.type]:null;
+    slots+='<div style="flex:1;background:'+(sk?'rgba(93,158,255,.15)':'rgba(0,0,0,.3)')+';border:1px '+(sk?'solid #5d9eff':'dashed #555')+';border-radius:8px;padding:7px;min-height:70px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">'+
+      (sk?'<div style="font-size:18px">'+(efDef?efDef.icon:'⚔')+'</div><div style="font-size:8px;color:#cde;margin-top:3px;line-height:1.3;max-height:30px;overflow:hidden">'+sk.ja.substring(0,16)+(sk.ja.length>16?'…':'')+'</div><div style="font-size:7px;color:#FFD700;margin-top:2px">★'+sk.star+'</div>':'<div style="font-size:24px;opacity:.3">＋</div><div style="font-size:7px;color:#666">空き</div>')+
+      '</div>';
+  }
+  var slotRow='<div style="display:flex;gap:5px;margin-bottom:10px">'+slots+'</div>';
+  // 選択肢リスト（☆別）
+  var list='';
+  stars.forEach(function(star){
+    list+='<div style="font-size:11px;color:'+(star>=10?'#FFD700':star>=7?'#c8a0ff':star>=4?'#5d9eff':'#5dca8a')+';font-weight:900;margin-top:10px;margin-bottom:5px;letter-spacing:1px">'+(star>=10?'✨ ':'')+'★'+star+(star>=10?' （別次元）':'')+'</div>';
+    byStar[star].forEach(function(sk){
+      var ef=SKILL_EFFECTS[sk.id];var efDef=ef?EFFECT_DEFS[ef.type]:null;
+      var isSelected=_jokeEquipSelected.indexOf(sk.id)>=0;
+      var usedBy=usedByOthers[sk.id];
+      var isInitial=(typeof isInitialSkill==='function')&&isInitialSkill(sk.id);
+      var disabled=usedBy&&!isInitial&&!isSelected;
+      var bgCol=isSelected?'rgba(93,158,255,.3)':(disabled?'rgba(50,50,50,.4)':'rgba(20,30,50,.5)');
+      var border=isSelected?'2px solid #5d9eff':(disabled?'1px solid #333':'1px solid #2a3a55');
+      list+='<div onclick="'+(disabled?'':'MV.toggleJokeEquip(\''+sk.id+'\')')+'" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:'+bgCol+';border:'+border+';margin-bottom:4px;cursor:'+(disabled?'not-allowed':'pointer')+';opacity:'+(disabled?'.4':'1')+'">'+
+        '<div style="font-size:16px;flex-shrink:0">'+(efDef?efDef.icon:'⚔')+(star>=10?'✨':'')+'</div>'+
+        '<div style="flex:1;min-width:0"><div style="font-size:10px;color:#cde;line-height:1.4">'+sk.ja+'</div><div style="font-size:8px;color:#8ad;margin-top:2px">★'+sk.star+' ／ '+(efDef?efDef.label:'通常')+(ef?' ×'+ef.mul:'')+(disabled?' ／<span style="color:#ff8b3b">他キャラで装備中</span>':'')+'</div></div>'+
+        (isSelected?'<div style="font-size:18px;color:#5d9eff">✓</div>':'')+
+        '</div>';
+    });
+  });
+  modal.innerHTML=
+    '<div style="max-width:420px;width:100%;background:linear-gradient(180deg,#13131f,#0a0a14);border:2px solid #5d9eff;border-radius:14px;padding:14px;max-height:88vh;overflow-y:auto;color:#fff">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid #2a3a55">'+
+        '<div style="font-size:13px;font-weight:900">'+gE(c)+' '+gN(c)+'｜ジョーク装備</div>'+
+        '<div onclick="MV.closeJokeEquip()" style="cursor:pointer;color:#9ab;font-size:20px">✕</div>'+
+      '</div>'+
+      '<div style="font-size:9px;color:#9ab;margin-bottom:6px">▼ 装備中 4枠（'+_jokeEquipSelected.filter(function(x){return x;}).length+'/4）</div>'+
+      slotRow+
+      '<div style="font-size:9px;color:#9ab;margin-bottom:4px">▼ 所持ジョーク '+allOwned.length+'種</div>'+
+      list+
+      '<button onclick="MV.saveJokeEquip()" style="width:100%;margin-top:14px;padding:12px;border-radius:9px;border:none;background:linear-gradient(180deg,#5d9eff,#2a5dca);color:#fff;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 4px 0 #1a3a8a">💾 保存して閉じる</button>'+
+    '</div>';
+}
+function toggleJokeEquip(jid){
+  var idx=_jokeEquipSelected.indexOf(jid);
+  if(idx>=0){
+    // 解除
+    _jokeEquipSelected.splice(idx,1);
+  }else{
+    // 装備
+    if(_jokeEquipSelected.length>=4){
+      // 4枠埋まってる場合、先頭を押し出す
+      _jokeEquipSelected.shift();
+    }
+    _jokeEquipSelected.push(jid);
+  }
+  renderJokeEquip();
+}
+function saveJokeEquip(){
+  if(typeof setEquipped==='function'){
+    var arr=_jokeEquipSelected.slice(0,4);
+    // 4枠未満は初期ジョークで埋める
+    if(typeof INITIAL_SKILLS!=='undefined'){
+      var fi=0;
+      while(arr.length<4){arr.push(INITIAL_SKILLS[fi%INITIAL_SKILLS.length]);fi++;}
+    }
+    setEquipped(_jokeEquipCharId, arr);
+    if(typeof toast==='function')toast('ジョークを保存しました');
+  }
+  closeJokeEquip();
+  // 詳細モーダルを再描画
+  try{detail(_jokeEquipCharId, _jokeEquipIsGacha);}catch(e){}
+}
+
 function form(id,isG,fi){var c=findChar(id,isG);if(!c||!c.forms[fi].unlocked)return;c.cur=fi;saveMV();detail(id,isG);renderTeam();}
+// フォルム開放：ストーリー進行イベントから呼ぶ（例：unlockForm('cat',1) で覚醒ねこ解放）
+function unlockForm(charId, formIdx){
+  var c=findChar(charId, false);
+  if(!c||!c.forms||!c.forms[formIdx])return false;
+  if(c.forms[formIdx].unlocked)return false; // 既に開放済み
+  c.forms[formIdx].unlocked=true;
+  saveMV();
+  // 開放通知
+  if(typeof mvUnlockNotice==='function'){
+    mvUnlockNotice('🔄 新フォルム解放！', gN(c)+' が「'+c.forms[formIdx].n+'」にフォルムチェンジできるようになった！');
+  }
+  return true;
+}
+// 開放状態もsaveMVで永続化されるよう、loadMV時に復元する仕組みを追加
+function restoreUnlockedForms(){
+  try{
+    var raw=localStorage.getItem(MV_KEY);
+    if(!raw)return;
+    var s=JSON.parse(raw);
+    if(s&&s.storyState){
+      STORY_CHARS.forEach(function(c){
+        var st=s.storyState[c.id];
+        if(st&&st.unlockedForms&&Array.isArray(st.unlockedForms)){
+          st.unlockedForms.forEach(function(fi){
+            if(c.forms&&c.forms[fi])c.forms[fi].unlocked=true;
+          });
+        }
+      });
+    }
+  }catch(e){}
+}
 function remove(id,isG){var c=findChar(id,isG);var i=party.indexOf(c);if(i>=0)party[i]=null;saveMV();closeModal();renderTeam();}
 function swap(id,isG){var c=findChar(id,isG);var empty=party.indexOf(null);if(empty>=0){party[empty]=c;saveMV();closeModal();renderTeam();toast(gN(c)+'を編成しました');return;}
   var cands=party.map(function(p,i){return {p:p,i:i};}).filter(function(x){return x.p&&!x.p.fixed;});
@@ -6485,847 +7004,38 @@ function renderColl(){var ids=gachaOwnedIds();document.getElementById('mv-collco
   document.getElementById('mv-collgrid').innerHTML=sorted.map(function(c){var col=RC[c.rarity];var have=ids[c.id];
     return have?'<div style="aspect-ratio:1;border-radius:8px;border:1.5px solid '+col+'88;background:'+col+'14;display:flex;align-items:center;justify-content:center;font-size:20px">'+c.emoji+'</div>':'<div style="aspect-ratio:1;border-radius:8px;border:1.5px solid #222;background:#0c0c12;display:flex;align-items:center;justify-content:center;font-size:16px;opacity:.3">❓</div>';}).join('');}
 
-// ===== パッシブ腕試しバトル（新システム検証用・シンプル自動戦闘）=====
-var btState=null;
-function btLog(html){var el=document.getElementById('mv-bt-log');if(!el)return;el.innerHTML+='<div style="animation:mvfadein .3s">'+html+'</div>';el.scrollTop=el.scrollHeight;}
-function passSet(c){ // そのキャラの全パッシブ名を結合した判定用文字列
-  return (gPassives(c)||[]).join('｜');
-}
-function startBattle(opts){
-  opts=opts||{};
-  // 編成データが未ロードなら初期化（Season2通しプレイ時など、編成画面を経由しないケース）
-  if(owned.length===0||party.every(function(x){return !x;})){
-    try{initData();}catch(e){}
-  }
-  // それでも空＝初プレイで物語キャラだけの状態。デフォルトで物語4人を編成
-  if(party.every(function(x){return !x;})){
-    var defaults=owned.filter(function(c){return !c.gacha;}).slice(0,4);
-    for(var i=0;i<defaults.length;i++)party[i]=defaults[i];
-    try{saveMV();}catch(e){}
-  }
-  var members=party.filter(Boolean);
-  if(members.length===0){toast('編成が空です');if(opts.onLose)setTimeout(opts.onLose,300);return;}
-  var hpMul=opts.hpMul||6;
-  var atkMul=opts.atkMul||0.7;
-  var bossName=opts.bossName||'観測者の影';
-  var bossEmoji=opts.bossEmoji||'👁️';
-  var noticeText=opts.notice||'';
-  var totalHP=members.reduce(function(s,c){return s+bp(c);},0)*hpMul;
-  btState={
-    units:members.map(function(c){var s=stats(c);return {c:c,hp:s.hp*3,maxhp:s.hp*3,atk:s.atk,def:s.def,spd:s.spd,sup:s.sup,alive:true,_atkBonus:0};}),
-    enemies:[{n:bossName,e:bossEmoji,hp:totalHP,maxhp:totalHP,atk:Math.round(members.reduce(function(s,c){return s+stats(c).atk;},0)/members.length*atkMul)}],
-    minions:opts.skipMinions?[]:[{n:'歪みの欠片',e:'🔻',hp:Math.round(totalHP*0.15),maxhp:Math.round(totalHP*0.15),atk:1},{n:'歪みの欠片',e:'🔻',hp:Math.round(totalHP*0.15),maxhp:Math.round(totalHP*0.15),atk:1}],
-    turn:0,over:false,
-    onWin:opts.onWin||null,onLose:opts.onLose||null,forcedLose:opts.forcedLose||false
-  };
-  document.getElementById('mv-battle').style.display='block';
-  document.getElementById('mv-bt-log').innerHTML='';
-  btRenderEnemy();btRenderParty();
-  document.getElementById('mv-bt-foot').innerHTML='<button onclick="MV.btStep()" id="mv-bt-next" style="flex:1;padding:13px;border-radius:11px;border:none;background:linear-gradient(180deg,#ff6b6b,#a83232);color:#fff;font-weight:900;font-size:14px">▶ ターン進行</button><button onclick="MV.btEnd()" style="padding:13px 18px;border-radius:11px;border:1px solid #445;background:#15151f;color:#9ab;font-weight:700">やめる</button>';
-  if(noticeText)btLog('<span style="color:#8fd3ff">📝 '+noticeText+'</span>');
-  btLog('<span style="color:#ff8b8b;font-weight:800">⚔ 「'+bossName+'」との戦闘開始！</span>');
-  btOpening();
-}
-function allEnemies(){return btState.enemies.concat(btState.minions).filter(function(e){return e.hp>0;});}
-function btOpening(){
-  var total=btState.units.reduce(function(s,u){return s+bp(u.c);},0);
-  btState.units.forEach(function(u){
-    var ps=passSet(u.c);
-    if(ps.indexOf('開幕崩し')>=0){
-      var dmg=Math.round(total*0.99);
-      allEnemies().forEach(function(e){e.hp=Math.max(0,e.hp-dmg);});
-      btLog('🌟 <b>'+gN(u.c)+'</b>の【開幕崩し】！ 敵全体に <span style="color:#ffd700">'+fmt(dmg*DISP)+'</span> の特大ダメージ！');
-    }
-    if(ps.indexOf('星の祝福')>=0){btState.units.forEach(function(x){x._atkBonus+=0.2;});btLog('✨ <b>'+gN(u.c)+'</b>の【星の祝福】！ 味方全体の攻撃UP');}
-    if(ps.indexOf('王の咆哮')>=0||ps.indexOf('鼓舞')>=0){btState.units.forEach(function(x){x._atkBonus+=0.15;});btLog('🦁 <b>'+gN(u.c)+'</b>の咆哮！ 味方の攻撃UP');}
-  });
-  btRenderEnemy();
-}
-function btStep(){
-  if(btState.over)return;
-  btState.turn++;
-  btLog('<span style="color:#888">― ターン'+btState.turn+' ―</span>');
-  // 味方行動（速い順）
-  var order=btState.units.filter(function(u){return u.alive;}).slice().sort(function(a,b){return b.spd-a.spd;});
-  order.forEach(function(u){
-    if(!u.alive||btState.over)return;
-    var ps=passSet(u.c);
-    // ヒーラー/回復パッシブ
-    if(ps.indexOf('全体大回復')>=0||ps.indexOf('優しき心の雨')>=0){
-      btState.units.forEach(function(x){if(x.alive){var h=Math.round(x.maxhp*0.25);x.hp=Math.min(x.maxhp,x.hp+h);}});
-      btLog('💚 <b>'+gN(u.c)+'</b>の【全体回復】！ 味方全体が回復した');
-    }
-    // 攻撃
-    var tgt=allEnemies()[0];if(!tgt){return;}
-    var atk=Math.round(u.atk*(1+u._atkBonus));
-    var hits=1;
-    if(ps.indexOf('二刀流')>=0){hits=2;}
-    if(ps.indexOf('捨て身')>=0){atk*=10;}
-    var crit=false;
-    if(ps.indexOf('観測完了')>=0||ps.indexOf('急所狙い')>=0){crit=true;}
-    for(var h=0;h<hits;h++){
-      tgt=allEnemies()[0];if(!tgt)break;
-      var dmg=Math.max(1,atk-Math.round(tgt.atk*0.05));
-      if(ps.indexOf('観測完了')>=0)dmg=atk; // 防御無視
-      if(crit)dmg=Math.round(dmg*1.8);
-      // 即死の賽
-      if(ps.indexOf('即死の賽')>=0&&Math.random()<0.1){tgt.hp=0;btLog('☠ <b>'+gN(u.c)+'</b>の【即死の賽】発動！ '+tgt.n+'を即死させた！');}
-      else{tgt.hp=Math.max(0,tgt.hp-dmg);btLog('🗡 <b>'+gN(u.c)+'</b> → '+tgt.n+' に '+(crit?'<span style="color:#ffd700">会心 ':'')+fmt(dmg*DISP)+(crit?'</span>':'')+' ダメージ');}
-      if(tgt.hp<=0)btLog('💥 '+tgt.n+'を撃破！');
-    }
-  });
-  btRenderEnemy();
-  if(allEnemies().length===0){btWin();return;}
-  // 敵行動
-  var boss=btState.enemies[0];
-  if(boss.hp>0){
-    // 盾の雑魚パッシブ：雑魚がいる味方が肩代わり
-    var target=btState.units.filter(function(u){return u.alive;});
-    target=target[Math.floor(Math.random()*target.length)];
-    var shielder=btState.units.find(function(u){return u.alive&&passSet(u.c).indexOf('盾の雑魚')>=0;});
-    var minionAlive=btState.minions.some(function(m){return m.hp>0;});
-    var dmg=Math.round(boss.atk*2);
-    if(shielder&&minionAlive){
-      var m=btState.minions.find(function(x){return x.hp>0;});m.hp=0;
-      btLog('🛡 <b>'+gN(shielder.c)+'</b>の【盾の雑魚】！ '+boss.n+'の攻撃を敵雑魚（'+m.e+'）に当てさせた！');
-    }else{
-      // 想いの盾/絶対防壁：致死を防ぐ
-      var guard=btState.units.find(function(u){return u.alive&&(passSet(u.c).indexOf('想いの盾')>=0||passSet(u.c).indexOf('絶対防壁')>=0||passSet(u.c).indexOf('不滅の盾')>=0);});
-      if(target.hp-dmg<=0&&guard){target.hp=1;btLog('🛡 <b>'+gN(guard.c)+'</b>の盾！ '+gN(target.c)+'がHP1で耐えた！');}
-      else{target.hp=Math.max(0,target.hp-dmg);btLog('👁 '+boss.n+' → <b>'+gN(target.c)+'</b> に '+fmt(dmg*DISP)+' ダメージ');
-        // 怒りパッシブ
-        if(passSet(target.c).indexOf('怒り')>=0){target._atkBonus+=0.1;}
-        if(target.hp<=0){target.alive=false;btLog('💀 '+gN(target.c)+'は倒れた…');}
-      }
-    }
-  }
-  btRenderParty();
-  if(btState.units.every(function(u){return !u.alive;})){btLose();return;}
-}
-function btWin(){
-  btState.over=true;
-  btLog('<span style="color:#ffd700;font-weight:900;font-size:14px">🏆 勝利！</span>');
-  var foot=document.getElementById('mv-bt-foot');
-  if(btState.onWin){
-    foot.innerHTML='<button onclick="MV.btEnd()" style="flex:1;padding:13px;border-radius:11px;border:none;background:linear-gradient(180deg,#5d9eff,#3a5bff);color:#fff;font-weight:900;font-size:14px">▶ 続ける</button>';
-  }else{
-    document.getElementById('mv-bt-next').style.display='none';
-  }
-}
-function btLose(){
-  btState.over=true;
-  if(btState.forcedLose){
-    btLog('<span style="color:#c8a0ff;font-weight:900;font-size:14px">— 全滅。だが、ここで終わるわけにはいかない。 —</span>');
-  }else{
-    btLog('<span style="color:#ff6b6b;font-weight:900">敗北…編成を見直そう。</span>');
-  }
-  var foot=document.getElementById('mv-bt-foot');
-  if(btState.onLose||btState.forcedLose){
-    foot.innerHTML='<button onclick="MV.btEnd()" style="flex:1;padding:13px;border-radius:11px;border:none;background:linear-gradient(180deg,#888,#555);color:#fff;font-weight:900;font-size:14px">▶ 続ける</button>';
-  }else{
-    document.getElementById('mv-bt-next').style.display='none';
-  }
-}
-function btEnd(){
-  var wasWin=btState&&btState.over&&btState.units.some(function(u){return u.alive;})&&!btState.enemies.some(function(e){return e.hp>0;});
-  var wasForcedLose=btState&&btState.forcedLose;
-  var onWin=btState?btState.onWin:null;
-  var onLose=btState?btState.onLose:null;
-  document.getElementById('mv-battle').style.display='none';
-  btState=null;
-  if(wasWin&&onWin){setTimeout(onWin,200);}
-  else if(wasForcedLose&&onLose){setTimeout(onLose,200);} // 強制敗北イベントは onLose で続行
-  else if(onLose&&!wasWin){setTimeout(onLose,200);}
-}
-// ============ フルレスバトル（コマンド式・ジョーク選択・必殺技選択・パッシブ自動）============
-var fbState=null;
-
-function fbLog(html){var el=document.getElementById('fb-log');if(!el)return;el.innerHTML+='<div style="animation:mvfadein .25s">'+html+'</div>';el.scrollTop=el.scrollHeight;}
-function fbDispDmg(n){return fmt(Math.round(n)*DISP);}
-
-function fbInit(opts){
-  // パーティ準備
-  if(owned.length===0||party.every(function(x){return !x;})){try{initData();}catch(e){}}
-  if(party.every(function(x){return !x;})){
-    var defaults=owned.filter(function(c){return !c.gacha;}).slice(0,4);
-    for(var i=0;i<defaults.length;i++)party[i]=defaults[i];try{saveMV();}catch(e){}
-  }
-  var members=party.filter(Boolean);
-  if(members.length===0){toast('編成が空です');if(opts.onLose)setTimeout(opts.onLose,300);return false;}
-  // 装備ジョーク（仮：4つランダム or 既存のINITIAL_SKILLSから）
-  // 物語キャラはequipped配列を持つようにしたいが、未設定なら j1-j4 を仮装備
-  var totalAtk=members.reduce(function(s,c){return s+stats(c).atk;},0);
-  var bossName=opts.bossName||'敵';
-  var bossEmoji=opts.bossEmoji||'⚔';
-  var hpMul=opts.hpMul||6;
-  var atkMul=opts.atkMul||0.7;
-  var bossHP=Math.round(members.reduce(function(s,c){return s+bp(c);},0)*hpMul);
-  fbState={
-    units:members.map(function(c,i){var s=stats(c);
-      var equippedJokes=(c.gacha?['j1','j5','j10','j15']:['j1','j2','j3','j4']);
-      var ults;
-      if(c.gacha){var uid=window.GACHA_ULT_MAP&&window.GACHA_ULT_MAP[c.id];ults=uid?[uid]:[];}
-      else{ults=(c.forms?c.forms[c.cur].ult:c.ult)||[];}
-      return {c:c,hp:s.hp*3,maxhp:s.hp*3,atk:s.atk,def:s.def,spd:s.spd,sup:s.sup,
-        tension:0,maxTension:100,alive:true,
-        _atkBuff:1.0,_defBuff:1.0,_invincibleTurns:0,_dotTurns:0,_dotDmg:0,_stunTurns:0,
-        equippedJokes:equippedJokes, ults:ults, idx:i};
-    }),
-    enemies:[{n:bossName,e:bossEmoji,hp:bossHP,maxhp:bossHP,atk:Math.round(totalAtk/members.length*atkMul),
-      _defBuff:1.0,_atkBuff:1.0,_dotTurns:0,_dotDmg:0,_stunTurns:0}],
-    turn:0,curUnit:0,over:false,phase:'select',
-    onWin:opts.onWin||null,onLose:opts.onLose||null,forcedLose:opts.forcedLose||false,
-    bossName:bossName,
-    chap:window.__mvtS2Chap||0
-  };
-  // 章バッジ＋ボス名表示
-  document.getElementById('fb-title-chap').textContent='SEASON 2 ・ CHAPTER '+(window.__mvtS2Chap||'?');
-  document.getElementById('fb-title-name').textContent='⚔ '+bossName+' 戦';
-  document.getElementById('fb-turn').textContent='1';
-  // 背景：章別BG＋画像
-  var spec=(typeof getS2BossSpec==='function')?getS2BossSpec(window.__mvtS2Chap):null;
-  var bgDeep=document.getElementById('fb-bg-deep');
-  bgDeep.className='fb-bg-layer fb-bg-deep'+((spec&&spec.bg)?' bg-'+spec.bg:'');
-  var bgImg=document.getElementById('fb-bg-image');
-  if(spec&&spec.bgImg){bgImg.style.backgroundImage='url("'+spec.bgImg+'")';bgImg.classList.add('on');}
-  else{bgImg.classList.remove('on');bgImg.style.backgroundImage='';}
-  document.getElementById('mv-fbattle').classList.add('on');
-  document.getElementById('fb-log').innerHTML='';
-  // 章特殊イントロ演出
-  var chap=fbState.chap;
-  if(chap===7){
-    // 7話：精神世界・1vs1モーダル
-    setTimeout(function(){
-      var modal=document.createElement('div');
-      modal.style.cssText='position:fixed;inset:0;z-index:1800;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;padding:20px;color:#fff;font-family:-apple-system,sans-serif';
-      modal.innerHTML='<div style="max-width:340px;background:#0a0a14;border:2px solid #555;border-radius:14px;padding:20px;text-align:center"><div style="font-size:38px;margin-bottom:10px">👤</div><div style="font-size:14px;color:#888;font-weight:900;letter-spacing:3px;margin-bottom:14px">精神世界</div><div style="font-size:11px;color:#cde;line-height:1.9;margin-bottom:18px">相手は<b style="color:#ffd700">お前自身</b>だ。<br>ステータス・装備技・パッシブが、<br>完全に同じ。<br><br>同じ力で正面から殴っても勝てない。<br><b style="color:#ff8b8b">お前にしか分からない、<br>お前の弱点を突け。</b></div><button onclick="this.parentElement.parentElement.remove()" style="padding:10px 30px;border-radius:10px;border:1px solid #888;background:#222;color:#ccc;font-weight:800;cursor:pointer">▶ 戦闘開始</button></div>';
-      document.body.appendChild(modal);
-    },200);
-  }
-  if(chap===8){
-    // 8話：神とのレスバ激化イントロ
-    setTimeout(function(){
-      var overlay=document.createElement('div');
-      overlay.style.cssText='position:fixed;inset:0;z-index:1750;background:radial-gradient(ellipse at 50% 50%,#fff8,#0008 60%,#000);display:flex;align-items:center;justify-content:center;animation:fbUltSacFlash 1.5s ease-out';
-      overlay.innerHTML='<div style="text-align:center;color:#fff;font-family:serif"><div style="font-size:80px;animation:fbUltSpin 6s linear infinite;display:inline-block">✨</div><div style="font-size:18px;margin-top:10px;font-weight:900;letter-spacing:6px;text-shadow:0 0 16px #ffd700">神、顕現</div><div style="font-size:11px;margin-top:8px;color:#ffd";letter-spacing:3px">― 言葉のレスバ、開幕 ―</div></div>';
-      document.body.appendChild(overlay);
-      setTimeout(function(){overlay.style.transition='opacity .6s';overlay.style.opacity='0';setTimeout(function(){overlay.remove();},700);},2200);
-    },200);
-  }
-  if(chap===9){
-    // 9話：核の主・原初の鼓動の威圧
-    setTimeout(function(){
-      var overlay=document.createElement('div');
-      overlay.style.cssText='position:fixed;inset:0;z-index:1750;background:radial-gradient(ellipse at 50% 50%,#000,#0a0010);display:flex;align-items:center;justify-content:center';
-      overlay.innerHTML='<div style="text-align:center;color:#fff"><div style="font-size:70px;filter:drop-shadow(0 0 30px #ff0066);animation:fbUltSpin 4s linear infinite;display:inline-block">🕴️</div><div style="font-size:16px;margin-top:14px;font-weight:900;letter-spacing:4px;color:#ff3a6b;text-shadow:0 0 14px #ff0066">原初の鼓動</div><div style="font-size:9px;margin-top:8px;color:#cab;letter-spacing:2px">― 倍率×100。これは、敗北するための戦いだ ―</div></div>';
-      document.body.appendChild(overlay);
-      setTimeout(function(){overlay.style.transition='opacity .6s';overlay.style.opacity='0';setTimeout(function(){overlay.remove();},700);},2500);
-    },200);
-  }
-  fbLog('<span style="color:#ff8b8b;font-weight:800">⚔ 「'+bossName+'」とのレスバが始まった！</span>');
-  fbOpening();
-  fbRender();
-  fbNextSelect();
-  return true;
-}
-
-function fbOpening(){
-  // パッシブ：開幕崩し（総戦力99%全体）
-  var total=fbState.units.reduce(function(s,u){return s+bp(u.c);},0);
-  fbState.units.forEach(function(u){
-    var ps=passSet(u.c);
-    if(ps.indexOf('開幕崩し')>=0){
-      var dmg=Math.round(total*0.99);
-      fbState.enemies.forEach(function(e){e.hp=Math.max(0,e.hp-dmg);});
-      fbLog('🌟 <b>'+gN(u.c)+'</b>【開幕崩し】！ 敵全体に <span style="color:#ffd700">'+fbDispDmg(dmg)+'</span> ダメージ！');
-    }
-    if(ps.indexOf('星の祝福')>=0){fbState.units.forEach(function(x){x._atkBuff+=0.2;});fbLog('✨ <b>'+gN(u.c)+'</b>【星の祝福】味方全体の攻撃UP');}
-    if(ps.indexOf('王の咆哮')>=0||ps.indexOf('鼓舞')>=0){fbState.units.forEach(function(x){x._atkBuff+=0.15;});fbLog('🦁 <b>'+gN(u.c)+'</b>【王の咆哮】味方全体の攻撃UP');}
-  });
-}
-
-function fbAliveAllies(){return fbState.units.filter(function(u){return u.alive;});}
-function fbAliveEnemies(){return fbState.enemies.filter(function(e){return e.hp>0;});}
-
-function fbRender(){
-  var e=fbState.enemies[0];
-  // 敵画像（あれば img）or 絵文字
-  var imgPath=null;
-  var spec=(typeof getS2BossSpec==='function')?getS2BossSpec(window.__mvtS2Chap):null;
-  if(spec){
-    if(spec.forms&&spec.forms[e._formIdx||0]&&spec.forms[e._formIdx||0].img){imgPath=spec.forms[e._formIdx||0].img;}
-    else if(spec.img){imgPath=spec.img;}
-  }
-  var enemyVisual=imgPath?'<img src="'+imgPath+'" class="fb-enemy-img" alt="">':'<div class="fb-enemy-emoji">'+e.e+'</div>';
-  var ehtml=enemyVisual+'<div class="fb-enemy-name">'+e.n+'</div>'+
-    '<div class="fb-hp-wrap"><div class="fb-hp-bg"><div class="fb-hp-fill" style="width:'+Math.max(0,e.hp/e.maxhp*100)+'%"></div></div><div class="fb-hp-num">'+fmt(Math.max(0,e.hp)*DISP)+' / '+fmt(e.maxhp*DISP)+'</div></div>';
-  document.getElementById('fb-enemy').innerHTML=ehtml;
-  // 味方カード（盛り盛り版）
-  document.getElementById('fb-party').innerHTML=fbState.units.map(function(u,i){
-    var pct=Math.max(0,u.hp/u.maxhp*100);
-    var tpPct=u.tension/u.maxTension*100;
-    var active=(fbState.phase==='select'&&i===fbState.curUnit&&u.alive);
-    var tpMax=u.tension>=u.maxTension;
-    return '<div class="fb-ally'+(active?' active':'')+(u.alive?'':' dead')+'">'+
-      '<div class="fb-ally-emoji">'+gE(u.c)+'</div>'+
-      '<div class="fb-ally-name">'+gN(u.c).substring(0,6)+'</div>'+
-      '<div class="fb-bar-mini"><div class="fb-hp-mini-fill'+(pct<=30?' low':'')+'" style="width:'+pct+'%"></div></div>'+
-      '<div class="fb-bar-mini"><div class="fb-tp-mini-fill'+(tpMax?' fb-tp-max':'')+'" style="width:'+tpPct+'%"></div></div>'+
-      '<div class="fb-tp-label'+(tpMax?' ready':'')+'">'+(tpMax?'✨ MAX':'TP '+Math.floor(u.tension))+'</div>'+
-      '</div>';
-  }).join('');
-  document.getElementById('fb-turn').textContent=fbState.turn+1;
-}
-// ダメージ数字飛び出し
-function fbPopDmg(value, isCrit, isHeal){
-  var wrap=document.getElementById('fb-wrap');if(!wrap)return;
-  var d=document.createElement('div');
-  d.className='fb-dmg-num'+(isCrit?' crit':'')+(isHeal?' heal':'');
-  d.textContent=Math.floor(value).toLocaleString();
-  var x=40+Math.random()*20,y=22+Math.random()*12;
-  d.style.left=x+'%';d.style.top=y+'%';
-  wrap.appendChild(d);
-  setTimeout(function(){d.remove();},1450);
-}
-function fbHitFx(){
-  var stage=document.getElementById('fb-enemy-stage');if(!stage)return;
-  var fx=document.createElement('div');fx.className='fb-hit-fx';
-  stage.appendChild(fx);
-  setTimeout(function(){fx.remove();},650);
-}
-function fbShakeScreen(){
-  var w=document.getElementById('fb-wrap');if(!w)return;
-  w.classList.remove('fb-shake');void w.offsetWidth;w.classList.add('fb-shake');
-}
-
-function fbNextSelect(){
-  // 次に行動するキャラを決める（味方順番制：左から）
-  if(fbState.over)return;
-  // 全員行動済みなら敵ターン
-  // 行動済み管理：unitに _actedThisTurn を持たせる
-  var nextIdx=-1;
-  for(var i=0;i<fbState.units.length;i++){
-    var u=fbState.units[i];
-    if(u.alive&&!u._actedThisTurn&&u._stunTurns<=0)nextIdx=i;
-    if(nextIdx>=0)break;
-  }
-  if(nextIdx<0){
-    // 全員行動済み→敵ターン
-    fbEnemyTurn();return;
-  }
-  fbState.curUnit=nextIdx;
-  fbState.phase='select';
-  fbShowCommands(fbState.units[nextIdx]);
-  fbRender();
-}
-
-function fbShowCommands(u){
-  var actEl=document.getElementById('fb-action');
-  var canUlt=u.tension>=u.maxTension&&u.ults&&u.ults.length>0;
-  var html='<div class="fb-cmd-actor">▶ <b style="color:'+RC[gR(u.c)]+'">'+gN(u.c)+'</b> の行動を選んでください</div>';
-  html+='<div class="fb-cmd-grid">';
-  html+='<button class="fb-cmd-btn fb-cmd-joke" onclick="MV.fbOpenJokePick()"><span class="fb-ico">🎤</span><span class="fb-lbl">ジョーク<span class="fb-sub">装備4種から選択</span></span></button>';
-  if(canUlt){
-    html+='<button class="fb-cmd-btn fb-cmd-ult" onclick="MV.fbUseUlt()"><span class="fb-ico">✨</span><span class="fb-lbl">必殺技 ('+u.ults.length+')<span class="fb-sub">テンションMAX</span></span></button>';
-  }else{
-    html+='<button class="fb-cmd-btn fb-cmd-ult disabled" disabled><span class="fb-ico">✨</span><span class="fb-lbl">必殺技<span class="fb-sub">TP '+Math.floor(u.tension)+'/'+u.maxTension+'</span></span></button>';
-  }
-  html+='<button class="fb-cmd-btn fb-cmd-def" onclick="MV.fbDefend()"><span class="fb-ico">🛡</span><span class="fb-lbl">防御<span class="fb-sub">受けダメ半減</span></span></button>';
-  html+='<button class="fb-cmd-btn fb-cmd-skip" onclick="MV.fbSkip()"><span class="fb-ico">⏭</span><span class="fb-lbl">様子見<span class="fb-sub">TP +10</span></span></button>';
-  html+='</div>';
-  actEl.innerHTML=html;
-}
-
-function fbOpenJokePick(){
-  var u=fbState.units[fbState.curUnit];
-  document.getElementById('fb-jokepick-name').textContent=gN(u.c)+'｜ジョーク選択';
-  var list=u.equippedJokes.map(function(jid){
-    var sk=SKILLS.find(function(s){return s.id===jid;});if(!sk)return '';
-    var ef=SKILL_EFFECTS[jid];var def=ef?EFFECT_DEFS[ef.type]:null;
-    var icon=def?def.icon:'⚔';var label=def?def.label:'攻撃';
-    return '<div onclick="MV.fbUseJoke(\''+jid+'\')" style="display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:9px;background:#1a1a26;border-left:3px solid #5d9eff;margin-bottom:5px;cursor:pointer">'+
-      '<span style="font-size:17px;flex-shrink:0">'+icon+'</span>'+
-      '<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700">'+sk.ja+'</div><div style="font-size:9px;color:#9ab;margin-top:2px">★'+sk.star+' ／ '+label+(ef?'（倍率×'+ef.mul+'）':'')+'</div></div></div>';
-  }).join('');
-  document.getElementById('fb-jokepick-list').innerHTML=list||'<div style="color:#9ab;font-size:11px;text-align:center;padding:20px">装備ジョークがありません</div>';
-  document.getElementById('fb-jokepick').style.display='flex';
-}
-function fbClosePick(){document.getElementById('fb-jokepick').style.display='none';}
-
-function fbUseJoke(jid){
-  try{
-    fbClosePick();
-    var u=fbState.units[fbState.curUnit];
-    if(!u){fbLog('<span style="color:#f66">エラー：行動キャラ不明</span>');return;}
-    var sk=SKILLS.find(function(s){return s.id===jid;});
-    var ef=SKILL_EFFECTS&&SKILL_EFFECTS[jid];
-    if(!sk){fbLog('<span style="color:#f66">スキル '+jid+' 不明</span>');fbAfterAction();return;}
-    if(!ef){ef={type:'attack',mul:1.0};} // フォールバック
-    fbLog('🎤 <b>'+gN(u.c)+'</b>：「'+sk.ja+'」');
-    fbApplyEffect(u, ef.type, ef.mul);
-    u.tension=Math.min(u.maxTension,u.tension+20);
-    u._actedThisTurn=true;
-    fbRender();
-    fbAfterAction();
-  }catch(err){
-    console.error('fbUseJoke error:', err);
-    fbLog('<span style="color:#f66">バトルエラー：'+err.message+'</span>');
-    // フリーズ防止：強制的に次へ
-    try{
-      var u=fbState.units[fbState.curUnit];
-      if(u)u._actedThisTurn=true;
-      fbAfterAction();
-    }catch(e){}
-  }
-}
-
-function fbApplyEffect(u, type, mul){
-  var atk=Math.round(u.atk*u._atkBuff*mul);
-  var enemies=fbAliveEnemies();
-  var allies=fbAliveAllies();
-  var ps=passSet(u.c);
-  switch(type){
-    case 'attack':case 'big_attack':
-      if(enemies.length===0)return;
-      var t=enemies[0];
-      var crit=ps.indexOf('観測完了')>=0||ps.indexOf('急所狙い')>=0||Math.random()<0.1;
-      var dmg=Math.max(1,atk-Math.round(t.atk*0.05*(t._defBuff||1)));
-      if(ps.indexOf('観測完了')>=0)dmg=atk;
-      if(crit)dmg=Math.round(dmg*1.8);
-      t.hp=Math.max(0,t.hp-dmg);
-      fbLog('🗡 → '+t.n+' に '+(crit?'<span style="color:#ffd700">会心 ':'')+fbDispDmg(dmg)+(crit?'</span>':'')+' ダメージ');
-      fbHitFx();fbPopDmg(dmg*DISP,crit,false);if(crit)fbShakeScreen();
-      if(t.hp<=0)fbLog('💥 '+t.n+'を撃破！');
-      break;
-    case 'aoe':
-      var aoeDmg=Math.max(1,Math.round(atk*0.7));
-      enemies.forEach(function(t){t.hp=Math.max(0,t.hp-aoeDmg);});
-      fbLog('🌊 敵全体に '+fbDispDmg(aoeDmg)+' ダメージ');
-      fbHitFx();for(var i=0;i<3;i++){(function(i){setTimeout(function(){fbPopDmg(aoeDmg*DISP,false,false);},i*120);})(i);}
-      break;
-    case 'heal':
-      var hAmt=Math.round(u.maxhp*0.3*mul);
-      u.hp=Math.min(u.maxhp,u.hp+hAmt);
-      fbLog('❤ 自分を '+fbDispDmg(hAmt)+' 回復');
-      fbPopDmg(hAmt*DISP,false,true);
-      break;
-    case 'heal_all':
-      var hh=Math.round(u.maxhp*0.2*mul);
-      allies.forEach(function(a){a.hp=Math.min(a.maxhp,a.hp+hh);});
-      fbLog('💚 味方全体を '+fbDispDmg(hh)+' 回復');
-      for(var i=0;i<3;i++){(function(i){setTimeout(function(){fbPopDmg(hh*DISP,false,true);},i*100);})(i);}
-      break;
-    case 'buff_atk':
-      allies.forEach(function(a){a._atkBuff+=0.25;});
-      fbLog('⬆⚔ 味方全体の攻撃UP');
-      break;
-    case 'buff_def':
-      allies.forEach(function(a){a._defBuff+=0.25;});
-      fbLog('⬆🛡 味方全体の防御UP');
-      break;
-    case 'debuff_def':
-      if(enemies[0]){enemies[0]._defBuff=Math.max(0.3,enemies[0]._defBuff-0.3);fbLog('⬇🛡 '+enemies[0].n+'の防御DOWN');}
-      break;
-    case 'debuff_atk':
-      if(enemies[0]){enemies[0]._atkBuff=Math.max(0.3,enemies[0]._atkBuff-0.3);fbLog('⬇⚔ '+enemies[0].n+'の攻撃DOWN');}
-      break;
-    case 'dot':
-      if(enemies[0]){enemies[0]._dotTurns=3;enemies[0]._dotDmg=Math.round(atk*0.2);fbLog('☠ '+enemies[0].n+'に毒を付与');}
-      break;
-    case 'stun':
-      if(enemies[0]){enemies[0]._stunTurns=1;fbLog('💫 '+enemies[0].n+'を行動不能に');}
-      break;
-    case 'drain':
-      if(enemies[0]){var d=Math.max(1,Math.round(atk*0.8));enemies[0].hp=Math.max(0,enemies[0].hp-d);u.hp=Math.min(u.maxhp,u.hp+d);fbLog('🩸 → '+enemies[0].n+'に '+fbDispDmg(d)+' ／ 自分を '+fbDispDmg(d)+' 吸収');}
-      break;
-    case 'counter':
-      u._counterReady=1;fbLog('🔄 反撃態勢');
-      break;
-    case 'shield':
-      u._invincibleTurns=1;fbLog('🛡 自分に致死無効1回');
-      break;
-    case 'ult':
-      // メタ＝ランダム強効果
-      if(Math.random()<0.5){if(enemies[0]){var sd=Math.round(atk*2);enemies[0].hp=Math.max(0,enemies[0].hp-sd);fbLog('✨ メタ攻撃 '+enemies[0].n+'に '+fbDispDmg(sd)+' ダメージ');}}
-      else{allies.forEach(function(a){a._atkBuff+=0.3;});fbLog('✨ メタ強化 味方全体の攻撃UP');}
-      break;
-  }
-}
-
-function fbUseUlt(){
-  var u=fbState.units[fbState.curUnit];
-  if(u.ults.length===1){fbCastUlt(u.ults[0]);return;}
-  // 複数所持 → 選択モーダル
-  var html=u.ults.map(function(uid){var ud=ULTIMATE_DEFS[uid];if(!ud)return '';
-    return '<div onclick="MV.fbCastUlt(\''+uid+'\');MV.fbCloseUltPick()" style="padding:12px;border-radius:9px;background:linear-gradient(135deg,#3a2a08,#1a1408);border:1px solid #FFD700;margin-bottom:8px;cursor:pointer;text-align:left">'+
-      '<div style="font-size:13px;font-weight:900;color:#FFD700"><span style="font-size:15px;margin-right:5px">'+(ud.icon||'✨')+'</span>'+ud.name+'</div>'+
-      '<div style="font-size:9px;color:#cde;margin-top:4px;line-height:1.5">'+ud.desc+'</div></div>';
-  }).join('');
-  document.getElementById('fb-ultpick-list').innerHTML=html;
-  document.getElementById('fb-ultpick').style.display='flex';
-}
-function fbCloseUltPick(){document.getElementById('fb-ultpick').style.display='none';}
-
-function fbCastUlt(uid){
-  var u=fbState.units[fbState.curUnit];
-  var ud=ULTIMATE_DEFS[uid];if(!ud){fbLog('必殺技不明');return;}
-  fbLog('<div style="font-size:14px;color:#FFD700;font-weight:900;text-align:center;padding:6px 0;background:linear-gradient(90deg,transparent,#FFD70022,transparent)">✨ '+gN(u.c)+'の必殺技 ✨<br><span style="font-size:16px">'+(ud.icon||'')+' '+ud.name+'</span></div>');
-  // シネマティック演出を再生（8秒）してから効果適用
-  fbPlayUltCine(u, ud, function(){
-    fbApplyUltimate(u, ud);
-    u.tension=0;
-    u._actedThisTurn=true;
-    fbRender();
-    fbAfterAction();
-  });
-}
-
-function fbApplyUltimate(u, ud){
-  var enemies=fbAliveEnemies();var allies=fbAliveAllies();
-  var atk=Math.round(u.atk*u._atkBuff);
-  switch(ud.type){
-    case 'combo_single':
-    case 'nine_combo':
-      if(enemies[0]){var totalDmg=0;for(var i=0;i<(ud.hits||5);i++){var d=Math.round(atk*(ud.mul||2));enemies[0].hp=Math.max(0,enemies[0].hp-d);totalDmg+=d;}fbLog('💥 '+(ud.hits||5)+'連撃！ 累計 '+fbDispDmg(totalDmg)+' ダメージ');if(ud.selfInvincibleNext)u._invincibleTurns=1;}
-      break;
-    case 'aoe_big':case 'pierce_crit_aoe':
-      var dmg=Math.round(atk*(ud.mul||3));enemies.forEach(function(t){t.hp=Math.max(0,t.hp-dmg);});
-      fbLog('🔥 敵全体に '+fbDispDmg(dmg)+' の特大ダメージ');break;
-    case 'revive_heal':case 'ultimate_heal':
-      fbState.units.forEach(function(a){a.alive=true;a.hp=a.maxhp;});
-      fbLog('🐦 味方全員HP全回復＆蘇生！');
-      if(ud.shield)allies.forEach(function(a){a._invincibleTurns=1;});
-      break;
-    case 'buff_all':
-      allies.forEach(function(a){a._atkBuff+=(ud.atk||0.5);a._defBuff+=(ud.def||0.4);});
-      fbLog('👑 味方全体の攻撃・防御 大UP');break;
-    case 'aoe_debuff':
-      var sd=Math.round(atk*(ud.mul||1.0));enemies.forEach(function(t){t.hp=Math.max(0,t.hp-sd);t._atkBuff*=(1-(ud.debuff||0.5));t._defBuff*=(1-(ud.debuff||0.5));});
-      fbLog('💀 敵全体に '+fbDispDmg(sd)+' ＋ 全能力DOWN');break;
-    case 'aoe_stun':
-      enemies.forEach(function(t){t._stunTurns=(ud.turns||2);});fbLog('⏸ 敵全体を行動不能に');break;
-    case 'drain_big':
-      if(enemies[0]){var dd=Math.round(atk*(ud.mul||3));enemies[0].hp=Math.max(0,enemies[0].hp-dd);u.hp=Math.min(u.maxhp,u.hp+dd);fbLog('🩸 '+enemies[0].n+'に '+fbDispDmg(dd)+' 吸収');}break;
-    case 'hp_swap':
-      if(enemies[0]){var oh=u.hp;u.hp=Math.min(u.maxhp,enemies[0].hp);enemies[0].hp=oh;fbLog('⚖ HPを入れ替えた！');}break;
-    case 'shield_all':case 'protect_full':
-      allies.forEach(function(a){a._invincibleTurns=(ud.count||1);if(ud.healAll)a.hp=a.maxhp;});
-      fbLog('🛡 味方全員に致死無効'+(ud.healAll?'＋全回復':''));break;
-    case 'sacrifice':
-      var cost=Math.round(u.maxhp*(ud.selfHpCost||0.5));u.hp=Math.max(1,u.hp-cost);
-      if(enemies[0]){var bd=Math.round(atk*(ud.mul||6));enemies[0].hp=Math.max(0,enemies[0].hp-bd);fbLog('☠ HP'+fbDispDmg(cost)+'を支払い、'+enemies[0].n+'に '+fbDispDmg(bd)+' 超特大！');}break;
-    case 'regen_all':
-      allies.forEach(function(a){a._regenTurns=(ud.turns||5);a._regenAmt=Math.round(a.maxhp*(ud.perTurn||0.15));});
-      fbLog('🐱 味方全員に自動再生付与');break;
-    case 'observe':
-      allies.forEach(function(a){a._atkBuff+=(ud.allyDamageMul||2.0)-1.0;});
-      fbLog('👁 敵の弱点看破！ 味方の与ダメージ激増');break;
-    case 'erase':
-      if(Math.random()<(ud.chance||0.1)){if(enemies[0]){enemies[0].hp=0;fbLog('🕳️ '+enemies[0].n+'を完全消去！！');}}
-      else{enemies.forEach(function(t){t.hp=Math.max(0,t.hp-Math.round(atk*(ud.fallbackMul||5)));});fbLog('🕳️ 消去失敗→敵全体に特大ダメージ');}break;
-    default:
-      // フォールバック：敵全体大ダメージ
-      enemies.forEach(function(t){t.hp=Math.max(0,t.hp-Math.round(atk*3));});fbLog('✨ '+ud.name+'発動！ 敵全体に大ダメージ');
-  }
-  fbAliveEnemies().forEach(function(t){if(t.hp<=0)fbLog('💥 '+t.n+'撃破！');});
-}
-// ============ 必殺技シネマティック演出（8秒）============
-function fbPlayUltCine(u, ud, onDone){
-  var overlay=document.createElement('div');
-  overlay.id='fb-ult-cine';
-  overlay.style.cssText='position:fixed;inset:0;z-index:1700;background:radial-gradient(ellipse at 50% 50%,#1a0030,#000 80%);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;pointer-events:none';
-  document.body.appendChild(overlay);
-  var col=RC[gR(u.c)];
-  var ultCol=(ud.icon&&ud.icon.indexOf('🛡')>=0)?'#5dca8a':(ud.icon&&(ud.icon.indexOf('🐱')>=0||ud.icon.indexOf('✨')>=0))?'#FFD700':col;
-  // バックグラウンドスキャンライン＋粒子
-  overlay.innerHTML='';
-  // レイヤ1：放射光
-  var rays=document.createElement('div');
-  rays.style.cssText='position:absolute;inset:0;background:conic-gradient(from 0deg,transparent,'+ultCol+'22,transparent,'+ultCol+'33,transparent,'+ultCol+'22,transparent);animation:fbUltSpin 4s linear infinite';
-  overlay.appendChild(rays);
-  // レイヤ2：キャラ大写し
-  var charBox=document.createElement('div');
-  charBox.style.cssText='position:absolute;left:50%;top:38%;transform:translate(-50%,-50%) scale(0);font-size:140px;filter:drop-shadow(0 0 28px '+ultCol+');transition:transform .5s cubic-bezier(.3,1.4,.5,1)';
-  charBox.textContent=gE(u.c);
-  overlay.appendChild(charBox);
-  setTimeout(function(){charBox.style.transform='translate(-50%,-50%) scale(1)';},50);
-  // レイヤ3：キャラ名
-  var nameEl=document.createElement('div');
-  nameEl.style.cssText='position:absolute;left:50%;top:60%;transform:translateX(-50%);font-size:14px;font-weight:900;color:'+col+';letter-spacing:3px;opacity:0;transition:opacity .4s';
-  nameEl.textContent=gN(u.c);
-  overlay.appendChild(nameEl);
-  setTimeout(function(){nameEl.style.opacity='1';},400);
-  // レイヤ4：技名テロップ（巨大）
-  var skillEl=document.createElement('div');
-  skillEl.style.cssText='position:absolute;left:50%;top:68%;transform:translate(-50%,0) scale(0);font-size:30px;font-weight:900;color:#fff;text-shadow:0 0 18px '+ultCol+',0 0 36px '+ultCol+',0 4px 8px #000;letter-spacing:2px;transition:transform .6s cubic-bezier(.3,1.4,.5,1);text-align:center;white-space:nowrap';
-  skillEl.innerHTML='<span style="font-size:36px;margin-right:6px">'+(ud.icon||'✨')+'</span>'+ud.name;
-  overlay.appendChild(skillEl);
-  setTimeout(function(){skillEl.style.transform='translate(-50%,0) scale(1)';},800);
-  // レイヤ5：技種別の演出
-  setTimeout(function(){fbUltEffectByType(overlay, ud, ultCol);},1400);
-  // レイヤ6：ダメージ数字大量
-  setTimeout(function(){fbUltNumbers(overlay, ud, ultCol);},2200);
-  // 終了
-  setTimeout(function(){
-    overlay.style.transition='opacity .5s';overlay.style.opacity='0';
-    setTimeout(function(){overlay.remove();if(onDone)onDone();},500);
-  },7500);
-}
-function fbUltEffectByType(host, ud, col){
-  var t=ud.type;
-  // 連撃系：斬撃線
-  if(t==='combo_single'||t==='nine_combo'){
-    var n=ud.hits||5;
-    for(var i=0;i<n;i++){
-      (function(i){setTimeout(function(){
-        var slash=document.createElement('div');
-        var ang=(Math.random()-.5)*60;
-        slash.style.cssText='position:absolute;left:50%;top:30%;transform:translate(-50%,-50%) rotate('+ang+'deg);width:140%;height:6px;background:linear-gradient(90deg,transparent,'+col+',#fff,'+col+',transparent);box-shadow:0 0 20px '+col+';opacity:0;animation:fbUltSlash .4s ease-out';
-        host.appendChild(slash);setTimeout(function(){slash.remove();},420);
-      },i*120);})(i);
-    }
-  }
-  // 全体焼却・特大全体：放射爆発
-  else if(t==='aoe_big'||t==='pierce_crit_aoe'){
-    for(var i=0;i<12;i++){(function(i){setTimeout(function(){
-      var blast=document.createElement('div');
-      blast.style.cssText='position:absolute;left:'+(15+Math.random()*70)+'%;top:'+(20+Math.random()*60)+'%;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,'+col+',transparent);animation:fbUltBoom 0.7s ease-out;pointer-events:none';
-      host.appendChild(blast);setTimeout(function(){blast.remove();},720);
-    },i*80);})(i);}
-  }
-  // 蘇生・全回復：光の柱
-  else if(t==='revive_heal'||t==='ultimate_heal'||t==='protect_full'){
-    for(var i=0;i<6;i++){(function(i){setTimeout(function(){
-      var pillar=document.createElement('div');
-      pillar.style.cssText='position:absolute;left:'+(10+i*15)+'%;bottom:0;width:60px;height:100%;background:linear-gradient(0deg,'+col+',transparent);animation:fbUltPillar 1.5s ease-out;opacity:.7';
-      host.appendChild(pillar);setTimeout(function(){pillar.remove();},1500);
-    },i*150);})(i);}
-  }
-  // バフ系：上昇粒子
-  else if(t==='buff_all'||t==='observe'||t==='regen_all'){
-    for(var i=0;i<30;i++){(function(i){setTimeout(function(){
-      var p=document.createElement('div');
-      p.style.cssText='position:absolute;left:'+(Math.random()*100)+'%;bottom:0;width:6px;height:6px;border-radius:50%;background:'+col+';box-shadow:0 0 10px '+col+';animation:fbUltRise 2s linear';
-      host.appendChild(p);setTimeout(function(){p.remove();},2000);
-    },i*40);})(i);}
-  }
-  // デバフ・停止系：闇のクラック
-  else if(t==='aoe_debuff'||t==='aoe_stun'){
-    for(var i=0;i<8;i++){(function(i){setTimeout(function(){
-      var crack=document.createElement('div');
-      var ang=Math.random()*360;
-      crack.style.cssText='position:absolute;left:50%;top:50%;width:120%;height:3px;background:linear-gradient(90deg,transparent,#000,'+col+',#000,transparent);transform:translate(-50%,-50%) rotate('+ang+'deg);opacity:0;animation:fbUltCrack .8s ease-out';
-      host.appendChild(crack);setTimeout(function(){crack.remove();},820);
-    },i*100);})(i);}
-  }
-  // 吸収：血のリング
-  else if(t==='drain_big'){
-    var ring=document.createElement('div');
-    ring.style.cssText='position:absolute;left:50%;top:50%;width:60px;height:60px;border:4px solid #ff3a6b;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 30px #ff3a6b;animation:fbUltDrain 1.5s ease-out';
-    host.appendChild(ring);setTimeout(function(){ring.remove();},1500);
-  }
-  // HP入れ替え：天秤
-  else if(t==='hp_swap'){
-    var balance=document.createElement('div');
-    balance.style.cssText='position:absolute;left:50%;top:50%;font-size:120px;transform:translate(-50%,-50%);filter:drop-shadow(0 0 18px '+col+');animation:fbUltSwing 1.5s ease-in-out';
-    balance.textContent='⚖';
-    host.appendChild(balance);setTimeout(function(){balance.remove();},1500);
-  }
-  // 盾系：六角形シールド
-  else if(t==='shield_all'){
-    for(var i=0;i<5;i++){(function(i){setTimeout(function(){
-      var sh=document.createElement('div');
-      sh.style.cssText='position:absolute;left:'+(20+i*15)+'%;top:50%;width:80px;height:80px;background:radial-gradient(circle,'+col+'88,transparent);transform:translateY(-50%);animation:fbUltShield 1s ease-out';
-      host.appendChild(sh);setTimeout(function(){sh.remove();},1000);
-    },i*150);})(i);}
-  }
-  // 犠牲：赤い閃光
-  else if(t==='sacrifice'){
-    var flash=document.createElement('div');
-    flash.style.cssText='position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,#ff0030,transparent 60%);animation:fbUltSacFlash 1s ease-out';
-    host.appendChild(flash);setTimeout(function(){flash.remove();},1000);
-  }
-  // 観測・消去：複数の目／黒穴
-  else if(t==='erase'){
-    var hole=document.createElement('div');
-    hole.style.cssText='position:absolute;left:50%;top:50%;width:200px;height:200px;background:radial-gradient(circle,#000,transparent);border-radius:50%;transform:translate(-50%,-50%) scale(0);animation:fbUltErase 2s ease-out';
-    host.appendChild(hole);setTimeout(function(){hole.remove();},2000);
-  }
-  // デフォルト：派手な光線
-  else{
-    for(var i=0;i<8;i++){(function(i){setTimeout(function(){
-      var beam=document.createElement('div');
-      var ang=(i/8)*360;
-      beam.style.cssText='position:absolute;left:50%;top:50%;width:200%;height:8px;background:linear-gradient(90deg,transparent,'+col+',transparent);transform:translate(-50%,-50%) rotate('+ang+'deg);opacity:0;animation:fbUltBeam .8s ease-out';
-      host.appendChild(beam);setTimeout(function(){beam.remove();},820);
-    },i*60);})(i);}
-  }
-}
-function fbUltNumbers(host, ud, col){
-  // ダメージ数字を無数に飛び出し
-  var base=Math.floor(Math.random()*900000+100000);
-  var count=ud.type==='aoe_big'||ud.type==='aoe_debuff'||ud.type==='pierce_crit_aoe'?40:25;
-  for(var i=0;i<count;i++){(function(i){setTimeout(function(){
-    var n=document.createElement('div');
-    var val=Math.floor(base*(0.5+Math.random()*1.5));
-    var x=20+Math.random()*60,y=25+Math.random()*40;
-    n.style.cssText='position:absolute;left:'+x+'%;top:'+y+'%;font-size:'+(18+Math.random()*22)+'px;font-weight:900;color:'+col+';text-shadow:0 0 12px '+col+',0 0 24px '+col+',0 2px 4px #000;font-family:monospace;animation:fbUltNum 1.5s ease-out;pointer-events:none;z-index:5';
-    n.textContent=val.toLocaleString();
-    host.appendChild(n);setTimeout(function(){n.remove();},1500);
-  },i*45);})(i);}
-}
-
-
-
-function fbDefend(){
-  var u=fbState.units[fbState.curUnit];
-  u._defBuff*=1.5;u.tension=Math.min(u.maxTension,u.tension+15);u._actedThisTurn=true;
-  fbLog('🛡 <b>'+gN(u.c)+'</b>は身構えた（防御UP・テンション+15）');
-  fbRender();fbAfterAction();
-}
-function fbSkip(){
-  var u=fbState.units[fbState.curUnit];
-  u.tension=Math.min(u.maxTension,u.tension+10);u._actedThisTurn=true;
-  fbLog('⏭ <b>'+gN(u.c)+'</b>は様子を見た（テンション+10）');
-  fbRender();fbAfterAction();
-}
-
-function fbAfterAction(){
-  // 形態変化チェック（10話など、boss.formsを持つ場合）
-  fbCheckTransform();
-  // 敵全滅チェック
-  if(fbAliveEnemies().length===0){fbWin();return;}
-  // 味方全滅チェック
-  if(fbAliveAllies().length===0){fbLose();return;}
-  // 次のキャラへ
-  setTimeout(fbNextSelect,600);
-}
-function fbCheckTransform(){
-  // S2BossSpecのformsを持つ敵に対して、HP閾値で形態切替
-  if(!window.__mvtS2Chap)return;
-  var spec=getS2BossSpec(window.__mvtS2Chap);
-  if(!spec||!spec.forms||spec.forms.length<2)return;
-  var boss=fbState.enemies[0];if(!boss||boss.hp<=0)return;
-  var pct=boss.hp/boss.maxhp;
-  var curForm=boss._formIdx||0;
-  // 次の形態に進むべきか
-  for(var i=spec.forms.length-1;i>curForm;i--){
-    var f=spec.forms[i];
-    if(pct<=f.hpThreshold){
-      // 形態変化！
-      boss._formIdx=i;
-      boss.n=f.name;boss.e=f.emoji;
-      if(f.atkBoost)boss.atk=Math.round(boss.atk*f.atkBoost);
-      // 演出
-      fbPlayTransform(boss,f);
-      fbLog('<div style="text-align:center;color:'+(f.col||'#ff6b6b')+';font-weight:900;font-size:14px;padding:8px 0;letter-spacing:3px">— '+boss.n+' に形態変化！ —</div>');
-      fbRender();
-      return;
-    }
-  }
-}
-function fbPlayTransform(boss,form){
-  var overlay=document.createElement('div');
-  var col=form.col||'#ff6b6b';
-  overlay.style.cssText='position:fixed;inset:0;z-index:1750;background:radial-gradient(ellipse at 50% 50%,'+col+'cc,#000 70%);display:flex;align-items:center;justify-content:center;animation:fbUltSacFlash 2s ease-out';
-  var extraEffect='';
-  if(form.specialFx==='pien'){
-    // ピエンターズ滲み出し：複数の目玉が地面から出てくる
-    extraEffect='<div style="position:absolute;inset:0;pointer-events:none">';
-    for(var i=0;i<12;i++){
-      extraEffect+='<div style="position:absolute;left:'+(8+i*7)+'%;bottom:-10%;font-size:40px;animation:fbUltRise 2.5s '+(i*0.1)+'s ease-out;filter:drop-shadow(0 0 12px '+col+')">👁️</div>';
-    }
-    extraEffect+='</div>';
-  }
-  overlay.innerHTML=extraEffect+'<div style="text-align:center;color:#fff"><div style="font-size:90px;filter:drop-shadow(0 0 30px '+col+');animation:fbUltSpin 4s linear infinite;display:inline-block">'+form.emoji+'</div><div style="font-size:20px;margin-top:14px;font-weight:900;letter-spacing:4px;color:'+col+';text-shadow:0 0 16px '+col+'">'+form.name+'</div></div>';
-  document.body.appendChild(overlay);
-  setTimeout(function(){overlay.style.transition='opacity .7s';overlay.style.opacity='0';setTimeout(function(){overlay.remove();},700);},2500);
-}
-
-function fbEnemyTurn(){
-  fbState.phase='enemy';
-  fbLog('<span style="color:#888">― 敵ターン ―</span>');
-  var enemies=fbAliveEnemies();
-  enemies.forEach(function(e){
-    if(e._stunTurns>0){e._stunTurns--;fbLog('💫 '+e.n+'は行動不能');return;}
-    // DOT
-    if(e._dotTurns>0){e.hp=Math.max(0,e.hp-e._dotDmg);e._dotTurns--;fbLog('☠ '+e.n+'は毒で '+fbDispDmg(e._dotDmg)+' ダメージ');if(e.hp<=0){fbLog('💥 '+e.n+'撃破！');return;}}
-    // 攻撃対象
-    var allies=fbAliveAllies();if(allies.length===0)return;
-    var t=allies[Math.floor(Math.random()*allies.length)];
-    var dmg=Math.round(e.atk*1.5*e._atkBuff/(t._defBuff||1));
-    // 盾の雑魚パッシブ：味方の中に持っていれば、ダメージを別味方に半減で振り分け
-    // 想いの盾／絶対防壁／不滅の盾：致死を防ぐ
-    var guard=fbState.units.find(function(u){return u.alive&&(passSet(u.c).indexOf('想いの盾')>=0||passSet(u.c).indexOf('絶対防壁')>=0||passSet(u.c).indexOf('不滅の盾')>=0);});
-    // 無敵カウント
-    if(t._invincibleTurns>0){t._invincibleTurns--;fbLog('🛡 '+gN(t.c)+'は無敵！ ダメージを無効化');return;}
-    if(t.hp-dmg<=0&&guard){t.hp=1;guard._invincibleTurns=Math.max(0,guard._invincibleTurns);fbLog('🛡 <b>'+gN(guard.c)+'</b>の盾！ '+gN(t.c)+'がHP1で耐えた');return;}
-    t.hp=Math.max(0,t.hp-dmg);
-    fbLog('👹 '+e.n+' → <b>'+gN(t.c)+'</b> '+fbDispDmg(dmg)+' ダメージ');
-    if(passSet(t.c).indexOf('怒り')>=0)t._atkBuff+=0.1;
-    if(t.hp<=0){t.alive=false;fbLog('💀 '+gN(t.c)+'は倒れた…');}
-    // 反撃（カウンター）
-    if(t.alive&&t._counterReady){t._counterReady=0;var cd=Math.round(t.atk*1.5);e.hp=Math.max(0,e.hp-cd);fbLog('🔄 '+gN(t.c)+'の反撃！ '+e.n+'に '+fbDispDmg(cd)+' ダメージ');}
-  });
-  // 味方の再生・テンション加算・行動済みリセット
-  fbState.units.forEach(function(u){
-    if(!u.alive)return;
-    if(u._regenTurns>0){u.hp=Math.min(u.maxhp,u.hp+u._regenAmt);u._regenTurns--;fbLog('🌿 '+gN(u.c)+' 自動再生 +'+fbDispDmg(u._regenAmt));}
-    u.tension=Math.min(u.maxTension,u.tension+5); // ターン経過テンション
-    u._actedThisTurn=false;
-  });
-  fbState.turn++;
-  fbRender();
-  if(fbAliveAllies().length===0){fbLose();return;}
-  if(fbAliveEnemies().length===0){fbWin();return;}
-  setTimeout(fbNextSelect,800);
-}
-
-function fbWin(){
-  fbState.over=true;
-  fbLog('<div style="text-align:center;color:#ffd700;font-weight:900;font-size:14px;padding:8px;background:linear-gradient(90deg,transparent,#ffd70022,transparent)">🏆 勝利！</div>');
-  document.getElementById('fb-action').innerHTML='<button onclick="MV.fbEnd()" style="width:100%;padding:13px;border-radius:11px;border:none;background:linear-gradient(180deg,#5d9eff,#3a5bff);color:#fff;font-weight:900;font-size:14px">▶ 続ける</button>';
-}
-function fbLose(){
-  fbState.over=true;
-  if(fbState.forcedLose){
-    fbLog('<div style="text-align:center;color:#c8a0ff;font-weight:900;font-size:13px;padding:8px">— 全滅。だが、ここで終わるわけにはいかない。 —</div>');
-  }else{
-    fbLog('<div style="text-align:center;color:#ff6b6b;font-weight:900;font-size:13px;padding:8px">敗北…編成を見直そう。</div>');
-  }
-  document.getElementById('fb-action').innerHTML='<button onclick="MV.fbEnd()" style="width:100%;padding:13px;border-radius:11px;border:none;background:linear-gradient(180deg,#888,#555);color:#fff;font-weight:900;font-size:14px">▶ 続ける</button>';
-}
-function fbEnd(){
-  var wasWin=fbState&&fbState.over&&fbAliveAllies().length>0&&fbAliveEnemies().length===0;
-  var wasForcedLose=fbState&&fbState.forcedLose;
-  var onWin=fbState?fbState.onWin:null;
-  var onLose=fbState?fbState.onLose:null;
-  document.getElementById('mv-fbattle').classList.remove('on');
-  fbState=null;
-  if(wasWin&&onWin){setTimeout(onWin,200);}
-  else if(wasForcedLose&&onLose){setTimeout(onLose,200);}
-  else if(onLose){setTimeout(onLose,200);}
-}
-
-
-function btRenderEnemy(){var els=allEnemies();var boss=btState.enemies[0];
-  var h='<div style="font-size:54px">'+boss.e+'</div><div style="font-size:13px;font-weight:800;color:#ff8b8b">'+boss.n+'</div>';
-  h+='<div style="margin:6px auto;max-width:220px;height:10px;border-radius:5px;background:#2a1a1a;overflow:hidden"><div style="height:100%;width:'+Math.max(0,boss.hp/boss.maxhp*100)+'%;background:linear-gradient(90deg,#ff6b6b,#a83232)"></div></div>';
-  h+='<div style="font-size:10px;color:#caa;font-family:monospace">'+fmt(Math.max(0,boss.hp)*DISP)+' / '+fmt(boss.maxhp*DISP)+'</div>';
-  var mins=btState.minions.filter(function(m){return m.hp>0;});
-  if(mins.length)h+='<div style="margin-top:4px;font-size:9px;color:#988">雑魚：'+mins.map(function(m){return m.e;}).join(' ')+'</div>';
-  document.getElementById('mv-bt-enemy').innerHTML=h;}
-function btRenderParty(){document.getElementById('mv-bt-party').innerHTML=btState.units.map(function(u){var col=RC[gR(u.c)];var pct=Math.max(0,u.hp/u.maxhp*100);
-  return '<div style="flex:1;text-align:center;opacity:'+(u.alive?1:.35)+'"><div style="font-size:26px">'+gE(u.c)+'</div><div style="height:6px;border-radius:3px;background:#222;overflow:hidden;margin:2px 1px"><div style="height:100%;width:'+pct+'%;background:'+(pct>30?'#5dca8a':'#ff6b6b')+'"></div></div></div>';}).join('');}
 function show(which){
-  initData();updCoins();
-  document.querySelectorAll('.mv-screen').forEach(function(s){s.classList.remove('on');});
-  if(which==='formation'){document.getElementById('mv-screen-formation').classList.add('on');renderTeam();}
-  else{document.getElementById('mv-screen-summon').classList.add('on');renderColl();}
+  var stage='start';
+  try{
+    stage='initData'; initData();
+    stage='updCoins'; updCoins();
+    document.querySelectorAll('.mv-screen').forEach(function(s){s.classList.remove('on');});
+    if(which==='formation'){
+      document.getElementById('mv-screen-formation').classList.add('on');
+      stage='renderTeam'; renderTeam();
+    }else{
+      document.getElementById('mv-screen-summon').classList.add('on');
+      stage='renderColl'; renderColl();
+    }
+  }catch(err){
+    if(window.__showErr){window.__showErr('show('+which+')失敗 @'+stage+': '+err.message,(err.stack||'').split('\n').slice(0,6).join('\n'));}
+    else{alert('show('+which+') @'+stage+': '+err.message);}
+  }
 }
 function openFormation(){show('formation');}
-function openSummon(){show('summon');}
-function close(){document.querySelectorAll('.mv-screen').forEach(function(s){s.classList.remove('on');});}
+function openSummon(){show('summon');if(typeof maybeShowTutorial==='function')maybeShowTutorial('summon');}
+function close(){
+  document.querySelectorAll('.mv-screen').forEach(function(s){s.classList.remove('on');});
+  // 来歴に応じて戻り先を決める
+  if(window.__mvFrom==='s2hub' && typeof MVT!=='undefined' && MVT.gotoHub){
+    window.__mvFrom=null;
+    MVT.gotoHub(2);
+  }else if(window.__mvFrom==='s1hub' && typeof MVT!=='undefined' && MVT.gotoHub){
+    window.__mvFrom=null;
+    MVT.gotoHub(1);
+  }
+  // それ以外はタイトル（mv-screenを消すだけ＝下のtitleが見える）
+}
 function sort(k){sortMode=k;renderSorts();renderRoster();}
 
 // 初期化（イベント）
@@ -7337,7 +7047,9 @@ function boot(){
 }
 if(document.readyState!=='loading')boot();else document.addEventListener('DOMContentLoaded',boot);
 
-return {openFormation:openFormation,openSummon:openSummon,close:close,pull:pull,detail:detail,form:form,remove:remove,swap:swap,doSwap:doSwap,closeSwap:closeSwap,closeModal:closeModal,equip:equip,togEquip:togEquip,sort:sort,closeResult:closeResult,startBattle:startBattle,btStep:btStep,btEnd:btEnd,fbInit:fbInit,fbOpenJokePick:fbOpenJokePick,fbClosePick:fbClosePick,fbUseJoke:fbUseJoke,fbUseUlt:fbUseUlt,fbCastUlt:fbCastUlt,fbCloseUltPick:fbCloseUltPick,fbDefend:fbDefend,fbSkip:fbSkip,fbEnd:fbEnd};
+// ===== fbattle撤去済み（Season1のstartBattleに統合） =====
+
+return {openFormation:openFormation,openSummon:openSummon,close:close,pull:pull,detail:detail,form:form,remove:remove,swap:swap,doSwap:doSwap,closeSwap:closeSwap,closeModal:closeModal,equip:equip,togEquip:togEquip,sort:sort,closeResult:closeResult,openJokeEquip:openJokeEquip,closeJokeEquip:closeJokeEquip,toggleJokeEquip:toggleJokeEquip,saveJokeEquip:saveJokeEquip,saveFormationManual:saveFormationManual,unlockForm:unlockForm};
 })();
 </script>
 
@@ -8240,46 +7952,54 @@ function buildMenu(){
   $('mvs-menu').innerHTML=h;
 }
 function toMenu(){
+  try{ _toMenuInner(); }
+  catch(err){
+    if(window.__showErr){window.__showErr('toMenu失敗: '+err.message,(err.stack||'').split('\n').slice(0,6).join('\n'));}
+    else{alert('toMenu: '+err.message);}
+  }
+}
+function _toMenuInner(){
   stopRain();if(typer){clearInterval(typer);typer=null;}typing=false;
-  // Season2通しプレイモードなら、メニューに戻らず次章へ
+  // Season2マップフロー：MVS終了時にクリアモーダル＋地図画面へ
   if(window.__mvtS2Playing){
-    var chap=window.__mvtS2Chap||1;
+    var chapNum=window.__mvtS2Chap||1;
     try{
       var prev=parseInt(localStorage.getItem('s2_cleared')||'0',10)||0;
-      if(chap>prev){localStorage.setItem('s2_cleared',String(chap));}
+      if(chapNum>prev){localStorage.setItem('s2_cleared',String(chapNum));}
     }catch(e){}
-    // 機能解放通知（Season2の編成2話・召喚5話を s2_cleared 基準でも発火）
-    try{
-      if(chap===2&&typeof mvUnlockNotice==='function')mvUnlockNotice('⚔️ Season2 機能解放','パーティ編成画面が、より使いこなせるようになりました。');
-      if(chap===5&&typeof mvUnlockNotice==='function')mvUnlockNotice('🍣 Season2 機能解放','マルチバース英雄召喚が、Season2の流れに組み込まれました。');
-    }catch(e){}
-    if(chap>=10){
-      window.__mvtS2Playing=false;window.__mvtS2Chap=0;
-      $('mvs-menu').style.display='none';
-      alert('🎉 Season2 クリア！\nお疲れさまでした。\n（異空間エピローグはタイトルメニューから見られます）');
-      $('mvs-root').classList.remove('on');
-      return;
-    }
-    // 次章を確認してから自動で再生
-    var nextChap=chap+1;
-    if(nextChap===6&&!window.STORY[6]){
-      // 6話本文がない場合のフォールバック（本来は本文あり）
-      nextChap=7;
-    }
-    window.__mvtS2Chap=nextChap;
-    if(confirm('第'+chap+'話 クリア！\n第'+nextChap+'話を始めますか？\n（キャンセルでタイトルへ戻る）')){
-      setTimeout(function(){play(nextChap);},100);
-      return;
-    }else{
-      window.__mvtS2Playing=false;window.__mvtS2Chap=0;
-      $('mvs-root').classList.remove('on');
-      return;
-    }
+    // 機能解放通知（撤廃済み：チュートリアルモーダルは出さない）
+    // （編成・召喚はSeason2ハブから最初から使えるため通知不要）
+    // Season2フラグをクリア
+    window.__mvtS2Playing=false;
+    window.__mvtS2Chap=0;
+    // MVSを閉じる
+    $('mvs-menu').style.display='none';
+    $('mvs-root').classList.remove('on');
+    // 地図画面に戻る＋クリアモーダル
+    setTimeout(function(){
+      if(typeof MVT!=='undefined'){
+        // 地図画面を開く
+        document.querySelectorAll('.mvt-screen').forEach(function(s){s.classList.remove('on');});
+        document.getElementById('mvt-map').classList.add('on');
+        if(typeof MVT.renderS2Map==='function')MVT.renderS2Map();
+        // クリアモーダル
+        if(chapNum<=10 && typeof MVT.showChapterClearModal==='function'){
+          setTimeout(function(){MVT.showChapterClearModal(chapNum);},400);
+        }else if(chapNum>=10){
+          // Season2完結
+          setTimeout(function(){
+            alert('🎉 Season2 クリア！\nお疲れさまでした。\n（異空間エピローグはタイトルメニューから見られます）');
+          },400);
+        }
+      }
+    },200);
+    return;
   }
-  // 通常モード：メニュー表示
-  $('mvs-menu').style.display='block';talkbox.style.opacity='0';portrait.style.opacity='0';tap.style.opacity='0';marker.style.opacity='0';chap.style.opacity='0';
+  // 通常フロー：メニューに戻る
+  $('mvs-menu').style.display='block';talkbox.style.opacity='0';portrait.style.opacity='0';tap.style.opacity='0';marker.style.opacity='0';if(chap&&chap.style)chap.style.opacity='0';
 }
 function play(e){
+  window.__s2battleStarting=false; // 章開始時、前回のフラグをクリア
   $('mvs-menu').style.display='none';
   var ep=STORY[e];seq=[];['pre','mid','post'].forEach(function(seg){if(ep[seg])seq=seq.concat(ep[seg]);});idx=0;
   var bg={'地上':'radial-gradient(ellipse at 50% 45%,#13283a,#0a1620 70%,#060e16)','施設':'radial-gradient(ellipse at 50% 45%,#1a1a2a,#0e0e18 70%,#070710)','空':'radial-gradient(ellipse at 50% 40%,#2a3a5a,#16243a 70%,#0a1420)','宇宙':'radial-gradient(ellipse at 50% 40%,#0a1030,#06081a 70%,#02030f)','核':'radial-gradient(ellipse at 50% 45%,#2a0808,#150404 70%,#080202)'};
@@ -8305,35 +8025,81 @@ function play(e){
   next();
 }
 function next(){
+  try{ _nextInner(); }
+  catch(err){
+    if(window.__showErr){window.__showErr('シネマ進行(next)失敗: '+err.message,(err.stack||'').split('\n').slice(0,6).join('\n'));}
+    else{alert('next: '+err.message);}
+  }
+}
+function _nextInner(){
   if(typing){clearInterval(typer);txt.textContent=curFull;typing=false;tap.style.opacity='1';return;}
   if(idx>=seq.length){toMenu();return;}
   var line=seq[idx++];
   if(line.chap!==undefined){showChap(line.chap);return;}
   if(line.battle!==undefined){
-    if(window.__mvtS2Playing&&typeof MV!=='undefined'&&MV.fbInit){
-      // Season2本編バトル：フルレスバトル起動（コマンド式）
-      var chap=window.__mvtS2Chap||1;
-      var s2bossSpec=getS2BossSpec(chap, line.battle);
-      $('mvs-root').style.zIndex='1000';
-      MV.fbInit({
-        bossName:s2bossSpec.name, bossEmoji:s2bossSpec.emoji,
-        hpMul:s2bossSpec.hpMul, atkMul:s2bossSpec.atkMul,
-        forcedLose:s2bossSpec.forcedLose||false,
-        onWin:function(){$('mvs-root').style.zIndex='';next();},
-        onLose:function(){
-          $('mvs-root').style.zIndex='';
-          if(s2bossSpec.forcedLose){next();}
-          else{
-            if(confirm('敗北しました。この戦闘からやり直しますか？\n（キャンセルでタイトルへ戻る）')){
-              if(typeof MVS!=='undefined')MVS.play(chap);
-            }else{
-              window.__mvtS2Playing=false;window.__mvtS2Chap=0;
-              $('mvs-root').classList.remove('on');
+    if(window.__mvtS2Playing){
+      // ★ バトル中の連打対策：idxを1つ戻す（battle行を再処理してもstartS2Battle中なら無効化）
+      idx--;
+      if(window.__s2battleStarting){return;} // 起動処理中の再入を防ぐ
+      window.__s2battleStarting=true;
+      // Season2本編バトル：Season1のstartBattleにSeason2仕様を渡す
+      var chapNum=window.__mvtS2Chap||1;
+      var s2spec=getS2BossSpec(chapNum, line.battle);
+      // 9話：負けイベント
+      if(s2spec.forcedLose){
+        // バトル省略してシネマ続行（味方HP残らない演出）
+        setTimeout(function(){
+          // 強制敗北の暗転演出
+          var ov=document.createElement('div');
+          ov.style.cssText='position:fixed;inset:0;z-index:1700;background:radial-gradient(ellipse at 50% 50%,#1a0008,#000);display:flex;align-items:center;justify-content:center;color:#fff;font-family:sans-serif;text-align:center';
+          ov.innerHTML='<div><div style="font-size:60px;filter:drop-shadow(0 0 30px #ff0066);animation:fbUltSpin 6s linear infinite;display:inline-block">🕴️</div><div style="font-size:16px;margin-top:14px;font-weight:900;letter-spacing:4px;color:#ff3a6b;text-shadow:0 0 14px #ff0066">原初の鼓動</div><div style="font-size:10px;margin-top:8px;color:#cab;line-height:1.8">― 全員が、瞬きの間に倒れた ―<br>― これは、敗北するための戦いだった ―</div></div>';
+          document.body.appendChild(ov);
+          setTimeout(function(){
+            ov.style.transition='opacity .8s';ov.style.opacity='0';
+            setTimeout(function(){
+              ov.remove();
+              idx++; // battle行を消費
+              window.__s2battleStarting=false;
+              next();
+            },800);
+          },3500);
+        },200);
+        return;
+      }
+      // 通常戦闘：Season1のstartBattleに渡す
+      if(typeof window.startS2Battle==='function'){
+        // ★ MVS画面を隠してバトル画面を見せる
+        $('mvs-root').classList.remove('on');
+        try{
+          window.startS2Battle(chapNum, s2spec, line.battle, {
+            onWin:function(){
+              // MVS画面を復帰
+              $('mvs-root').classList.add('on');
+              idx++; // battle行を消費
+              window.__s2battleStarting=false;
+              next();
+            },
+            onLose:function(){
+              window.__s2battleStarting=false;
+              if(confirm('敗北しました。この戦闘からやり直しますか？\n（キャンセルでタイトルへ戻る）')){
+                $('mvs-root').classList.add('on');
+                if(typeof MVS!=='undefined')MVS.play(chapNum);
+              }else{
+                window.__mvtS2Playing=false;window.__mvtS2Chap=0;
+                $('mvs-root').classList.remove('on');
+              }
             }
-          }
+          });
+        }catch(err){
+          $('mvs-root').classList.add('on');
+          window.__s2battleStarting=false;
+          alert('バトル起動エラー：'+err.message+'\n\n詳細：'+(err.stack||'').substring(0,300));
+          console.error('startS2Battle error:',err);
         }
-      });
-      return;
+        return;
+      }
+      // フォールバック：マーカー
+      showMarker('⚔ BATTLE','#ff9b3b',line.battle,'（startS2Battle未実装）タップで続行');return;
     }
     showMarker('⚔ BATTLE','#ff9b3b',line.battle,'（ここでバトル）タップで続行');return;
   }
@@ -8343,9 +8109,24 @@ function next(){
       MVM.play(mvNum,function(){next();});
       return;
     }
+    // 外部ムービー（debug_*.html）は dev環境に無いと404になるため、
+    // 存在チェックして無ければマーカー表示で代替（進行を止めない）
     var extPath=mapMovieExternal(line.movie);
     if(extPath&&typeof MVM!=='undefined'&&MVM.playExternal){
-      MVM.playExternal(extPath,function(){next();});
+      // fetchで存在確認してから再生（404を避ける）
+      try{
+        fetch(extPath,{method:'HEAD'}).then(function(r){
+          if(r&&r.ok){
+            MVM.playExternal(extPath,function(){next();});
+          }else{
+            showMarker('🎬 シネマティックムービー','#c8a0ff',line.movie,'（ムービー準備中）タップで続行');
+          }
+        }).catch(function(){
+          showMarker('🎬 シネマティックムービー','#c8a0ff',line.movie,'（ムービー準備中）タップで続行');
+        });
+      }catch(e){
+        showMarker('🎬 シネマティックムービー','#c8a0ff',line.movie,'（ムービー準備中）タップで続行');
+      }
       return;
     }
     showMarker('🎬 シネマティックムービー','#c8a0ff',line.movie,'（ここでムービー再生）タップで続行');return;
@@ -8378,7 +8159,7 @@ function getS2BossSpec(chap, battleLabel){
     1:{name:'鬼大家',emoji:'👹',hpMul:4,atkMul:0.5,bg:'town'},
     2:{name:'闇堕ちかえる',emoji:'🐸',hpMul:5,atkMul:0.6,bg:'forest'},
     3:{name:'チワワ',emoji:'🐶',hpMul:5.5,atkMul:0.65,bg:'town',img:'boss_chihuahua.png'},
-    4:{name:'巨人の王',emoji:'👑',hpMul:6.5,atkMul:0.7,bg:'castle',img:'boss_king_giant.jpg'},
+    4:{name:'巨人の王',emoji:'🧌',hpMul:6.5,atkMul:0.7,bg:'castle',img:'boss_king_giant.jpg'},
     5:{name:'暴走実験体',emoji:'🧪',hpMul:7,atkMul:0.75,bg:'lab'},
     6:{name:'風呂将軍ふろしき',emoji:'🛁',hpMul:7.5,atkMul:0.8,bg:'desert'},
     7:{name:'過去の自分',emoji:'👤',hpMul:8,atkMul:0.9,bg:'mental'},
@@ -8667,7 +8448,11 @@ function loadEarthTex(){
   const L=new THREE.TextureLoader();
   // テクスチャが読めればそれを、ダメなら手続き的な色で代替
   const tex={};
-  try{tex.color=L.load('earth_color.jpg');tex.clouds=L.load('earth_clouds.jpg');}catch(e){}
+  try{
+    tex.color=L.load('earth_color.jpg');
+    tex.clouds=L.load('earth_clouds.jpg');
+    tex.night=L.load('earth_night.jpg');
+  }catch(e){}
   return tex;
 }
 function makeEarth(radius){
@@ -8979,7 +8764,49 @@ function gotoSeason1(){closeRec();gotoHub(1);}
 function forceSeason2(){closeRec();gotoHub(2);}
 
 // ===== シーズン別ハブ =====
+// Season2 編成リセット通知モーダル
+function showFormationResetModal(){
+  var modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;z-index:2300;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);animation:s2ModalFade .3s ease-out';
+  modal.innerHTML='<div style="max-width:340px;width:100%;background:linear-gradient(180deg,#1a2a3a,#0a1420);border:2px solid #ffb84d;border-radius:16px;padding:24px 20px;text-align:center;color:#fff;box-shadow:0 0 36px #ffb84d66;animation:s2ModalPop .4s cubic-bezier(.3,1.4,.5,1)">'+
+    '<div style="font-size:44px;margin-bottom:8px;filter:drop-shadow(0 0 14px #ffb84d)">🔄</div>'+
+    '<div style="font-size:16px;font-weight:900;color:#ffb84d;letter-spacing:1px;margin-bottom:12px;text-shadow:0 0 10px #ffb84d">編成がリセットされました</div>'+
+    '<div style="font-size:11px;color:#cde;line-height:1.9;margin-bottom:18px">Season2の新システムにあわせて、<br>編成・ジョーク装備・フォルムを<br>初期状態にリセットしました。<br><br>「⚔️ パーティ編成」から<br>あらためて編成してください。<br><span style="font-size:9px;color:#8ad">（コイン・所持キャラ・進行度は保持されています）</span></div>'+
+    '<button id="mv-reset-ok" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(180deg,#ffb84d,#a8772a);color:#fff;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 4px 0 #6a4a18">確認しました</button>'+
+  '</div>';
+  document.body.appendChild(modal);
+  document.getElementById('mv-reset-ok').onclick=function(){modal.remove();};
+  if(typeof sfx==='function')try{sfx('select');}catch(e){}
+}
+
 function gotoHub(n){
+  // Season2ハブ初回表示時：古い編成データをリセット
+  if(n===2){
+    try{
+      var resetDone=localStorage.getItem('s2_formation_reset_v2');
+      if(!resetDone){
+        // 編成・フォルム・ジョーク装備＋Season2進行度をリセット（コイン・ガチャ所持は保持）
+        localStorage.removeItem('mv_data');
+        localStorage.removeItem('s2_cleared');
+        localStorage.removeItem('rpg_cleared_chapters');
+        localStorage.removeItem('tut_shown');
+        // rpg_progressのequippedを初期化
+        try{
+          var pp=JSON.parse(localStorage.getItem('rpg_progress')||'null');
+          if(pp){
+            pp.equipped=undefined;
+            delete pp.equipped;
+            localStorage.setItem('rpg_progress',JSON.stringify(pp));
+          }
+        }catch(e){}
+        localStorage.setItem('s2_formation_reset_v2','1');
+        // MV内部状態も再初期化
+        if(typeof initData==='function'){try{initData();}catch(e){}}
+        // リセット通知モーダル
+        setTimeout(function(){showFormationResetModal();},400);
+      }
+    }catch(e){}
+  }
   selSeason=n;$('mvt-season').classList.remove('on');$('mvt-hub').classList.add('on');stars($('mvt-hub-stars'),40);
   var S=SEASONS[n];
   $('mvt-hub-head').innerHTML='<div style="font-size:11px;color:'+S.col+';letter-spacing:3px;font-weight:800">'+S.label+'</div><div style="font-size:20px;font-weight:900;margin-top:4px">'+S.name+'</div>';
@@ -8992,8 +8819,8 @@ function gotoHub(n){
     html+=hub('📓 ネタ帳（技・スキン）',null,'MVT.close();openNotebookFromTitle()');
   }else{
     html+=hub('▶ 物語を進める（Season2）','#ff6b6b','MVT.playS2()');
-    html+=hub('⚔️ パーティ編成',null,'MVT.close();MV.openFormation()');
-    html+=hub('🍣 マルチバース英雄召喚',null,'MVT.close();MV.openSummon()');
+    html+=hub('⚔️ パーティ編成',null,'s2nav(\'formation\')');
+    html+=hub('🍣 マルチバース英雄召喚',null,'s2nav(\'summon\')');
     html+=hub('📖 Season2 ストーリー（回想）',null,'MVT.close();MVS.open()');
     html+=hub('🌍 世界の脅威（再戦）',null,'MVT.openThreat(2)');
   }
@@ -9030,7 +8857,7 @@ function playS2(){
   renderS2Map();
 }
 function closeMap(){document.getElementById('mvt-map').classList.remove('on');gotoHub(2);}
-function renderS2Map(){
+function renderS2Map(){if(typeof maybeShowTutorial==='function')maybeShowTutorial('s2map');
   var s2c=0;try{s2c=parseInt(localStorage.getItem('s2_cleared')||'0',10)||0;}catch(e){}
   var nextChap=Math.min(10,s2c+1);
   // 各章のマップ上の座標（%）と情報
@@ -9087,15 +8914,59 @@ function renderS2Map(){
 }
 function playChapter(n){
   if(typeof MVS==='undefined'){alert('ストーリープレイヤーが見つかりません');return;}
-  // 通しプレイモード（章クリアで次へ進むか確認）
-  window.__mvtS2Playing=true;
-  window.__mvtS2Chap=n;
-  document.getElementById('mvt-map').classList.remove('on');
-  MVS.open();
-  setTimeout(function(){
-    document.getElementById('mvs-menu').style.display='none';
-    MVS.play(n);
-  },120);
+  // 確認モーダル
+  showChapterConfirm(n, function(){
+    window.__mvtS2Playing=true;
+    window.__mvtS2Chap=n;
+    document.getElementById('mvt-map').classList.remove('on');
+    MVS.open();
+    setTimeout(function(){
+      document.getElementById('mvs-menu').style.display='none';
+      MVS.play(n);
+    },120);
+  });
+}
+
+// Season2: 章開始の確認モーダル
+function showChapterConfirm(n, onConfirm){
+  var titles={1:'タコパと、終わりの音',2:'優しい心の雨',3:'生きた寿司と、おじいちゃん',4:'王と、あうー',5:'米の中の宇宙',6:'ふろしき将軍と、宇宙船泥棒',7:'過去の自分と、レスバ',8:'神と、ガチレスバ',9:'核の囚人',10:'終わりの、その先',99:'異空間'};
+  var title=titles[n]||('第'+n+'話');
+  var modal=document.createElement('div');
+  modal.id='s2-chap-confirm';
+  modal.style.cssText='position:fixed;inset:0;z-index:1800;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);animation:s2ModalFade .3s ease-out';
+  modal.innerHTML='<div style="max-width:340px;background:linear-gradient(180deg,#1a1530,#0a0820);border:2px solid #ffb84d;border-radius:14px;padding:22px;text-align:center;color:#fff;box-shadow:0 0 32px #ffb84d88;animation:s2ModalPop .4s cubic-bezier(.3,1.4,.5,1)">'+
+    '<div style="font-size:10px;color:#ffb84d;letter-spacing:3px;font-weight:900;margin-bottom:6px">SEASON 2 ・ '+(n===99?'EXTRA':'CHAPTER '+n)+'</div>'+
+    '<div style="font-size:16px;font-weight:900;color:#fff;margin-bottom:14px;letter-spacing:1px">'+title+'</div>'+
+    '<div style="font-size:11px;color:#cde;line-height:1.7;margin-bottom:18px">このステージを開始しますか？</div>'+
+    '<div style="display:flex;gap:8px;justify-content:center">'+
+      '<button id="s2-confirm-yes" style="flex:1;padding:11px 18px;border-radius:9px;border:none;background:linear-gradient(180deg,#ffb84d,#a8772a);color:#fff;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 4px 0 #6a4a18">▶ はい</button>'+
+      '<button id="s2-confirm-no" style="flex:1;padding:11px 18px;border-radius:9px;border:1px solid #555;background:#15151f;color:#aab;font-weight:700;font-size:13px;cursor:pointer">いいえ</button>'+
+    '</div></div>';
+  document.body.appendChild(modal);
+  document.getElementById('s2-confirm-yes').onclick=function(){modal.remove();onConfirm();};
+  document.getElementById('s2-confirm-no').onclick=function(){modal.remove();};
+}
+
+// Season2: ステージクリアモーダル
+function showChapterClearModal(n){
+  var titles={1:'タコパと、終わりの音',2:'優しい心の雨',3:'生きた寿司と、おじいちゃん',4:'王と、あうー',5:'米の中の宇宙',6:'ふろしき将軍と、宇宙船泥棒',7:'過去の自分と、レスバ',8:'神と、ガチレスバ',9:'核の囚人',10:'終わりの、その先'};
+  var nextTitle=(n<10)?titles[n+1]:null;
+  var modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;z-index:1900;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);animation:s2ModalFade .4s ease-out';
+  modal.innerHTML='<div style="max-width:340px;background:linear-gradient(180deg,#1a3530,#082018);border:2px solid #5dca8a;border-radius:14px;padding:24px;text-align:center;color:#fff;box-shadow:0 0 40px #5dca8a;animation:s2ModalPop .5s cubic-bezier(.3,1.6,.5,1)">'+
+    '<div style="font-size:42px;margin-bottom:8px;filter:drop-shadow(0 0 16px #5dca8a)">🏆</div>'+
+    '<div style="font-size:18px;font-weight:900;color:#5dca8a;letter-spacing:3px;margin-bottom:6px;text-shadow:0 0 12px #5dca8a">CLEAR！</div>'+
+    '<div style="font-size:11px;color:#9ab;margin-bottom:12px">第'+n+'話「'+titles[n]+'」</div>'+
+    (nextTitle?'<div style="font-size:9px;color:#ffb84d;margin-bottom:4px;letter-spacing:2px">▼ 次のステージ解放 ▼</div><div style="font-size:13px;color:#fff;font-weight:700;margin-bottom:18px">第'+(n+1)+'話「'+nextTitle+'」</div>':'<div style="font-size:11px;color:#FFD700;margin-bottom:18px;font-weight:900;letter-spacing:2px">✦ SEASON 2 完結！ ✦</div>')+
+    '<button id="s2-clear-ok" style="padding:11px 32px;border-radius:9px;border:none;background:linear-gradient(180deg,#5dca8a,#2a8a5a);color:#fff;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 4px 0 #1a5a3a">▶ 地図へ</button>'+
+  '</div>';
+  document.body.appendChild(modal);
+  document.getElementById('s2-clear-ok').onclick=function(){
+    modal.remove();
+    // 地図画面に戻って再描画
+    document.getElementById('mvt-map').classList.add('on');
+    renderS2Map();
+  };
 }
 function lockedChap(n){alert('第'+n+'話はまだ解放されていません。\n前の章をクリアすると挑戦できます。');}
 function MVT_close(){document.querySelectorAll('.mvt-screen').forEach(function(s){s.classList.remove('on');});}
@@ -9115,7 +8986,7 @@ var THREAT_PLANETS=[
      return list.filter(function(t){return t.ch<=c;}).map(function(t,i){return {e:t.e,n:t.n,x:pos[i%pos.length][0],y:pos[i%pos.length][1]};});}}
 ];
 var threatIdx=0;
-function openThreat(season){threatIdx=(season===2)?1:0;$('mvt-threat').classList.add('on');stars($('mvt-threat-stars'),50);renderThreat();}
+function openThreat(season){if(typeof maybeShowTutorial==='function')maybeShowTutorial('threat');threatIdx=(season===2)?1:0;$('mvt-threat').classList.add('on');stars($('mvt-threat-stars'),50);renderThreat();}
 function closeThreat(){$('mvt-threat').classList.remove('on');}
 function renderThreat(){
   var P=THREAT_PLANETS[threatIdx];
@@ -9168,8 +9039,282 @@ function boot(){
 }
 if(document.readyState!=='loading')boot();else document.addEventListener('DOMContentLoaded',boot);
 
-return {openSeasonSelect:openSeasonSelect,selSeason:setSeason,enter:enter,showRec:showRec,closeRec:closeRec,gotoSeason1:gotoSeason1,forceSeason2:forceSeason2,backToSeason:backToSeason,playS1:playS1,playS2:playS2,close:close,openThreat:openThreat,closeThreat:closeThreat,threatPrev:threatPrev,threatNext:threatNext,threatGo:threatGo,hitThreat:hitThreat,playChapter:playChapter,closeMap:closeMap,lockedChap:lockedChap};
+return {openSeasonSelect:openSeasonSelect,selSeason:setSeason,enter:enter,showRec:showRec,closeRec:closeRec,gotoSeason1:gotoSeason1,forceSeason2:forceSeason2,backToSeason:backToSeason,playS1:playS1,playS2:playS2,close:close,openThreat:openThreat,closeThreat:closeThreat,threatPrev:threatPrev,threatNext:threatNext,threatGo:threatGo,hitThreat:hitThreat,playChapter:playChapter,closeMap:closeMap,lockedChap:lockedChap,showChapterClearModal:showChapterClearModal,renderS2Map:renderS2Map,gotoHub:gotoHub};
 })();
+
+
+/* ============ Season2 固有技定義（UR/物語キャラ専用・4スロット固定） ============
+ * ロール別テンプレ24個 + 物語12キャラ×4 = 72個
+ */
+window.UNIQUE_SKILLS = {
+  // ロール別テンプレート（ガチャUR用）
+  attacker: [
+    {id:'us_atk_1', name:'鋭斬', icon:'⚔', type:'attack', mul:1.6, desc:'敵単体に高威力ダメージ'},
+    {id:'us_atk_2', name:'連撃', icon:'🗡', type:'combo', hits:3, mul:0.7, desc:'敵単体に3連続ダメージ'},
+    {id:'us_atk_3', name:'破壊', icon:'💥', type:'pierce', mul:1.4, desc:'防御無視ダメージ'},
+    {id:'us_atk_4', name:'狙撃', icon:'🎯', type:'crit', mul:1.3, critRate:0.5, desc:'クリ率50%UPで攻撃'}
+  ],
+  tank: [
+    {id:'us_tnk_1', name:'かばう', icon:'🛡', type:'cover', desc:'1ターン味方ダメージを肩代わり'},
+    {id:'us_tnk_2', name:'挑発', icon:'😤', type:'taunt', desc:'敵の攻撃対象を自分に集める'},
+    {id:'us_tnk_3', name:'鉄壁', icon:'🛡', type:'def_up', val:0.5, desc:'自分の防御UP（×1.5）'},
+    {id:'us_tnk_4', name:'報復', icon:'🔄', type:'counter', desc:'1ターン反撃態勢（被弾で反撃）'}
+  ],
+  healer: [
+    {id:'us_hel_1', name:'治癒', icon:'💚', type:'heal', mul:0.4, desc:'味方単体を回復'},
+    {id:'us_hel_2', name:'祈り', icon:'🙏', type:'heal_all', mul:0.25, desc:'味方全体を回復'},
+    {id:'us_hel_3', name:'再生', icon:'🌿', type:'regen', turns:3, mul:0.15, desc:'味方単体に継続回復付与'},
+    {id:'us_hel_4', name:'浄化', icon:'✨', type:'cleanse', desc:'味方全体の状態異常解除'}
+  ],
+  buffer: [
+    {id:'us_buf_1', name:'鼓舞', icon:'⤴', type:'atk_up', val:0.3, target:'all', desc:'味方全体の攻撃UP'},
+    {id:'us_buf_2', name:'守護', icon:'🛡', type:'def_up_all', val:0.3, desc:'味方全体の防御UP'},
+    {id:'us_buf_3', name:'加速', icon:'💨', type:'spd_up', val:0.4, desc:'味方全体のSPD UP'},
+    {id:'us_buf_4', name:'祝福', icon:'✨', type:'all_up', val:0.2, desc:'味方全体の全能力UP'}
+  ],
+  debuffer: [
+    {id:'us_dbf_1', name:'呪詛', icon:'☠', type:'atk_down', val:0.3, desc:'敵単体の攻撃DOWN'},
+    {id:'us_dbf_2', name:'脆弱', icon:'⬇', type:'def_down', val:0.3, desc:'敵単体の防御DOWN'},
+    {id:'us_dbf_3', name:'鈍化', icon:'🐌', type:'spd_down', val:0.3, desc:'敵単体のSPD DOWN'},
+    {id:'us_dbf_4', name:'衰弱', icon:'💀', type:'all_down', val:0.2, desc:'敵単体の全能力DOWN'}
+  ],
+  trickster: [
+    {id:'us_trk_1', name:'攪乱', icon:'💫', type:'confuse', desc:'敵単体を混乱（行動不能1T）'},
+    {id:'us_trk_2', name:'盗撃', icon:'🩸', type:'drain', mul:0.8, desc:'与ダメ分自分回復'},
+    {id:'us_trk_3', name:'変身', icon:'🎭', type:'morph', val:0.4, turns:2, desc:'2T自分の攻撃UP×1.4'},
+    {id:'us_trk_4', name:'奇襲', icon:'⚡', type:'preempt', mul:1.2, desc:'即座に敵単体に先制ダメ'}
+  ],
+  // 物語キャラ12人 × 4 = 48個
+  dev: [
+    {id:'us_dev_1', name:'デバッグの一閃', icon:'🐛', type:'attack', mul:1.5, desc:'バグを潰すような鋭い一撃'},
+    {id:'us_dev_2', name:'徹夜の覚悟', icon:'☕', type:'atk_up', val:0.5, target:'self', desc:'自分の攻撃を激上げ'},
+    {id:'us_dev_3', name:'仕様変更', icon:'📝', type:'def_down', val:0.4, desc:'敵の防御を破壊的にDOWN'},
+    {id:'us_dev_4', name:'リリース', icon:'🚀', type:'combo', hits:4, mul:0.6, desc:'リリースまでの執念の連撃'}
+  ],
+  cat: [
+    {id:'us_cat_1', name:'9つの命', icon:'🐱', type:'revive_self', desc:'死亡時1回だけHP半分で復活'},
+    {id:'us_cat_2', name:'毛玉砲', icon:'💨', type:'attack', mul:1.4, desc:'吐き出した毛玉が敵を撃つ'},
+    {id:'us_cat_3', name:'のびの構え', icon:'😼', type:'spd_up', val:0.5, target:'self', desc:'自分のSPDを激上げ'},
+    {id:'us_cat_4', name:'眠気誘発', icon:'😴', type:'confuse', desc:'敵を眠らせて行動不能'}
+  ],
+  salmon: [
+    {id:'us_sal_1', name:'寿司の心', icon:'🍣', type:'heal_all', mul:0.3, desc:'味方全体を寿司で癒す'},
+    {id:'us_sal_2', name:'回転する想い', icon:'🌀', type:'regen', turns:5, mul:0.1, desc:'長時間の継続回復'},
+    {id:'us_sal_3', name:'米粒の祈り', icon:'🌾', type:'cleanse', desc:'味方全体の状態異常浄化'},
+    {id:'us_sal_4', name:'孫の記憶', icon:'👴', type:'heal', mul:0.6, desc:'特大の単体回復'}
+  ],
+  frog: [
+    {id:'us_frg_1', name:'通訳の声', icon:'💬', type:'atk_up', val:0.3, target:'all', desc:'全員のATK UP'},
+    {id:'us_frg_2', name:'冷静沈着', icon:'🧘', type:'def_up_all', val:0.3, desc:'全員のDEF UP'},
+    {id:'us_frg_3', name:'カエル飛び', icon:'🐸', type:'attack', mul:1.3, desc:'飛び跳ねて単体攻撃'},
+    {id:'us_frg_4', name:'親友の絆', icon:'💚', type:'heal_all', mul:0.25, desc:'絆の力で全員回復'}
+  ],
+  ufo: [
+    {id:'us_ufo_1', name:'あうー光線', icon:'👽', type:'attack', mul:1.4, desc:'謎の光線で単体攻撃'},
+    {id:'us_ufo_2', name:'宇宙の祝福', icon:'🛸', type:'all_up', val:0.25, desc:'味方全体の全能力UP'},
+    {id:'us_ufo_3', name:'重力反転', icon:'🌌', type:'spd_down', val:0.4, desc:'敵のSPD大幅DOWN'},
+    {id:'us_ufo_4', name:'瞬間移動', icon:'✨', type:'preempt', mul:1.0, desc:'先制で単体攻撃'}
+  ],
+  reviewer: [
+    {id:'us_rev_1', name:'★1判定', icon:'⭐', type:'def_down', val:0.5, desc:'敵の防御を激下げ'},
+    {id:'us_rev_2', name:'長文レビュー', icon:'📜', type:'attack', mul:1.5, desc:'冗長な攻撃で単体撃破'},
+    {id:'us_rev_3', name:'低評価爆撃', icon:'💢', type:'pierce', mul:1.3, desc:'防御無視で単体攻撃'},
+    {id:'us_rev_4', name:'評論家の眼', icon:'👁', type:'crit', critRate:0.7, mul:1.2, desc:'クリ率70%で攻撃'}
+  ],
+  // 残り6人分（landlord, tamura_human, tamura_earth, watcher, dev_v2, salmon_v2）
+  landlord: [
+    {id:'us_lor_1', name:'家賃の催促', icon:'📜', type:'attack', mul:1.4, desc:'家賃を取り立てる強撃'},
+    {id:'us_lor_2', name:'退去命令', icon:'🚪', type:'taunt', desc:'敵の攻撃を全部受ける'},
+    {id:'us_lor_3', name:'契約の力', icon:'📋', type:'def_up', val:0.4, desc:'契約書のような硬さ'},
+    {id:'us_lor_4', name:'闇金の手段', icon:'💸', type:'drain', mul:0.7, desc:'与ダメ分自分回復'}
+  ],
+  tamura_human: [
+    {id:'us_tmh_1', name:'核の鼓動', icon:'💢', type:'pierce', mul:2.0, desc:'核の力で防御無視'},
+    {id:'us_tmh_2', name:'人型の冷笑', icon:'😏', type:'all_down', val:0.3, desc:'敵単体の全能力DOWN'},
+    {id:'us_tmh_3', name:'原初の威圧', icon:'🌌', type:'atk_down', val:0.4, desc:'敵の攻撃を大幅DOWN'},
+    {id:'us_tmh_4', name:'始まりの一撃', icon:'⚡', type:'preempt', mul:1.8, desc:'先制で大ダメージ'}
+  ],
+  tamura_earth: [
+    {id:'us_tme_1', name:'万有引力', icon:'🌍', type:'attack', mul:1.8, desc:'引力で敵を引き寄せる'},
+    {id:'us_tme_2', name:'地殻変動', icon:'🏔', type:'def_down', val:0.4, desc:'敵全体の防御DOWN（AOE版）'},
+    {id:'us_tme_3', name:'マントル爆発', icon:'🔥', type:'attack', mul:1.6, desc:'地表からの噴出攻撃'},
+    {id:'us_tme_4', name:'惑星意志', icon:'🌎', type:'all_up', val:0.3, target:'self', desc:'自分の全能力UP'}
+  ],
+  watcher: [
+    {id:'us_wat_1', name:'万象観測', icon:'👁', type:'pierce', mul:2.0, desc:'防御無視ダメージ'},
+    {id:'us_wat_2', name:'観測完了', icon:'✨', type:'crit', critRate:1.0, mul:1.5, desc:'必中クリティカル'},
+    {id:'us_wat_3', name:'宇宙の歪み', icon:'🌀', type:'all_down', val:0.3, desc:'敵単体の全能力DOWN'},
+    {id:'us_wat_4', name:'存在抹消', icon:'🕳', type:'attack', mul:2.5, desc:'超特大ダメージ'}
+  ],
+  dev_v2: [
+    {id:'us_dv2_1', name:'真の覚悟', icon:'🌟', type:'attack', mul:2.0, desc:'覚醒形態の特大攻撃'},
+    {id:'us_dv2_2', name:'仕様確定', icon:'📜', type:'def_up_all', val:0.4, desc:'味方全体の防御UP'},
+    {id:'us_dv2_3', name:'バージョン2', icon:'🚀', type:'all_up', val:0.3, target:'all', desc:'味方全体の全能力UP'},
+    {id:'us_dv2_4', name:'完成の一撃', icon:'⚔', type:'pierce', mul:1.8, desc:'防御無視の決定打'}
+  ],
+  salmon_v2: [
+    {id:'us_sv2_1', name:'神の寿司', icon:'🍣', type:'heal_all', mul:0.5, desc:'神の力で全員大回復'},
+    {id:'us_sv2_2', name:'時を超えた絆', icon:'⏰', type:'cleanse', desc:'味方全体の状態異常完全浄化'},
+    {id:'us_sv2_3', name:'孫の声', icon:'👶', type:'regen', turns:5, mul:0.2, desc:'長時間の特大継続回復'},
+    {id:'us_sv2_4', name:'寿司の真理', icon:'🌾', type:'heal', mul:1.0, desc:'単体HPを最大値に'}
+  ]
+};
+
+// 固有技をキャラIDに割り当てる関数
+window.getUniqueSkills = function(charId, roleType){
+  // 物語キャラ個別が優先
+  if(window.UNIQUE_SKILLS[charId]) return window.UNIQUE_SKILLS[charId];
+  // ロール別テンプレ
+  if(roleType && window.UNIQUE_SKILLS[roleType]) return window.UNIQUE_SKILLS[roleType];
+  // フォールバック：attacker
+  return window.UNIQUE_SKILLS.attacker;
+};
+
+/* ============ Season2ハブ ナビゲーション（エラー捕捉付き） ============ */
+window.s2nav=function(dest){
+  try{
+    window.__mvFrom='s2hub';
+    if(typeof MVT!=='undefined'&&MVT.close)MVT.close();
+    if(dest==='formation'){
+      if(typeof MV==='undefined'){throw new Error('MV未定義');}
+      if(!MV.openFormation){throw new Error('MV.openFormation未定義');}
+      MV.openFormation();
+    }else if(dest==='summon'){
+      if(typeof MV==='undefined'){throw new Error('MV未定義');}
+      if(!MV.openSummon){throw new Error('MV.openSummon未定義');}
+      MV.openSummon();
+    }
+  }catch(err){
+    if(window.__showErr){
+      window.__showErr('s2nav('+dest+')失敗: '+err.message, (err.stack||'').split('\n').slice(0,5).join('\n'));
+    }else{
+      alert('画面遷移エラー('+dest+'): '+err.message);
+    }
+  }
+};
+
+/* ============ Season2 バトル統合ラッパー ============
+ * Season1のstartBattle()を流用しつつ、Season2のENEMIES_S2/形態変化/単体ボスSPD4回行動に対応
+ */
+(function(){
+  // Season2用の現在のステージ仕様を保持
+  window._s2battle = null;
+
+  window.startS2Battle = function(chap, s2spec, battleKey, callbacks){
+    var G=window.G;
+    if(!G){alert('バトル状態G未初期化');if(callbacks&&callbacks.onLose)callbacks.onLose();return;}
+    if(typeof ENEMIES==='undefined'){
+      // ENEMIESがこのスコープから見えない場合 → window経由
+      if(typeof window.ENEMIES!=='undefined'){var ENEMIES=window.ENEMIES;}
+      else{alert('ENEMIES未定義');if(callbacks&&callbacks.onLose)callbacks.onLose();return;}
+    }
+    // battleKey: 1, 2, '10b', '10c' など。デフォルト=chap
+    // ただしSTORYのbattleマーカーは文字列（例「鬼大家（ゾンビ化）」）。chap基準でフォールバック。
+    var BATTLE_KEY_MAP={
+      '鬼大家（ゾンビ化）':1,
+      'かえる（前半・正気）':2,
+      'かえる（後半・闇堕ち）':'2b',
+      'ゾンビニキ×10 ＋ ボス「チワワ」':3,
+      '巨人の王':4,
+      '暴走した実験体':5,
+      '風呂将軍ふろしき':6,
+      '過去の自分（開発者）':7,
+      '神':8,
+      '田村くん（人型・封印状態）':9,
+      '田村くん（最終形態・無限進化）':10,
+      '田村くん（怪物形態）':'10b',
+      '田村くん（ピエンターズ形態）':'10c',
+      '歪みの番人':7,
+      '宇宙の漂流物（小バトル）':99
+    };
+    var mapped = BATTLE_KEY_MAP[battleKey];
+    var enemyKey = (mapped !== undefined) ? mapped : (typeof battleKey==='number' ? battleKey : chap);
+    var ENEMIES_S2_ref = (typeof ENEMIES_S2!=='undefined')?ENEMIES_S2:window.ENEMIES_S2;
+    if(!ENEMIES_S2_ref){alert('ENEMIES_S2未定義');if(callbacks&&callbacks.onLose)callbacks.onLose();return;}
+    var e = ENEMIES_S2_ref[enemyKey];
+    if(!e){ console.error('ENEMIES_S2 not found:', enemyKey); if(callbacks&&callbacks.onLose) callbacks.onLose(); return; }
+    // バトル状態を保存
+    window._s2battle = {
+      chap: chap,
+      spec: s2spec,
+      enemyData: e,
+      onWin: callbacks && callbacks.onWin,
+      onLose: callbacks && callbacks.onLose
+    };
+    // Season1の G オブジェクトに敵を仕込んでstartBattle()を呼ぶ
+    // 既存のENEMIESに追加してidxを指す（一時的な統合）
+    var ENEMIES_ref = (typeof ENEMIES!=='undefined')?ENEMIES:window.ENEMIES;
+    if(!ENEMIES_ref){alert('ENEMIES未定義');if(callbacks&&callbacks.onLose)callbacks.onLose();return;}
+    if(!ENEMIES_ref._s2temp){ ENEMIES_ref._s2temp = ENEMIES_ref.length; }
+    var slot = ENEMIES_ref._s2temp;
+    ENEMIES_ref[slot] = Object.assign({}, e);
+    G.enemyIdx = slot;
+    G.rematch = false;
+    G.rematchDiff = null;
+    G._s2mode = true;  // Season2モードフラグ
+    G._s2chap = chap;
+    G._s2enemyKey = enemyKey;
+    // Season1のstartBattle()を呼ぶ
+    if(typeof startBattle === 'function'){
+      try{ startBattle(); }
+      catch(err){
+        console.error('startBattle error:', err);
+        alert('バトル開始失敗: '+err.message);
+        if(callbacks&&callbacks.onLose) callbacks.onLose();
+      }
+    }
+  };
+
+  // Season2勝利時のフック：winBattleを拡張
+  var origWinBattle = window.winBattle;
+  window.winBattle = function(){
+    var G=window.G;
+    if(G && G._s2mode){
+      // Season2モード：通常のwinBattle処理（演出のみ）を行い、afterWinでコールバック
+      G._s2mode_winFlag = true;
+    }
+    if(typeof origWinBattle === 'function') return origWinBattle.apply(this, arguments);
+  };
+  // afterWinをフックして、Season2モードならコールバック呼出
+  var origAfterWin = window.afterWin;
+  window.afterWin = function(){
+    var G=window.G;
+    if(G && G._s2mode_winFlag){
+      G._s2mode_winFlag = false;
+      G._s2mode = false;
+      var b = window._s2battle;
+      if(b && b.onWin){
+        // バトル画面を消す（title遷移はしない＝titleチュートリアル誤発火を防ぐ）
+        try{
+          var bs=document.getElementById('screen-battle');
+          if(bs)bs.classList.remove('active');
+        }catch(e){}
+        setTimeout(b.onWin, 300);
+        return;
+      }
+    }
+    if(typeof origAfterWin === 'function') return origAfterWin.apply(this, arguments);
+  };
+  // loseBattleもフック
+  var origLoseBattle = window.loseBattle;
+  window.loseBattle = function(){
+    var G=window.G;
+    if(G && G._s2mode){
+      G._s2mode = false;
+      var b = window._s2battle;
+      if(typeof origLoseBattle === 'function') origLoseBattle.apply(this, arguments);
+      if(b && b.onLose){
+        setTimeout(function(){
+          try{ if(typeof showScreen==='function') showScreen('title'); }catch(e){}
+          b.onLose();
+        }, 600);
+      }
+      return;
+    }
+    if(typeof origLoseBattle === 'function') return origLoseBattle.apply(this, arguments);
+  };
+})();
+
 </script>
 
 </body>
