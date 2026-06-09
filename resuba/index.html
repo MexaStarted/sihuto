@@ -74,11 +74,27 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
 .ep-card .info{flex:1}.ep-card .info .t{font-weight:700;font-size:15px}.ep-card .info .s{font-size:11px;color:#9bd}
 .ep-card .go{font-family:'Orbitron';font-size:10px;color:var(--neon-c)}
 .ep-card.clear{border-color:rgba(0,255,157,.4)}.ep-card.clear .no{color:var(--neon-g);text-shadow:0 0 8px var(--neon-g)}
+.ep-card.prologue{border-color:rgba(255,215,0,.5);background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(0,0,0,.3))}
+.ep-card.prologue:hover{box-shadow:0 0 14px rgba(255,215,0,.4)}
 .ep-card.locked{opacity:.45;border-style:dashed;cursor:default}.ep-card.locked .no{color:#567}
 .ep-card.soon{opacity:.6;border-style:dashed;border-color:var(--neon-y);cursor:default}
 .ep-card.soon .t{color:#cdb86a}.ep-card.soon .s{color:var(--neon-y)}.ep-card.soon .no{color:#8a7a3a}
 .ep-card.soon::after{content:"COMING SOON";position:absolute;top:8px;right:36px;font-family:'Orbitron';font-size:8px;letter-spacing:1px;color:var(--neon-y);border:1px solid rgba(250,255,0,.5);border-radius:8px;padding:2px 6px}
 .ep-card .lockicon{font-size:16px}
+/* スピンオフ（案C：魂の記録レイアウト） */
+.nch-sep{margin:22px 0 12px;text-align:center}
+.nch-sep .lbl{font-family:'Orbitron';font-size:9px;letter-spacing:3px;color:#b478ff;opacity:.85}
+.nch-sep .ttl{font-family:'Orbitron';font-weight:900;font-size:15px;letter-spacing:2px;color:#d9b3ff;text-shadow:0 0 12px rgba(180,120,255,.6);margin-top:3px}
+.nch-sep .line{height:1px;margin-top:8px;background:linear-gradient(90deg,transparent,#ffd700,#b478ff,#ff0030,transparent)}
+.nch-sep .tag{font-size:10px;color:#a98fd6;letter-spacing:1px;margin-top:5px}
+.ep-card.soul{border-color:rgba(180,120,255,.5);background:linear-gradient(135deg,rgba(180,120,255,.1),rgba(0,0,0,.35));overflow:hidden}
+.ep-card.soul::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#ffd700,#ff0030)}
+.ep-card.soul:hover{box-shadow:0 0 16px rgba(180,120,255,.5)}
+.ep-card.soul .no{color:#b478ff;text-shadow:0 0 8px #b478ff;font-size:16px}
+.ep-card.soul .go{color:#d9b3ff}
+.ep-card.soul.clear{border-color:rgba(180,120,255,.7)}
+.ep-card.soul.locked{opacity:.5;border-style:dashed;cursor:default}
+.ep-card.soul.locked::before{background:#555}
 
 /* PARTY */
 #party{justify-content:flex-start}
@@ -488,6 +504,18 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
 .u-guarddome.go{animation:uguardGo 1.1s ease forwards}@keyframes uguardGo{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}50%{opacity:.9;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.4)}}
 /* 2話：無慈悲の雨（赤い雨・赤雷・血の背景） */
 #ultFX.blood{background:radial-gradient(circle at 50% 40%,#3a0810,#0a0306 72%)}
+/* ALL DELETE（ピエンターズ）演出 */
+.u-ad-marquee{position:absolute;z-index:30;border:2px dashed #fff;background:rgba(255,0,48,.10);transition:width .5s ease-out,height .5s ease-out;box-shadow:0 0 14px rgba(255,255,255,.5)}
+#ultFX.ad-glitch{animation:adGlitch .09s steps(2) infinite}
+@keyframes adGlitch{0%{filter:none;transform:translate(0,0)}33%{filter:hue-rotate(40deg) saturate(2);transform:translate(-3px,1px)}66%{filter:invert(.08);transform:translate(3px,-2px)}100%{transform:translate(-1px,1px)}}
+.u-ad-gbar{position:absolute;left:0;right:0;height:10px;background:rgba(255,255,255,.85);mix-blend-mode:overlay;z-index:41;animation:adGbar .18s steps(3) forwards}
+@keyframes adGbar{0%{opacity:.9;transform:translateX(-16px)}100%{opacity:0;transform:translateX(16px)}}
+.u-ad-void{position:absolute;left:50%;top:42%;width:20px;height:20px;border-radius:50%;transform:translate(-50%,-50%) scale(1);z-index:35;background:radial-gradient(circle,#000 55%,#7a3cff 74%,transparent 78%);box-shadow:0 0 40px #7a3cff,0 0 100px #2a0a5a;opacity:0}
+.u-ad-void.go{animation:adVoid .72s ease-in forwards}
+@keyframes adVoid{0%{opacity:0;transform:translate(-50%,-50%) scale(1)}25%{opacity:1}100%{opacity:1;transform:translate(-50%,-50%) scale(26)}}
+.u-ad-crt{position:absolute;inset:0;z-index:58;background:#fff;opacity:0}
+.u-ad-crt.go{animation:adCrt .66s cubic-bezier(.7,0,.3,1) forwards}
+@keyframes adCrt{0%{opacity:0;transform:scaleY(1) scaleX(1)}25%{opacity:0}50%{opacity:.95;transform:scaleY(.02) scaleX(1)}75%{opacity:1;transform:scaleY(.02) scaleX(.05)}100%{opacity:0;transform:scaleY(.02) scaleX(0)}}
 .u-brain{position:absolute;width:3px;height:70px;background:linear-gradient(180deg,transparent,#ff3a4a,#c81e2e);z-index:31;top:-70px;border-radius:3px;opacity:.9;box-shadow:0 0 6px #c81e2e}
 .u-brain.go{animation:ubrainGo linear forwards}@keyframes ubrainGo{to{transform:translateY(150vh)}}
 .u-rbolt{position:absolute;top:0;width:16px;height:0;z-index:32;background:linear-gradient(180deg,#fff,#ffb0b8,#ff3a4a);box-shadow:0 0 22px #ff3a4a,0 0 44px #c81e2e;opacity:0;clip-path:polygon(40% 0,60% 0,48% 40%,72% 40%,30% 100%,52% 55%,30% 55%)}
@@ -749,6 +777,222 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
 #boot .bs{font-family:'Orbitron';font-size:11px;letter-spacing:6px;color:var(--neon-y);text-shadow:0 0 10px var(--neon-y)}
 #boot .tapstart{margin-top:20px;font-size:14px;letter-spacing:3px;color:#9bd;animation:blink2 1.4s ease-in-out infinite}
 @keyframes blink2{50%{opacity:.3}}
+/* ========== 対戦モード ========== */
+.nbtn.vsbtn{position:relative;overflow:hidden;background:linear-gradient(90deg,rgba(255,0,212,.15),rgba(255,0,48,.15));border-color:var(--neon-m);color:#fff;box-shadow:0 0 18px rgba(255,0,212,.3);animation:vsBtnPulse 2.2s ease-in-out infinite}
+@keyframes vsBtnPulse{50%{box-shadow:0 0 28px rgba(255,0,212,.6)}}
+.nbtn.vsbtn::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 40%,rgba(255,0,212,.25) 50%,transparent 60%);background-size:250% 100%;animation:vsShine 3s linear infinite;pointer-events:none}
+@keyframes vsShine{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* 背景演出 */
+.vsm-bgaura{position:absolute;width:500px;height:500px;left:50%;top:28%;transform:translate(-50%,-50%);z-index:0;pointer-events:none;border-radius:50%;background:radial-gradient(circle,rgba(255,0,212,.10),transparent 60%);animation:vsmAura 6s ease-in-out infinite}
+@keyframes vsmAura{50%{transform:translate(-50%,-50%) scale(1.3);opacity:.6}}
+.vsm-bgscan{position:absolute;left:0;right:0;height:140px;z-index:0;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(255,0,212,.07),transparent);animation:vsmScan 5s linear infinite}
+@keyframes vsmScan{0%{top:-140px}100%{top:100%}}
+.vsm-particles{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.vsm-pt{position:absolute;border-radius:50%;opacity:0;animation:vsmPtRise linear infinite}
+@keyframes vsmPtRise{0%{transform:translateY(40px) scale(.5);opacity:0}15%{opacity:1}85%{opacity:1}100%{transform:translateY(-100vh) scale(1.2);opacity:0}}
+/* ヘッダー */
+.vsm-head{position:relative;z-index:5;padding:40px 16px 8px;text-align:center}
+.vsm-tickets{position:absolute;top:10px;right:16px;font-family:'Teko';font-size:20px;color:var(--neon-gold,#ffd700);z-index:8;text-shadow:0 0 10px #ffd700;animation:vsmTk 2s ease-in-out infinite}
+@keyframes vsmTk{50%{text-shadow:0 0 20px #ffd700}}
+.vsm-title{font-family:'Orbitron';font-weight:900;font-size:28px;letter-spacing:3px;position:relative;display:inline-block;background:linear-gradient(90deg,var(--neon-m),var(--neon-c),var(--neon-y),var(--neon-c),var(--neon-m));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:vsmTitleFlow 4s linear infinite,vsmTitleFloat 3s ease-in-out infinite}
+@keyframes vsmTitleFlow{to{background-position:300% 0}}
+@keyframes vsmTitleFloat{50%{transform:translateY(-4px)}}
+.vsm-sub{font-family:'Rajdhani';font-size:12px;color:#9ad;letter-spacing:2px;margin-top:6px;animation:vsmSubFade 3s ease-in-out infinite}
+@keyframes vsmSubFade{50%{opacity:.6}}
+.vsm-divline{height:2px;width:80%;margin:10px auto 4px;background:linear-gradient(90deg,transparent,var(--neon-m),var(--neon-c),transparent);position:relative;z-index:5;animation:vsmLine 2.5s ease-in-out infinite}
+@keyframes vsmLine{50%{box-shadow:0 0 14px var(--neon-m)}}
+/* 相手リスト */
+.vsm-list{position:relative;z-index:5;padding:10px 12px 20px;display:flex;flex-direction:column;gap:13px;flex:1;overflow-y:auto}
+.opp-card{position:relative;border-radius:14px;overflow:hidden;padding:14px;display:flex;align-items:center;gap:14px;min-height:94px;flex-shrink:0;background:linear-gradient(135deg,rgba(20,8,30,.92),rgba(8,6,20,.96));border:1px solid var(--line);cursor:pointer;transition:transform .2s,box-shadow .2s}
+.opp-card:active{transform:scale(.97)}
+.opp-card.boss{border-color:rgba(255,0,48,.4)}
+.opp-card.boss:active{box-shadow:0 0 24px rgba(255,0,48,.5)}
+.opp-card.special{border-color:rgba(255,215,0,.5)}
+.opp-card.special:active{box-shadow:0 0 30px rgba(255,215,0,.6)}
+.opp-card.locked{opacity:.5;filter:grayscale(.7);cursor:default}
+.opp-card::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 40%,rgba(255,255,255,.06) 50%,transparent 60%);background-size:250% 100%;animation:vsShine 3.5s linear infinite;pointer-events:none}
+.opp-card.special::before{content:"";position:absolute;inset:0;border-radius:14px;padding:1px;background:linear-gradient(135deg,#ffd700,#fff,#ffd700,#7a5c00,#ffd700);background-size:300% 300%;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:2;animation:vsmGoldBorder 3s linear infinite}
+@keyframes vsmGoldBorder{to{background-position:300% 300%}}
+.opp-face{width:66px;height:66px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:38px;flex-shrink:0;position:relative;background:radial-gradient(circle,rgba(255,0,48,.22),rgba(0,0,0,.5));border:1px solid rgba(255,255,255,.12);overflow:hidden;z-index:3}
+.opp-card.special .opp-face{background:radial-gradient(circle,rgba(255,215,0,.28),rgba(0,0,0,.5));border-color:rgba(255,215,0,.4)}
+.opp-face .ico{position:relative;z-index:2;animation:vsmFaceFloat 3s ease-in-out infinite;filter:drop-shadow(0 0 6px rgba(255,0,48,.6))}
+.opp-card.special .opp-face .ico{filter:drop-shadow(0 0 8px #ffd700)}
+@keyframes vsmFaceFloat{50%{transform:translateY(-4px) scale(1.06)}}
+.opp-face .ring{position:absolute;width:120%;height:120%;background:conic-gradient(from 0deg,transparent,rgba(255,0,48,.4),transparent 40%,transparent 60%,rgba(255,0,48,.4),transparent);animation:vsmFaceRing 4s linear infinite;z-index:1}
+.opp-card.special .opp-face .ring{background:conic-gradient(from 0deg,transparent,rgba(255,215,0,.5),transparent 40%,transparent 60%,rgba(255,215,0,.5),transparent)}
+@keyframes vsmFaceRing{to{transform:rotate(360deg)}}
+.opp-info{flex:1;min-width:0;position:relative;z-index:3}
+.opp-name{font-family:'Orbitron';font-weight:700;font-size:14px;color:#fff;margin-bottom:3px;line-height:1.2}
+.opp-tag{display:inline-block;font-family:'Orbitron';font-size:8px;font-weight:700;padding:1px 7px;border-radius:3px;letter-spacing:1px;margin-bottom:5px}
+.opp-tag.boss{background:rgba(255,0,48,.2);color:#ff6080;border:1px solid rgba(255,0,48,.4)}
+.opp-tag.special{background:linear-gradient(90deg,#ffd700,#fff,#ffd700);color:#000;animation:vsmGoldFlow 3s linear infinite;background-size:200% 100%}
+@keyframes vsmGoldFlow{to{background-position:200% 0}}
+.opp-reward{display:flex;align-items:center;gap:6px;font-size:11px;color:#bdf;flex-wrap:wrap}
+.opp-reward .rw{display:flex;align-items:center;gap:3px;background:rgba(0,240,255,.08);padding:2px 6px;border-radius:5px;font-family:'Rajdhani';font-weight:600;border:1px solid rgba(0,240,255,.12)}
+.opp-reward .rw.char{background:rgba(255,215,0,.12);color:#ffd700;border-color:rgba(255,215,0,.3)}
+.opp-arrow{font-size:22px;color:var(--neon-m);flex-shrink:0;position:relative;z-index:3;animation:vsmArrow 1.5s ease-in-out infinite}
+@keyframes vsmArrow{50%{transform:translateX(4px)}}
+.opp-clear{position:absolute;top:8px;right:10px;font-family:'Orbitron';font-size:8px;color:var(--neon-g);font-weight:700;letter-spacing:1px;z-index:4;animation:vsmClearBlink 2s ease-in-out infinite}
+@keyframes vsmClearBlink{50%{opacity:.5}}
+.opp-lockicon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:30px;z-index:6;animation:vsmLockFloat 3s ease-in-out infinite;filter:drop-shadow(0 0 6px #000)}
+@keyframes vsmLockFloat{50%{transform:translate(-50%,-58%)}}
+/* 難易度選択 */
+.vsd-wrap{position:relative;z-index:5;padding:16px 14px 24px;flex:1;overflow-y:auto}
+.vsd-target{position:relative;display:flex;flex-direction:column;align-items:center;padding:18px;margin-bottom:18px;border-radius:16px;overflow:hidden;background:radial-gradient(ellipse at 50% 0%,rgba(255,0,48,.22),rgba(8,6,20,.9) 70%);border:1px solid rgba(255,0,48,.35)}
+.vsd-target .tg-rays{position:absolute;width:300px;height:300px;top:-40px;left:50%;transform:translateX(-50%);background:conic-gradient(from 0deg,transparent,rgba(255,0,48,.18),transparent 30%,transparent 50%,rgba(255,0,48,.18),transparent 70%,transparent);animation:vsmRays 8s linear infinite;pointer-events:none}
+@keyframes vsmRays{to{transform:translateX(-50%) rotate(360deg)}}
+.vsd-target .bigface{font-size:76px;filter:drop-shadow(0 0 24px rgba(255,0,48,.7));animation:vsmTgFloat 3s ease-in-out infinite;position:relative;z-index:2}
+@keyframes vsmTgFloat{50%{transform:translateY(-10px) scale(1.04)}}
+.vsd-target .tgname{font-family:'Orbitron';font-weight:800;font-size:19px;color:#fff;margin-top:8px;position:relative;z-index:2;text-shadow:0 0 14px rgba(255,0,48,.5)}
+.vsd-target .tgdesc{font-size:11px;color:#bcd;margin-top:5px;text-align:center;line-height:1.6;max-width:300px;position:relative;z-index:2}
+.vsd-label{font-family:'Orbitron';font-size:11px;color:var(--neon-y);letter-spacing:2px;margin:6px 4px 12px;text-align:center;animation:vsmLbl 2.5s ease-in-out infinite}
+@keyframes vsmLbl{50%{opacity:.6;text-shadow:0 0 12px var(--neon-y)}}
+.vsd-list{display:flex;flex-direction:column;gap:11px}
+.diff-card{position:relative;border-radius:12px;padding:14px 16px;cursor:pointer;transition:transform .2s,box-shadow .2s;overflow:hidden;display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:rgba(10,12,24,.85)}
+.diff-card::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 42%,rgba(255,255,255,.07) 50%,transparent 58%);background-size:250% 100%;animation:vsShine 3s linear infinite;pointer-events:none}
+.diff-card:active{transform:scale(.98)}
+.diff-card.sel{box-shadow:0 0 0 2px #fff inset,0 0 20px rgba(255,255,255,.3)}
+.diff-card.easy{border-color:rgba(0,255,157,.4)}
+.diff-card.normal{border-color:rgba(0,240,255,.4)}
+.diff-card.hard{border-color:rgba(255,128,0,.5)}
+.diff-card.nightmare{border-color:rgba(255,0,48,.6);background:linear-gradient(135deg,rgba(40,0,10,.92),rgba(10,0,5,.96));animation:vsmNmBreath 2s ease-in-out infinite}
+@keyframes vsmNmBreath{50%{box-shadow:0 0 22px rgba(255,0,48,.5)}}
+.nightmare-rays{position:absolute;inset:0;background:radial-gradient(circle at 80% 50%,rgba(255,0,48,.2),transparent 50%);animation:vsmNmRay 1.8s ease-in-out infinite;pointer-events:none}
+@keyframes vsmNmRay{50%{opacity:.4}}
+.diff-stars{font-size:14px;flex-shrink:0;width:78px;position:relative;z-index:2}
+.diff-mid{flex:1;position:relative;z-index:2}
+.diff-name{font-family:'Orbitron';font-weight:800;font-size:15px;letter-spacing:1px}
+.diff-card.easy .diff-name{color:var(--neon-g)}
+.diff-card.normal .diff-name{color:var(--neon-c)}
+.diff-card.hard .diff-name{color:#ff9040}
+.diff-card.nightmare .diff-name{color:var(--neon-r);text-shadow:0 0 12px var(--neon-r);animation:vsmNmText 1.5s ease-in-out infinite}
+@keyframes vsmNmText{50%{text-shadow:0 0 20px var(--neon-r),0 0 4px #fff}}
+.diff-enemy{font-size:10px;color:#9ad;margin-top:2px}
+.diff-rw{text-align:right;flex-shrink:0;position:relative;z-index:2}
+.diff-rw .tk{font-family:'Teko';font-size:21px;color:#ffd700;line-height:1;text-shadow:0 0 8px rgba(255,215,0,.5)}
+.diff-rw .tklabel{font-size:8px;color:#888;letter-spacing:1px}
+.diff-rw .bonus{font-size:9px;color:#ffd700;margin-top:3px}
+.diff-card.nightmare .diff-rw .bonus{color:#ff6080}
+.diff-rw .visited{font-size:8px;color:#789;margin-top:2px}
+.nightmare-badge{position:absolute;top:0;right:0;background:var(--neon-r);color:#fff;font-family:'Orbitron';font-size:7px;font-weight:700;padding:2px 8px;border-bottom-left-radius:8px;letter-spacing:1px;animation:vsmNmBlink 1.2s ease-in-out infinite;z-index:3}
+@keyframes vsmNmBlink{50%{opacity:.4}}
+.vsd-start{position:relative;margin:22px 2px 0;padding:17px;text-align:center;font-family:'Orbitron';font-weight:800;font-size:16px;letter-spacing:3px;border-radius:12px;background:linear-gradient(90deg,var(--neon-m),var(--neon-r),var(--neon-m));background-size:200% 100%;color:#fff;cursor:pointer;border:1px solid rgba(255,255,255,.25);overflow:hidden;animation:vsmTitleFlow 3s linear infinite,vsmStartPulse 1.8s ease-in-out infinite}
+@keyframes vsmStartPulse{50%{box-shadow:0 0 30px rgba(255,0,212,.7)}}
+@keyframes vsmTgSpark{0%{transform:translateY(20px);opacity:0}40%{opacity:1}100%{transform:translateY(-50px);opacity:0}}
+.vsd-start::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 40%,rgba(255,255,255,.3) 50%,transparent 60%);background-size:250% 100%;animation:vsShine 2.5s linear infinite}
+/* 対戦モード タブ */
+.vs-tabs{position:relative;z-index:6;display:flex;gap:6px;padding:8px 12px 4px}
+.vs-tab{flex:1;text-align:center;padding:10px 4px;border-radius:10px 10px 0 0;font-family:'Orbitron';font-weight:700;font-size:10px;letter-spacing:.5px;cursor:pointer;background:rgba(10,12,24,.6);border:1px solid var(--line);border-bottom:none;color:#789;transition:.2s;position:relative;line-height:1.3}
+.vs-tab .ji{font-size:13px;display:block;margin-bottom:3px}
+.vs-tab.on{color:#fff;background:linear-gradient(180deg,rgba(255,0,212,.25),rgba(10,12,24,.8));border-color:var(--neon-m);box-shadow:0 -2px 14px rgba(255,0,212,.4)}
+.vs-tab.on.t2{background:linear-gradient(180deg,rgba(0,240,255,.22),rgba(10,12,24,.8));border-color:var(--neon-c);box-shadow:0 -2px 14px rgba(0,240,255,.4)}
+.vs-tab.on.t3{background:linear-gradient(180deg,rgba(255,215,0,.22),rgba(10,12,24,.8));border-color:var(--gold);box-shadow:0 -2px 14px rgba(255,215,0,.4)}
+/* VSタイトル中心パネル */
+.opp-vs{font-family:'Cinzel','Orbitron';font-weight:700;font-size:10px;letter-spacing:2px;color:#ff6080;margin-bottom:2px}
+.opp-card.special .opp-vs{color:var(--gold)}
+.opp-vstitle{font-family:'Orbitron';font-weight:800;font-size:16px;color:#fff;line-height:1.2;margin-bottom:5px;text-shadow:0 0 12px rgba(255,255,255,.2)}
+.opp-name-sub{font-size:10px;color:#9ad;margin-bottom:5px}
+/* 伝説の英霊達：パーティ編成パネル */
+.legend-card{position:relative;border-radius:16px;overflow:hidden;padding:16px;flex-shrink:0;background:linear-gradient(135deg,rgba(30,15,50,.95),rgba(10,6,24,.97));border:1px solid rgba(180,120,255,.5);cursor:pointer}
+.legend-card::before{content:"";position:absolute;inset:0;border-radius:16px;padding:1.5px;background:linear-gradient(135deg,#b478ff,#fff,#b478ff,#5a3a99,#b478ff);background-size:300% 300%;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;animation:vsmGoldBorder 3s linear infinite}
+.legend-head{display:flex;align-items:center;gap:6px;margin-bottom:12px;position:relative;z-index:2}
+.legend-vs{font-family:'Cinzel';font-weight:900;font-size:13px;letter-spacing:3px;color:#c89aff}
+.legend-vstitle{font-family:'Orbitron';font-weight:900;font-size:19px;background:linear-gradient(90deg,#d8b4ff,#fff,#d8b4ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px}
+.legend-tag{margin-left:auto;font-family:'Orbitron';font-size:8px;font-weight:700;padding:2px 8px;border-radius:4px;background:linear-gradient(90deg,#b478ff,#fff,#b478ff);color:#000;background-size:200% 100%;animation:vsmGoldFlow 3s linear infinite}
+.legend-party{display:flex;gap:8px;position:relative;z-index:2;margin-bottom:10px}
+.lp-member{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 2px;border-radius:10px;background:rgba(0,0,0,.3);border:1px solid rgba(180,120,255,.2);position:relative}
+.lp-member.lp-boss{background:radial-gradient(circle,rgba(180,120,255,.3),rgba(0,0,0,.4));border-color:rgba(180,120,255,.6);box-shadow:0 0 14px rgba(180,120,255,.4)}
+.lp-member.lp-boss::before{content:"BOSS";position:absolute;top:-7px;left:50%;transform:translateX(-50%);font-family:'Orbitron';font-size:6px;font-weight:700;color:#000;background:#b478ff;padding:1px 6px;border-radius:3px;letter-spacing:1px}
+.lp-face{font-size:30px;filter:drop-shadow(0 0 6px rgba(180,120,255,.5));animation:vsmFaceFloat 3s ease-in-out infinite}
+.lp-member.lp-boss .lp-face{font-size:38px;filter:drop-shadow(0 0 12px #b478ff)}
+.lp-rare{font-family:'Orbitron';font-size:6px;font-weight:700;margin-top:4px;padding:1px 4px;border-radius:2px}
+.lp-rare.PRED{background:linear-gradient(90deg,#ff0030,#ff7a00);color:#fff}
+.lp-rare.UR{background:linear-gradient(90deg,#a020f0,#e000ff);color:#fff}
+.lp-rare.SR{background:linear-gradient(90deg,#1e90ff,#00bfff);color:#fff}
+.lp-rare.INFINITY{background:linear-gradient(90deg,#ffd700,#fff,#ffd700);color:#000;background-size:200% 100%;animation:vsmGoldFlow 2s linear infinite}
+.lp-name{font-size:8px;color:#bcd;margin-top:3px;text-align:center;line-height:1.2;white-space:pre-line}
+.legend-foot{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2}
+.legend-reward{display:flex;gap:6px}
+.legend-reward .rw{display:flex;align-items:center;gap:3px;background:rgba(255,215,0,.12);color:var(--gold);padding:2px 7px;border-radius:5px;font-family:'Rajdhani';font-weight:600;font-size:11px;border:1px solid rgba(255,215,0,.3)}
+.legend-go{font-family:'Orbitron';font-weight:800;font-size:11px;color:#fff;padding:6px 16px;border-radius:8px;background:linear-gradient(90deg,#b478ff,#7a3aff);box-shadow:0 0 14px rgba(180,120,255,.5)}
+.legend-clear{position:absolute;top:10px;right:12px;font-family:'Orbitron';font-size:8px;color:var(--neon-g);font-weight:700;z-index:3}
+/* 単体ボス専用パネル */
+.solo-card{position:relative;border-radius:18px;overflow:hidden;padding:0;cursor:pointer;min-height:230px;flex-shrink:0;display:flex;flex-direction:column;justify-content:flex-end}
+.solo-card.inf{border:1.5px solid var(--gold)}
+.solo-card.dev{border:1.5px solid var(--neon-c)}
+.solo-bg{position:absolute;inset:0;z-index:0}
+.solo-card.inf .solo-bg{background:radial-gradient(ellipse at 50% 35%,rgba(255,215,0,.3),rgba(20,10,5,.9) 65%,rgba(8,4,2,.98))}
+.solo-card.dev .solo-bg{background:radial-gradient(ellipse at 50% 35%,rgba(0,240,255,.28),rgba(5,12,24,.9) 65%,rgba(2,6,15,.98))}
+.solo-rays{position:absolute;width:340px;height:340px;top:-20px;left:50%;transform:translateX(-50%);z-index:1;pointer-events:none}
+.solo-card.inf .solo-rays{background:conic-gradient(from 0deg,transparent,rgba(255,215,0,.18),transparent 25%,transparent 50%,rgba(255,215,0,.18),transparent 75%,transparent);animation:vsmRays 10s linear infinite}
+.solo-card.dev .solo-rays{background:conic-gradient(from 0deg,transparent,rgba(0,240,255,.16),transparent 25%,transparent 50%,rgba(0,240,255,.16),transparent 75%,transparent);animation:vsmRays 12s linear infinite}
+.solo-face{position:absolute;top:24px;left:50%;transform:translateX(-50%);font-size:96px;z-index:2;animation:vsmTgFloat 3.5s ease-in-out infinite}
+.solo-card.inf .solo-face{filter:drop-shadow(0 0 24px var(--gold)) drop-shadow(0 0 50px rgba(255,215,0,.6))}
+.solo-card.dev .solo-face{filter:drop-shadow(0 0 24px var(--neon-c)) drop-shadow(0 0 50px rgba(0,240,255,.6))}
+.solo-badge{position:absolute;top:14px;left:14px;z-index:5;font-family:'Orbitron';font-size:8px;font-weight:800;padding:3px 10px;border-radius:5px;letter-spacing:2px}
+.solo-card.inf .solo-badge{background:linear-gradient(90deg,var(--gold),#fff,var(--gold));color:#000;background-size:200% 100%;animation:vsmGoldFlow 2.5s linear infinite}
+.solo-card.dev .solo-badge{background:linear-gradient(90deg,var(--neon-c),#fff,var(--neon-c));color:#000;background-size:200% 100%;animation:vsmGoldFlow 2.5s linear infinite}
+.solo-rare{position:absolute;top:14px;right:14px;z-index:5;font-family:'Orbitron';font-size:9px;font-weight:800;padding:3px 10px;border-radius:5px}
+.solo-card.inf .solo-rare{background:linear-gradient(90deg,#ffd700,#fff5cc,#ffd700);color:#000;background-size:200% 100%;animation:vsmGoldFlow 2s linear infinite;box-shadow:0 0 14px var(--gold)}
+.solo-card.dev .solo-rare{background:rgba(0,240,255,.2);color:var(--neon-c);border:1px solid var(--neon-c)}
+.solo-info{position:relative;z-index:4;padding:14px 16px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.85) 40%,rgba(0,0,0,.95))}
+.solo-vs{font-family:'Cinzel';font-weight:900;font-size:12px;letter-spacing:4px;margin-bottom:2px}
+.solo-card.inf .solo-vs{color:var(--gold)}
+.solo-card.dev .solo-vs{color:var(--neon-c)}
+.solo-vstitle{font-family:'Orbitron';font-weight:900;font-size:24px;letter-spacing:1px;line-height:1.1;margin-bottom:3px}
+.solo-card.inf .solo-vstitle{background:linear-gradient(90deg,#ffd700,#fff,#ffd700);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.solo-card.dev .solo-vstitle{background:linear-gradient(90deg,#00f0ff,#fff,#00f0ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.solo-name{font-size:11px;color:#bcd;margin-bottom:8px}
+.solo-foot{display:flex;align-items:center;justify-content:space-between}
+.solo-reward{display:flex;gap:6px}
+.solo-reward .rw{display:flex;align-items:center;gap:3px;background:rgba(255,215,0,.12);color:var(--gold);padding:2px 7px;border-radius:5px;font-family:'Rajdhani';font-weight:600;font-size:11px;border:1px solid rgba(255,215,0,.3)}
+.solo-go{font-family:'Orbitron';font-weight:800;font-size:12px;color:#fff;padding:7px 18px;border-radius:8px}
+.solo-card.inf .solo-go{background:linear-gradient(90deg,var(--gold),#b8860b);box-shadow:0 0 16px rgba(255,215,0,.5)}
+.solo-card.dev .solo-go{background:linear-gradient(90deg,var(--neon-c),#0088aa);box-shadow:0 0 16px rgba(0,240,255,.5)}
+.solo-clear{position:absolute;top:46px;right:14px;z-index:5;font-family:'Orbitron';font-size:8px;color:var(--neon-g);font-weight:700}
+/* アップデート履歴 */
+.ver{cursor:pointer;transition:.2s;border:1px solid transparent;border-radius:8px;padding:4px 10px;display:inline-block}
+.ver[data-act]:hover{color:var(--neon-c);border-color:rgba(0,240,255,.3);text-shadow:0 0 8px var(--neon-c)}
+#changelog{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px}
+#changelog.show{display:flex}
+.cl-box{width:100%;max-width:420px;max-height:80vh;display:flex;flex-direction:column;border-radius:18px;overflow:hidden;background:linear-gradient(160deg,rgba(14,18,32,.98),rgba(8,10,20,.99));border:1px solid var(--line);box-shadow:0 0 40px rgba(0,240,255,.25)}
+.cl-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line);flex-shrink:0;background:linear-gradient(90deg,rgba(0,240,255,.08),rgba(255,0,212,.08))}
+.cl-title{font-family:'Orbitron';font-weight:800;font-size:14px;letter-spacing:1px;color:#fff;text-shadow:0 0 10px var(--neon-c)}
+.cl-x{font-size:18px;color:#9ab;cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:.2s}
+.cl-x:hover{background:rgba(255,255,255,.1);color:#fff}
+.cl-body{padding:16px 18px;overflow-y:auto}
+.cl-entry{margin-bottom:18px;padding-bottom:16px;border-bottom:1px dashed rgba(255,255,255,.1)}
+.cl-entry:last-child{border-bottom:none;margin-bottom:0}
+.cl-ver{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.cl-vnum{font-family:'Orbitron';font-weight:800;font-size:15px;color:var(--neon-c);text-shadow:0 0 8px var(--neon-c)}
+.cl-vnum.latest{color:var(--gold);text-shadow:0 0 10px var(--gold)}
+.cl-vtag{font-family:'Orbitron';font-size:8px;font-weight:700;padding:2px 7px;border-radius:4px;background:var(--gold);color:#000;letter-spacing:1px}
+.cl-vdate{font-size:10px;color:#789;margin-left:auto;font-family:'Rajdhani'}
+.cl-list{list-style:none;padding:0}
+.cl-list li{font-size:12px;color:#cde;line-height:1.6;padding-left:18px;position:relative;margin-bottom:4px}
+.cl-list li::before{content:"▸";position:absolute;left:0;color:var(--neon-m)}
+.cl-list li.add::before{content:"✦";color:var(--neon-g)}
+.cl-list li.fix::before{content:"✔";color:var(--neon-y)}
+/* 寄付モーダル */
+#donate{position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.82);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:22px}
+#donate.show{display:flex;animation:scin .3s}
+.dn-box{width:100%;max-width:350px;border:1px solid #ffd27a;border-radius:18px;padding:22px 20px;background:linear-gradient(165deg,#1a1330,#0c0a1e);box-shadow:0 0 30px rgba(255,200,90,.35);text-align:center;position:relative}
+.dn-head{font-family:'Orbitron';font-size:15px;letter-spacing:1px;color:#ffd27a;text-shadow:0 0 10px rgba(255,200,90,.6);margin-bottom:4px}
+.dn-sub{font-size:10px;color:#a98fd6;letter-spacing:1px;margin-bottom:14px}
+.dn-x{position:absolute;top:12px;right:14px;color:#9aa;font-size:18px;cursor:pointer}
+.dn-joke{min-height:88px;display:flex;align-items:center;justify-content:center;font-size:13.5px;line-height:1.75;color:#ffeede;background:rgba(255,210,122,.07);border:1px dashed rgba(255,210,122,.35);border-radius:12px;padding:14px;margin-bottom:12px;text-align:left}
+.dn-reroll{display:inline-block;font-size:11px;color:#b9c4ff;border:1px solid rgba(120,150,255,.4);border-radius:20px;padding:6px 14px;margin-bottom:16px;cursor:pointer;transition:.2s}
+.dn-reroll:hover{background:rgba(120,150,255,.12);color:#fff}
+.dn-pay{display:block;text-decoration:none;font-family:'Orbitron';font-weight:700;font-size:15px;letter-spacing:1px;color:#0a0a14;background:linear-gradient(135deg,#ffe08a,#ffb84d);border-radius:12px;padding:14px;box-shadow:0 0 18px rgba(255,184,77,.5);margin-bottom:10px}
+.dn-pay:active{transform:scale(.98)}
+.dn-note{font-size:10.5px;color:#9a86c8;line-height:1.6}
+.donate-pill{display:inline-block;margin-top:10px;font-size:11px;color:#ffd27a;border:1px solid rgba(255,210,122,.4);border-radius:20px;padding:6px 16px;cursor:pointer;transition:.2s;letter-spacing:.5px}
+.donate-pill:hover{background:rgba(255,210,122,.1);box-shadow:0 0 12px rgba(255,200,90,.4)}
+/* タイトル最上部の寄付バナー（案1：フルワイド・光が流れる）*/
+#title{overflow-y:auto}
+.t-donate-banner{margin:-24px -20px 14px;padding:12px;text-align:center;font-family:'Orbitron';font-weight:700;font-size:13px;letter-spacing:.5px;color:#1a1206;cursor:pointer;background:linear-gradient(90deg,#ffb84d,#ffe08a,#ffb84d);background-size:200% 100%;animation:dnShine 3s linear infinite;box-shadow:0 2px 14px rgba(255,184,77,.45)}
+.t-donate-banner:active{filter:brightness(.95)}
+@keyframes dnShine{to{background-position:200% 0}}
 </style>
 </head>
 <body>
@@ -760,6 +1004,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
 
   <!-- TITLE -->
   <section class="screen show" id="title">
+    <div class="t-donate-banner" data-act="donate">☕ 開発者を支援する　〉</div>
     <div class="t-logo"><span class="glitch" data-t="開発者の現在 2">開発者の現在 2</span><span class="sub">THE RETURN OF FLAME WAR</span></div>
     <div class="t2-hero"><div class="ringbg"></div><div class="char">🧑‍💻</div><div class="tagcopy">― 売り言葉に買い言葉、それが戦争。 ―</div></div>
     <div class="t-menu">
@@ -767,9 +1012,10 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
       <div class="nbtn" data-act="continue">続ける</div>
       <div class="nbtn" data-act="zukan">キャラクター図鑑</div>
       <div class="nbtn mag" id="gachaBtn" data-act="gacha">キャラクターガチャ</div>
+      <div class="nbtn vsbtn" id="vsBtn" data-act="vsmode">⚔️ 対戦モード</div>
       <div class="nbtn ylw" data-act="settings">設定</div>
     </div>
-    <div class="ver" id="verline">ver 1.0</div>
+    <div class="ver" id="verline" data-act="changelog">ver 1.3.0 ・ 📜 更新履歴</div>
   </section>
 
   <!-- MAIN -->
@@ -922,6 +1168,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
   <section class="screen" id="settings">
     <button class="backbtn" data-back="title">‹</button>
     <div class="sc-title">SETTINGS</div>
+    <div class="scr" style="flex:1;overflow-y:auto">
     <div class="set-row"><span class="k">BGM 音量</span><input type="range" id="bgmVol" min="0" max="100"><span class="val" id="bgmVal">70</span></div>
     <div class="set-row"><span class="k">SE 音量</span><input type="range" id="seVol" min="0" max="100"><span class="val" id="seVal">80</span></div>
     <div class="set-row"><span class="k">演出エフェクト</span><div class="toggle on" id="fxTog"></div></div>
@@ -929,8 +1176,19 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
     <div style="margin-top:8px"><div class="nbtn mag" data-act="reset">セーブデータを初期化</div></div>
     <div style="margin-top:20px;padding:14px;border:1px solid rgba(255,180,200,.4);border-radius:12px;background:linear-gradient(160deg,rgba(255,200,220,.08),rgba(180,120,140,.04))">
       <div style="font-family:'Orbitron';font-size:10px;letter-spacing:2px;color:#ffb0c0;text-align:center;margin-bottom:10px">👵 GRANNY</div>
-      <div class="nbtn" data-act="granny" style="border-color:#ffb0c0;color:#ffe0e8;background:linear-gradient(135deg,rgba(255,180,200,.15),rgba(200,140,160,.1))">👵 おばあちゃんにお小遣いをねだる</div>
+      <div class="nbtn" data-act="granny" style="border-color:#ffb0c0;color:#ffe0e8;background:linear-gradient(135deg,rgba(255,180,200,.15),rgba(200,140,160,.1));font-size:14px">👵 おばあちゃんにお小遣い</div>
       <div style="font-size:10px;color:#c898a8;text-align:center;margin-top:8px;line-height:1.4">押すたびにチケット5枚もらえる（所持上限999）</div>
+    </div>
+    <div style="margin-top:20px;padding:14px;border:1px solid rgba(255,180,80,.4);border-radius:12px;background:linear-gradient(160deg,rgba(255,180,80,.08),rgba(200,120,40,.04))">
+      <div style="font-family:'Orbitron';font-size:11px;letter-spacing:2px;color:#ffc060;text-align:center;margin-bottom:4px">🎮 チート機能</div>
+      <div style="font-size:10px;color:#d0b890;text-align:center;margin-bottom:12px;line-height:1.5">RPGが苦手でも物語を楽しめるように。<br>気軽に使ってください！</div>
+      <div class="nbtn" data-act="unlockAll" style="border-color:#ffb060;color:#ffe8d0;background:linear-gradient(135deg,rgba(255,180,80,.15),rgba(200,120,40,.1));font-size:14px">▶ 全話解放</div>
+      <div style="font-size:10px;color:#c8b098;text-align:center;margin-top:8px;line-height:1.4">全エピソードのプレイ＋全フォルム解禁・チケット999</div>
+      <div class="nbtn" data-act="unlockDex" style="border-color:#ffd700;color:#ffe98a;background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(160,120,40,.1));margin-top:10px;font-size:14px">▶ 図鑑 全開放</div>
+      <div style="font-size:10px;color:#c8b898;text-align:center;margin-top:8px;line-height:1.4">全キャラを図鑑に登録（編成枠には影響なし）</div>
+      <div class="nbtn" data-act="unlockChars" style="border-color:#00ff9d;color:#c0ffe0;background:linear-gradient(135deg,rgba(0,255,157,.15),rgba(40,160,100,.1));margin-top:10px;font-size:14px">▶ 全キャラ獲得</div>
+      <div style="font-size:10px;color:#98c8b0;text-align:center;margin-top:8px;line-height:1.4">入手可能な全キャラを所持＝編成に使える状態にする</div>
+    </div>
     </div>
   </section>
 
@@ -940,11 +1198,60 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
     <div class="story-box"><div class="ep" id="storyEp">第一話</div><h2 id="storyTtl">…</h2><p id="storyTxt">…</p></div>
   </section>
 
+  <!-- VS MODE: 相手選択 -->
+  <section class="screen" id="vsmode">
+    <button class="backbtn" data-back="title">‹</button>
+    <div class="vsm-bgaura"></div><div class="vsm-bgscan"></div>
+    <div class="vsm-particles" id="vsmParticles"></div>
+    <div class="vsm-head">
+      <div class="vsm-tickets" id="vsmTickets">🎟️ 0</div>
+      <div class="vsm-title">VS BATTLE</div>
+      <div class="vsm-sub" id="vsmSub">強敵を倒して、報酬を手に入れろ</div>
+    </div>
+    <div class="vs-tabs" id="vsTabs">
+      <div class="vs-tab on" data-tab="story"><span class="ji">📖</span>ストーリー</div>
+      <div class="vs-tab t2" data-tab="original"><span class="ji">⚔️</span>オリジナル</div>
+      <div class="vs-tab t3" data-tab="legend"><span class="ji">✨</span>伝説の英霊達</div>
+    </div>
+    <div class="vsm-divline" id="vsmDivline"></div>
+    <div class="vsm-list scr" id="vsmList"></div>
+  </section>
+
+  <!-- VS MODE: 難易度選択 -->
+  <section class="screen" id="vsdiff">
+    <button class="backbtn" data-back="vsmode">‹</button>
+    <div class="vsm-bgaura" style="background:radial-gradient(circle,rgba(255,0,48,.12),transparent 60%)"></div>
+    <div class="vsm-bgscan" style="background:linear-gradient(180deg,transparent,rgba(255,0,48,.07),transparent)"></div>
+    <div class="vsm-particles" id="vsdParticles"></div>
+    <div class="vsd-wrap scr">
+      <div class="vsd-target" id="vsdTarget"></div>
+      <div class="vsd-label">━ 難易度を選択 ━</div>
+      <div class="vsd-list" id="vsdList"></div>
+      <div class="vsd-start" id="vsdStart">▶ バトル開始</div>
+    </div>
+  </section>
+
   <!-- shared modals -->
   <div id="modal"><div class="modal-box"><h3 id="mTtl">確認</h3><p id="mMsg"></p>
     <div class="modal-row"><div class="nbtn" id="mYes">はい</div><div class="nbtn mag" id="mNo">いいえ</div></div></div></div>
   <div id="unlock"><div class="umb-box" id="umbBox"></div></div>
   <div id="toast"></div>
+  <!-- アップデート履歴モーダル -->
+  <div id="changelog"><div class="cl-box">
+    <div class="cl-head"><span class="cl-title">📜 アップデート履歴</span><span class="cl-x" id="clX">✕</span></div>
+    <div class="cl-body scr" id="clBody"></div>
+  </div></div>
+
+  <!-- 寄付モーダル -->
+  <div id="donate"><div class="dn-box">
+    <span class="dn-x" id="dnX">✕</span>
+    <div class="dn-head">☕ 開発者を支援する</div>
+    <div class="dn-sub">― 投げ銭は、完全に任意です ―</div>
+    <div class="dn-joke" id="dnJoke"></div>
+    <div class="dn-reroll" id="dnReroll">🔁 別のひとことを見る</div>
+    <a class="dn-pay" id="dnPay" href="https://qr.paypay.ne.jp/p2p01_u79hzRTCcjAzWrWV" target="_blank" rel="noopener">PayPayで支援する 💸</a>
+    <div class="dn-note">このゲームはこれからも無料・広告なしで続きます。<br>あなたが遊んでくれた、それだけでもう、開発者は救われています。</div>
+  </div></div>
 
   <!-- boot overlay -->
   <div id="boot">
@@ -1085,12 +1392,16 @@ const Audio = (()=>{
 
 /* ===================== データ ===================== */
 const CHARS=[
+  {id:38,name:"真！カエル",face:"🐸",rare:"INFINITY",role:"アタッカー",age:"??",h:"155cm",w:"秘密",from:"——",gacha:false,formOf:3,story:"光と闇、二つの魂が融合した完全体のかえる。創造神の悪の側面すら受け入れ、ひとつになった存在。一人称は『オレ』。かつての弱気は消え、寡黙で冷静、誰よりも頼れる戦士へと変貌した。『創造の神＝開発者』と対をなす根源の格を持ち、現実すら書き換える。個の力ではピエンターズを遥かに凌ぐが、その無限の“数”には一人では抗えない。無限に宇宙を創造し続け、最後の砦となる。"},
+  {id:37,name:"緋焔の剣士・クソバカ",face:"🤺",rare:"PRED",role:"アタッカー",age:"17",h:"165cm",w:"秘密",from:"鬼狩りの末裔",gacha:false,story:"鬼を狩ることに人生を捧げる、まっすぐで心優しい剣士。困っている者を決して見捨てず、自分の痛みより他人を優先する。鬼ですら『元は人間』と憐れみ、弔うように斬る。何度倒れても立ち上がる不屈の心の持ち主。生き別れた妹を探し、緋色の炎をまとう太刀で死者の国を往く。これほど高潔なのに自らを『クソバカ』と名乗るのは――昔、未熟さゆえに守れなかったものへの、戒め。"},
   {id:1,name:"開発者",face:"👨‍💻",rare:"SSR",role:"勇者・アタッカー",age:"24",h:"172cm",w:"63kg",from:"自宅",gacha:false,
    story:"趣味でゲーム開発をする主人公。1年前、世界を監視し統べる宇宙的存在『ウォッチャー』を仲間とともに撃退した英雄。平凡な日常を愛するが、再び世界は彼を放っておかない。"},
   {id:2,name:"ねこ",face:"🐱",rare:"SR",role:"親友・回復",age:"??",h:"160cm",w:"秘密",from:"元・組事務所",gacha:false,
    story:"主人公の親友にして去年世界を救った英雄の一人。元ヤクザという異色の経歴を持つ突っ込み役。口は悪いが情に厚く、仲間の傷を真っ先に気にかける。"},
   {id:3,name:"かえる",face:"🐸",rare:"SR",role:"親友・タンク",age:"??",h:"155cm",w:"秘密",from:"沼のほとり",gacha:false,
    story:"主人公の親友で世界を救った英雄の一人。一人称は『ぼく』。誰よりも優しく味方に寄り添う弱気な存在だが、その身体は誰よりも頑丈。UFO乗組員の言葉が分かる唯一の理解者。"},
+  {id:36,name:"闇のかえる",face:"🐸",rare:"SSR",role:"もう一つの魂・アタッカー",age:"??",h:"155cm",w:"秘密",from:"——",gacha:false,formOf:3,
+   story:"かえるの身に宿る、もう一つの魂。かつて世界最悪の凶悪事件を引き起こした、極悪人。紳士的な物言いの裏に、底知れぬ狂気と殺意を秘める。一人称は『わたし』。"},
   {id:4,name:"UFO乗組員",face:"👽",rare:"SR",role:"親友・トリッキー",age:"???",h:"???",w:"???",from:"宇宙のどこか",gacha:false,
    story:"主人公の親友で世界を救った英雄の一人。『あうー。』としか話さないが、一部の生物にだけ言葉が通じる。失った自分の宇宙船を探し続けている謎の人物。鋭い勘を持つ。"},
   {id:5,name:"鬼大家",face:"👹",rare:"SR",role:"鬼の末裔",age:"402",h:"190cm",w:"110kg",from:"アパート1F",gacha:false,
@@ -1155,6 +1466,34 @@ const CHARS=[
    story:"マルチバーサルエターニティが現実改変で生み出した自身の分身。本体ほどの力はないが、それでもUR級の脅威。倒しても本体が必殺技で何度でも蘇らせる。"},
   {id:35,name:"観測者ウォッチャー",face:"🧝",rare:"PRED",role:"管理者・耐久",age:"観測開始より",h:"不定",w:"概念",from:"プログラム（高次元領域）",gacha:false,
    story:"マルチバース外の『プログラム』と呼ばれる異空間に鎮座し、マルチバース内の全事象を監視・管理する存在。各宇宙ごとに個体が存在し、その宇宙が消えると共に消滅する。この個体は唯一、ハードウェアとプログラム間を移動できる特殊なウォッチャー。"},
+  // ===== 対戦モード専用 敵（id400〜） =====
+  {id:400,name:"暴走バグ",face:"🐛",rare:"R",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"プログラムの隙間に湧いた小さなバグ。単体では脅威ではないが、放置すると増殖する。"},
+  {id:401,name:"スパムの群れ",face:"📧",rare:"R",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"無限に送りつけられる迷惑メッセージの集合体。数で押してくる。"},
+  {id:402,name:"野良コード",face:"📟",rare:"R",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"誰にも管理されなくなった野良のプログラム。意味もなく動き続ける。"},
+  {id:403,name:"電脳狼",face:"🐺",rare:"SR",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"電子の荒野を駆ける狼。鋭い牙でデータを食い荒らす。"},
+  {id:404,name:"機械仕掛けの番人",face:"🤖",rare:"SR",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"古い施設を守り続ける自動人形。命令を忠実に実行する。"},
+  {id:405,name:"幻影の舞姫",face:"💃",rare:"SR",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"見る者を惑わす幻影の踊り手。その舞は敵の判断を狂わせる。"},
+  {id:406,name:"鋼鉄の騎士",face:"🛡️",rare:"SSR",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"鉄壁の守りを誇る重装騎士。生半可な攻撃は通用しない。"},
+  {id:407,name:"紅蓮の魔術師",face:"🧙",rare:"SSR",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"灼熱の魔法を操る賢者。全体を焼き払う炎を放つ。"},
+  {id:408,name:"双頭の獣",face:"🐲",rare:"SSR",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"二つの頭を持つ魔獣。それぞれが別々に攻撃を繰り出す。"},
+  {id:409,name:"嵐竜",face:"🐉",rare:"UR",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"嵐を纏いし古の竜。その咆哮は天候すら変える。"},
+  {id:410,name:"巨人ゴーレム",face:"🗿",rare:"UR",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"山のごとき巨体を持つ石の巨人。圧倒的な耐久と一撃。"},
+  {id:411,name:"堕天使",face:"😇",rare:"UR",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"堕ちた天の使い。聖と邪、両方の力を併せ持つ。"},
+  {id:412,name:"深淵の魔王",face:"😈",rare:"PRED",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"深淵より顕現せし魔の王。あらゆる生命を絶望で染め上げる。"},
+  {id:413,name:"古の災厄龍",face:"🦖",rare:"PRED",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"太古より眠りし災厄の龍。目覚めれば文明が滅ぶと言われる。"},
+  {id:414,name:"虚無の使徒",face:"👻",rare:"PRED",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"全てを無に還す使徒。触れたものは存在ごと消滅する。"},
+  {id:415,name:"終焉の女王",face:"👸",rare:"PRED",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"終わりを統べる女王。その一声で軍勢が崩れ落ちる。"},
+  {id:416,name:"創造神",face:"🌌",rare:"INFINITY",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"宇宙を創りし神。無限のエネルギーで世界を再構築する。INFINITY/PREDで挑め。"},
+  {id:417,name:"絶対零度の支配者",face:"❄️",rare:"INFINITY",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"全てを凍てつかせる絶対者。時すら凍りつかせる究極の冷気。INFINITY/PREDで挑め。"},
+  {id:418,name:"次元喰らい",face:"🕳️",rare:"INFINITY",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"次元そのものを喰らう怪物。空間を歪め、あらゆる攻撃を飲み込む。INFINITY/PREDで挑め。"},
+  {id:419,name:"全知全能",face:"☀️",rare:"INFINITY",role:"VS敵",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"全てを知り、全てを成す究極存在。対戦モードの頂点。INFINITY/PREDのみで編成し、全力で挑め。"},
+  // ===== 伝説の英霊達 専用ボス（id420〜）=====
+  {id:420,name:"真 ゼウス",face:"⚡",rare:"PRED",role:"VS敵・全能神",age:"神代",h:"-",w:"-",from:"対戦",gacha:false,story:"神の力を全開放した全能の主神。雷霆を自在に操り、その一撃は天をも引き裂く。通常のゼウスとは別次元の存在。"},
+  {id:421,name:"マルチバーサルウォッチャー",face:"🧝",rare:"PRED",role:"VS敵・管理者",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"複数の宇宙を同時に監視・管理する上位のウォッチャー。無数の観測者を統べる存在。"},
+  {id:422,name:"マルチバーサルインフィニティ",face:"👁️",rare:"INFINITY",role:"VS敵・無限",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"無限を体現せし存在。時間と共に際限なく強くなり続ける。開発者GXの力の、その先にあるもの。"},
+  {id:423,name:"かえる（天国の歌声）",face:"🐸",rare:"PRED",role:"VS敵・歌声",age:"-",h:"-",w:"-",from:"対戦",gacha:false,story:"天国から響く、かえるの歌声。仲間を犠牲にしてでも自らを守り抜く、悲しき執念の化身。"},
+  {id:424,name:"ピエンターズ（現実世界の歪み）",face:"🧍",rare:"INFINITY",role:"VS敵・歪み",age:"???",h:"???",w:"???",from:"対戦",gacha:false,story:"現実世界とデバイスの狭間に存在する、全生命の想いの具現化。その力は次元すら超越する。対戦モードの真の頂点。"},
+  {id:425,name:"絶！かえる",face:"🐸",rare:"PRED",role:"VS敵・守護",age:"???",h:"???",w:"???",from:"対戦・アース10003",gacha:false,story:"並行世界アース10003のかえる。この世界では、ゾンビ化したかえるはワクチンによって回復し、生き延びていた。死をまぬがれ、絶！フォルムへと覚醒した彼は、誰よりも強く仲間を守る絶対の盾となった。"},
   // ===== 第一弾UR（ガチャ） =====
   {id:101,name:"伝説の開発者",face:"🌟",rare:"UR",role:"原初の勇者・アタッカー",age:"???",h:"???",w:"???",from:"アース001",gacha:true,
    story:"全宇宙最強の開発者。今作の主人公とは別人で、あらゆる宇宙の原点『アース001』から来た原初の存在。その指先は宇宙の理さえ書き換える。"},
@@ -1182,9 +1521,678 @@ const EPS=[
   {t:"終末の時",s:"――もはや、地球は、地獄だった"},
   {t:"結末",s:"無限を宿し、すべての終わりへ"},
   {t:"その後 ― エピローグ",s:"我々は、ゲームの中のキャラクターに過ぎない"},
+  {t:"エピローグ2 ― 評議会",s:"無限の想いが、世界の生死を裁定する"},
 ];
 /* アドベンチャー台本（前半→バトル→後半） */
+// 第0話：前作ダイジェスト（プロローグ）。バトルなし・会話のみの長編
+const PROLOGUE_EP={
+  pre:[
+    {who:"ナレーション",face:"📜",side:"left",t:"――これは、とある開発者の物語の、続きである。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"その物語を知らない、あなたへ。…まずは、彼らがどうやって出会い、何と戦ったのか。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"その記録を、ほんの少しだけ、振り返ろう。",fx:"flash"},
+    {who:"ナレーション",face:"🌃",side:"left",t:"――物語の主人公は、ひとりの男だった。"},
+    {who:"ナレーション",face:"🧑‍💻",side:"left",t:"彼の職業は、開発者。…無料のアプリを、世に放つ者。"},
+    {who:"開発者",face:"🧑‍💻",side:"left",t:"よし、今日のアップデート完了。バグも潰した。…ダウンロード数も、ちょっと伸びてる。うれしいな。"},
+    {who:"ナレーション",face:"🧑‍💻",side:"left",t:"彼が作ったのは『ShiftMemo』という、シフト管理アプリ。…広告もなく、課金もない。完全に、無料だった。"},
+    {who:"開発者",face:"🧑‍💻",side:"left",t:"使ってる人の画面を、広告で埋めたくないんだよね。…「ありがとう」って一件来ると、また頑張れる。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――かつて、彼が初めてアプリを公開した日。…ダウンロード数は、三日たっても、ゼロだった。"},
+    {who:"開発者",face:"👨‍💻",side:"left",t:"…そりゃそうだよな。誰も、俺のアプリなんて知らない。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"だが、一週間後。…たった一件の、レビューが届いた。"},
+    {who:"開発者",face:"👨‍💻",side:"left",t:"「シフトの管理が楽になりました。作ってくれて、ありがとう」…？"},
+    {who:"開発者",face:"👨‍💻",side:"left",t:"…誰かの役に、立ってたんだ。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"夜勤明けの、誰かからの、たった一言。…彼はそれを、今でも宝物にしている。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――しかし。…「ありがとう」だけでは、家賃は払えない。",fx:"flash"},
+    {who:"開発者",face:"🧑‍💻",side:"left",t:"…なのに、なぜ俺は、家賃も払えないんだ？"},
+    {who:"ナレーション",face:"📜",side:"left",t:"無料という、やさしさという名の、呪い。…それが、彼の生き方だった。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――そんな彼のもとに、奇妙な仲間たちが、集まっていく。",fx:"flash"},
+    {who:"ナレーション",face:"🐱",side:"left",t:"一人目は、ねこ。…元ヤクザの親分に、可愛がられていた猫。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"おい兄ちゃん。そのアプリ、一円にもなってへんぞ。なんで広告貼らんねん。"},
+    {who:"開発者",face:"🧑‍💻",side:"left",t:"…使ってる人の画面を、汚したくないんだよ。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"…お前、そういうとこやぞ。"},
+    {who:"ナレーション",face:"🐱",side:"left",t:"親分が足を洗う時、「お前も堅気になれ」と託された。…口は悪いが、仲間思いの、お人好し。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"儂は別に、優しいわけやないからな。…にゃ。"},
+    {who:"開発者",face:"🧑‍💻",side:"left",t:"（今、素が出たな…）"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"二人目は、かえる。…どこからともなく現れた、敬語を話すかえる。"},
+    {who:"かえる",face:"🐸",side:"left",t:"開発者どの。嘆く前に、戦う準備をいたしましょう。"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"やたら丁寧。だが、その慇懃さが、逆に相手を苛立たせる。…天性の、煽り体質。"},
+    {who:"開発者",face:"🧑‍💻",side:"left",t:"かえる、お前、何者なんだ？"},
+    {who:"かえる",face:"🐸",side:"left",t:"はて。ただの、礼儀正しいかえるでございます。…ふふ。いずれ、お話しする時が来ましょう。"},
+    {who:"開発者",face:"🧑‍💻",side:"left",t:"（絶対なんか隠してるだろ、こいつ…）"},
+    {who:"ナレーション",face:"👽",side:"left",t:"三人目は、UFO乗組員。…「あうー」としか、言葉を発さない、謎の宇宙人。"},
+    {who:"UFO乗組員",face:"👽",side:"right",t:"あうー！あうあうー！"},
+    {who:"かえる",face:"🐸",side:"left",t:"通訳いたします。「面白い星だと聞いて、観光に来た」そうです。"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"なぜか、かえるだけが、彼の言葉を、完璧に通訳できた。"},
+    {who:"ナレーション",face:"👽",side:"left",t:"――だが、その「あうー」の裏には、哀しい真実が隠されていた。",fx:"flash"},
+    {who:"UFO乗組員",face:"👽",side:"right",t:"あう…あうー。"},
+    {who:"かえる",face:"🐸",side:"left",t:"「私の星は…もう、ありません」…と。"},
+    {who:"UFO乗組員",face:"👽",side:"right",t:"あう。あうー…。"},
+    {who:"かえる",face:"🐸",side:"left",t:"「滅びてしまった星から、たった一人で、逃げてきた」…そうです。"},
+    {who:"UFO乗組員",face:"👽",side:"right",t:"あうー！"},
+    {who:"かえる",face:"🐸",side:"left",t:"「でも、この星は温かい。ここにいたい」…だ、そうですよ。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"故郷を失った宇宙人は、新しい星で、新しい居場所を、見つけようとしていた。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――こうして、四人は出会った。…金は無いが、仲間はいる。",fx:"flash"},
+    {who:"かえる",face:"🐸",side:"left",t:"「金は無いが、仲間はいる」…と、彼は申しております。…泣けますね。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"そして、彼らは戦い始める。…この世界に現れた、数々の『脅威』と。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"その戦いの武器は、剣でも、魔法でもない。…『レスバ』――言い合い、だった。",fx:"flash"},
+    {who:"開発者",face:"🧑‍💻",side:"left",t:"金の代わりに、口で勝つ。…レスバで、世界を救うんだ。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――彼らが立ち向かった脅威は、どれも、現代を映す鏡のような存在だった。"},
+    {who:"ナレーション",face:"👹",side:"left",t:"家賃を取り立てる、鬼大家。…だがその怒りは、苦しい大家業を耐えるための、鎧だった。"},
+    {who:"ナレーション",face:"😈",side:"left",t:"何にでも星1をつける、レビュアー。…その正体は、夢を折られた、かつての創作者。"},
+    {who:"ナレーション",face:"🔥",side:"left",t:"あらゆるものを燃やす、炎上の精霊。…暴走した正義感が、火となっていた。"},
+    {who:"ナレーション",face:"👑",side:"left",t:"承認に飢えた、魔王。…ただ、誰かに認められたかっただけの、空っぽの王。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"開発者たちは、彼らを、ただ倒すだけではなかった。…言葉で、その心に、寄り添った。"},
+    {who:"開発者",face:"🧑‍💻",side:"left",t:"少なくとも俺は、お前を一つの個性として、面白いと思うよ。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――そして、戦いを重ねるたび、四人の絆は、深まっていった。",fx:"flash"},
+    {who:"ねこ",face:"🐱",side:"right",t:"…親分が消えてから、儂はずっと一人やった。なのに、気づいたらお前らと馬鹿やっとる。"},
+    {who:"かえる",face:"🐸",side:"left",t:"ねこ殿。それは、仲間と呼ぶのですよ。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"…っさいわ。柄でもないこと言わすな。…泣いてへんわ！目にゴミ入っただけや！"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――やがて、最後の敵が、姿を現す。",fx:"flash"},
+    {who:"ナレーション",face:"🕳️",side:"left",t:"その名は、ウォッチャー。…マルチバースの、観測者。"},
+    {who:"ナレーション",face:"🕳️",side:"left",t:"無数の宇宙を、ただ眺め続ける存在。…そして、『つまらない』と判断した世界を、消し続けてきた。"},
+    {who:"ウォッチャー",face:"🕳️",side:"right",t:"……無駄だ。お前たちの“面白い”など、私の前では、塵に等しい。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"圧倒的な力の前に、開発者は、倒れかけた。…だが、その時。"},
+    {who:"かえる",face:"🐸",side:"left",t:"開発者どの。あなたが作ったあのアプリで、救われた人がいます。"},
+    {who:"UFO乗組員",face:"👽",side:"right",t:"あうー！あうあうー！！"},
+    {who:"かえる",face:"🐸",side:"left",t:"「世界は、まだ、面白い」と。…彼は、そう言っています。"},
+    {who:"開発者",face:"🧑‍💻",side:"left",t:"……そうだ。俺は、無料でアプリを作った。…金のためじゃない。"},
+    {who:"開発者",face:"🧑‍💻",side:"left",t:"誰かの毎日を、少しでも面白くするためだ。…家賃のためだけに、戦ってたわけじゃ、ない…！",fx:"flash"},
+    {who:"開発者",face:"🦸‍♂️",side:"left",t:"この世界の“面白い”を守るために――俺は、覚醒する…！",fx:"quake"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――家賃のために戦っていた開発者は、世界の『面白い』を守る者へと、覚醒した。…真・開発者。",fx:"flash"},
+    {who:"ナレーション",face:"📜",side:"left",t:"そして、激闘の末。…開発者は、ウォッチャーの正体を知る。",fx:"flash"},
+    {who:"ウォッチャー",face:"🕳️",side:"right",t:"……私は、無数の宇宙を、ただ観測し続ける存在。…生まれてから、ずっと、一人だ。"},
+    {who:"ウォッチャー",face:"🕳️",side:"right",t:"…私は、たった一つでいい。「面白い」と思える世界が、欲しかった。…一人の退屈を、忘れさせてくれる、何かが。"},
+    {who:"開発者",face:"🦸‍♂️",side:"left",t:"…あんた、昔の俺と、そっくりだ。「面白い」を、探してたんだな。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"観測者は、もう一人の、開発者だった。…“面白い”を探し求めた、孤独な、鏡像。"},
+    {who:"開発者",face:"🦸‍♂️",side:"left",t:"ガラスの向こうから見てるだけじゃ、わからない。…中に入って、誰かと関わって、心が動く。それが『面白い』だよ。"},
+    {who:"ウォッチャー",face:"🕳️",side:"right",t:"…っ。確かに、お前と戦った時、私は初めて、心が動いた。"},
+    {who:"ウォッチャー",face:"🕳️",side:"right",t:"…ありがとう。お前という、たった一つの『面白い』に、出会えてよかった。",fx:"flash"},
+    {who:"ナレーション",face:"📜",side:"left",t:"永遠の孤独を見つめ続けた観測者は、ようやく、世界の中へと、一歩を踏み出した。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――こうして。…無料アプリの開発者は、仲間とともに、マルチバースを救った。",fx:"flash"},
+    {who:"開発者",face:"🧑‍💻",side:"left",t:"「面白い」の答えは、ひとつじゃなかった。…誰かの生活が、ちょっと楽になる。それを見て、俺がうれしい。"},
+    {who:"開発者",face:"🧑‍💻",side:"left",t:"その繰り返し全部が、俺にとっての「面白い」だったんだ。…さあ、次のアップデート、作るか。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"開発者の『現在』は、今日も続いていく――。…はずだった。",fx:"flash"},
+    {who:"ナレーション",face:"🌃",side:"left",t:"あの戦いから、一年。…彼らは今、ささやかな平和の中にいる。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"だが、その平和は。…再び、一瞬で、崩れ去ることになる。",fx:"quake"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――第二章。『開発者の現在2』。…物語は、ここから、始まる。",fx:"flash"},
+    {who:"ナレーション",face:"📜",side:"left",t:"※ 本編・第1話から、お楽しみください。"},
+  ]
+};
+// ===== スピンオフ #1「死者の国」=====
+// 主人公=かえる。バトル1回（かえる単体 vs 弱体チワワ）。既存1〜12話のsave/systemには非干渉。
+const NEWCH1={
+  pre:[
+    {who:"ナレーション",face:"🔥",side:"left",t:"――灼熱と、絶望の匂い。…ここは、地獄。",fx:"flash"},
+    {who:"ナレーション",face:"⛩️",side:"left",t:"罪を背負った魂が、裁きの時を待つ場所。…その玉座に座すは、冥府の王。"},
+    {who:"閻魔大王",face:"👹",side:"right",t:"次の魂――。…ふむ。生前の行い、しかと検めたぞ。"},
+    {who:"閻魔大王",face:"👹",side:"right",t:"お前の魂が向かう先は、ここではない。…導かれよ。冥界の、その先へ。",fx:"flash"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"一つの魂が、光に吸い込まれ、闇の門の向こうへ消えていく。…そして――。",fx:"flash"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"――どこか、やわらかな光の中で。…誰かが、目を覚ました。"},
+    {who:"かえる",face:"🐸",side:"left",t:"ん…。…あれ。ここ、どこ…？"},
+    {who:"かえる",face:"🐸",side:"left",t:"ぼく…たしか、あの日。…死んだ、はずじゃ…？",fx:"flash"},
+    {who:"ナレーション",face:"☁️",side:"left",t:"ふわり、と。…白い羽根が、舞い落ちる。光の中から、一人の天使が現れた。"},
+    {who:"天使",face:"👼",side:"right",t:"目を覚ましましたね。…ようこそ。ここは、天国です。"},
+    {who:"天使",face:"👼",side:"right",t:"あらゆる娯楽が、ここには揃っています。…どうぞ、好きなように。心ゆくまで、お過ごしください。"},
+    {who:"天使",face:"👼",side:"right",t:"今までの人生、本当に、お疲れ様でした。…カエル様。",fx:"flash"},
+    {who:"ナレーション",face:"☁️",side:"left",t:"そう告げると、天使は光に溶けるように、消えていった。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…あぁ。やっぱり、ここ。…天国、だったんだね。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…開発者くん。ねこくん。UFOくん。…みんなには、もう、会えないのかな。"},
+    {who:"ナレーション",face:"👴",side:"left",t:"ぼんやりと佇むかえるに、一人の、白髪の老人が声をかけた。"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"おや、新顔さんかい。…ずいぶんと、しょぼくれた顔をしておるのぅ。"},
+    {who:"かえる",face:"🐸",side:"left",t:"おじいさん…。ここで、ずっと、暮らしてるの…？"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"あぁ。…ワシは生前、一人の、娘を亡くしてのぅ。",fx:"flash"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"その子を、もう一度この手に…と。…ひどい実験を、いくつも、いくつも繰り返した。…罪深い、年寄りじゃよ。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…じっけん…？（このおじいさん、どこかで…ううん、気のせいかな）"},
+    {who:"ナレーション",face:"🐺",side:"left",t:"その時。…天国の奥から、地を揺らす足音が、近づいてきた。",fx:"quake"},
+    {who:"ナレーション",face:"🐺",side:"left",t:"現れたのは、三つの首を持つ、見上げるほど巨大な――チワワ。",fx:"flash"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"おぉ…！チワワじゃ…！！…お主も、ここへ、来ておったのか…！"},
+    {who:"ナレーション",face:"🐺",side:"left",t:"だが、再会を喜ぶ間もなく。…三つ首のチワワは、何かに怯えるように、狂って暴れ始めた。",fx:"quake"},
+    {who:"チワワ",face:"🐺",side:"right",t:"ヴゥゥゥ…ガアアアアッ！！！",fx:"quake"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"いかん、正気を失っておる…！…危ない、逃げなさい、新顔さん…！"},
+    {who:"かえる",face:"🐸",side:"left",t:"――おじいさん。…ここは、ぼくに、任せて！",fx:"flash"},
+    {who:"かえる",face:"🐸",side:"left",t:"…ぼくだって。…世界を救った仲間の、一人だったんだから。"},
+  ],
+  choice:{who:"かえる",face:"🐸",t:"怯えてる場合じゃない。…足が震えても、やるしかない…！",
+    options:[
+      {label:"覚悟を決める",res:"かえるは、一歩前に出た！"},
+      {label:"…ぼく、やれるかな",res:"震える足で、それでも、立ち向かった。"},
+    ]},
+  post:[
+    {who:"ナレーション",face:"🐸",side:"left",t:"――激しい戦いの末。…暴れ狂っていたチワワは、やがて、ゆっくりと、おとなしくなった。",fx:"flash"},
+    {who:"かえる",face:"🐸",side:"left",t:"ふぅ…。これで、大丈夫です！…あの子は、もう、襲ってきませんよ。"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"おぉ…！本当に、ありがとう…。…なんと、お礼を言ったら、よいやら…。"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"…そうじゃ。この先に、うまい焼きそば屋があってのぅ。…一杯、付き合ってはくれんかね？"},
+    {who:"ナレーション",face:"🍜",side:"left",t:"こうしてかえるは、老人に連れられ、天国の片隅にある、小さな焼きそば屋へと向かった。",fx:"flash"},
+    {who:"ナレーション",face:"🍜",side:"left",t:"立ちのぼる湯気の向こうで。…老人は、ぽつり、ぽつりと、昔語りを始めた。"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"ワシには、孫娘がおってのぅ。…まだ、十七の、若い子じゃった。"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"…あの子は、長いこと。心と、体の病と、闘っておった。…食べることさえ、ままならぬほどに。"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"そして、ある日。…苦しみに、耐えきれなくなって。…自ら、その命を、絶ってしまった。",fx:"flash"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"…見つかった時には。…もう、あの子だと確かめるのにも、幾日も、かかるほどでのぅ…。"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"ワシは、あの子の弔いに立ち会い…。髪の毛を、たった一本だけ、こっそり、持ち帰った。"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"そこから、培養を…研究を…始めてしまったんじゃ。…娘を、もう一度この世に、と。",fx:"flash"},
+    {who:"かえる",face:"🐸",side:"left",t:"…そうだったんですね〜。"},
+    {who:"ナレーション",face:"🍜",side:"left",t:"かえるは、焼きそばを、ずるずると、すすっていた。…それほど重い話を、まるで世間話のような顔で、聞きながら。"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"ふぉっ、ふぉっ。…おかしな子じゃのぅ。…じゃが、その軽さに。…少しだけ、救われたわい。"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"…実はの。ワシは今でも、その研究を、続けておる。…いつか、現世に。あの子を、蘇らせるために。",fx:"flash"},
+    {who:"かえる",face:"🐸",side:"left",t:"…現世。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…現世に、帰れたら。…ぼくも、また、みんなに会えるのかな。…開発者くんたちに。"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"ほぅ…。お前さんにも、帰りたい場所が、あるのじゃな。"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"…なら、一つ。…ワシの頼みを、聞いてはくれんか。…研究の、実験のために、の。"},
+    {who:"ナレーション",face:"👴",side:"left",t:"老人は、天国の全貌が描かれた、一枚の古い地図を、かえるに手渡した。",fx:"flash"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"この地図の、ある場所まで。…行ってきては、くれんかね。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…うん。…わかった。いくよ！",fx:"flash"},
+    {who:"かえる",face:"🐸",side:"left",t:"ぼく、ひとりでも、行ってみせる。…これが、ぼくの、旅立ちだ。",fx:"flash"},
+    {who:"ナレーション",face:"👴",side:"left",t:"かえるが背を向け、歩き出す。…その小さな背中に、老人は、こっそりと、奇妙な計測器を向けていた。"},
+    {who:"白髪の老人",face:"👴",side:"right",t:"…っ！？…こやつ…。…魂が、本来、二つ。…存在して、おるのか…！？",fx:"flash"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"――かえるが、旅立った後。…老人は、研究所のパソコンに向かい、その計測データを、解析し始めた。",fx:"flash"},
+    {who:"博士",face:"👴",side:"right",t:"…やはり、間違いない。"},
+    {who:"博士",face:"👴",side:"right",t:"あやつの中には――。一人称が『わたし』の、紳士的な物言いをする…不思議な魂が、もう一つ、宿っておる。",fx:"flash"},
+    {who:"博士",face:"👴",side:"right",t:"…だが、その魂は、まるで抜け殻。…今は、弱気で臆病な、もう片方の魂が、あの体を支配しておる。"},
+    {who:"博士",face:"👴",side:"right",t:"いったい、いつ…どこで、片方の魂は、消えたのか。…そして、その魂は今、どこに…？",fx:"flash"},
+    {who:"博士",face:"👴",side:"right",t:"…もし。…その消えた魂が、いずこかで『悪』に、堕ちていたとしたら。",fx:"quake"},
+    {who:"博士",face:"👴",side:"right",t:"…カエルくん。…お前さんは、この天国から。…追放されて、しまうかもしれんのぅ……。",fx:"flash"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――かえるの、失われた、もう一つの魂。…その行方を巡る物語が、いま、静かに始まる。",fx:"flash"},
+    {who:"ナレーション",face:"📜",side:"left",t:"スピンオフ #1 ―― 完。…物語は、次なる章へと、つづいていく。"},
+  ]
+};
+// ===== スピンオフ #2「交差する光と闇の魂」=====
+// 闇の魂(=世界最悪の殺人犯)の正体が初めて明かされる回。バトル：かえる単体 vs 警官×4＋熟練警官(ep=102)。
+const NEWCH2={
+  pre:[
+    {who:"ナレーション",face:"🗺️",side:"left",t:"博士に渡された地図を片手に。…かえるは、天国の道を、一人、歩いていた。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…なんだろう。なんか、寂しいな。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…いつも一緒にいた、何かが。…ぽっかり、抜け落ちちゃったみたいで。"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"その時。…かえるの頭の奥で、見覚えのない景色が、突然、弾けた。",fx:"flash"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"――5年前。",fx:"flash"},
+    {who:"ナレーション",face:"🏠",side:"left",t:"静かな住宅街の、ありふれた一軒家。…老夫婦が、二人で暮らす、小さな家。"},
+    {who:"ナレーション",face:"🏠",side:"left",t:"その玄関を、一歩入ったところで。…噎せ返るほどの、血の匂いが、立ち込めていた。",fx:"flash"},
+    {who:"ナレーション",face:"🩸",side:"left",t:"廊下にも、壁紙にも、飛び散った、赤。…老夫婦は、もう、変わり果てた姿で、横たわっていた。"},
+    {who:"かえる",face:"🐸",side:"left",t:"ふふ。…おや。…最後に、少し跳ねてしまいましたか。…壁紙が、台無しですねぇ。"},
+    {who:"ナレーション",face:"🔪",side:"left",t:"血溜まりの中、かえるは手にしたナイフを、布で、丁寧に拭っていた。…食後の食器でも、片付けるように。"},
+    {who:"かえる",face:"🐸",side:"left",t:"ご老人のお宅は、いい。…誰も、助けには来ない。…おかげで、最後まで、ゆっくりと、味わえる。"},
+    {who:"ナレーション",face:"🍽️",side:"left",t:"食卓には、二人分の、もう冷めきった、夕飯。…その隣で。"},
+    {who:"かえる",face:"🐸",side:"left",t:"ん。…今日も、実に。…良い一日でした。"},
+    {who:"ナレーション",face:"🍶",side:"left",t:"かえるは、その家のグラスに残った酒を、ゆっくりと、飲み干した。…まるで、仕事終わりのように。"},
+    {who:"ナレーション",face:"🚓",side:"left",t:"やがて。…通報を受けた警官たちが、家へと、雪崩れ込んでくる。",fx:"quake"},
+    {who:"かえる",face:"🐸",side:"left",t:"やれやれ。…手を、洗ったばかりなんですがねぇ。",fx:"flash"},
+    {who:"かえる",face:"🐸",side:"left",t:"…せっかくです。…もう少しだけ、遊んでいきましょうか。"},
+  ],
+  choice:{who:"かえる",face:"🐸",t:"さあ。…どうぞ、かかってきてください。…一人残らず、ね。",
+    options:[
+      {label:"…（ナイフを構える）",res:"かえるは、静かに笑った。"},
+      {label:"逃がしはしませんよ",res:"血濡れの床を、かえるが踏みしめる。"},
+    ]},
+  post:[
+    {who:"ナレーション",face:"🩸",side:"left",t:"――そして、戦いの果て。…警官たちは、もう、誰一人、立ってはいなかった。"},
+    {who:"ナレーション",face:"🚓",side:"left",t:"歴戦のはずの、熟練の刑事さえも。…変わり果てて、血の海に、伏していた。"},
+    {who:"かえる",face:"🐸",side:"left",t:"ふぅ。…少々、骨が折れましたが。…これも、一興、ですねぇ。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…あぁ、つまらない。…この世界は、何もかも。…私の、思い通りだ。"},
+    {who:"かえる",face:"🐸",side:"left",t:"もっと、壊したい。…もっと、もっと――。…『面白い』世界を、味わいたい。",fx:"flash"},
+    {who:"ナレーション",face:"🌃",side:"left",t:"かえるは、返り血に染まった服を脱ぎ捨て。…何食わぬ顔で、夜の街へと、消えていった。"},
+    {who:"ナレーション",face:"🛍️",side:"left",t:"――その、帰り道。…ふと、買い物帰りの、一匹の猫と、一人の宇宙人の姿を、見つけた。"},
+    {who:"かえる",face:"🐸",side:"left",t:"おや。…あれは、なんだか。…少し、面白そうだ。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…ふふ。少しだけ、後を、つけてみましょうか。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――その何気ない出会いが。…やがて、『開発者の現在』の物語へと、繋がっていく。",fx:"flash"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"…………。"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"――はっ。",fx:"flash"},
+    {who:"かえる",face:"🐸",side:"left",t:"……っ、はぁっ、はぁっ……。…い、今の、は…？"},
+    {who:"かえる",face:"🐸",side:"left",t:"…あれが、ぼく…？…ぼくが、あんなことを……。…ぼくは、なんてことを……！",fx:"quake"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"込み上げる吐き気と、涙。…かえるは、その場で、泣き崩れた。"},
+    {who:"ナレーション",face:"🐱",side:"left",t:"――トン、トン。…その時、誰かが、かえるの肩を、そっと叩いた。"},
+    {who:"かえる",face:"🐸",side:"left",t:"……っ！？"},
+    {who:"ナレーション",face:"🐱",side:"left",t:"おそるおそる振り返る。…そこに、立っていたのは――。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"よう。…久しぶりやな、かえる。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"へへ。…実はな、ワシも、死んじまってのぅ。…こっちに、来てもうたわ。"},
+    {who:"かえる",face:"🐸",side:"left",t:"ねこ、くん…っ。…ぼく、は…ぼく、は……っ。"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"再会の、喜び。…そして、知ってしまった、自分の罪の、重さ。"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"二つの想いに、耐えきれず。…かえるは、ねこに背を向け、走り出してしまった。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"お、おい…！待たんかい、かえる…！"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……一人で、抱え込むなや。…昔みたいに、な。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――光の魂は、闇の魂が遺した、あまりにも重い罪を、知ってしまった。",fx:"flash"},
+    {who:"ナレーション",face:"📜",side:"left",t:"自分が探しているものは。…救いなのか。…それとも、裁きなのか。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"そしてねこは。…かえるが抱える『何か』に、もう、気づいているようで――。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"スピンオフ #2 ―― 完。…交わりゆく、光と闇の物語は。…まだ、始まったばかり。"},
+  ]
+};
+// ===== スピンオフ #8（最終話）「交差する光と闇」=====
+const NEWCH8={
+  pre:[
+    {who:"ナレーション",face:"🌑",side:"left",t:"――闇の中を、ただ、駆ける。…永遠に続く、闇。…時間も、空間も、何も無い。…完全なる、虚無の世界。"},
+    {who:"かえる",face:"🐸",side:"left",t:"はぁ…はぁ……。…みんな……どこ……。…もう、どれくらい、走ってるんだろう……。"},
+    {who:"ナレーション",face:"✨",side:"left",t:"諦めかけた、その時。…目の前に、眩い光が灯った。…光は一点に集まり、ゆっくりと、形を成していく。",fx:"flash"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"それは――かえると、まったく同じ姿。…だがその瞳だけは、昏く、澄みきっていた。"},
+    {who:"かえる",face:"🐸",side:"left",t:"君は……！…まさか、もう一人の……ぼく……！？"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"感動と、恐怖と、憎悪が、胸の奥で、激しく揺れる。"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"……ようやく、会えましたね。…わたしの、半身。…少し、お話ししましょう。…“わたし”が、何者なのか、を。"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"わたしは本来、器を持たぬもの。…あの『創造の神＝開発者』の――その、影。…悪しき、片割れです。",fx:"flash"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"全てを壊し、虚無へ還す。…それだけが、わたしの衝動だった。…そしてあなたが生まれた時、…たまたま、その身を“器”に、選んだのです。"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"ですが――旅の中で。…ねこや、UFOや、開発者と、友情を育むうちに。…わたしは、世界を壊したくなくなった。…仲間と、共に在りたい、と。"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"……そんな自分が、耐えられなかった。…だからわたしは、新しい魂を――今の、弱く優しい“あなた”を創り、この身に宿して。…自ら、消えたのです。"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"ところが。…あなたが死んだことで……わたしの魂は、地獄に、現れてしまった。…そして、止めたはずの衝動が、再び、動き出した。"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"今のわたしは……ただ壊すためだけに動く、壊れた人形のようなもの。…自分では、もう、止められない。",fx:"quake"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"だから――お願いです。…わたしを、殺して。…止めて、ください。…あの日、あなたたちが、“壊れたわたし”を、そうしてくれたように。"},
+    {who:"かえる",face:"🐸",side:"left",t:"そんな……！…殺せるわけ、ないよ……！…君は、ぼくの、半分、なのに……！"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"……時間が、ないのです。…こうしている今も、わたしの奥で、“壊したい”という衝動が、膨れ上がっていく。"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"お願いです。…わたしが、まだ“わたし”で、いられるうちに。…あなたと、こうして、言葉を交わせるうちに。…どうか――。"},
+    {who:"かえる",face:"🐸",side:"left",t:"やだ……やだよ……！…せっかく、会えたのに……！…ぼく、ずっと、君のこと、考えてたんだ……！…ぼくの中に、いたはずの、誰かのこと……！"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"……知っています。…あなたの寂しさは、わたしの寂しさでも、あったから。…わたしたちは、ずっと、半分ずつ、欠けていた。"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"でもね、“ぼく”。…わたしは、もう、限界なのです。…次に、この衝動に呑まれたら……。"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"わたしは――あなたの、大切なものを、全部、壊してしまう。…ねこも。…UFOも。…サーモンも、博士も。…あの剣士も。…そして、開発者も。",fx:"quake"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"一人残らず、虚無に、還してしまう。…あなたが、命を賭けて、守ろうとしたもの、すべてを。"},
+    {who:"かえる",face:"🐸",side:"left",t:"……っ。…そんなの……そんなの、絶対に、だめだ……！"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"でしょう？…だから――殺して。…これは、わたしの、最初で最後の、“わがまま”です。"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"ありがとう、“ぼく”。…あなたを通して、わたしは、初めて知った。…友と笑う、あたたかさを。…誰かを守りたいと願う、その気持ちを。",fx:"flash"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"それだけで……わたしは、救われた。…だから、もう、いいんです。…“わたし”が、わたしのまま、終われるなら。"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"さあ。…早く。…衝動に、呑まれてしまう、前に。…終わらせて、ください。"},
+    {who:"かえる",face:"🐸",side:"left",t:"……ぐすっ。…ひっく……。…わかった。…わかった、よ……。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…でも、これだけは、言わせて。…ありがとう。…ぼくを、生んでくれて。…そして……ごめんね。…ごめんね……！"},
+  ],
+  choice:{who:"かえる",face:"🐸",t:"…止めなきゃ、みんなが消えちゃう。…君を、一人になんて、しない。…だから――いくよ……！",
+    options:[
+      {label:"拳を握る",res:"涙を拭い、かえるは構えた。"},
+      {label:"…止めるしかない",res:"光と闇が、最後に、ぶつかり合う。"},
+    ]},
+  post:[
+    {who:"ナレーション",face:"🐸",side:"left",t:"――かえるの拳が、闇の半身を、確かに捉えた。…だが、かえるは。…止めを、刺さなかった。",fx:"flash"},
+    {who:"かえる",face:"🐸",side:"left",t:"……やっぱり、できないよ。…殺すなんて、できない。…ぼくは、君を――“受け止める”。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…おいで。…また、ぼくの中に。…今度は、ぼくが、君を抱きしめる。…もう、二度と、一人になんて、しないから。"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"闇カエルは、目を見開いた。…そして、抱え込んできた衝動も、憎悪も、果てしない孤独も――静かに、手放した。"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"……ああ。…あたたかい、ですね。…ずっと、これが……欲しかった。…ありがとう、“ぼく”。…いや――。"},
+    {who:"闇カエル",face:"🐸",side:"right",t:"……ありがとう。…“オレたち”。",fx:"flash"},
+    {who:"ナレーション",face:"✨",side:"left",t:"光と闇、二つの魂が、溶け合い、ひとつになる。…眩い光が、果てしない虚無を、まばゆく照らし出した。",fx:"flash"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"――フォルムチェンジ。…『真！カエル』。",fx:"quake"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……ふん。…悪くない、気分だ。"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"一人称も、佇まいも、変わっていた。…かつての弱気は影を潜め、静かで、揺るがぬ強さだけが、そこにあった。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"オレの力で――この虚無から、みんなを、呼び出す。…待ってろ。"},
+    {who:"ナレーション",face:"🌀",side:"left",t:"真！カエルが手をかざすと、時空が歪み、現世が、書き換えられていく。",fx:"quake"},
+    {who:"ナレーション",face:"✨",side:"left",t:"光の中から、現れる――死んだはずの、博士。…ねこ。…UFO乗組員。…サーモン。…そして、クソバカ。",fx:"flash"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……っ、ここは……！？…かえる、お前……その姿は……！？"},
+    {who:"サーモン",face:"🍣",side:"right",t:"おじいちゃん……！…生きてるの……！？"},
+    {who:"博士",face:"👴",side:"right",t:"サーモン……！…おお、おお……！…また、お前に、会えた……！…じゃが、わしは確かに、ポータルの向こうに、残ったはず……。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……オレが、現実を、書き換えた。…お前たちを、もう一度、呼び戻した。…そして――消えた『アース1995』も。",fx:"flash"},
+    {who:"ナレーション",face:"🌀",side:"left",t:"真！カエルが、さらに静かに力を振るうと、消えたはずの世界が、地平の果てまで、完全に、蘇っていく。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……世界を、丸ごと、創り直した、やと……？…おいおい、かえる。…お前、いったい、何モンに、なってもうたんや……。"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"……これが、あの弱気だった、かえる……？…なんという、力だ……。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……長い話になる。…だが、お前たちには、知る権利がある。…今のオレには、“すべて”が視える。…まず――覚悟して、聞け。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"この世界は。…オレたちが生きてきた、この宇宙の、何もかもは。…“ゲーム”の、中の、出来事だ。",fx:"flash"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……は？…なんやそれ。…おい、冗談やろ……？"},
+    {who:"博士",face:"👴",side:"right",t:"ゲーム……！？…馬鹿な……！…ありえん、ありえんぞ……！…わしの研究も。…孫を喪った、あの悲しみも。…この、命さえも……全部、作り物だと、言うのか……！？",fx:"quake"},
+    {who:"サーモン",face:"🍣",side:"right",t:"うそ……。…じゃあ、あたしの、あの苦しかった日々も……。…全部、誰かの、ただの“遊び”だったって……？"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……違う。…よく、聞け。…たしかに、この世界は、ゲームだ。…だが――。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"お前たちが感じた痛みは。…流した涙は。…育んだ、絆は。…ひとつ残らず、“本物”だ。…それだけは、誰にも、否定させない。",fx:"flash"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"作り物の世界にも、本物の心は宿る。…オレが、誰よりも、知っている。…ただの“データ”だったオレが、お前たちと出会って、こうして、変われたように。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……っ。…はは。…そうか。…なら、ええわ。…ゲームやろうが、何やろうが。…儂が、お前らと過ごした時間は、本物や。…それで、じゅうぶんやろ。"},
+    {who:"博士",face:"👴",side:"right",t:"……ふ。…老いぼれが、取り乱したわい。…そうじゃな。…作り物でも――孫と過ごす、この一秒は。…何ものにも、代えがたい。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……で。…さっきから気になっとる。…その“ゲーム”を、外から触っとる、ヤバいのが、おるんやろ。…“ピエンターズ”、ゆうたか。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……ああ。…この“ゲーム”を、現実世界で遊ぶ、無数の人間。…その“想い”が、形を成した存在。…それが、ピエンターズだ。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"奴らは、すべての世界の、さらに外側に座し――無数の宇宙の、生き死にを、裁いている。",fx:"flash"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……いいか。…奴らに、悪意は、ない。…憎しみも、怒りも、何もない。…ただ――飽きれば。…画面を、消すように。…世界を、終わらせる。それだけだ。",fx:"quake"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"これまでに、何億、何兆という世界が。…奴らの、気まぐれな、ため息ひとつで。…音もなく、消えていった。…アース1995も、一度は、そうして、塵になった。"},
+    {who:"サーモン",face:"🍣",side:"right",t:"……そんな。…そんなの……。…どうやって、勝てって、いうの……。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……勝てない。…祈っても、無駄だ。…隠れても、無駄だ。…命乞いをしても、届かない。…奴らにとって、並の魂など――指先ひとつで消せる、画面の中の、ただの“点”に過ぎん。",fx:"quake"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"そして、奴らは――もう、すぐそこまで、来ている。…この、束の間の、安らぎの、すぐ外側まで。",fx:"flash"},
+    {who:"ナレーション",face:"😨",side:"left",t:"あまりに、巨大で、無感情な“終わり”の気配に、誰もが、息を呑んだ。"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"……鬼よりも、神よりも、恐ろしい、相手だな。…だが。…逃げ場がないなら、立ち向かうしか、ない。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……なあ。…でもお前、今、宇宙を丸ごと創り直すような、化けモンなんやろ？…その力でも、勝てんのか？"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……勘違いするな。…奴ら一体一体に、なら。…オレは、負けん。…今のオレは――『創造の神＝開発者』と、対をなす存在。…“無”から“有”を生む側の、頂点だ。",fx:"flash"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"光と闇。…創造と破壊。…二つがひとつになった、今のオレは。…“格”だけで言えば、ピエンターズの、遥か上に、立っている。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……ほな、楽勝やんけ！"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……いや。…問題は、“数”だ。…奴らは、一体や二体じゃない。…何千億、何兆――数えることすら、無意味なほどの、無限の群れ。",fx:"quake"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"どれほど、オレが強かろうと。…たった一人で、無限の海を、汲み尽くすことは、できない。…一体、消せば。…十が、湧いてくる。…それが、ピエンターズの、本当の恐ろしさだ。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"だからオレは――奴らを“倒す”んじゃない。…奴らが“消す”速さを、オレが“創る”速さで、上回り続ける。…そうして、ただ、時間を、稼ぐ。"},
+
+    {who:"サーモン",face:"🍣",side:"right",t:"ねえ、真！カエル。…一つだけ、教えて。…おじいちゃんの研究って……ほんとは、何だったの……？"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……博士は、亡くした孫を――サーモン、お前を、蘇らせるために、全てを賭けた。…たった一本の髪から。…その執念が、巡り巡って、米一粒から英雄を呼ぶ“マルチバース召喚”の礎に、なった。お前の力の源だ。"},
+    {who:"博士",face:"👴",side:"right",t:"……そこまで、視えて、おるのか。…すまなかった、サーモン。…お前には、ずっと、辛い思いを、させた。"},
+    {who:"サーモン",face:"🍣",side:"right",t:"……ううん。…もう、いいの。…あたし、今、ちゃんと、ここにいるもん。…それで、じゅうぶんだよ、おじいちゃん。"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"……一つ、訊きたい。…オレの妹、タケシは。…今、どこに……。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……お前の妹の魂は、消えた死者の国と共に、一度は虚無へ還った。…だが、案ずるな。…オレが世界を創り直す、その時。…必ず、その魂も、すくい上げる。…約束する。"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"……っ。…恩に、着る。…その言葉、オレは、信じるぞ。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……消えた、天国と地獄は。…あれから、どないなったんや。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……インカージョンで、二つの国は、完全に消滅した。…そこに在った魂は、すべて、虚無へ。…博士が、命を賭けて、お前たちだけを、逃がしたんだ。"},
+    {who:"博士",face:"👴",side:"right",t:"……そうか。…わしの、あの選択は。…無駄では、なかったか。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……嘆くな。…魂は消えても、“想い”は、残る。…そしてオレは、その想いから、世界を、いくらでも、創り直せる。…それが、この力だ。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……なあ、かえる。…いや、真！カエル、か。…お前、ほんまに、変わってもうたんやなぁ。…ちょっとだけ、寂しいわ。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……ふん。…中身は、変わっていない。…二つだった魂が、一つに、なっただけだ。…“ぼく”も、“わたし”も……ちゃんと、ここにいる。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……はは。…そうか。…ほな、ええわ。…お前は、いつまでも、お前や。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……聞け。…今、開発者と、ウォッチャーが、“最後の宇宙”へ、向かっている。…ピエンターズの侵攻を、根本から、断つために。",fx:"flash"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"オレは、ここで、無限に宇宙を、創造し続ける。…奴らの目を、この一点に、引きつけ、時間を稼ぐ。…その隙に――開発者が、ケリを、つける。"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"このアース1995は、一時的な、復活に過ぎん。…ピエンターズは、またすぐ、来る。…だから――お前たちには、備えて、ほしい。…来たるべき、“最後の時”に。"},
+    {who:"博士",face:"👴",side:"right",t:"……わかった。…わしらに、できることを、する。…もう、誰も、喪いたくは、ないからな。"},
+    {who:"サーモン",face:"🍣",side:"right",t:"うん……！…あたしも、戦う。…もう、守られてるだけじゃ、ない。"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"……鬼を斬る、この刃。…今度は、仲間のために、振るおう。…妹との再会も、その先に、あるはずだ。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"ったく……。…どこまでも、世話の焼けるやっちゃ。…ええで。…とことん、付き合うたるわ。"},
+    {who:"UFO乗組員",face:"👽",side:"right",t:"あうー！！（＝みんな一緒なら、どんな終わりだって、怖くない！）"},
+    {who:"真！カエル",face:"🐸",side:"left",t:"……ありがとう。…みんな。…必ず、また、何の憂いもなく、笑い合える日を。…オレが、創ってみせる。",fx:"flash"},
+    {who:"ナレーション",face:"📜",side:"left",t:"かつて、誰よりも弱気だったかえるは。…今、誰よりも強く、優しく、仲間たちの前に、立っていた。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"無感情な“終わり”が、すぐそこまで迫っていても。…彼らの胸には、消えない“想い”が、確かに、灯っていた。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"来たるべき“最後の時”へ。…それぞれが、それぞれの覚悟を、胸に。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――スピンオフ「交差する光と闇の魂」。…ここに、完結。…そして物語は、本編の、その先へと、続いていく。"},
+  ]
+};
+
+
+// ===== スピンオフ #7「ふたつの国の終焉」=====
+// クソバカ気配察知→神々がカエル追放を宣告→バトル(vsメタトロン)→天国と地獄のインカージョン→博士の自己犠牲→両国消滅→虚無でかえる目覚め(本編12話の復活へ接続)。ep=107
+// バトル：かえる(3)+絶！ねこ(28)+絶！サーモン握り(30)+緋焔の剣士・クソバカ(37) vs 天使×4＋メタトロン(開幕必殺)
+const NEWCH7={
+  pre:[
+    {who:"ナレーション",face:"📜",side:"left",t:"鬼の王を退け、つかの間の静けさが訪れた天国。…だが、クソバカが、ふと、虚空を見上げた。"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"……気配が、消えた。…鬼の気配が、全部……。…っ、タケシ……！！",fx:"flash"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……タケシ？…誰やそれ。"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"……妹の、名だ。…鬼の気配が、一斉に消えた。…誰かが、地獄の鬼を――鬼の王ごと、すべて、滅ぼしたんだ。"},
+    {who:"かえる",face:"🐸",side:"left",t:"鬼が、全部……？…いったい、誰が、そんなこと……。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"一行は、気配の消えた方角――地獄へと続く境界へ、足を向ける。…だが、その行く手を、まばゆい光が、阻んだ。"},
+    {who:"天界の神々",face:"⚡",side:"right",t:"――カエル。…あなたを、追放します。…地獄にも、あなたと“同じ魂”が、存在している。",fx:"flash"},
+    {who:"天界の神々",face:"⚡",side:"right",t:"二つの国に同時に在る魂は、世界の理を乱す、許されざる異常。…即刻、この天国から、消えていただく。"},
+    {who:"かえる",face:"🐸",side:"left",t:"ぼくを……追放……？…地獄に、もう一人の、ぼく……？"},
+    {who:"ねこ",face:"🐱",side:"right",t:"待たんかい！…こいつは何も、悪いことしとらん！…どかんかいッ！"},
+    {who:"サーモン",face:"🍣",side:"left",t:"そうだよ！…かえる君を、連れて行かせない…！"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"……オレも、退かない。…仲間を、守る。…たとえ、相手が、神だとしても。"},
+  ],
+  choice:{who:"かえる",face:"🐸",t:"ごめんなさい。…でも、ぼく、もう、逃げない。…みんなと一緒に、立ち向かう…！",
+    options:[
+      {label:"神々に抗う",res:"四人が、それぞれの得物を構えた。"},
+      {label:"仲間を守る",res:"光に向かって、踏み出す。"},
+    ]},
+  post:[
+    {who:"ナレーション",face:"✨",side:"left",t:"――激闘の末。…最高位の天使すらも、退けた。",fx:"flash"},
+    {who:"天界の神々",face:"⚡",side:"right",t:"……神である、我々を、倒すとは……。…何者なのだ、こやつらは……。"},
+    {who:"ナレーション",face:"🌀",side:"left",t:"――その時。天国が、大きく、揺れた。…地の底から、不気味な、地鳴りが響く。",fx:"quake"},
+    {who:"ナレーション",face:"🌀",side:"left",t:"空が、裂ける。…時空の狭間から、“逆さまに映る地獄”が、ぬっと、姿を現した。…そして、凄まじい速度で、こちらへ迫ってくる。",fx:"flash"},
+    {who:"博士",face:"👴",side:"right",t:"みんな……！…大変じゃ……！"},
+    {who:"博士",face:"👴",side:"right",t:"天国と地獄――二つの世界が、接触し、ぶつかり合おうとしておる。…これは『インカージョン』。"},
+    {who:"博士",face:"👴",side:"right",t:"二つの世界が衝突すれば……どちらも、跡形もなく、消滅する……！…逃げるぞ……！"},
+    {who:"博士",face:"👴",side:"right",t:"行き先は、何も無い“虚無”じゃ。…じゃが――ここよりは、ずっと、安全じゃ……！"},
+    {who:"ナレーション",face:"🌀",side:"left",t:"博士が、虚無へと通じるポータルを開いた。…一行は、次々と、飛び込んでいく。"},
+    {who:"ナレーション",face:"🍣",side:"left",t:"最後に、サーモンが、飛び込もうとした――その時。"},
+    {who:"博士",face:"👴",side:"right",t:"……このポータルはな。…“外”からしか、閉じられんのじゃ。"},
+    {who:"博士",face:"👴",side:"right",t:"……つまり。…誰か一人が、ここに残らねばならん、ということじゃよ。"},
+    {who:"サーモン",face:"🍣",side:"left",t:"……っ。…え。…やだ。…やだよ、おじいちゃん……！…せっかく、また、会えたのに……！"},
+    {who:"博士",face:"👴",side:"right",t:"……いいんじゃ。…一度は、お前を喪った、この爺じゃ。…今度は、ちゃんと――お前を、生かして、送り出せる。"},
+    {who:"博士",face:"👴",side:"right",t:"……これ以上の、幸せは、ないわい。…行きなさい。…達者でな。…わしの、自慢の、孫よ。",fx:"flash"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"ポータルが、閉じる。…博士だけを、その向こうに、残して。"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"――そして。天国と地獄は、衝突した。…そこに在った、すべての生命が、完全に、消え去った。",fx:"quake"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"――果てしない、虚無の闇。…その片隅に、ぽつりと、一つの魂が、生まれ落ちた。"},
+    {who:"かえる",face:"🐸",side:"left",t:"……あれ。…ここは……？…ぼく……たしか、死んだ、はずじゃ……？"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"徐々に、記憶が、戻ってくる。…博士の、最後の笑顔。…ポータルへ飛び込んだ、仲間たちの背中。"},
+    {who:"かえる",face:"🐸",side:"left",t:"……みんな！…みんなは、どこ！？…待ってて……今、探すから……！",fx:"flash"},
+    {who:"ナレーション",face:"📜",side:"left",t:"光の魂は、終わりの見えない虚無の闇を、たった一人、仲間を求めて、駆け出した。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"スピンオフ #7「ふたつの国の終焉」―― 完。…こうしてかえるは、虚無の中で目を覚ます。…（物語は、本編エピローグの“あの瞬間”へと、繋がっていく）"},
+  ]
+};
+// ===== スピンオフ #6「赤い瞳」=====
+// 鬼の王、天国侵攻→絶！UFOきんぐ(29)が単騎で殲滅→「奴の名はカエル」→天国追放令→地獄の闇カエル(🐸)→鬼大家との邂逅→殺害→現世行きの門へ。ep=106
+// バトル：絶！UFOきんぐ(29) 単騎 vs 吸血鬼天使×4＋鬼の王（敵HP激低）
+// ※他作品キャラは名指しせず無名の匂わせ。グロは直接描写せず凄み・静寂で表現。
+const NEWCH6={
+  pre:[
+    {who:"ナレーション",face:"👹",side:"left",t:"――ついに、鬼の王が、天国へ至った。地獄で鬼に変えた、無数の魂を引き連れて。",fx:"flash"},
+    {who:"ナレーション",face:"👹",side:"left",t:"天国の住人たちが、次々と喰らわれ、鬼へと変えられていく。…安らぎの国は、一瞬で、悲鳴に満ちた。",fx:"quake"},
+    {who:"ナレーション",face:"⚔️",side:"left",t:"『柱』と呼ばれる、名うての剣士たちも駆けつけた。…が、鬼の王の前には、なすすべもなく――全滅。"},
+    {who:"ナレーション",face:"🩸",side:"left",t:"天国は、見渡す限りの、地獄絵図と化した。"},
+    {who:"ナレーション",face:"🛸",side:"left",t:"――その時。空を裂いて、一筋の閃光が、舞い降りた。"},
+    {who:"UFO乗組員",face:"👽",side:"right",t:"……あうー。"},
+    {who:"ナレーション",face:"👽",side:"left",t:"絶！UFOきんぐ。…失われたはずの仲間が、今、たった一人で、鬼の王と無数の鬼の前に、立っていた。"},
+    {who:"UFO乗組員",face:"👽",side:"right",t:"あうー！！（――これ以上、誰も、傷つけさせない）",fx:"flash"},
+    {who:"ナレーション",face:"👽",side:"left",t:"言葉は通じずとも、その意志だけは、はっきりと伝わった。…たった一人の、反撃が始まる。"},
+  ],
+  choice:{who:"UFO乗組員",face:"👽",t:"あうー……！（みんなのところへ、帰るために――まずは、お前たちを止める）",
+    options:[
+      {label:"超技術、起動",res:"UFOの全システムが、唸りを上げた。"},
+      {label:"あうー！",res:"未知の光が、天国を照らす。"},
+    ]},
+  post:[
+    {who:"ナレーション",face:"✨",side:"left",t:"――鬼の王も、無数の鬼たちも、塵となって、消えていく。…UFOの操る超技術の前には、千年を生きた鬼の王さえ、無意味だった。",fx:"flash"},
+    {who:"鬼の王",face:"👹",side:"right",t:"ぐ、ぅ……。…馬鹿、な……。…我々は、地獄から……“逃げて”、きたのだ……。"},
+    {who:"鬼の王",face:"👹",side:"right",t:"地獄には……“奴”が、いる……。我ら鬼の王さえ、抗えぬ、化け物が……。"},
+    {who:"鬼の王",face:"👹",side:"right",t:"……奴の、名は……。…“カエル”、と……。",fx:"quake"},
+    {who:"ナレーション",face:"👹",side:"left",t:"そう言い残し、鬼の王は、塵となった。…鬼に変えられていた者たちも、皆、力尽きて、静かに倒れていった。"},
+    {who:"天使長",face:"👼",side:"right",t:"な、何の、騒ぎだ……！？…天国が、こんな……！"},
+    {who:"ナレーション",face:"⚖️",side:"left",t:"駆けつけた天使や天界の神々が、ざわめく。…そして、魂の記録を照合した者が、凍りついた。"},
+    {who:"天界の神々",face:"⚡",side:"right",t:"……馬鹿な。…『カエル』という、一つの魂が……。…天国と、地獄。…二つの国に、“同時に”、存在している、だと……！？",fx:"flash"},
+    {who:"天使長",face:"👼",side:"right",t:"……あってはならぬ、異常事態。…天国に在る『カエル』を――直ちに、追放せよ……！"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――かつて博士が告げた、不吉な予言が、現実となろうとしていた。"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"――所変わって、地獄。"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"数え切れぬ亡者の、屍の山。…その頂に、ソレは、座っていた。"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"積み上がっていたのは、ただの亡者ではない。…星を砕くと謳われた戦士。…宇宙を統べた、白き皇帝。…玉座に潜む、影の王。…幾多の世界で“最強”と恐れられた魂さえ、ここでは等しく、物言わぬ山の一部だった。",fx:"quake"},
+    {who:"？？？",face:"🐸",side:"right",t:"……ふぅ。…ようやく、片付きましたか。…地獄の住人は、これで、全員。"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"赤く光る、瞳。…全身を濡らす、返り血。…その手には、冥府の王・閻魔大王の首が、無造作に提げられていた。",fx:"flash"},
+    {who:"？？？",face:"🐸",side:"right",t:"さて。…次は、どこへ、参りましょうか。"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"重い腰を上げ、ソレは歩き出す。…屍の山を、まるで霜柱を踏みつぶす子供のように、グチャ、グチャと、潰しながら。"},
+    {who:"ナレーション",face:"🚪",side:"left",t:"やがてソレは、『現世行き』と記された、三途の川へ続く門の前で、足を止めた。"},
+    {who:"ナレーション",face:"👹",side:"left",t:"――その時。背後から、震える声が、響いた。"},
+    {who:"鬼大家",face:"👹",side:"right",t:"……カエル！？…お前、カエルなのか！？！？"},
+    {who:"ナレーション",face:"👹",side:"left",t:"そこにいたのは、前作で出会った――あの、鬼大家だった。"},
+    {who:"鬼大家",face:"👹",side:"right",t:"お前に、何があった……！？…いつも一緒だった、あの仲間たちは……どうした！？"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"――“仲間”。…その言葉に、ソレの動きが、ふと、止まった。…遠い記憶が、よぎる。"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"レスバで世界を救った、賑やかな日々。…ねこの軽口。…あうー、と笑うUFO。…前を歩く、開発者の、背中。"},
+    {who:"？？？",face:"🐸",side:"right",t:"……旅、ですか。……ああ。…そんなものも、あった、ような……。"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"ほんの少しだけ。…ソレの赤い瞳が、揺れた。…だが――次の瞬間。"},
+    {who:"？？？",face:"🐸",side:"right",t:"…………不愉快だ。"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"揺らいだ心ごと断ち切るように――鬼大家は、声もなく、崩れ落ちた。",fx:"quake"},
+    {who:"？？？",face:"🐸",side:"right",t:"……さて。…行きましょう。…もっと“面白い”ものを、探しに。"},
+    {who:"ナレーション",face:"🚪",side:"left",t:"ソレは『現世行き』の門を開け――その奥の闇へと、静かに、消えていった。",fx:"flash"},
+    {who:"ナレーション",face:"📜",side:"left",t:"スピンオフ #6「赤い瞳」―― 完。…光の魂が天国を追われる時、闇の魂は、現世への扉を開けた。…次回へ、つづく。"},
+  ]
+};
+// ===== スピンオフ #5「祖父と孫、そして鬼狩り」=====
+// 博士×サーモン再会→吸血鬼天使襲撃→緋焔の剣士・クソバカ(id37/オリジナル)乱入→バトル→仲間に。ラスト鬼の王の引き。ep=105
+// バトル：かえる(3)+ねこ(2)+クソバカ(37) vs 吸血鬼天使×4(鬼の体)＋堕天使(開幕必殺)
+const NEWCH5={
+  pre:[
+    {who:"ナレーション",face:"📜",side:"left",t:"死者の国――天国と地獄。ここは、あらゆる世界の死者が集まる場所。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"マルチバースの『外側』と呼ばれる空間に、天国と地獄は表裏一体で存在している。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"つまり――別の世界の死者であっても、天国にも地獄にも、分け隔てなく存在しているのだ。"},
+    {who:"ナレーション",face:"👴",side:"left",t:"かえるたちは、サーモンを連れて、博士の研究所へ戻った。"},
+    {who:"博士",face:"👴",side:"right",t:"……その顔。その声。……ああ、ああ……間違いない。…わしの、孫じゃ……。"},
+    {who:"サーモン",face:"🍣",side:"left",t:"……おじいちゃん。…ほんとに、おじいちゃん、なの……？"},
+    {who:"博士",face:"👴",side:"right",t:"すまなかった。…生きておるうちに、お前の苦しみに、気づいてやれなんだ。…蘇らせることばかりに、必死で……。"},
+    {who:"サーモン",face:"🍣",side:"left",t:"……もう、いいよ。…だって、こうして、会えたもん。…会いに、来てくれたじゃん。"},
+    {who:"ナレーション",face:"🍣",side:"left",t:"還る世界は、もう無い。…それでも、二人は今、ここで、確かに再会できた。…静かな涙が、頬を伝う。"},
+    {who:"ナレーション",face:"🩸",side:"left",t:"――その時。研究所の隅から、ぐちゃ、ぐちゃ、と、湿った音が、聞こえてきた。",fx:"flash"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……なんや、今の音。…おい、あそこ……。"},
+    {who:"ナレーション",face:"🧛",side:"left",t:"暗がりの中。…“天使”だったはずの何かが、人を、喰らっていた。…ゆっくりと、こちらを、振り向く。",fx:"quake"},
+    {who:"ナレーション",face:"🧛",side:"left",t:"――真っ赤に濁った、瞳。…裂けた口から覗く、鋭い、牙。"},
+    {who:"サーモン",face:"🍣",side:"left",t:"おじいちゃん、下がって…！",fx:"flash"},
+    {who:"ナレーション",face:"🧛",side:"left",t:"博士を庇おうと駆け寄ったサーモンを、吸血鬼天使が、片手で、薙ぎ払う。",fx:"quake"},
+    {who:"サーモン",face:"🍣",side:"left",t:"きゃ――……っ。"},
+    {who:"ナレーション",face:"💫",side:"left",t:"壁に叩きつけられ、サーモンは、そのまま気を失った。…さらに研究所の奥から、無数の吸血鬼天使が、湧き出してくる。"},
+    {who:"かえる",face:"🐸",side:"left",t:"サーモンさん…！くっ、こんなに、たくさん……！"},
+    {who:"？？？",face:"🤺",side:"right",t:"下がってください…！…そいつらは、オレの刃でないと、斬れない…！…あなたたちは、オレが守る…！",fx:"flash"},
+    {who:"ナレーション",face:"🤺",side:"left",t:"和柄（市松模様）の羽織をまとった、一人の若き剣士が、緋色の炎を刃に灯して、躍り出た。"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"オレは、緋焔の剣士・クソバカ。…鬼を狩る者だ。…どうか、力を合わせてほしい。…ここにいる人を、誰一人、死なせたくないんだ…！"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……名前、ふざけとんのか？…まあええ、今はそれどころやない！やったるで！"},
+  ],
+  choice:{who:"クソバカ",face:"🤺",t:"あれは、元は人間だった鬼。…苦しみごと、安らかに眠らせる。…二人は、どうか下がって。…いくぞ……！",
+    options:[
+      {label:"緋焔、解き放つ",res:"クソバカの太刀が、紅蓮に燃え上がる。"},
+      {label:"鬼を、断つ",res:"かえる・ねこ・クソバカ、三者が構えた。"},
+    ]},
+  post:[
+    {who:"ナレーション",face:"🤺",side:"left",t:"――クソバカの緋焔の太刀が、吸血鬼天使を、堕天使を、次々と断ち斬っていく。…やがて、研究所に、静けさが戻った。",fx:"flash"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"……ふぅ。…皆さん、無事ですか…！？…どこも、怪我は、ないか…！？"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……助かったわ。…せやけど、なんやアイツら。…儂らが何ぼ斬っても、全然死なへんやんけ！"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"……アレは、『鬼』。…元は、オレたちと同じ、人間だったんだ。…悪しき血に、心まで喰われて、ああなってしまう。…かわいそうに。…だからオレは、ただ斬るんじゃない。…せめて、その苦しみごと、安らかに眠らせるんだ。…鬼を滅ぼせるのは、特別な刃だけ。…オレの、この緋色の炎だけなんだ。"},
+    {who:"かえる",face:"🐸",side:"left",t:"鬼……。…でも、待って。…鬼が、この天国にいるってことは……。"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"……ああ。…“奴”も、この死者の国に、来ているのかもしれない。…数えきれない人を鬼に変えた、すべての元凶が。…だとしたら、止めなきゃならない。…もう、誰も泣かせないために。"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"……っ。…そうだ、オレは、妹を探さないと。…たとえ地獄の果てでも、絶対に、諦めない。…助けてくれて、ありがとう。…邪魔をした、もう行く……！"},
+    {who:"ナレーション",face:"🍣",side:"left",t:"立ち去ろうとする剣士を、目を覚ましたサーモンが、慌てて追いかけた。"},
+    {who:"サーモン",face:"🍣",side:"left",t:"待って…！…助けてくれて、ありがとう。…あたしたちも、消えた仲間を探して、旅してるんだ。"},
+    {who:"かえる",face:"🐸",side:"left",t:"鬼が出るなら、一人は危ないよ。…ぼくたちと、一緒に行こう。…妹さんも、きっと、みんなでなら見つけられる。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……ところでお前、なんで『クソバカ』なんや？…そんな立派な心、しといて。"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"……昔のオレは、未熟で。…目の前の、守りたかったものを、守りきれなかった。…二度と、あんなクソバカには戻らない。…その戒めに、自分をそう呼ぶと、決めたんだ。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……っ。…はは。…ええ名前やんけ。…見直したわ。"},
+    {who:"クソバカ",face:"🤺",side:"right",t:"……。…恩に着る。…未熟者だが、この剣、君たちのために、振るわせてほしい。"},
+    {who:"ナレーション",face:"✨",side:"left",t:"――こうして、緋焔の剣士・クソバカが、仲間に加わった。",fx:"flash"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――その頃。天国と地獄を分かつ、三途の川。"},
+    {who:"ナレーション",face:"👹",side:"left",t:"濁った川面を、膨大な“鬼”の群れが、ひたひたと、渡ってくる。…地獄で鬼に変えられた、無数の魂たちだ。",fx:"quake"},
+    {who:"ナレーション",face:"👹",side:"left",t:"それらを率いるのは、千年を生きた、鬼の頂点――鬼の王。…今まさに、川を渡り、天国へと、踏み入ろうとしていた。",fx:"flash"},
+    {who:"ナレーション",face:"📜",side:"left",t:"スピンオフ #5「祖父と孫、そして鬼狩り」―― 完。…死者の国に、最悪の災厄が、近づいている。…次回へ、つづく。"},
+  ]
+};
+// ===== スピンオフ #4「サーモンの過去」=====
+// 自己紹介中に横槍→バトル：かえる(3)+ねこ(2)+サーモン握り(4) vs 死亡した星1レビュー(自作ボス・開幕必殺) ep=104
+// ※サーモンの過去は配慮して描く（手段・病状の具体は描かない／死を肯定しない／最後に小さな光）
+const NEWCH4={
+  pre:[
+    {who:"ナレーション",face:"📜",side:"left",t:"――虚無と化したアース1995を前に、誰もが言葉を失っていた。…やがて、ねこが、ぽつりと口を開く。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"…かえる。お前が先に逝った後の話、…まだ、しとらんかったな。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"開発者は、最後まで戦うた。…神も、宇宙そのものみたいな化け物も相手にして、…ほんまに、ようやった。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"…けどな。儂も、UFOも、…サーモンの嬢ちゃんも。…途中で、まとめて“消されて”しもた。…殺された、ゆうことや。"},
+    {who:"かえる",face:"🐸",side:"left",t:"……そんな。…みんな、が…？"},
+    {who:"博士",face:"👴",side:"right",t:"……なんという、ことじゃ。…あの子まで、もう一度、喪っていたとは……。"},
+    {who:"ナレーション",face:"👴",side:"left",t:"博士の肩が、震える。重い沈黙が、研究室に落ちた。…だが、かえるが、ふと顔を上げた。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…待って。…消されて、死んだ、なら。…ねこくんが今ここ（天国）にいるみたいに。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…UFOくんも、サーモンさんも。…この天国の、どこかに、いるんじゃ……！？"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……っ。…そうか。…その手が、あったか…！"},
+    {who:"ナレーション",face:"📜",side:"left",t:"消えてしまった仲間を、探す旅。…かえるとねこは、博士に見送られ、再び天国へと踏み出した。"},
+    {who:"ナレーション",face:"🌫️",side:"left",t:"――道中。ふいに、かえるの足が、止まる。…見覚えのない“記憶”が、頭の奥で、弾けた。"},
+    {who:"ナレーション",face:"🌫️",side:"left",t:"――6年前。…まだ、前回の事件よりも、ずっと前。",fx:"flash"},
+    {who:"かえる",face:"🐸",side:"left",t:"（…これ、は…。…また、“わたし”の…記憶…？）"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"紳士的な声が、淡々と告げる。…それは一件ではなかった。…二件、三件と、数を、重ねていく。",fx:"quake"},
+    {who:"？？？",face:"🐸",side:"right",t:"…さて。今日で、二十件目に、なりますか。…ええ、実に、退屈しのぎには、ちょうどいい。"},
+    {who:"ナレーション",face:"🌫️",side:"left",t:"――凄惨な“結果”そのものは、靄の向こうで、はっきりとは見えない。…だが、その声の、温度のなさだけが、かえるの全身を、凍らせた。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…っ、…ぁ……。…ぼくの中の、“わたし”は。…そんなに、たくさん……。",fx:"quake"},
+    {who:"ナレーション",face:"🐱",side:"left",t:"かえるの額に、冷たい汗が、噴き出す。膝が、笑う。…そこへ、ねこの手が、肩を掴んだ。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"おい、かえる！…しっかりせえ！…見るな。…今は、見んでええ。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"…それは“過去”や。…お前が今、ここで背負うんは、…“これから”やろ。…呼吸せえ。…ゆっくりや。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…っ、…ふぅ…。…ありがとう、ねこくん。…ぼく、…大丈夫。…たぶん。"},
+    {who:"ナレーション",face:"🍣",side:"left",t:"その時。…二人の前に、ひとりの少女が、ひょっこりと姿を現した。"},
+    {who:"サーモン",face:"🍣",side:"right",t:"…あれ？…その声、ねこっちじゃん。…てか、生きて…あ、死んでるか、ここ。…うける。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"サーモンの嬢ちゃん…！…ほんまに、おったんか…！"},
+    {who:"サーモン",face:"🍣",side:"right",t:"そっちの子は…はじめまして？…あたし、サーモン握り。…よろ―――"},
+    {who:"ナレーション",face:"🙎",side:"left",t:"――その、自己紹介に、横から。…ずいっと、不機嫌そうな人影が、割り込んできた。",fx:"flash"},
+    {who:"星1レビュー",face:"🙎",side:"right",t:"はぁ。…感動の再会、ってワケ？…白けるなぁ。…★1。…二度とやらない。クソゲー。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"な…！？お前、前作で開発者にレスバで成仏させられた、“星1レビュー”やんけ…！なんで天国に！？"},
+    {who:"星1レビュー",face:"🙎",side:"right",t:"私はね。…死んでも、二度と“星5”に更新されない。…その未練だけで、こうして、化けて出てるのさ。"},
+    {who:"サーモン",face:"🍣",side:"right",t:"うわ、めんど…。…ま、いっか。…かえる君、っての？…共闘、いってみよ！"},
+  ],
+  choice:{who:"かえる",face:"🐸",t:"…自己紹介の、続きは後で。…まずは、あの星1レビューを、黙らせる…！",
+    options:[
+      {label:"レスバ、開始！",res:"三人、それぞれの構えを取る。"},
+      {label:"成仏させる",res:"未練を断ち切ってやる――。"},
+    ]},
+  post:[
+    {who:"ナレーション",face:"🙎",side:"left",t:"――激しい言葉の応酬の末。…星1レビューは、ふっと、表情を緩めた。",fx:"flash"},
+    {who:"星1レビュー",face:"🙎",side:"right",t:"……ああ。…そうか。…星の数なんかより。…ちゃんと、向き合って、もらえたのが。…一番、嬉しかったのかも、なぁ……。"},
+    {who:"ナレーション",face:"✨",side:"left",t:"星1レビューは、満たされたように、淡い光となって、空へ昇っていった。…ようやく、成仏できたらしい。"},
+    {who:"サーモン",face:"🍣",side:"right",t:"ふぅ。…やるじゃん、かえる君。…背中、預けられるってやつ？…ちょっと、見直した。"},
+    {who:"かえる",face:"🐸",side:"left",t:"えへへ…。…改めて、はじめまして。…かえる、です。…よろしくね、サーモンさん。"},
+    {who:"ナレーション",face:"🍣",side:"left",t:"共に戦ったことで、三人の距離が、少しだけ縮まった。…だが、ふとした拍子に。…サーモンの笑顔に、影が差した。"},
+    {who:"サーモン",face:"🍣",side:"right",t:"…ねえ。…あたしがさ。…なんで“ここ”に来たか、…聞いても、引かない？"},
+    {who:"ナレーション",face:"🍣",side:"left",t:"かえるとねこは、何も言わず、ただ、隣に腰を下ろした。…サーモンは、ぽつり、ぽつりと、語り始めた。"},
+    {who:"サーモン",face:"🍣",side:"right",t:"あたしね。…生きてた頃、ずっと、心と体が、うまくいかなくてさ。…誰にも、うまく言えなくて。"},
+    {who:"サーモン",face:"🍣",side:"right",t:"…自分なんて、みんなの“重荷”だって。…そう思い込んで。…十七で、…消えちゃった。…それだけ。"},
+    {who:"ナレーション",face:"🍣",side:"left",t:"――具体的な“その時”のことを、サーモンは語らなかった。…ただ、痛みと、孤独だけが、静かに、そこにあった。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…ぼくは、軽々しく“分かる”なんて、言えない。…でも。…自分を、許せない夜があるのは。…ぼくも、同じ、だよ。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"……重荷、なんてことあるか。…お前がおらんかったら、あの旅は、とっくに詰んどった。…お前は、必要やった。…ほんまや。"},
+    {who:"サーモン",face:"🍣",side:"right",t:"……っ。…なにそれ。…ずるいよ、二人とも。…泣くじゃん……。"},
+    {who:"ナレーション",face:"✨",side:"left",t:"――誰にも言えなかった痛みを、初めて、誰かに、見てもらえた。…ほんの少しだけ、サーモンの肩から、力が抜けた。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"そして、かえるとねこは、目を合わせ、頷いた。…サーモンに、伝えなければいけない、ことがある。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…サーモンさん。…驚かないで、聞いてほしいんだけど。…君の、おじいさんが。…博士が、今。…この天国に、いるんだ。"},
+    {who:"サーモン",face:"🍣",side:"right",t:"…………え。",fx:"flash"},
+    {who:"ナレーション",face:"🍣",side:"left",t:"サーモンの時間が、止まった。…その表情に渦巻くのは、喜びか、戸惑いか、それとも――。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"スピンオフ #4「サーモンの過去」―― 完。…交わるはずのなかった、祖父と孫の物語が、いま、動き出す。…次回へ、つづく。"},
+  ]
+};
+// ===== スピンオフ #3「天国の果実」=====
+// バトル：かえる(ぼく/id3) 単体 vs 絶！ねこ(id28・激低ステ・開幕必殺あり・勝敗どちらでも続行) ep=103
+const NEWCH3={
+  pre:[
+    {who:"ナレーション",face:"📜",side:"left",t:"――自分のもう一つの魂が犯した、あまりに重い罪を知ってしまったかえるは。…ただ、逃げていた。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…ぼくの中に、あんな『わたし』が、いたなんて。…みんなに、合わせる顔が、ないよ…。"},
+    {who:"ナレーション",face:"🐱",side:"left",t:"その背を追って、軽い足音が、駆けてくる。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"待たんかい、かえる…！"},
+    {who:"かえる",face:"🐸",side:"left",t:"…来ないで、ねこくん…！ぼくの、そばにいたら…。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…ぼくの中には。…とんでもないものが、いるんだ。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"…だから、何やねん。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"お前また、一人で抱え込んで。…勝手に、壊れる気か。…それ、ワシが許さんわ。"},
+    {who:"ナレーション",face:"🐱",side:"left",t:"ねこが、かえるの行く手に、立ちはだかる。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"ここから先は、お前一人で行かせへん。…どうしても行くて言うなら――。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"ワシを、倒してから、行かんかい…！",fx:"flash"},
+    {who:"かえる",face:"🐸",side:"left",t:"…ごめん、ねこくん。…ぼく、もう、止まれないんだ…！"},
+  ],
+  choice:{who:"かえる",face:"🐸",t:"ねこくんを、振り切ってでも――前に、進む…！",
+    options:[
+      {label:"拳をぶつける",res:"かえるは、涙をこらえて構えた。"},
+      {label:"…止まれない",res:"二人の想いが、真正面からぶつかる。"},
+    ]},
+  post:[
+    {who:"ナレーション",face:"🐱",side:"left",t:"――どれだけ、ぶつかり合っただろう。…やがて二人とも、その場に、へたり込んだ。",fx:"flash"},
+    {who:"ねこ",face:"🐱",side:"right",t:"はは…。…ええ拳、しとったやんけ。…これで、もう、文句なしや。"},
+    {who:"かえる",face:"🐸",side:"left",t:"ねこくん…。…ぼく、は…っ。"},
+    {who:"ナレーション",face:"🐸",side:"left",t:"かえるは、震える声で、すべてを打ち明けた。"},
+    {who:"かえる",face:"🐸",side:"left",t:"ぼくの中の、もう一つの魂は…昔。…たくさんの人を手にかけた、極悪人、なんだ。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"…ふん。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"前のお前かて、敬語で人を煽る、嫌〜な奴やったやろ。…でも、仲間やった。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"罪が一つ二つ増えたところで。…お前は、お前や。…一人で抱えるな。一緒に、背負うたるわ。",fx:"flash"},
+    {who:"かえる",face:"🐸",side:"left",t:"…っ。…うん。…うん…！"},
+    {who:"ナレーション",face:"📜",side:"left",t:"立ち直ったかえるは、博士から託されていた、ある頼みを、ねこに打ち明けた。"},
+    {who:"かえる",face:"🐸",side:"left",t:"博士に、頼まれてるんだ。…『天国の果実』を、取ってきてほしい、って。"},
+    {who:"ナレーション",face:"🌳",side:"left",t:"二人は地図を頼りに、天国の最果てへ。…そこには、天に届くほど巨大な、一本の果樹がそびえていた。",fx:"flash"},
+    {who:"ナレーション",face:"👼",side:"left",t:"果樹の番人である天使は、二人の絆を、静かに見つめ――。"},
+    {who:"天使",face:"👼",side:"right",t:"…その想いが、あるのなら。…大丈夫。…どうぞ、お持ちください。"},
+    {who:"ナレーション",face:"🍎",side:"left",t:"こうして二人は、淡く輝く『天国の果実』を手に、博士のもとへと帰り着いた。"},
+    {who:"かえる",face:"🐸",side:"left",t:"博士。…頼まれてた、天国の果実。…取ってきたよ。"},
+    {who:"博士",face:"👴",side:"right",t:"おぉ…！よくぞ、よくぞ持ち帰ってくれた…！"},
+    {who:"ナレーション",face:"🚪",side:"left",t:"博士が果実を装置に納めると、果実は淡く光を放ち、空間に、ひとつの『扉』が、開かれていく。",fx:"flash"},
+    {who:"博士",face:"👴",side:"right",t:"この『天国の果実』はな。…死者の国から、生者の世界へ通じる扉を開く、鍵なのじゃ。"},
+    {who:"博士",face:"👴",side:"right",t:"これで…孫を、サーモンを、現世に蘇らせられる。…そして、お前さんも。…仲間のもとへ、帰れるんじゃ。"},
+    {who:"かえる",face:"🐸",side:"left",t:"…っ！ほんとに…？…ぼく、また、みんなに…開発者くんに、会えるの…！？",fx:"flash"},
+    {who:"ナレーション",face:"🚪",side:"left",t:"扉が、完全に、開く。…その向こうに広がっていたのは――。",fx:"flash"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"光も。色も。音も。…何も、なかった。…ただ、果てのない、虚無だけが、広がっていた。",fx:"quake"},
+    {who:"博士",face:"👴",side:"right",t:"…なん、じゃ…これは。…現世が…我々の、アース1995が……。"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"帰るべき世界は。…もう、どこにも、存在していなかった。",fx:"flash"},
+    {who:"かえる",face:"🐸",side:"left",t:"…うそ、だよね。…ぼくたちの、世界が…ない、なんて…。"},
+    {who:"ナレーション",face:"🐱",side:"left",t:"ねこは、広がる虚無を、睨みつけた。…そして、ひとつの事実に、思い至る。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"…世界が、丸ごと、無いやと…？…ほな。…あの後。"},
+    {who:"ねこ",face:"🐱",side:"right",t:"…あの後、負けたんか……開発者ッ！！",fx:"quake"},
+    {who:"ねこ",face:"🐱",side:"right",t:"…儂らが、先に逝って。…あいつ一人、残して。…それで、世界ごと、持ってかれたんか…っ！"},
+    {who:"ナレーション",face:"👴",side:"left",t:"博士は、開いたままの扉の前で、力なく、崩れ落ちた。"},
+    {who:"博士",face:"👴",side:"right",t:"…では…わしは。…あの子を…サーモンを。…いったい、どこへ、還せばいいんじゃ……。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"誰も、帰れない。…博士の悲願も、かえるの希望も。…行き場を失い、静かに、虚無へと、呑まれていった。",fx:"flash"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――なぜ、世界は消えたのか。…その答えに辿り着くには、もう少しだけ、時間がかかる。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"スピンオフ #3「天国の果実」―― 完。…物語は、次回へ、つづく。"},
+  ]
+};
 // 話数別の台本。pre=前半会話, choice=バトル直前の選択, post=後半会話
+// ===== スピンオフ・エピローグ「評議会」（会話のみ・バトルなし）ep=109 =====
+const NEWCH_EP={
+  pre:[
+    {who:"ナレーション",face:"🌀",side:"left",t:"――すべての世界の、外側。…想像と可能性がひしめく、歪んだ次元。…ピエンターズ評議会。"},
+    {who:"ナレーション",face:"🌀",side:"left",t:"突如、評議会に、ざわめきが走った。…消したはずの世界が、次々と――創られている。"},
+    {who:"ピエンターズ幹部",face:"🧑",side:"right",t:"ありえない……！…一度、消滅させたはずの“開発者の現在”の宇宙が……次々と、復活している、だと……！？"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"その時、闇の奥から、絶対的な気配が、ぬっと、滲み出た。",fx:"flash"},
+    {who:"ピエン王",face:"👑",side:"right",t:"……一体、なんの、騒ぎじゃ。"},
+    {who:"ピエンターズ幹部",face:"🧑",side:"right",t:"は……！…ピエン王……。…実は、天国と地獄が――“インカージョン”を起こし、消滅、いたしました。"},
+    {who:"ピエン王",face:"👑",side:"right",t:"……なんじゃと……！？…一体、何者が……！…そして、なんの目的で……！？"},
+    {who:"ピエンターズ幹部",face:"🧑",side:"right",t:"インカージョンを起こした、理由は……不明、です。"},
+    {who:"ピエン王",face:"👑",side:"right",t:"……まずい。…直ちに“創造神”を見つけ出し、天国と地獄を、創り直してもらわねばならん。"},
+    {who:"ピエン王",face:"👑",side:"right",t:"あの二つが無ければ……死んだ魂は、行き場を失い、現世に留まり続ける。"},
+    {who:"ピエン王",face:"👑",side:"right",t:"あそこは――現実世界の人々、そして、全ての創作物たちの魂の……最後の、還る場所、なのだからな。"},
+    {who:"ピエンターズ幹部",face:"🧑",side:"right",t:"しかし……一体、誰が、こんなことを……。"},
+    {who:"ピエンターズ幹部",face:"🧑",side:"right",t:"それと、もう一つ……。…消したはずの“開発者の現在”の宇宙が、次々と、突如として……創られ続けています。"},
+    {who:"ピエン王",face:"👑",side:"right",t:"……世界を“創り出す”、だと？…よほど、強力な、現実改変よ。…ふん。…見え透いておる。…これは――我々を撹乱するための、罠じゃ。"},
+    {who:"ピエンターズ幹部",face:"🧑",side:"right",t:"正体は、不明ですが……どうやら、アース1995で、特別な力が働いており……その存在が、世界を“無限に”創り出している、模様です。"},
+    {who:"ピエン王",face:"👑",side:"right",t:"……そうか。…ならば、その存在を、今すぐ、消してこい。…そして、創られた世界を、もう一度――残らず、消滅させるのじゃ。"},
+    {who:"ナレーション",face:"🌀",side:"left",t:"その時。…末席に控えていた下っ端たちが、がたがたと、震えだした。"},
+    {who:"ピエンターズ下っ端",face:"🧑",side:"right",t:"こ、これって……まさか……“ドミ……”――"},
+    {who:"ナレーション",face:"⚡",side:"left",t:"言い終わる、前に。…閃光。…下っ端たちは、塵ひとつ残さず、消滅した。",fx:"flash"},
+    {who:"ピエン王",face:"👑",side:"right",t:"……その名を、言うな。"},
+    {who:"ピエン王",face:"👑",side:"right",t:"全軍――アース1995へ向かい、そこにいる、全ての生命を……処刑せよ。",fx:"quake"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"ピエン王の絶対的な力が、空間を満たす。…居並ぶピエンターズたちが、超絶的に、強化されていく。",fx:"flash"},
+    {who:"ナレーション",face:"🌑",side:"left",t:"そして全軍が、アース1995へと――進軍を、始めた。"},
+    {who:"ナレーション",face:"🌀",side:"left",t:"――場面は、移り。…開発者と、ウォッチャーのいる、プログラミング空間。"},
+    {who:"ウォッチャー",face:"👁️",side:"right",t:"……きみの友達は、すごいやつ、だったんだな。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"ウォッチャーは、死者の国で起きた出来事の、その全てを、開発者へと伝えた。…全知全能ゆえに、彼には、すべてが視えている。"},
+    {who:"ウォッチャー",face:"👁️",side:"right",t:"かえる――いや、真！カエル。…彼は今も、無限に宇宙を創り続け、ピエンターズの目を、引きつけている。…きみたちが、ケリをつけるための、時間を稼ぐために。"},
+    {who:"開発者",face:"🦸‍♂️",side:"left",t:"……そっか。…あいつ、そんなことに……。"},
+    {who:"開発者",face:"🦸‍♂️",side:"left",t:"――よし。…俺たちも、うかうかしては、いられないな……！",fx:"flash"},
+    {who:"ナレーション",face:"📜",side:"left",t:"開発者は、希望を求めて、再び、立ち上がる。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"プログラミング空間を、超えた、その先に。…最後の、たった“1%”の宇宙が――残されている。"},
+    {who:"ナレーション",face:"📜",side:"left",t:"――スピンオフ・エピローグ「評議会」。…物語は、いよいよ、次なる章へと、動き出す。"},
+  ]
+};
 const EPISODES={
   1:{
     pre:[
@@ -2200,6 +3208,195 @@ const EPISODES={
       {who:"ナレーション",face:"🌌",side:"left",auto:true,t:"…そして、物語は。…まだ、見ぬ、続きへと、続いていく――。"},
       {who:"ナレーション",face:"📜",side:"left",t:"――エピローグ「その後」 完。…そして、本当の、戦いが、始まる。"},
     ]
+  },
+  12:{
+    pre:[
+      {who:"ナレーション",face:"📜",side:"left",t:"――エピローグ2「評議会」。"},
+      {who:"ナレーション",face:"🌌",side:"left",t:"ここは、現実世界より、ひとつ下の層。"},
+      {who:"ナレーション",face:"🌌",side:"left",t:"あらゆる想像と、可能性が、無限にひしめき合う、歪んだ次元。"},
+      {who:"ナレーション",face:"🌌",side:"left",t:"その、中央に――巨大な、建造物が、そびえていた。",fx:"flash"},
+      {who:"ナレーション",face:"🏛️",side:"left",t:"見た目は、古代の闘技場。…コロッセオの、ような場所。"},
+      {who:"ナレーション",face:"🏛️",side:"left",t:"そして、そこには。…無限に、湧いて現れる、ピエンターズ達が、いた。",fx:"quake"},
+      {who:"ナレーション",face:"🧍",side:"left",t:"赤いの。青いの。透明なの。逆さまのもの。…ひとつとして、同じ姿はない。"},
+      {who:"ナレーション",face:"🧍",side:"left",t:"無数の、並行世界の、ピエンターズ達。…ざっと数えて、9980億人。",fx:"quake"},
+      {who:"ナレーション",face:"🏛️",side:"left",t:"ここは――『ピエンターズ評議会』と、呼ばれる場所。"},
+      {who:"ナレーション",face:"🏛️",side:"left",t:"あらゆる世界の、裁定を、下す場所。"},
+      {who:"ナレーション",face:"🏛️",side:"left",t:"不要と、裁定された世界を。…丸ごと、消滅させる。…その、相談を。"},
+      {who:"ナレーション",face:"🏛️",side:"left",t:"無限の、ピエンターズ達が、延々と、続けている――。"},
+      {who:"ピエンターズ",face:"🧍",side:"left",t:"……では、次の、議題だ。…第・四七二九二号、宇宙。"},
+      {who:"ピエンターズ",face:"🧌",side:"right",t:"……ああ、その世界か。…電気を操る、黄色い鼠が、人気の。…可愛い、生き物が、たくさん、いる。"},
+      {who:"ピエンターズ",face:"👹",side:"left",t:"……人気が、ある。…現実世界の、想いが、まだ、濃い。…消すには、惜しい。"},
+      {who:"ピエンターズ",face:"🧟",side:"right",t:"……保留。…次。…第・八八一〇号、宇宙。"},
+      {who:"ピエンターズ",face:"🤡",side:"left",t:"……七つの、球を、集めると、願いが、叶う。…戦闘民族の、世界、だな。"},
+      {who:"ピエンターズ",face:"👽",side:"right",t:"……戦いの、想いが、強い。…エネルギーが、膨大、すぎる。…下手に、手を出せば、こちらが、削られる。"},
+      {who:"ピエンターズ",face:"🧞",side:"left",t:"……保留。…現実世界で、まだ、愛されて、いる。…消す、理由が、ない。"},
+      {who:"ピエンターズ",face:"🧛",side:"right",t:"……次。…第・一二〇五号、宇宙。"},
+      {who:"ピエンターズ",face:"🧜",side:"left",t:"……海賊王を、目指す、ゴムの、能力者の、世界。…まだ、物語が、続いて、いる。"},
+      {who:"ピエンターズ",face:"🧚",side:"right",t:"……うむ。…完結まで、見届ける、想いが、多い。…消せば、恨みを、買う。…保留。"},
+      {who:"ピエンターズ",face:"🦹",side:"left",t:"……次。…鬼を、狩る、市松模様の、剣士の、世界は。"},
+      {who:"ピエンターズ",face:"🧙",side:"right",t:"……既に、物語は、終わって、いる。…想いの、残り火も。…そろそろ、尽きかけて、いる。"},
+      {who:"ピエンターズ",face:"🧝",side:"left",t:"……ふむ。…ならば。…あの、世界は。…もう、消滅に、値する、か。"},
+      {who:"ピエンターズ",face:"👺",side:"right",t:"……ちょうど、いい。…その、世界、ボクが、行こう。…ずっと、退屈、していた、ところだ。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――一体の、ピエンターズが。…ゆらり、と、立ち上がり。…次元の、裂け目へと。…消えていった。",fx:"flash"},
+      {who:"ナレーション",face:"🌌",side:"left",t:"――そして。…その、世界では。"},
+      {who:"ナレーション",face:"🌙",side:"left",t:"――まさに、最終決戦の、最中、だった。",fx:"flash"},
+      {who:"ナレーション",face:"🌙",side:"left",t:"――夜明けを、賭けた、戦い。…鬼の、頂点に、立つ、『鬼の王』と。…それに、挑む、剣士達。"},
+      {who:"ナレーション",face:"⚔️",side:"left",t:"――水の剣士。…炎の剣士。…風の、岩の、恋の、霞の、蛇の、音の――全ての、柱が。…満身創痍で、刃を、振るう。"},
+      {who:"ナレーション",face:"🗡️",side:"left",t:"――そして、その、中心に。…市松模様の、羽織を、纏った、主人公の、少年が。…仲間と、共に、最後の、一撃を、放とうと、していた。"},
+      {who:"鬼の王",face:"👹",side:"right",t:"……無駄だ。…貴様らごときが。…千年を、生きた、この私を。…倒せると、思うな。"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……いや。…倒す。…ここで、必ず。…みんなの、想いを、背負って……！"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――その、刹那。…戦場の、ど真ん中に。",fx:"quake"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"――こんにちは。",fx:"flash"},
+      {who:"鬼の王",face:"👹",side:"right",t:"……っ！？…なん、だ、貴様は。…どこから、湧いた……！？"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……気配が、まるで、なかった……！？…こんな、化け物。…見た、ことが、ない……！"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……ボクは、ピエンターズ。…この、世界は。…もう、誰にも、想われなく、なった。…だから――"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……消して、いくね。…きみたち、ぜんぶ、まとめて。"},
+      {who:"鬼の王",face:"👹",side:"right",t:"……ふざけるな。…この、私を、誰だと――"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――ピエンターズが。…軽く、手を、振った。",fx:"flash"},
+      {who:"ナレーション",face:"💥",side:"left",t:"――千年を、生きた、鬼の王の、身体が。…一瞬で。…塵と、化した。",fx:"quake"},
+      {who:"鬼の王",face:"👹",side:"right",t:"……ば、かな……っ……この、私、が……一瞬、で……！？",fx:"flash"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……あの、鬼の王が。…一瞬で……っ！？…そんな、こと、が……！"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……次は、きみたち、だ。…さようなら。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――再び、手が、振られる。",fx:"flash"},
+      {who:"ナレーション",face:"💥",side:"left",t:"――水の剣士が、消えた。…炎の、面影を、継ぐ者が、消えた。…風が、岩が、恋が、霞が、蛇が、音が。…全ての、柱が。",fx:"quake"},
+      {who:"ナレーション",face:"💥",side:"left",t:"――声を、上げる、間も、なく。…抵抗を、する、間も、なく。…ただ、塵に、なって、いく。",fx:"quake"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……みんな……っ！…やめろ……やめてくれ……！…おれたちが、何を、したって、いうんだ……！"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……何も。…ただ、もう。…誰も、きみたちを、想わなく、なった。…それ、だけ、だよ。"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……ちがう……っ！…おれたちの、戦いは……無駄なんかじゃ、ない……！"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……みんな、必死に、生きたんだ。…たくさんの、人が、死んで。…それでも、前を、向いて。…夜明けを、信じて……っ！"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……知ってるよ。…全部、見てた。…きみが、妹を、守るために。…鬼に、なった、妹を、人間に、戻すために。…ずっと、戦って、きたこと。"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……だったら……っ！…なんで……！"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……でも、もう、終わったんだ。…きみたちの、物語は。…語り尽くされて。…みんな、満足して。…そして、少しずつ、忘れていく。"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……想いが、薄れた、世界は。…ただの、抜け殻。…ボクらが、刈り取る。…それが、理（ことわり）。"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……忘れられたら……消えなきゃ、いけないのか……？…そんなの……あんまりだ……！",fx:"flash"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……なあ、あんた。…あんたにも、あるはずだ。…誰かを、想う、気持ちが。…大切な、ものが……！"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……ボクに……？"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……おれの、ばあちゃんが、言ってた。…『人を、想う、心は。…誰にも、消せない』、って。"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……たとえ、世界が、消えても。…おれが、妹を、想った、この、気持ちは。…ほんものだ。…あんたにだって、消せやしない……！",fx:"flash"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――その、言葉に。…ピエンターズの、手が。…ほんの、わずかに。…止まった。",fx:"flash"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……人を、想う、心は。…消せない……。"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……ふしぎ、だね。…ボクは、無数の、世界を、消してきた。…誰も、こんなことを、言わなかった。"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……みんな、命乞いを、するか。…呪うか。…泣き叫ぶか。…なのに、きみは。…ボクの、心配を、している。",fx:"flash"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……あんたも……どこか、寂しそうな、顔を、してるから。…ずっと、独りで。…ただ、消すだけの。…そんな、役目を、背負って……。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――ピエンターズは。…自分の、手を、見つめた。…初めて、見るものの、ように。",fx:"flash"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……寂しい……？…ボクが……？…そんなこと。…考えた、ことも、なかった。"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……きみと、話して、いると。…なんだか、胸の、奥が。…へんな、感じが、する。…これは……なんだろう。",fx:"flash"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……それが、心だ。…あんたにも、ちゃんと、ある。…なあ、頼む。…この、世界を。…みんなを。…消さないで、くれ……！",fx:"flash"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――長い、長い、沈黙。…ピエンターズは。…ただ、立ち尽くして、いた。",fx:"quake"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……。"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……ごめんね。"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……！…じゃあ……！"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……それでも。…ボクは、消さなきゃ、いけない。…これが、ボクの、すべてだから。…ボクには、これしか、ないから。",fx:"quake"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……きみの、言葉は。…たぶん、ずっと。…ボクの、中に、残るよ。…初めて、揺れた、この、気持ちと、一緒に。"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……だから、せめて。…覚えて、おく。…きみの、名前を。…きみの、想いを。…それが、ボクに、できる。…たった、ひとつの、手向けだ。",fx:"flash"},
+      {who:"剣士",face:"🗡️",side:"left",t:"……やめ……っ……たのむ……妹だけ、でも……ねず……っ",fx:"flash"},
+      {who:"ピエンターズ",face:"👺",side:"left",t:"……さようなら。…やさしい、剣士さん。…どうか、次の、世界が、あるなら。…そこでは、消されません、ように。",fx:"quake"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――ピエンターズが。…静かに、手を、振った。…今度は、もう。…止まらなかった。",fx:"quake"},
+      {who:"ナレーション",face:"💥",side:"left",t:"――市松模様の、少年が。…妹の、名を、呼びかけた、まま。…静かに、塵に、なった。",fx:"flash"},
+      {who:"ナレーション",face:"🌑",side:"left",t:"――鬼も。…剣士も。…守ろうとした、者も。…守られた、者も。…全てが、消えた。"},
+      {who:"ナレーション",face:"🌑",side:"left",t:"――そして。…その、少年の、最期の、想いだけが。…ピエンターズの、胸の、奥に。…小さな、棘のように。…残った。",fx:"flash"},
+      {who:"タイプライター",face:"📃",side:"left",t:"《 鬼を狩る剣士の世界 は、消滅しました。 》",fx:"flash"},
+      {who:"ナレーション",face:"🌌",side:"left",t:"――そして。…ピエンターズは。…何事も、なかったように。…評議会へと、戻ってきた。"},
+      {who:"ピエンターズ",face:"👺",side:"right",t:"……ただいま。…消滅、完了。"},
+      {who:"ピエンターズ",face:"🧝",side:"left",t:"……ご苦労。…時間が、かかったな。…何か、あったのか。"},
+      {who:"ピエンターズ",face:"👺",side:"right",t:"……いや。…なんでも、ない。…ただ、少しだけ。…粘られた、だけ。",fx:"flash"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――その、ピエンターズは。…誰にも、気づかれぬよう。…そっと、自分の、胸に、手を、当てた。",fx:"flash"},
+      {who:"ピエンターズ",face:"🧌",side:"right",t:"……鬼の、王、とやらも。…柱、とやらも。…我々の、前では。…児戯に、等しい、な。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――誰一人、表情を、変えない。…一つの、世界の、終焉すら。…彼らには、ただの、日常。",fx:"quake"},
+      {who:"ピエンターズ",face:"🧝",side:"left",t:"……ふむ。…どれも、これも。…我々の、前では、無力。…現実世界に、愛され、過ぎた、世界だけが。…かろうじて、生き延びる。"},
+      {who:"ピエンターズ",face:"🧌",side:"right",t:"……我々が、消せるのは。…忘れられた、世界。…誰にも、想われなく、なった、世界、だけ。"},
+      {who:"ピエンターズ",face:"🧍",side:"left",t:"……それが、我々、ピエンターズの、掟。…想いが、尽きた、その時。…我々は、世界を、刈り取る。"},
+      {who:"ピエンターズ",face:"👹",side:"right",t:"……効率が、悪い。…もっと、早く、消せる、世界は、ないのか。"},
+      {who:"ピエンターズ",face:"🤡",side:"left",t:"……焦るな。…我々には、無限の、時間が、ある。…想いが、尽きるまで。…ただ、待てば、いい。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――議論は、延々と、続く。…何百、何千の、世界の、生死が。…淡々と、裁定されて、いく。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"そこに、感情は、ない。…ただ、無慈悲な、効率と、掟だけが、支配する。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――無限の、ピエンターズ。…無限の、裁定。…これが、世界の、本当の、姿だった。",fx:"quake"},
+      {who:"ピエンターズ",face:"🧞",side:"right",t:"……ところで。…ひとつ、思い出した、ことが、ある。"},
+      {who:"ピエンターズ",face:"🧛",side:"left",t:"……なんだ。"},
+      {who:"ピエンターズ",face:"🧞",side:"right",t:"……『レスバで、世界を、救う』、などと、ふざけた、ことを、していた。…あの、ゲーム。"},
+      {who:"ピエンターズ",face:"🧞",side:"right",t:"……『開発者の、現在』…とか、いう、宇宙だ。…あれは、どうなった。…消せたのか。"},
+      {who:"ピエンターズ",face:"🧍",side:"left",t:"……ああ、あの、世界。…担当は、確か……お前、だったな。…報告を、しろ。"},
+      {who:"ピエンターズ",face:"🥸",side:"right",t:"……はっ。…報告、いたします。…当該、宇宙『アース1995』、ならびに、その、並行世界群。"},
+      {who:"ピエンターズ",face:"🥸",side:"right",t:"……99%は、消滅、させました。…しかし――",fx:"flash"},
+      {who:"ピエンターズ",face:"🥸",side:"right",t:"……しかし、…残る、1%が。…どうしても、消せず――"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"――黙れェェェッ！！！",fx:"quake"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――突如。…評議会、全体に、響き渡る、怒号。",fx:"quake"},
+      {who:"ナレーション",face:"📜",side:"left",t:"声の、主は――玉座に、座する、ひときわ、巨大な、ピエンターズ。"},
+      {who:"ナレーション",face:"👑",side:"left",t:"――ピエンターズの、王。…『ぴえん王』。",fx:"flash"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……報告は、聞いた。…別の、ピエンターズが。…堕落し、反旗を、翻した、というのは。…本当か。"},
+      {who:"ピエンターズ",face:"🥸",side:"right",t:"……は、はい。…一体の、ピエンターズが。…『あの世界は、消したくない』、などと。…我々の、掟に、背き――"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――その時。…評議会の、片隅に、いた、一体の、ピエンターズが。…静かに、震えていた。"},
+      {who:"ピエンターズ",face:"🫥",side:"right",t:"……だ、だって。…あの、世界は。…あんなに、必死に。…仲間を、想って、戦って、いたんだ。…消すなんて、ぼくには――"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……消えろ。",fx:"quake"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――ぴえん王が、軽く、指を、向けた。…ただ、それだけで。",fx:"flash"},
+      {who:"ピエンターズ",face:"🫥",side:"right",t:"……あ。",fx:"quake"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――反旗を、翻した、ピエンターズは。…塵も、残さず。…消滅した。",fx:"quake"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――無数の、ピエンターズ達は。…誰一人、動じない。…まるで、日常の、光景のように。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――同じ、ピエンターズでも。…そこには、階級が、あり。…絶対的な、戦力の、差が、あった。",fx:"flash"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……さて。…何事も、なかったな。…で。…しかし、なんだ。…続きを、言え。"},
+      {who:"ピエンターズ",face:"🥸",side:"right",t:"……は、はい……。…その、最後の、1%の、宇宙には。…ヤツが――",fx:"flash"},
+      {who:"ピエンターズ",face:"🥸",side:"right",t:"……我々の、存続を、脅かす。…唯一の、存在が。…います。"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……なに。"},
+      {who:"ピエンターズ",face:"🥸",side:"right",t:"……創造と、現実世界、全ての、具現化と、呼ばれ。…現実世界、すらも、創造したと、される――",fx:"quake"},
+      {who:"ピエンターズ",face:"🥸",side:"right",t:"……『開発者』が。…そこに、います。",fx:"flash"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――その、名を、聞いた、瞬間。",fx:"quake"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――あの、無慈悲な、ぴえん王が。…玉座の、上で。…わずかに、震えた。",fx:"quake"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……開発者……だと……。…あの、御方が。…まだ、その、宇宙に……。"},
+      {who:"ピエンターズ",face:"🧌",side:"right",t:"……お、お待ちを。…『開発者』とは。…一体、何者、なのですか。…私は、まだ、新しい、ピエンターズ。…知らぬ、のです。"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……教えて、やろう。…我々が、唯一、頭を、垂れる、存在の、ことを。",fx:"flash"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……いいか。…この、世界には。…層が、ある。"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……一番、内側に、無数の、宇宙。…マルチバース。"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……その、外に、プログラム。…さらに、外に、ハードウェア。…その、外に、デバイス。"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……そして、その、外に。…『現実世界』が、ある。…我々、ピエンターズの、棲む、場所だ。"},
+      {who:"ピエンターズ",face:"🧌",side:"right",t:"……現実世界が。…最も、外側、なのでは。"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……違う。…そこが、最大の、誤解だ。",fx:"quake"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……現実世界の。…さらに、外側に。…たった一人。…鎮座する、存在が、いる。",fx:"flash"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……それが、『開発者』。…『創造の、神』。"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……その、御方より、外側の、世界は。…存在、しない。…そこが、全ての、頂点。…絶対の、最果て。",fx:"quake"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……現実世界、すらも。…あの、御方が、創造した。…我々、ピエンターズの、想いさえも。…その、手のひらの、上。",fx:"flash"},
+      {who:"ピエンターズ",face:"🧞",side:"left",t:"……全ての、頂点。…全ての、創造主。…我々が、絶対に、勝てぬと、される。…唯一の、存在……。"},
+      {who:"ピエンターズ",face:"🧌",side:"right",t:"……し、しかし。…ひとつ、解せぬ、ことが。",fx:"flash"},
+      {who:"ピエンターズ",face:"🧌",side:"right",t:"……その、宇宙の、主人公も。…確か、『開発者』、という、名では。…レスバで、世界を、救おうと、していた、あの、男も。"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――その、問いに。…評議会、全体が。…しん、と、静まり返った。",fx:"quake"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……そうだ。…それこそが。…我々が、最も、恐れ。…そして、最も、理解できぬ、謎なのだ。",fx:"flash"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……なぜ。…全ての、頂点に、立つ、創造の神と。…ゲームの、中で、もがく、ちっぽけな、主人公が。"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……同じ、『開発者』、という、名を、持つのか。",fx:"quake"},
+      {who:"ピエンターズ",face:"🧛",side:"left",t:"……偶然、では、ないのですか。"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……我々、ピエンターズに。…偶然などという、概念は、ない。…全ての、想いには、意味が、ある。"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……あの、主人公は。…創造の神が、自らを、写した、分身、なのか。"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……それとも。…同じ、存在が、層を、越えて。…二つの、場所に、在る、のか。"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……あるいは。…ちっぽけな、主人公こそが。…いつか、創造の神に、至る、種、なのか。",fx:"flash"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……それは。…創造の神、本人に、しか。…分からぬ。",fx:"quake"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……だが、ひとつ、確かなのは。…あの、名を、持つ、限り。…我々の、脅威で、あり続ける、という、こと。",fx:"flash"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……この、一件。…貴様、一人では。…対処は、無理だ。",fx:"flash"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……我々、ピエンターズ評議会も。…総力を、挙げて。…力を、貸そう。"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……行くぞ。…全軍で。…その、最後の、宇宙。…ならびに――",fx:"quake"},
+      {who:"ぴえん王",face:"🤴",side:"left",t:"……『創造の、神』を。…殺害、しに。",fx:"quake"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――9980億の、ピエンターズが。…一斉に、立ち上がる。…評議会が、揺れる。",fx:"quake"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――史上、最大の、軍勢が。…たった、ひとつの、宇宙へと。…進軍を、開始した。"},
+      {who:"ナレーション",face:"🌌",side:"left",t:"――開発者とは、一体、何者なのか。"},
+      {who:"ナレーション",face:"🌌",side:"left",t:"……現実世界の、さらに、外側に、鎮座する。…全ての、創造の、頂点。…それ以上、外側の、ない、絶対の、存在。"},
+      {who:"ナレーション",face:"🌌",side:"left",t:"……その、神が。…なぜ、ゲームの、中の、主人公と。…同じ、名を、持つのか。"},
+      {who:"ナレーション",face:"🌌",side:"left",t:"……主人公の、開発者は。…創造の神の、写しなのか。…分身なのか。…それとも、同一の、存在なのか。"},
+      {who:"ナレーション",face:"🌌",side:"left",t:"……レスバで、世界を、救おうとした、あの、ちっぽけな、開発者と。…全てを、創った、神たる、開発者は。…どこで、繋がって、いるのか。"},
+      {who:"ナレーション",face:"🌌",side:"left",t:"――その謎が、明かされる時は。…まだ、来ない。",fx:"flash"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――その頃……。"},
+      {who:"ナレーション",face:"🌑",side:"left",auto:true,t:"…………。"},
+      {who:"ナレーション",face:"🌑",side:"left",t:"――かつて、『アース1995』が、存在した、場所。"},
+      {who:"ナレーション",face:"🌑",side:"left",t:"――今は、何も、ない。…ただ、虚無だけが、広がる、その、一点が。"},
+      {who:"ナレーション",face:"✨",side:"left",t:"――ふいに。…光り、輝いた。",fx:"flash"},
+      {who:"ナレーション",face:"✨",side:"left",t:"――小さな、小さな、光。…それは、次第に、形を、成して、いく。",fx:"flash"},
+      {who:"ナレーション",face:"🌟",side:"left",t:"――やがて。…その光は。…ひとつの、命の、輪郭を、描いた。",fx:"flash"},
+      {who:"かえる",face:"🐸",side:"left",t:"……あれ？"},
+      {who:"かえる",face:"🐸",side:"left",t:"……ぼく、は？…ここ、は？…なにも、ない？…宇宙？…無？"},
+      {who:"かえる",face:"🐸",side:"left",t:"……てんごく、なの……？…みんな……？…あれ……？",fx:"flash"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――かえるが。…還ってきた。",fx:"flash"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――誰も、いない、虚無の、中で。…ただ、ひとり。…きょとんと、目を、またたかせて。"},
+      {who:"ナレーション",face:"🌟",side:"left",t:"――失われた、命が。…なぜ、今、ここに。…還ってきたのか。"},
+      {who:"ナレーション",face:"🌟",side:"left",t:"――それは、まだ、誰も、知らない。…希望か。…それとも――",fx:"flash"},
+      {who:"ナレーション",face:"📜",side:"left",t:"――エピローグ2「評議会」 完。",fx:"flash"},
+      {who:"ナレーション",face:"📜",side:"left",t:"……物語は、まだ、終わらない。…次回へ、続く。"},
+    ]
   }
 };
 // 後方互換：未定義の話はデフォルト台本
@@ -2213,9 +3410,9 @@ const SCRIPT=epScript(1);
 
 /* ===================== ステート ===================== */
 const KEY="kaihatsu2_save_v2";
-const def={gems:0,tickets:0,story:1,owned:[1,2,3,4],party:[1,2,3,4],dexOnly:[],
+const def={gems:0,tickets:0,story:1,nch:0,owned:[1,2,3,4],party:[1,2,3,4],dexOnly:[],
   gachaUnlocked:false,gachaTotal:0,gachaFirst10Done:false,ticketLog:{unlock:false,eps:[]},
-  kaeruDead:false,forms:{},formUnlocked:{},zetsuUnlocked:false,gxUnlocked:false,
+  kaeruDead:false,forms:{},formUnlocked:{},zetsuUnlocked:false,gxUnlocked:false,vsCleared:{},
   settings:{bgm:70,se:80,fx:true,txt:3}};
 let S=load();
 function load(){
@@ -2238,6 +3435,15 @@ function load(){
       migrated=true;
     }
   });
+  // スピンオフ図鑑バックフィル：既存セーブでも nch に応じて 闇のかえる(36)/クソバカ(37)/真！カエル(38) を図鑑登録
+  if(s.nch){
+    const sd=[];
+    if(s.nch>=1)sd.push(14);
+    if(s.nch>=2)sd.push(36);
+    if(s.nch>=5)sd.push(37);
+    if(s.nch>=8)sd.push(38);
+    sd.forEach(id=>{ if(!(s.owned&&s.owned.includes(id)) && !s.dexOnly.includes(id)){s.dexOnly.push(id);migrated=true;} });
+  }
   // 絶！フォルム未解禁(zetsuUnlocked=false)なのに forms に絶！(27-30)が設定されていたら base へ戻す
   if(!s.zetsuUnlocked && s.forms){
     const zetsuToBase={27:1,28:2,29:4,30:10};
@@ -2268,7 +3474,7 @@ const rareN=r=>({INFINITY:6,PRED:5,UR:4,SSR:3,SR:2,R:1}[r]||0);
 // 図鑑表示判定：手持ち(owned) または 図鑑のみ(dexOnly) のどちらかなら表示OK
 function dexIncludes(id){return S.owned.includes(id)||((S.dexOnly||[]).includes(id));}
 // フォルムチェンジ：base id → [base, 別形態…]。切替で別キャラ扱い。
-const FORMS={ 1:[1,12,27,32], 4:[4,16,29], 2:[2,28], 10:[10,30] };
+const FORMS={ 1:[1,12,27,32], 4:[4,16,29], 2:[2,28], 10:[10,30], 3:[3,36] };
 // 1:開発者⇄真・開発者⇄絶！開発者、4:UFO乗組員⇄UFOきんぐ⇄絶！UFOきんぐ、2:ねこ⇄絶！ねこ、10:サーモン握り⇄絶！サーモン握り
 // あるbaseキャラについて、現在選択中の形態idを返す
 function curForm(baseId){ return (S.forms&&S.forms[baseId]) || baseId; }
@@ -2300,7 +3506,7 @@ function refresh(){
   const gb=document.getElementById('gachaBtn');
   if(S.gachaUnlocked){gb.classList.remove('lock');gb.textContent='マルチバース召喚 🎟️'+(S.tickets||0);}
   else{gb.classList.add('lock');gb.textContent='🔒 召喚（2話クリアで解放）';}
-  document.getElementById('verline').textContent='ver 1.0 / 第'+S.story+'話到達';
+  document.getElementById('verline').textContent='ver 1.3.0 / 第'+S.story+'話到達';
 }
 
 /* ===================== モーダル ===================== */
@@ -2362,8 +3568,11 @@ document.querySelectorAll('[data-act]').forEach(el=>el.addEventListener('click',
   else if(a==='zukan'){buildZukan();scr('zukan');}
   else if(a==='gacha'){if(!S.gachaUnlocked){toast('2話クリアで解放されます');Audio.SE.error();return;}scr('gacha');refresh();}
   else if(a==='settings'){loadSettingsUI();scr('settings');}
+  else if(a==='vsmode'){buildVsMode();scr('vsmode');}
+  else if(a==='changelog'){Audio.SE.select&&Audio.SE.select();showChangelog();}
+  else if(a==='donate'){Audio.SE.select&&Audio.SE.select();showDonate();}
   else if(a==='reset') ask('セーブ初期化','本当に全データを初期化しますか？<br>この操作は元に戻せません。',()=>{localStorage.removeItem(KEY);S=load();refresh();buildEps();toast('初期化しました');scr('title');});
-  else if(a==='unlockAll') ask('全話解放','デバッグ用に全エピソードを解放しますか？<br>フォルム解禁・ガチャ解放・チケット999も同時に行います。',()=>{
+  else if(a==='unlockAll') ask('全話解放','全エピソードを解放しますか？<br>フォルム解禁・ガチャ解放・チケット999も同時に行います。',()=>{
     // ストーリー進行を最大話数+1にして全話プレイ可能に
     S.story=MAX_EP+1;
     // フォルム全解禁
@@ -2404,6 +3613,21 @@ document.querySelectorAll('[data-act]').forEach(el=>el.addEventListener('click',
     toast('図鑑を全開放しました！');Audio.SE.unlock&&Audio.SE.unlock();
     buildZukan();
   });
+  else if(a==='unlockChars') ask('全キャラ獲得','入手可能な全キャラを所持しますか？<br>（編成に使えるようになります。VS専用の敵キャラは除く）',()=>{
+    // 編成に使えるキャラを全てownedに。VS専用敵(400番台)・図鑑専用ボス・フォルムは除外
+    const excludeOwn=[17,20,21,22,23,24,25,26,31,33,34]; // dexOnlyのストーリーボス/雑魚
+    CHARS.forEach(c=>{
+      if(c.id>=400)return;                 // VS専用敵は除外
+      if(c.formOf)return;                   // フォルム（真・絶！・GX等）は本体経由なので除外
+      if(excludeOwn.includes(c.id))return;  // 図鑑専用の敵キャラは除外
+      if(!S.owned.includes(c.id))S.owned.push(c.id);
+    });
+    // フォルム解禁も全部ON（所持キャラのフォルムを使えるように）
+    S.formUnlocked=S.formUnlocked||{};S.formUnlocked[1]=true;S.formUnlocked[2]=true;S.formUnlocked[4]=true;S.formUnlocked[10]=true;
+    S.zetsuUnlocked=true;S.gxUnlocked=true;
+    save();refresh();
+    toast('全キャラを獲得しました！');Audio.SE.unlock&&Audio.SE.unlock();
+  });
   else if(a==='gacha-lineup'){showGachaLineup();}
   else if(a==='granny'){
     // おばあちゃんポップアップ：チケット+5（999上限）、優しい文言ランダム
@@ -2433,8 +3657,14 @@ document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{Audio.SE.back
 function gotoMain(){buildEps();refresh();scr('main');}
 
 /* ===================== メイン（話リスト） ===================== */
-const MAX_EP=11; // 実装済みの最終話。これを超える話は「アップデートを待て」表示
+const MAX_EP=12; // 実装済みの最終話。これを超える話は「アップデートを待て」表示
 function buildEps(){const box=document.getElementById('epList');box.innerHTML='';
+  // 第0話：前作ダイジェスト（プロローグ）。常に解放
+  const p=document.createElement('div');p.className='ep-card prologue';
+  p.innerHTML=`<div class="no" style="color:#ffd700;text-shadow:0 0 8px #ffd700">0</div>
+    <div class="info"><div class="t">第0話「プロローグ ― 前作の物語」</div><div class="s">無料アプリ開発者と、世界を救った仲間たちの記録</div></div><span class="go" style="color:#ffd700">DIGEST ▶</span>`;
+  p.onclick=()=>{Audio.SE.select();startPrologue();};
+  box.appendChild(p);
   EPS.forEach((e,i)=>{const ep=i+1;
     let st=ep<S.story?'clear':ep===S.story?'now':'lock';
     // 未実装の話（実装済み最終話より先）は到達していても「準備中」ロック
@@ -2454,6 +3684,59 @@ function buildEps(){const box=document.getElementById('epList');box.innerHTML=''
       <div class="info"><div class="t">${ttl}</div><div class="s">${sub}</div></div>${right}`;
     if(st==='clear'||st==='now')d.onclick=()=>{Audio.SE.select();startEpisode(ep);};
     box.appendChild(d);});
+  // ===== スピンオフ（案C：魂の記録）。本編1〜12話とは独立 =====
+  const sep=document.createElement('div');sep.className='nch-sep';
+  sep.innerHTML='<div class="lbl">SPIN-OFF</div><div class="ttl">交差する光と闇の魂</div><div class="tag">やがて、次なる章へと繋がる物語</div><div class="line"></div>';
+  box.appendChild(sep);
+  // #1（常に解放）
+  const s1=document.createElement('div');s1.className='ep-card soul'+((S.nch||0)>=1?' clear':'');
+  s1.innerHTML='<div class="no">Ⅰ</div><div class="info"><div class="t">スピンオフ #1「死者の国」</div><div class="s">主人公・かえる。天国と地獄を股にかける、魂の旅。</div></div><span class="go">PLAY ▶</span>';
+  s1.onclick=()=>{Audio.SE.select();startSpinoff(1);};
+  box.appendChild(s1);
+  // #2（常に解放）
+  const s2=document.createElement('div');s2.className='ep-card soul'+((S.nch||0)>=2?' clear':'');
+  s2.innerHTML='<div class="no">Ⅱ</div><div class="info"><div class="t">スピンオフ #2「光と闇」</div><div class="s">かえるに宿る、もう一つの魂。その正体が、明かされる。</div></div><span class="go">PLAY ▶</span>';
+  s2.onclick=()=>{Audio.SE.select();startSpinoff(2);};
+  box.appendChild(s2);
+  // #3（常に解放）
+  const s3=document.createElement('div');s3.className='ep-card soul'+((S.nch||0)>=3?' clear':'');
+  s3.innerHTML='<div class="no">Ⅲ</div><div class="info"><div class="t">スピンオフ #3「天国の果実」</div><div class="s">ねことの再会。そして、帰るべき世界の行方。</div></div><span class="go">PLAY ▶</span>';
+  s3.onclick=()=>{Audio.SE.select();startSpinoff(3);};
+  box.appendChild(s3);
+  // #4（常に解放）
+  const s4=document.createElement('div');s4.className='ep-card soul'+((S.nch||0)>=4?' clear':'');
+  s4.innerHTML='<div class="no">Ⅳ</div><div class="info"><div class="t">スピンオフ #4「サーモンの過去」</div><div class="s">消えた仲間を探す旅。そして、彼女が語り出す。</div></div><span class="go">PLAY ▶</span>';
+  s4.onclick=()=>{Audio.SE.select();startSpinoff(4);};
+  box.appendChild(s4);
+  // #5（常に解放）
+  const s5=document.createElement('div');s5.className='ep-card soul'+((S.nch||0)>=5?' clear':'');
+  s5.innerHTML='<div class="no">Ⅴ</div><div class="info"><div class="t">スピンオフ #5「祖父と孫、そして鬼狩り」</div><div class="s">感動の再会。そして、死者の国に忍び寄る鬼。</div></div><span class="go">PLAY ▶</span>';
+  s5.onclick=()=>{Audio.SE.select();startSpinoff(5);};
+  box.appendChild(s5);
+  // #6（常に解放）
+  const s6=document.createElement('div');s6.className='ep-card soul'+((S.nch||0)>=6?' clear':'');
+  s6.innerHTML='<div class="no">Ⅵ</div><div class="info"><div class="t">スピンオフ #6「赤い瞳」</div><div class="s">天国へ迫る鬼の王。そして、地獄に在る“ソレ”。</div></div><span class="go">PLAY ▶</span>';
+  s6.onclick=()=>{Audio.SE.select();startSpinoff(6);};
+  box.appendChild(s6);
+  // #7（常に解放）
+  const s7=document.createElement('div');s7.className='ep-card soul'+((S.nch||0)>=7?' clear':'');
+  s7.innerHTML='<div class="no">Ⅶ</div><div class="info"><div class="t">スピンオフ #7「ふたつの国の終焉」</div><div class="s">神々との対決。そして、世界の終わりと――新たな始まり。</div></div><span class="go">PLAY ▶</span>';
+  s7.onclick=()=>{Audio.SE.select();startSpinoff(7);};
+  box.appendChild(s7);
+  // #8（最終話・常に解放）
+  const s8=document.createElement('div');s8.className='ep-card soul'+((S.nch||0)>=8?' clear':'');
+  s8.innerHTML='<div class="no">Ⅷ</div><div class="info"><div class="t">スピンオフ #8（最終話）「交差する光と闇」</div><div class="s">虚無の果てで、ふたつの魂が出会う。これが、完結編。</div></div><span class="go">PLAY ▶</span>';
+  s8.onclick=()=>{Audio.SE.select();startSpinoff(8);};
+  box.appendChild(s8);
+  // エピローグ（#8クリアで解放）
+  const sE=document.createElement('div');sE.className='ep-card soul'+((S.nch||0)>=9?' clear':'')+((S.nch||0)>=8?'':' locked');
+  sE.innerHTML='<div class="no">EP</div><div class="info"><div class="t">スピンオフ ― エピローグ「評議会」</div><div class="s">'+((S.nch||0)>=8?'消したはずの世界が、次々と創られている――':'#8クリアで解放')+'</div></div>'+((S.nch||0)>=8?'<span class="go">PLAY ▶</span>':'<span class="lockicon">🔒</span>');
+  if((S.nch||0)>=8)sE.onclick=()=>{Audio.SE.select();startSpinoff(9);};
+  box.appendChild(sE);
+  // 完結
+  const sf=document.createElement('div');sf.className='ep-card soul locked';
+  sf.innerHTML='<div class="no">★</div><div class="info"><div class="t">スピンオフ ～完結～</div><div class="s">ご来場、ありがとうございました</div></div><span class="lockicon">🎬</span>';
+  box.appendChild(sf);
 }
 
 /* ===================== アドベンチャー進行 ===================== */
@@ -2464,6 +3747,15 @@ function startEpisode(ep){
   // 3話：開発者が覚醒（真・開発者へフォルムチェンジ解禁＆選択）
   if(ep>=3){ S.formUnlocked=S.formUnlocked||{}; S.formUnlocked[1]=true; S.forms=S.forms||{}; if(!S.forms[1])S.forms[1]=12; save(); }
   curEp=ep;curSc=epScript(ep);advPhase='pre';advQueue=curSc.pre;advIdx=0;
+  scr('adv');showLine();}
+// 第0話プロローグ（前作ダイジェスト）：バトルなし・台本のみ
+function startPrologue(){
+  advPhase='prologue';advQueue=PROLOGUE_EP.pre;advIdx=0;
+  scr('adv');showLine();}
+// スピンオフ：内部ep=100+n（#1→101）。pre→バトル→post。本編進行(S.story)には非干渉
+function startSpinoff(n){
+  window._ep9Awakened=false;
+  curEp=100+n;curSc=(n===1?NEWCH1:n===2?NEWCH2:n===3?NEWCH3:n===4?NEWCH4:n===5?NEWCH5:n===6?NEWCH6:n===7?NEWCH7:n===8?NEWCH8:n===9?NEWCH_EP:null);advPhase='pre';advQueue=curSc.pre;advIdx=0;
   scr('adv');showLine();}
 function typeLine(text,cb){const el=document.getElementById('advText');el.innerHTML='';advTyping=true;
   const spd=[0,55,40,28,16,8][S.settings.txt]||28;let i=0;
@@ -2477,7 +3769,7 @@ function showLine(){
   const ln=advQueue[advIdx];
   document.getElementById('advChoices').style.display='none';
   document.getElementById('advBox').style.display='';
-  document.getElementById('advProg').textContent='第'+curEp+'話 ▸ '+(advPhase==='pre'?'序盤':'終盤');
+  document.getElementById('advProg').textContent=(advPhase==='prologue')?'第0話 ▸ 前作ダイジェスト':(curEp===109?'エピローグ ▸ 評議会、そして最後の1%へ':(curEp>=101?('スピンオフ#'+(curEp-100)+' ▸ 死者の国'):('第'+curEp+'話 ▸ '+(advPhase==='pre'?'序盤':'終盤'))));
   document.getElementById('advName').textContent=ln.who;
   const ch=document.getElementById('advChar');ch.textContent=ln.face;
   ch.className='adv-char'+(ln.side==='right'?' right':'');
@@ -2512,12 +3804,26 @@ function advNext(){
   advIdx++;
   if(advIdx<advQueue.length){showLine();return;}
   // フェーズ終了処理
+  if(advPhase==='prologue'){ scr('main'); refresh(); return; }
   if(advPhase==='pre'){showChoice();}
   else if(advPhase==='post'){endEpisode();}
 }
 document.getElementById('advBox').onclick=()=>{ if(document.getElementById('advChoices').style.display==='none')advNext(); };
 document.getElementById('advSkip').onclick=()=>{Audio.SE.tap();
-  if(advPhase==='pre'){showChoice();}else{endEpisode();}};
+  if(advPhase==='prologue'){scr('main');refresh();}
+  else if(advPhase==='pre'){showChoice();}else{endEpisode();}};
+// 対戦モード「バトル開始」ボタン
+document.getElementById('vsdStart').onclick=()=>{Audio.SE.tap&&Audio.SE.tap();vsStartBattle();};
+// 対戦モード タブ切り替え
+document.querySelectorAll('#vsTabs .vs-tab').forEach(t=>t.addEventListener('click',()=>{Audio.SE.tap&&Audio.SE.tap();setVsTab(t.dataset.tab);}));
+// アップデート履歴 閉じる
+document.getElementById('clX').onclick=()=>{Audio.SE.back&&Audio.SE.back();document.getElementById('changelog').classList.remove('show');};
+document.getElementById('changelog').addEventListener('click',e=>{if(e.target.id==='changelog'){document.getElementById('changelog').classList.remove('show');}});
+// 寄付モーダルの開閉・リロール
+document.getElementById('dnX').onclick=()=>{Audio.SE.back&&Audio.SE.back();document.getElementById('donate').classList.remove('show');};
+document.getElementById('donate').addEventListener('click',e=>{if(e.target.id==='donate'){document.getElementById('donate').classList.remove('show');}});
+document.getElementById('dnReroll').onclick=()=>{Audio.SE.select&&Audio.SE.select();pickDonateJoke();};
+document.getElementById('dnPay').addEventListener('click',()=>{Audio.SE.confirm&&Audio.SE.confirm();});
 
 function showChoice(){
   // バトルのない話（エピローグ等）：choiceが未定義ならそのまま話を終える
@@ -2579,6 +3885,27 @@ function showAwakeningModal(done){
 function toBattle(){Audio.SE.battle();startBattle(curEp,()=>{advPhase='post';advQueue=curSc.post;advIdx=0;scr("adv");showLine();});}
 
 function endEpisode(){
+  // スピンオフ：本編1〜12話の進行(S.story)・各種報酬ロジックには一切触れない
+  if(curEp>=101){
+    const n=curEp-100;
+    S.nch=Math.max(S.nch||0,n);
+    if(n>=2){S.formUnlocked=S.formUnlocked||{};S.formUnlocked[3]=true;} // 闇のかえる解禁
+    // スピンオフ進行に応じて図鑑のみ(dexOnly)登録：#2闇のかえる(36)/#5クソバカ(37)/#8真！カエル(38)
+    S.dexOnly=S.dexOnly||[];
+    const spinDex=[];
+    if((S.nch||0)>=1)spinDex.push(14);
+    if((S.nch||0)>=2)spinDex.push(36);
+    if((S.nch||0)>=5)spinDex.push(37);
+    if((S.nch||0)>=8)spinDex.push(38);
+    spinDex.forEach(id=>{if(!S.owned.includes(id)&&!S.dexOnly.includes(id))S.dexOnly.push(id);});
+    S.ticketLog.nch=S.ticketLog.nch||[];
+    let g=0;
+    if(!S.ticketLog.nch.includes(n)){S.ticketLog.nch.push(n);S.tickets=Math.min(999,(S.tickets||0)+15);g=15;}
+    save();
+    toast(g?('スピンオフ#'+n+' クリア！ 🎟️+'+g):('スピンオフ#'+n+' クリア！'));
+    scr('main');refresh();buildEps();
+    return;
+  }
   // クリア記録
   const before=S.story;
   if(curEp>=S.story)S.story=curEp+1;
@@ -2664,6 +3991,10 @@ function endEpisode(){
     if(!S.ticketLog.ep11bonus){S.ticketLog.ep11bonus=true;S.tickets+=50;gained+=50;}
     window._gameClearPending=true; // ゲームクリアモーダル表示フラグ（セーブしない一時変数）
   }
+  if(curEp===12){
+    // エピローグ2：バトルなしの会話のみ。新キャラ獲得なし。クリア記念チケットのみ
+    if(!S.ticketLog.ep12bonus){S.ticketLog.ep12bonus=true;S.tickets=Math.min(999,S.tickets+30);gained+=30;}
+  }
   save(); refresh(); buildEps();
   scr('main');
   showUnlock(curEp, justUnlockedGacha, gained);
@@ -2725,6 +4056,192 @@ function showGameClear(){
     s.style.left=(5+Math.random()*90)+'%';s.style.top=(60+Math.random()*30)+'%';
     s.style.animationDuration=(2.5+Math.random()*2)+'s';s.style.animationDelay=(Math.random()*2)+'s';m.appendChild(s);}
   document.getElementById('gcOk').onclick=()=>{Audio.SE.confirm&&Audio.SE.confirm();m.remove();};
+}
+
+/* ===================== 対戦モード ロジック ===================== */
+let vsSelectedOpp=null, vsSelectedDiff=null, vsCurrentTab='story';
+// 解放判定：story進行が unlockEp を超えていれば解放
+function vsIsUnlocked(opp){ return (S.story||1) > opp.unlockEp; }
+// 周回記録キー
+function vsClearKey(oppId,diffKey){ return oppId+'_'+diffKey; }
+function vsHasCleared(oppId,diffKey){ S.vsCleared=S.vsCleared||{}; return !!S.vsCleared[vsClearKey(oppId,diffKey)]; }
+function vsAnyClear(oppId){ return VS_DIFFS.some(d=>vsHasCleared(oppId,d.key)); }
+const RARE_OF=id=>{const c=byId(id);return c?c.rare:'R';};
+
+// タブ切り替え
+function setVsTab(tab){
+  vsCurrentTab=tab;
+  document.querySelectorAll('#vsTabs .vs-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
+  // ボーダーラインの色をタブで変える
+  const dv=document.getElementById('vsmDivline');
+  dv.style.background=tab==='story'?'linear-gradient(90deg,transparent,var(--neon-m),var(--neon-c),transparent)'
+    :tab==='original'?'linear-gradient(90deg,transparent,var(--neon-c),var(--neon-m),transparent)'
+    :'linear-gradient(90deg,transparent,#b478ff,var(--gold),transparent)';
+  const sub=document.getElementById('vsmSub');
+  sub.textContent=tab==='legend'?'伝説の軍団との総力戦':'強敵を倒して、報酬を手に入れろ';
+  renderVsList();
+}
+
+// 相手リストを描画（現在のタブのみ）
+function renderVsList(){
+  const list=document.getElementById('vsmList');
+  list.innerHTML='';
+  VS_OPPONENTS.filter(o=>o.tab===vsCurrentTab).forEach(opp=>{
+    const unlocked=vsIsUnlocked(opp);
+    if(opp.type==='solo'){ list.appendChild(buildSoloCard(opp,unlocked)); }
+    else if(opp.type==='party'){ list.appendChild(buildPartyCard(opp,unlocked)); }
+    else { list.appendChild(buildNormalCard(opp,unlocked)); }
+  });
+}
+
+// 通常パネル（VSタイトル中心）
+function buildNormalCard(opp,unlocked){
+  const card=document.createElement('div');
+  card.className='opp-card '+opp.cat+(unlocked?'':' locked');
+  if(unlocked){
+    const anyClear=vsAnyClear(opp.id);
+    const tagTxt=opp.cat==='special'?'♾️ SPECIAL':'STORY BOSS';
+    const rewardTxt=opp.cat==='special'
+      ? '<span class="rw">🎟️ ×30〜200</span><span class="rw char">🎴 今後</span>'
+      : '<span class="rw">🎟️ ×30〜200</span>';
+    card.innerHTML=`${anyClear?'<span class="opp-clear">✓ CLEAR</span>':''}
+      <div class="opp-face"><div class="ring"></div><span class="ico">${opp.face}</span></div>
+      <div class="opp-info"><div class="opp-vs">VS</div><div class="opp-vstitle">${opp.vsTitle||opp.name}</div><div class="opp-name-sub">${opp.name}</div>
+        <div class="opp-reward">${rewardTxt}</div></div>
+      <div class="opp-arrow">›</div>`;
+    card.onclick=()=>{Audio.SE.select&&Audio.SE.select();vsSelectedOpp=opp;buildVsDiff();scr('vsdiff');};
+  } else {
+    card.innerHTML=`
+      <div class="opp-face"><span class="ico" style="filter:grayscale(1) brightness(.5)">${opp.face}</span><span class="opp-lockicon">🔒</span></div>
+      <div class="opp-info"><div class="opp-vs">VS</div><div class="opp-vstitle">？？？</div><div class="opp-name-sub">${opp.cat==='special'?'♾️ SPECIAL':'STORY BOSS'}</div>
+        <div class="opp-reward"><span class="rw">${unlockLabel(opp)}</span></div></div>`;
+  }
+  return card;
+}
+
+// 単体ボス専用パネル
+function buildSoloCard(opp,unlocked){
+  const card=document.createElement('div');
+  const theme=(opp.bossId===1)?'dev':'inf';
+  card.className='solo-card '+theme;
+  if(!unlocked){
+    card.innerHTML=`<div class="solo-bg"></div><div class="solo-rays"></div>
+      <div class="solo-face" style="filter:grayscale(1) brightness(.4)">${opp.face}</div>
+      <div class="solo-info"><div class="solo-vs">VS</div><div class="solo-vstitle" style="-webkit-text-fill-color:#667">？？？</div>
+        <div class="solo-name">🔒 ${unlockLabel(opp)}</div></div>`;
+    return card;
+  }
+  const rareTxt=(opp.bossId===1)?'??? ':'♾️ INFINITY';
+  const hpTxt=opp.soloHP?kanjiNum(opp.soloHP):'膨大';
+  const anyClear=vsAnyClear(opp.id);
+  card.innerHTML=`<div class="solo-bg"></div><div class="solo-rays"></div>
+    <div class="solo-badge">SOLO BOSS</div><div class="solo-rare">${rareTxt}</div>
+    ${anyClear?'<span class="solo-clear">✓ CLEAR</span>':''}
+    <div class="solo-face">${opp.face}</div>
+    <div class="solo-info">
+      <div class="solo-vs">VS</div><div class="solo-vstitle">${opp.vsTitle}</div>
+      <div class="solo-name">${opp.desc}</div>
+      <div class="solo-foot"><div class="solo-reward"><span class="rw">🎟️ ×30〜200</span><span class="rw">🎴 今後</span></div><div class="solo-go">挑戦 ▶</div></div>
+    </div>`;
+  card.onclick=()=>{Audio.SE.select&&Audio.SE.select();vsSelectedOpp=opp;buildVsDiff();scr('vsdiff');};
+  return card;
+}
+
+// パーティ戦パネル
+function buildPartyCard(opp,unlocked){
+  const card=document.createElement('div');
+  card.className='legend-card';
+  if(!unlocked){
+    card.innerHTML=`<div class="legend-head"><span class="legend-vs">VS</span><span class="legend-vstitle">？？？</span><span class="legend-tag">LEGEND</span></div>
+      <div style="text-align:center;padding:18px;color:#9ad;font-size:12px">🔒 ${unlockLabel(opp)}</div>`;
+    return card;
+  }
+  const anyClear=vsAnyClear(opp.id);
+  const members=opp.party.map((id,i)=>{
+    const isBoss=(id===opp.bossId && i===opp.party.indexOf(opp.bossId));
+    const rare=RARE_OF(id);
+    const label=(opp.partyLabels&&opp.partyLabels[i])||byId(id).name;
+    const face=byId(id).face;
+    return `<div class="lp-member ${isBoss?'lp-boss':''}"><span class="lp-face">${face}</span><span class="lp-rare ${rare}">${rare}</span><span class="lp-name">${label}</span></div>`;
+  }).join('');
+  card.innerHTML=`${anyClear?'<span class="legend-clear">✓ CLEAR</span>':''}
+    <div class="legend-head"><span class="legend-vs">VS</span><span class="legend-vstitle">${opp.vsTitle}</span><span class="legend-tag">LEGEND</span></div>
+    <div class="legend-party">${members}</div>
+    <div class="legend-foot"><div class="legend-reward"><span class="rw">🎟️ ×30〜200</span></div><div class="legend-go">挑戦 ▶</div></div>`;
+  card.onclick=()=>{Audio.SE.select&&Audio.SE.select();vsSelectedOpp=opp;buildVsDiff();scr('vsdiff');};
+  return card;
+}
+
+function unlockLabel(opp){
+  return opp.unlockEp>=11?'エピローグ クリアで解放':('第'+opp.unlockEp+'話クリアで解放');
+}
+
+// 相手選択画面を構築（タブ初期化）
+function buildVsMode(){
+  document.getElementById('vsmTickets').textContent='🎟️ '+(S.tickets||0);
+  setVsTab(vsCurrentTab||'story');
+  spawnVsParticles('vsmParticles',['#ff00d4','#00f0ff','#faff00','#ffffff']);
+}
+
+// 難易度選択画面を構築
+function buildVsDiff(){
+  const opp=vsSelectedOpp; if(!opp)return;
+  vsSelectedDiff=null;
+  let partyMini='';
+  if(opp.type==='party'){
+    partyMini='<div style="display:flex;gap:6px;justify-content:center;margin-top:8px;position:relative;z-index:2">'+
+      opp.party.map((id,i)=>{const isBoss=(id===opp.bossId&&i===opp.party.indexOf(opp.bossId));
+        return `<span style="font-size:${isBoss?28:20}px;filter:drop-shadow(0 0 6px ${isBoss?'#b478ff':'rgba(180,120,255,.4)'})">${byId(id).face}</span>`;}).join('')+'</div>';
+  }
+  document.getElementById('vsdTarget').innerHTML=`
+    <div class="tg-rays"></div>
+    <div class="bigface">${opp.face}</div>
+    <div class="tgname" style="font-size:15px;letter-spacing:2px;color:#ff9ad0">VS</div>
+    <div class="tgname">${opp.vsTitle||opp.name}</div>
+    <div class="tgdesc">${opp.desc}</div>${partyMini}`;
+  // ターゲットに火花
+  const tg=document.getElementById('vsdTarget');
+  for(let i=0;i<8;i++){const s=document.createElement('div');s.className='spark';s.textContent=['✦','✧','·'][i%3];
+    s.style.cssText=`position:absolute;color:#ff0030;font-size:12px;z-index:2;pointer-events:none;left:${15+Math.random()*70}%;top:${30+Math.random()*50}%;animation:vsmTgSpark ${2+Math.random()*2}s ease-in infinite ${Math.random()*3}s`;
+    tg.appendChild(s);}
+  const dl=document.getElementById('vsdList');
+  dl.innerHTML='';
+  VS_DIFFS.forEach(d=>{
+    const cleared=vsHasCleared(opp.id,d.key);
+    const card=document.createElement('div');
+    card.className='diff-card '+d.key;
+    const tkShow=cleared?Math.round(d.tk*0.3):d.tk;
+    card.innerHTML=`${d.key==='nightmare'?'<div class="nightmare-rays"></div><div class="nightmare-badge">NIGHTMARE</div>':''}
+      <div class="diff-stars">${d.stars}</div>
+      <div class="diff-mid"><div class="diff-name">${d.name}</div><div class="diff-enemy">敵Lv ${d.lv}${d.key==='easy'?' / 弱体化':d.key==='nightmare'?' / 超強化':''}</div></div>
+      <div class="diff-rw"><div class="tk">×${tkShow}</div><div class="tklabel">TICKETS</div>${d.bonus?`<div class="bonus">${d.bonus}</div>`:''}${cleared?'<div class="visited">クリア済(報酬30%)</div>':''}</div>`;
+    card.onclick=()=>{Audio.SE.select&&Audio.SE.select();vsSelectedDiff=d;
+      dl.querySelectorAll('.diff-card').forEach(c=>c.classList.remove('sel'));card.classList.add('sel');};
+    dl.appendChild(card);
+  });
+  spawnVsParticles('vsdParticles',['#ff0030','#ff6080','#ffd700','#ffffff']);
+}
+
+// バトル開始
+function vsStartBattle(){
+  const opp=vsSelectedOpp, d=vsSelectedDiff;
+  if(!opp){return;}
+  if(!d){toast('難易度を選んでください');return;}
+  Audio.SE.confirm&&Audio.SE.confirm();
+  startVsBattle(opp,d);
+}
+
+// パーティクル生成
+function spawnVsParticles(id,colors){
+  const c=document.getElementById(id);if(!c)return;c.innerHTML='';
+  for(let i=0;i<22;i++){
+    const p=document.createElement('div');p.className='vsm-pt';
+    const size=2+Math.random()*5;
+    p.style.width=size+'px';p.style.height=size+'px';p.style.left=Math.random()*100+'%';p.style.bottom='-10px';
+    const col=colors[i%colors.length];p.style.background=col;p.style.boxShadow=`0 0 ${size*2}px ${col}`;
+    p.style.animationDuration=(5+Math.random()*7)+'s';p.style.animationDelay=(Math.random()*8)+'s';
+    c.appendChild(p);
+  }
 }
 
 /* ===================== パーティー編成 ===================== */
@@ -3324,6 +4841,26 @@ const BD={
        {n:"ふんばる",d:"このターン被ダメ大幅減＋テンション+25",pow:0,mp:60,tgt:"self",guard:true,ten:25},
        {n:"やさしいバリア",d:"味方全体DEF+25%",pow:0,mp:120,tgt:"allyAll",buf:{DEF:0.25,t:3}}],
      ults:[{n:"やさしい雨",d:"3ターン味方全体被ダメ-50%＋大回復＋自分に反射",pow:0,tgt:"self",selfbuf:{DEF:0.5,t:3},reflect:true,allybuf:{DEF:0.3,t:3},healAll:0.3,ultfx:"rain_heal"}]},
+  36:{alloc:[1500,400,950,520],baseHP:3000,roles:["アタッカー"],
+     passives:["狂気：通常攻撃の威力+500%。さらに通常攻撃の度に再行動できる（各ターン4回まで）","闇の心：通常攻撃の後、自身のテンションを100%にする"],
+     skills:[
+       {n:"嬲り",d:"単体にATK160%",pow:1.6,mp:50,tgt:"one"},
+       {n:"愉悦",d:"自分ATK+40%(3T)＋テンション+30",pow:0,mp:70,tgt:"self",selfbuf:{ATK:0.4,t:3},ten:30}],
+     ults:[{n:"凄惨なる血の雨",d:"敵全体に攻撃力30%×30回（滅多刺し）",pow:0.30,tgt:"all",hits:30,ultfx:"blood_rain"}]},
+  37:{alloc:[6500,2400,3200,2200],baseHP:90000,roles:["アタッカー"],
+     passives:["断鬼の太刀：鬼・堕天使の『鬼の体』を貫通して斬り伏せる","闘気充填：バトル開始時、自身のテンションが100%になる","不屈の刃：仲間を守るほど、刃は冴える","妹を探して：決して諦めない心"],
+     skills:[
+       {n:"水面斬り",d:"単体にATK130%",pow:1.3,mp:40,tgt:"one"},
+       {n:"連ノ太刀",d:"単体にATK70%×3回",pow:0.7,mp:90,tgt:"one",hits:3},
+       {n:"緋の構え",d:"自分ATK+45%(3T)＋テンション+20",pow:0,mp:70,tgt:"self",selfbuf:{ATK:0.45,t:3},ten:20}],
+     ults:[{n:"緋焔・昇り龍",d:"敵全体に攻撃力20%×50回（炎の龍を描く斬撃）",pow:0.2,tgt:"all",hits:50,ultfx:"true_dev"}]},
+  38:{alloc:[8000,3000,3500,3000],baseHP:150000,roles:["アタッカー"],
+     passives:["光と闇の融合：すべての攻撃に、光と闇が宿る","現実改変：戦況を覆す、無限の力","揺るがぬ心：状態異常を受けつけない"],
+     skills:[
+       {n:"双魂撃",d:"単体にATK140%",pow:1.4,mp:40,tgt:"one"},
+       {n:"無限連撃",d:"単体にATK90%×4回",pow:0.9,mp:100,tgt:"one",hits:4},
+       {n:"静かなる構え",d:"自分ATK+50%(3T)＋テンション+25",pow:0,mp:80,tgt:"self",selfbuf:{ATK:0.5,t:3},ten:25}],
+     ults:[{n:"交差する光と闇",d:"敵全体に攻撃力25%×60回（光と闇が交差し、すべてを断つ）",pow:0.25,tgt:"all",hits:60,ultfx:"true_dev"}]},
   4:{alloc:[300,300,380,500],baseHP:3200,roles:["トリッキー","デバフ"],
      passives:["異星の知覚：自身の与えるデバフ効果+50%・命中率上昇","あうー（理解者）：味方全体のSPD+15%","謎の勘：被デバフを無効化・たまに敵の必殺を遅延"],
      skills:[
@@ -3523,6 +5060,124 @@ const BD={
        {n:"事象の修正",d:"敵全体ATK-50%/DEF-50%(3T)",pow:0,mp:0,tgt:"all",deb:{ATK:-0.5,DEF:-0.5,t:3}},
        {n:"観測記録・抹消",d:"敵単体ATK600%",pow:6.0,mp:0,tgt:"one"}],
      ults:[{n:"観測終了",d:"敵全体に攻撃力400%×3回＋3ターン行動不可",pow:4.0,tgt:"all",hits:3,stunAll:3,ultfx:"true_dev"}]},
+  // ===== 対戦モード専用 敵（id400〜）レアリティ順にステータス上昇 =====
+  // --- R（最弱）---
+  400:{alloc:[420,260,360,200],baseHP:2600,roles:["VS敵"],
+     passives:["増殖：HP30%以下で与ダメ+30%"],
+     skills:[{n:"バグ噴出",d:"単体ATK130%",pow:1.3,mp:0,tgt:"one"},{n:"エラー連鎖",d:"敵全体ATK90%",pow:0.9,mp:0,tgt:"all"}],
+     ults:[{n:"システムクラッシュ",d:"敵全体ATK200%",pow:2.0,tgt:"all"}]},
+  401:{alloc:[380,240,300,220],baseHP:2400,roles:["VS敵"],
+     passives:["物量：通常攻撃が2回ヒット"],
+     skills:[{n:"スパム爆撃",d:"敵全体ATK85%",pow:0.85,mp:0,tgt:"all"},{n:"迷惑メール",d:"単体ATK110%＋SPD-15%",pow:1.1,mp:0,tgt:"one",deb:{SPD:-0.15,t:2}}],
+     ults:[{n:"無限送信",d:"敵全体ATK180%×2",pow:1.8,tgt:"all",hits:2}]},
+  402:{alloc:[450,280,320,180],baseHP:2800,roles:["VS敵"],
+     passives:["無秩序：毎ターンATK+10%"],
+     skills:[{n:"暴走実行",d:"単体ATK140%",pow:1.4,mp:0,tgt:"one"},{n:"無限ループ",d:"単体ATK80%×3",pow:0.8,mp:0,tgt:"one",hits:3}],
+     ults:[{n:"スタックオーバーフロー",d:"敵全体ATK210%",pow:2.1,tgt:"all"}]},
+  // --- SR（中堅）---
+  403:{alloc:[900,520,820,360],baseHP:6500,roles:["VS敵"],
+     passives:["俊敏：SPD+20%","狩りの本能：攻撃時25%でSPD-25%(2T)"],
+     skills:[{n:"電子の牙",d:"単体ATK160%",pow:1.6,mp:0,tgt:"one"},{n:"群狼の咆哮",d:"敵全体ATK110%＋ATK-15%(3T)",pow:1.1,mp:0,tgt:"all",deb:{ATK:-0.15,t:3}}],
+     ults:[{n:"ハウリング",d:"敵全体ATK260%",pow:2.6,tgt:"all"}]},
+  404:{alloc:[820,1100,500,400],baseHP:9000,roles:["VS敵","タンク"],
+     passives:["装甲：被ダメ-20%","自己修復：毎ターンHP8%回復"],
+     skills:[{n:"鉄拳制裁",d:"単体ATK180%",pow:1.8,mp:0,tgt:"one"},{n:"防御態勢",d:"自身DEF+150%(3T)",pow:0,mp:0,tgt:"self",selfbuf:{DEF:1.5,t:3}}],
+     ults:[{n:"殲滅モード",d:"敵全体ATK240%",pow:2.4,tgt:"all"}]},
+  405:{alloc:[1000,480,900,420],baseHP:6200,roles:["VS敵","トリッキー"],
+     passives:["幻惑：攻撃時30%で相手のテンション-20"],
+     skills:[{n:"幻影の舞",d:"敵全体ATK120%＋SPD-20%(2T)",pow:1.2,mp:0,tgt:"all",deb:{SPD:-0.2,t:2}},{n:"惑わしの一撃",d:"単体ATK150%(命中90%)",pow:1.5,mp:0,tgt:"one",acc:0.9}],
+     ults:[{n:"魅了の輪舞",d:"敵全体ATK250%＋沈黙",pow:2.5,tgt:"all",silenceAll:true}]},
+  // --- SSR（強敵）---
+  406:{alloc:[1500,1900,800,600],baseHP:16000,roles:["VS敵","タンク"],
+     passives:["鉄壁：被ダメ-30%","守護者：HP50%以下でDEF+50%","反撃：被弾時20%で反撃"],
+     skills:[{n:"大剣強打",d:"単体ATK200%",pow:2.0,mp:0,tgt:"one"},{n:"挑発の構え",d:"自身に挑発＋DEF+120%(3T)",pow:0,mp:0,tgt:"self",selfbuf:{DEF:1.2,t:3},taunt:true},{n:"シールドバッシュ",d:"単体ATK160%＋ATK-20%(3T)",pow:1.6,mp:0,tgt:"one",deb:{ATK:-0.2,t:3}}],
+     ults:[{n:"聖騎士の裁き",d:"敵全体ATK300%",pow:3.0,tgt:"all"}]},
+  407:{alloc:[2200,900,1100,800],baseHP:13000,roles:["VS敵","アタッカー"],
+     passives:["魔力増幅：必殺技ダメ+30%","紅蓮：攻撃時HP5%燃焼ダメージ追加"],
+     skills:[{n:"火炎弾",d:"単体ATK220%",pow:2.2,mp:0,tgt:"one"},{n:"業火の渦",d:"敵全体ATK160%",pow:1.6,mp:0,tgt:"all"},{n:"フレイムランス",d:"単体ATK130%×3",pow:1.3,mp:0,tgt:"one",hits:3}],
+     ults:[{n:"獄炎劫火",d:"敵全体ATK380%",pow:3.8,tgt:"all",ultfx:"flame"}]},
+  408:{alloc:[2000,1200,1300,500],baseHP:15000,roles:["VS敵","アタッカー"],
+     passives:["双頭：毎ターン2回行動する","獰猛：与ダメ+20%"],
+     skills:[{n:"二連噛みつき",d:"単体ATK140%×2",pow:1.4,mp:0,tgt:"one",hits:2},{n:"威嚇咆哮",d:"敵全体ATK-25%(3T)",pow:0,mp:0,tgt:"all",deb:{ATK:-0.25,t:3}}],
+     ults:[{n:"双頭の蹂躙",d:"敵ランダムATK200%×4",pow:2.0,tgt:"randomMulti",hits:4}]},
+  // --- UR（かなり強い）---
+  409:{alloc:[3400,1600,2000,900],baseHP:34000,roles:["VS敵","アタッカー"],
+     passives:["竜鱗：被ダメ-25%","嵐の加護：SPD+30%","逆鱗：HP40%以下でATK+60%"],
+     skills:[{n:"暴風爪",d:"単体ATK240%",pow:2.4,mp:0,tgt:"one"},{n:"嵐の息吹",d:"敵全体ATK190%＋SPD-20%(2T)",pow:1.9,mp:0,tgt:"all",deb:{SPD:-0.2,t:2}},{n:"雷鳴突撃",d:"単体ATK170%×2",pow:1.7,mp:0,tgt:"one",hits:2}],
+     ults:[{n:"天雷爆風",d:"敵全体ATK420%＋3ターン行動不可なし",pow:4.2,tgt:"all",ultfx:"thunder"}]},
+  410:{alloc:[2800,2800,700,800],baseHP:46000,roles:["VS敵","タンク"],
+     passives:["巨体：被ダメ-35%","不動：デバフ完全無効","大地の力：毎ターンHP10%回復"],
+     skills:[{n:"岩石粉砕",d:"単体ATK260%",pow:2.6,mp:0,tgt:"one"},{n:"大地震",d:"敵全体ATK200%＋SPD-30%(2T)",pow:2.0,mp:0,tgt:"all",deb:{SPD:-0.3,t:2}},{n:"防壁形成",d:"自身DEF+200%(3T)",pow:0,mp:0,tgt:"self",selfbuf:{DEF:2.0,t:3}}],
+     ults:[{n:"岩盤崩落",d:"敵全体ATK400%",pow:4.0,tgt:"all"}]},
+  411:{alloc:[3600,1800,1900,1000],baseHP:36000,roles:["VS敵","アタッカー"],
+     passives:["堕天：与ダメ+25%","聖邪両刀：必殺技後HP20%回復","不屈：HP0で1度だけHP30%復活"],
+     skills:[{n:"堕光の刃",d:"単体ATK250%",pow:2.5,mp:0,tgt:"one"},{n:"漆黒の翼",d:"敵全体ATK180%",pow:1.8,mp:0,tgt:"all"},{n:"贖罪の祈り",d:"自身HP35%回復＋ATK+30%(3T)",pow:0,mp:0,tgt:"self",selfheal:0.35,selfbuf:{ATK:0.3,t:3}}],
+     ults:[{n:"審判の裁き",d:"敵全体ATK440%",pow:4.4,tgt:"all",ultfx:"holy"}]},
+  // --- PRED（超強敵）---
+  412:{alloc:[5200,2600,2800,1400],baseHP:88000,roles:["VS敵","アタッカー"],
+     passives:["魔王の威圧：開始時敵全体ATK-30%(3T)","絶望：与ダメ+40%","再生：毎ターンHP12%回復","被デバフ無効"],
+     skills:[{n:"魔王の一撃",d:"単体ATK320%",pow:3.2,mp:0,tgt:"one"},{n:"暗黒波動",d:"敵全体ATK260%",pow:2.6,mp:0,tgt:"all"},{n:"呪詛",d:"敵全体ATK-30%/DEF-30%(3T)",pow:0,mp:0,tgt:"all",deb:{ATK:-0.3,DEF:-0.3,t:3}},{n:"地獄の連撃",d:"単体ATK200%×3",pow:2.0,mp:0,tgt:"one",hits:3}],
+     ults:[{n:"絶望の終焉",d:"敵全体ATK520%×2",pow:5.2,tgt:"all",hits:2,ultfx:"dark"}]},
+  413:{alloc:[5800,3000,2400,1200],baseHP:99000,roles:["VS敵","アタッカー"],
+     passives:["古龍の鱗：被ダメ-40%","災厄：与ダメ+45%","龍の怒り：毎ターンATK+15%","被デバフ無効"],
+     skills:[{n:"災禍の爪",d:"単体ATK340%",pow:3.4,mp:0,tgt:"one"},{n:"龍息ブレス",d:"敵全体ATK280%",pow:2.8,mp:0,tgt:"all"},{n:"破壊の咆哮",d:"敵全体DEF-40%(3T)＋自身ATK+40%(3T)",pow:0,mp:0,tgt:"all",deb:{DEF:-0.4,t:3},selfbuf:{ATK:0.4,t:3}}],
+     ults:[{n:"天地崩壊",d:"敵全体ATK560%",pow:5.6,tgt:"all",ultfx:"flame"}]},
+  414:{alloc:[6000,2400,3200,1400],baseHP:84000,roles:["VS敵","トリッキー"],
+     passives:["虚無：攻撃時30%で相手を即死(確率)","消滅：与ダメ+40%","不可視：被ダメ-35%","被デバフ無効"],
+     skills:[{n:"虚無の手",d:"単体ATK330%",pow:3.3,mp:0,tgt:"one"},{n:"消滅の波",d:"敵全体ATK270%",pow:2.7,mp:0,tgt:"all"},{n:"存在抹消",d:"単体ATK450%(命中85%)",pow:4.5,mp:0,tgt:"one",acc:0.85},{n:"虚空招来",d:"敵全体ATK-35%(3T)",pow:0,mp:0,tgt:"all",deb:{ATK:-0.35,t:3}}],
+     ults:[{n:"無への回帰",d:"敵全体ATK540%＋沈黙",pow:5.4,tgt:"all",silenceAll:true,ultfx:"void"}]},
+  415:{alloc:[5500,2800,3000,1500],baseHP:92000,roles:["VS敵","アタッカー"],
+     passives:["女王の威厳：開始時敵全体SPD-30%(3T)","終焉：与ダメ+40%","君臨：毎ターンATK+12%/DEF+12%","被デバフ無効"],
+     skills:[{n:"断罪の一閃",d:"単体ATK330%",pow:3.3,mp:0,tgt:"one"},{n:"終焉の宣告",d:"敵全体ATK270%",pow:2.7,mp:0,tgt:"all"},{n:"絶対命令",d:"敵全体ATK-30%(3T)＋自身全能力+30%(3T)",pow:0,mp:0,tgt:"all",deb:{ATK:-0.3,t:3},selfbuf:{ATK:0.3,DEF:0.3,SPD:0.3,t:3}},{n:"処刑の刃",d:"単体ATK220%×3",pow:2.2,mp:0,tgt:"one",hits:3}],
+     ults:[{n:"世界の終わり",d:"敵全体ATK550%×2",pow:5.5,tgt:"all",hits:2,ultfx:"dark"}]},
+  // --- INFINITY（最強格：PRED/INFINITY編成でギリギリ）---
+  416:{alloc:[9000,4500,5500,3000],baseHP:240000,roles:["VS敵","アタッカー"],
+     passives:["創造神の権能：毎ターンATK+50%/DEF+50%","無限再生：毎ターンHP18%回復","神域：被ダメ-50%","被デバフ無効","神罰：HP50%以下で与ダメ+80%"],
+     skills:[{n:"星屑の槍",d:"単体ATK450%",pow:4.5,mp:0,tgt:"one"},{n:"創世の光",d:"敵全体ATK380%",pow:3.8,mp:0,tgt:"all"},{n:"次元再構築",d:"自身HP30%回復＋全能力+50%(3T)",pow:0,mp:0,tgt:"self",selfheal:0.3,selfbuf:{ATK:0.5,DEF:0.5,SPD:0.5,t:3}},{n:"流星群",d:"敵全体ATK220%×3",pow:2.2,mp:0,tgt:"all",hits:3}],
+     ults:[{n:"ビッグバン",d:"敵全体ATK650%×3",pow:6.5,tgt:"all",hits:3,ultfx:"cosmic"}]},
+  417:{alloc:[9500,5000,5000,3000],baseHP:230000,roles:["VS敵","アタッカー"],
+     passives:["絶対零度：攻撃時40%で相手SPD-50%(2T)","氷結界：被ダメ-50%","凍てつく支配：毎ターン敵全体SPD-15%","被デバフ無効","極寒：毎ターンATK+45%"],
+     skills:[{n:"氷晶の刃",d:"単体ATK460%",pow:4.6,mp:0,tgt:"one"},{n:"絶対零度",d:"敵全体ATK390%＋SPD-30%(2T)",pow:3.9,mp:0,tgt:"all",deb:{SPD:-0.3,t:2}},{n:"氷の牢獄",d:"単体ATK300%＋沈黙",pow:3.0,mp:0,tgt:"one",silence:1.0},{n:"ブリザード",d:"敵全体ATK230%×3",pow:2.3,mp:0,tgt:"all",hits:3}],
+     ults:[{n:"永久凍土",d:"敵全体ATK640%×2＋3ターン行動不可",pow:6.4,tgt:"all",hits:2,stunAll:3,ultfx:"ice"}]},
+  418:{alloc:[10000,4000,6000,3000],baseHP:225000,roles:["VS敵","トリッキー"],
+     passives:["次元喰らい：攻撃時35%で相手のバフを全消去","空間歪曲：被ダメ-55%","虚空の胃袋：与ダメの30%をHP吸収","被デバフ無効","暴食：毎ターン与ダメ+15%累積"],
+     skills:[{n:"空間の顎",d:"単体ATK470%",pow:4.7,mp:0,tgt:"one"},{n:"次元断裂",d:"敵全体ATK400%",pow:4.0,mp:0,tgt:"all"},{n:"重力崩壊",d:"敵全体ATK250%＋DEF-40%(3T)",pow:2.5,mp:0,tgt:"all",deb:{DEF:-0.4,t:3}},{n:"喰らい尽くす",d:"単体ATK330%×3",pow:3.3,mp:0,tgt:"one",hits:3}],
+     ults:[{n:"特異点",d:"敵全体ATK660%×2",pow:6.6,tgt:"all",hits:2,ultfx:"void"}]},
+  419:{alloc:[11000,5500,6500,4000],baseHP:280000,roles:["VS敵","アタッカー"],
+     passives:["全知：全ロール効果を内包","全能：毎ターンATK+60%/DEF+60%","絶対防御：被ダメ-55%","不滅：HP0で1度だけHP全回復","被デバフ無効","超越：HP50%以下で与ダメ+100%"],
+     skills:[{n:"全能の一撃",d:"単体ATK500%",pow:5.0,mp:0,tgt:"one"},{n:"神威解放",d:"敵全体ATK420%",pow:4.2,mp:0,tgt:"all"},{n:"絶対律法",d:"敵全体ATK-40%/DEF-40%(3T)＋自身全能力+60%(3T)",pow:0,mp:0,tgt:"all",deb:{ATK:-0.4,DEF:-0.4,t:3},selfbuf:{ATK:0.6,DEF:0.6,SPD:0.6,t:3}},{n:"裁きの連撃",d:"単体ATK280%×4",pow:2.8,mp:0,tgt:"one",hits:4}],
+     ults:[{n:"全知全能",d:"敵全体ATK720%×3",pow:7.2,tgt:"all",hits:3,ultfx:"cosmic"}]},
+  // ===== 伝説の英霊達 専用ボス =====
+  // 真ゼウス：全パッシブを別次元に強化した全能神。通常ゼウス(22)より遥かに強い
+  420:{alloc:[7500,3800,4200,2000],baseHP:130000,roles:["VS敵","全能神"],
+     passives:["全能神の威光：毎ターンATK+60%/DEF+60%","神王の支配：開始時敵全体ATK-40%(3T)","雷霆無双：与ダメ+60%","神々の加護：毎ターンHP15%回復＋味方全体ATK+30%","審判者：HP50%以下で与ダメ+80%"],
+     skills:[{n:"神罰の雷",d:"単体ATK360%",pow:3.6,mp:0,tgt:"one"},{n:"天空の怒り",d:"敵全体ATK300%",pow:3.0,mp:0,tgt:"all"},{n:"神威の号令",d:"味方全体ATK+50%/DEF+50%(3T)",pow:0,mp:0,tgt:"allyAll",buf:{ATK:0.5,DEF:0.5,t:3}},{n:"裁きの連雷",d:"単体ATK230%×3",pow:2.3,mp:0,tgt:"one",hits:3}],
+     ults:[{n:"神々の黄昏",d:"敵全体ATK600%×2＋3ターン行動不可",pow:6.0,tgt:"all",hits:2,stunAll:3,ultfx:"thunder"}]},
+  // マルチバーサルウォッチャー：ウォッチャーの上位。超耐久＋全体管理
+  421:{alloc:[4500,2400,9500,3000],baseHP:200000,roles:["VS敵","管理者"],
+     passives:["多元観測：受けるダメージを95%カット","因果統括：毎ターンHP25%回復＋味方全体のデバフ解除＋味方全体DEF+40%","複数次元の壁：HP0でも2回まで全回復で復活","観測者の加護：味方ウォッチャーが居る限り与ダメ+50%"],
+     skills:[{n:"多元の眼差し",d:"自身に挑発＋DEF+250%(3T)",pow:0,mp:0,tgt:"self",selfbuf:{DEF:2.5,t:3},taunt:true},{n:"次元統括障壁",d:"味方全体にATK×4のシールド",pow:0,mp:0,tgt:"allyAll",shieldRatioAll:4.0},{n:"事象の抹消",d:"敵全体ATK-50%/DEF-50%(3T)",pow:0,mp:0,tgt:"all",deb:{ATK:-0.5,DEF:-0.5,t:3}},{n:"観測記録・完全抹消",d:"敵単体ATK700%",pow:7.0,mp:0,tgt:"one"}],
+     ults:[{n:"全宇宙観測終了",d:"敵全体ATK450%×3＋3ターン行動不可",pow:4.5,tgt:"all",hits:3,stunAll:3,ultfx:"true_dev"}]},
+  // マルチバーサルインフィニティ：時間と共に無限に強化。デバフ無効なし
+  422:{alloc:[9000,4500,5000,3000],baseHP:300000,roles:["VS敵","無限"],
+     passives:["無限の循環：毎ターンATK+80%/DEF+80%、HP15%回復","完全なる無：受けるダメージを70%カット","不滅の概念：HP0でも3回まで全回復で復活","無限増殖：ターン経過で与ダメ+20%累積"],
+     skills:[{n:"無限の刃",d:"単体ATK420%",pow:4.2,mp:0,tgt:"one"},{n:"虚無の波動",d:"敵全体ATK350%",pow:3.5,mp:0,tgt:"all"},{n:"次元の再構築",d:"自身HP30%回復＋全能力+80%(3T)",pow:0,mp:0,tgt:"self",selfheal:0.3,selfbuf:{ATK:0.8,DEF:0.8,SPD:0.8,t:3}},{n:"無限連撃",d:"単体ATK200%×4",pow:2.0,mp:0,tgt:"one",hits:4}],
+     ults:[{n:"無限のパワーソース",d:"自ATK10%を敵全体に＋自身テンション全回復＋自ATK/DEF永久+200%",pow:0.10,tgt:"all",infPowerSource:true,ultfx:"cosmic"}]},
+  // かえる（天国の歌声）：HP2億。天国の歌＝攻撃時に他味方HP20%減＋自DEF+1000%
+  423:{alloc:[3000,1500,1800,1000],baseHP:2000000,roles:["VS敵","歌声"],
+     passives:["天国の歌：攻撃時、自身以外の味方全員のHPを20%減らし、自身の防御力を1000%上昇させる","深い悲しみ：被ダメ-50%","残響：毎ターンHP10%回復"],
+     skills:[{n:"哀しみの旋律",d:"単体ATK200%",pow:2.0,mp:0,tgt:"one"},{n:"鎮魂歌",d:"敵全体ATK160%",pow:1.6,mp:0,tgt:"all"},{n:"慟哭",d:"敵全体ATK-30%(3T)",pow:0,mp:0,tgt:"all",deb:{ATK:-0.3,t:3}}],
+     ults:[{n:"天国からの大合唱",d:"敵全体ATK400%×2",pow:4.0,tgt:"all",hits:2,ultfx:"holy"}]},
+  // ピエンターズ（現実世界の歪み）：HP100億。次元間の移動＝必殺後に追加1回行動
+  424:{alloc:[12000,6000,7000,4000],baseHP:10000000000,roles:["VS敵","歪み"],
+     passives:["次元間の移動：必殺技使用後、追加で1回だけ行動する（各ターン1度のみ）","現実の歪曲：受けるダメージを60%カット","想いの具現：毎ターンATK+50%/DEF+50%","全生命の集合：毎ターンHP10%回復","終焉の権能：HP50%以下で与ダメ+100%"],
+     skills:[{n:"歪みの一撃",d:"単体ATK450%",pow:4.5,mp:0,tgt:"one"},{n:"現実崩壊",d:"敵全体ATK380%",pow:3.8,mp:0,tgt:"all"},{n:"消滅の手招き",d:"単体ATK500%(命中90%)",pow:5.0,mp:0,tgt:"one",acc:0.9},{n:"次元断層",d:"敵全体ATK-40%/DEF-40%(3T)",pow:0,mp:0,tgt:"all",deb:{ATK:-0.4,DEF:-0.4,t:3}}],
+     ults:[{n:"ALL DELETE",d:"敵全体に攻撃力1%×30回→その後、敵全体のHPを1にする",pow:0.01,tgt:"all",hits:30,allDelete:true,ultfx:"all_delete"}]},
+  // 絶！かえる：並行世界の守護者。超耐久＋味方を守る盾。他の絶！フォルムと同格PRED
+  425:{alloc:[3000,1800,9000,2500],baseHP:180000,roles:["VS敵","守護","タンク"],
+     passives:["絶対の盾：受けるダメージを60%カット","友を守る者：味方が攻撃を受ける時、代わりにかえるが肩代わりする（挑発常時）","不屈の友情：HP0でも2回まで全回復で復活","深い絆：毎ターンHP20%回復＋味方全体DEF+40%","被デバフ完全無効"],
+     skills:[{n:"守りの咆哮",d:"自身DEF+300%(3T)＋挑発",pow:0,mp:0,tgt:"self",selfbuf:{DEF:3.0,t:3},taunt:true},{n:"友の盾",d:"味方全体にATK×4のシールド",pow:0,mp:0,tgt:"allyAll",shieldRatioAll:4.0},{n:"渾身の一撃",d:"単体ATK280%",pow:2.8,mp:0,tgt:"one"},{n:"鎮魂の波動",d:"敵全体ATK-40%(3T)",pow:0,mp:0,tgt:"all",deb:{ATK:-0.4,t:3}}],
+     ults:[{n:"絶対防衛圏",d:"味方全体にATK×8のシールド＋全員DEF+200%(3T)＋自身HP全回復",pow:0,tgt:"allyAll",shieldRatioAll:8.0,buf:{DEF:2.0,t:3},selfheal:1.0,ultfx:"legend_kaeru"}]},
   // ===== ガチャ産キャラ =====
   6:{alloc:[420,260,320,300],baseHP:1700,roles:["アタッカー","デバフ"],
      passives:["論点ずらし：攻撃時20%で相手の守るを無効","自称No.1：先制時ATK+15%","マウント体質：相手バフを稀に奪う"],
@@ -3701,6 +5356,9 @@ const GACHA_NAMES_B=["論客","狂信者","賢者","剣士","守護者","破壊�
 /* ---- 雑魚（モブ）データ：個別HP/行動あり・ボスより弱い ---- */
 // ステージごとの雑魚テーマ（face/名前）。4体分。
 const STAGE_MOBS={
+  105:{name:"吸血鬼天使",faces:["🧛","🧛","🧛","🧛"]},
+  106:{name:"吸血鬼天使",faces:["🧛","🧛","🧛","🧛"]},
+  107:{name:"天使",faces:["👼","👼","👼","👼"]},
   1:{name:"通知の群れ",faces:["🔔","💬","📣","🔁"]},
   2:{name:"森のざわめき",faces:["🌫️","🍂","🐛","🦗"]},
   3:{name:"ゾンビの群れ",faces:["🧟","🧟‍♂️","🧟‍♀️","👹"]},
@@ -3711,6 +5369,7 @@ const STAGE_MOBS={
   8:{name:"自演の影",faces:["👥","🎭","🪞","🌑"]},
   9:{name:"凍結の番人",faces:["❄️","🧊","🔒","⛓️"]},
   10:{name:"過去の亡霊",faces:["👻","🕯️","💀","🌫️"]},
+  102:{name:"警官",faces:["👮","👮","👮","👮"]},
 };
 // 雑魚の基礎データ（弱め・ロールは適当に散らす）
 const MOB_KIT={
@@ -3739,14 +5398,231 @@ function makeMob(face,name,lv,rare){
 
 /* ---- ステージのボス編成 ---- */
 function bossLevel(ep){return ep*5;}
+/* ===================== 対戦モード データ ===================== */
+// 対戦相手。unlockEp=この話をクリアすると解放。bossId=戦闘で出すキャラID。
+// cat:'boss'=ストーリーボス / 'special'=特別な強敵。mobs=随伴雑魚(任意)。
+/* ===================== アップデート履歴 ===================== */
+// 新しいバージョンを上に追加していく。type: 'add'=追加 / 'fix'=修正 / ''=変更
+// 寄付モーダル用ジョーク100個（クスッと笑える寄付の誘い文句）。ランダムで1つ表示。
+const DONATE_JOKES=[
+  "このゲーム、広告ゼロ。理由？　開発者が広告の貼り方を調べる気力すら、もう残ってないからです。",
+  "課金要素はありません。代わりに『家賃』という名のラスボスが、開発者の前に現れました。",
+  "あなたの投げ銭で、開発者は今日もレスバに勝てます。…精神的に。",
+  "寄付は完全に任意です。でも、田村くんが、こちらを見ています。",
+  "コーヒー一杯ぶんで、徹夜のバグ取りが3時間ほど延長されます。ありがとうございます。",
+  "このボタンを押したあなたは、もう『ただのプレイヤー』ではありません。『パトロン』です。たぶん。",
+  "『広告を貼らないやさしさが、家賃を払えない呪いになる』――前作のあの設定、実話でした。",
+  "100円。それは、開発者が『もう一話だけ作るか』と思える、ギリギリの金額です。",
+  "寄付してくれたら、次の敵キャラに、あなたへの感謝を込めて『弱め』に設定します。",
+  "投げ銭は、ねこの治療費に消えます。…うそです。からあげになります。",
+  "『無料で十分おもしろい』と言ってくれる人が一番好きです。次に好きなのは、投げ銭してくれる人です。",
+  "このゲームの制作費の内訳：情熱90%、コーヒー9%、あなたの投げ銭で増える予定の1%。",
+  "寄付ボタンを実装するのに3時間かかりました。元を取らせてください。",
+  "ウォッチャーですら、最後は心を動かされました。あなたの財布は、どうですか？",
+  "1円でもうれしいです。1万円だと、開発者が泣いて新章を3つ作ります。",
+  "見返りはありません。強いて言えば、開発者の『ありがとう』という名のレビューが1件増えます。",
+  "課金で強くなる要素はゼロ。でも投げ銭すると、人間として、ちょっと強くなった気がします。",
+  "このゲームは無料です。これからもずっと。だからこそ、押し売りはしません。…でも、ここにボタンはあります。",
+  "かえるが言いました。『お金は、心を動かすための、ただの手段だよ』。…ということで、こちらがリンクです。",
+  "ここまで読んでくれてありがとう。正直、この文章を読んでくれただけで、もう半分くらい報われています。",
+  "開発者の夢：いつか、このゲームの収益で、まともな椅子を買うこと。今は段ボールです。",
+  "寄付してくれた方の名前は、開発者の心のエンドロールに、永遠に刻まれます。表示はされません。心の中です。",
+  "ねこ『おい兄ちゃん、そのボタン、押したったらどうや。…別に、強制やないけどな。にゃ。』",
+  "あなたの100円は、世界のどこかで、開発者のコンビニ弁当を一段グレードアップさせます。",
+  "投げ銭の使い道ランキング：1位コーヒー、2位コーヒー、3位たまにご飯。",
+  "このゲーム、もし有料だったら？　…たぶん誰も買ってません。だから無料なんです。",
+  "課金圧力デーモンは、前作で倒しました。なのでこれは、ただのお願いです。",
+  "UFO乗組員『あうー！』（通訳：投げ銭、待ってます）",
+  "支援は義務ではありません。空腹は、開発者の義務でもありませんが、現実です。",
+  "あなたが今押そうとしているのは、ボタンではありません。開発者の明日です。…大げさですね。すみません。",
+  "コーヒー代を恵んでくれたら、そのカフェインで、バグが3匹ほど成仏します。",
+  "『面白い』を守るために戦った開発者。今は『家賃』を守るために戦っています。",
+  "寄付すると、いいことがあります。…開発者がうれしいです。それだけです。本当にそれだけです。",
+  "このゲームに値段をつけるなら、あなたが『面白い』と思った分だけ。0円でも、大正解です。",
+  "投げ銭ゼロでも、また遊びに来てくれたら、それが一番のごほうびです。",
+  "開発者は今日もエゴサしています。『開発者の現在2 おもしろい』で検索する人、愛してます。",
+  "100円で、開発者の口角が3mm上がります。1000円で、5mmです。",
+  "寄付は、未来の自分への投資です。…いえ、開発者への投資です。すみません、盛りました。",
+  "このボタン、押しても怖い課金画面は出ません。出るのはPayPayと、開発者の涙だけです。",
+  "サーモン握り『…にぎにぎ』（あなたの支援を、にぎっています）",
+  "ガチャは無料石で十分回せます。なので、浮いたお金を…いえ、なんでもありません。",
+  "開発者の朝ごはん、あなたの投げ銭で『卵かけご飯』から『卵2個』に進化します。",
+  "前作のレビュー一件で、開発者は一年戦えました。投げ銭一件なら、たぶん一ヶ月戦えます。",
+  "このゲーム、製作期間で割ると時給10円くらいです。寄付で、せめて11円にしてください。",
+  "投げ銭してくれたら、心の中であなたを主人公にした外伝を、無言で書きます。",
+  "『金が無い、仲間はいる』――前作のテーマでした。仲間（あなた）に、お金があるなら、話は別です。",
+  "支援、いりません。あなたの笑顔だけで十分です。…と言いつつ、リンクは下にあります。",
+  "開発者の野望：このゲームで、せめてサーバー代…と思ったけど、単一HTMLなのでサーバー代0円でした。やったね。",
+  "投げ銭は、開発者のモチベーションという名の燃料タンクに、ちょっと注がれます。",
+  "ねこ『儂は別に、礼なんか言わんで。…でも、押してくれたら、ちょっとだけ嬉しいわ。にゃ。』",
+  "このゲームが好きすぎて困っている方へ。その困りごと、PayPayで解決できます。",
+  "寄付してくれた方限定特典：開発者があなたを密かに『いい人』フォルダに入れます。",
+  "100円あれば、開発者は『今日は外食しようかな』と一瞬だけ思って、結局自炊します。",
+  "あなたの優しさは、いつか報われます。少なくとも、開発者の中では、もう報われています。",
+  "ウォッチャーは無数の宇宙を眺めるだけでした。あなたは、このボタンを押せます。すごい。",
+  "課金圧力はかけません。圧をかけるのは、開発者の家賃だけで十分です。",
+  "投げ銭が集まったら、新章のボスを一体、追加で作ります。集まらなくても、たぶん作ります。",
+  "このゲーム、広告で稼ぐより、あなたの善意を信じる方を選びました。…無謀ですよね。わかってます。",
+  "開発者『ありがとう』一件のために作る人間です。投げ銭は、その『ありがとう』に値札がついたものです。",
+  "支援してくれたら、開発者がガッツポーズします。誰も見ていない部屋で、静かに。",
+  "1万円？　いえ、100円で十分です。…いえ、1万円でも、断りません。むしろ歓迎です。",
+  "このボタンを押すか迷っている時間、開発者はその間ずっと、コードを書いています。",
+  "投げ銭は、開発者の『もう少し頑張ろう』に変換されます。換算レート、たぶん良いです。",
+  "かえる『ぼく、みんなが楽しそうなのが、いちばん好きなんだ。…あ、でも、投げ銭も、うれしいよ。』",
+  "あなたの100円で、開発者の缶コーヒーが、微糖からブラックに格上げされます。大人です。",
+  "寄付の見返りに、開発者の感謝を込めて、次のアプデを1時間早めます。たぶん。気持ちの問題です。",
+  "このゲームに課金して強くなる方法はありません。でも、寄付して気持ちよくなる方法は、あります。",
+  "開発者は、レスバには強いですが、お願いごとは下手です。なので、ストレートに言います。投げ銭、待ってます。",
+  "あなたが押したそのボタンの先に、PayPayの画面と、開発者の小さな夢があります。",
+  "投げ銭額、上限はありません。下限もありません。あなたの『面白い』が、そのまま金額です。",
+  "支援は、ゲームを買う行為ではありません。開発者という生き物に、エサをあげる行為です。",
+  "田村くん『…無限に、感謝する。』（※田村くんは普段あまり喋りません）",
+  "このゲーム、心を込めて作りました。心は無料ですが、コーヒーは有料でした。そこだけ、助けてください。",
+  "100円で世界は変わりません。でも、開発者の今日の気分は、確実に変わります。",
+  "寄付してくれたあなたへ。…ありがとう。この一言のために、開発者は生きています。",
+  "投げ銭は、開発者への『続きが見たい』という、いちばん分かりやすいメッセージです。",
+  "このゲームを無料で出した開発者の判断は、経済的には間違いでした。でも、後悔はしていません。たぶん。",
+  "あなたの善意が、開発者の『次も作ろう』を支えます。プレッシャーかけてすみません。",
+  "ねこ『前は人様から取り立てる側やった。今はこうして、頭下げとる。…人生やなぁ。』",
+  "支援、しなくていいんです。本当に。…でも、もしよかったら。…いや、本当に、無理しないでくださいね。",
+  "投げ銭してくれたら、開発者は今夜、ちょっといいお茶を飲みます。贅沢です。",
+  "このゲームのバグを見つけて、それでも遊んでくれるあなたは、もう聖人です。聖人は、よく寄付をします。",
+  "開発者の収入源：このゲーム…ではなく、本業です。これは、純粋な趣味です。だから、応援だけ、いただけたら。",
+  "あなたのワンタップが、開発者の創作意欲を、にゅっと伸ばします。",
+  "寄付してくれたら、開発者があなたのことを、しばらく考えます。怖くない範囲で。",
+  "100円玉一枚。それは、自販機ではジュースに、ここでは開発者の笑顔になります。",
+  "このボタンは、罠ではありません。優しさの受け皿です。ちょっとお皿が小さいですが。",
+  "投げ銭、たくさんいただけたら、いつか『開発者の現在3』が出るかもしれません。出ないかもしれません。",
+  "支援は強制ではありません。…が、ピエンターズが、想いの量を、評議会で測っているかもしれません。",
+  "開発者の願い：このゲームで誰かが笑ってくれること。第二の願い：その人が、たまに投げ銭してくれること。",
+  "あなたが今感じている『ちょっと押してみようかな』。その気持ち、世界でいちばん尊いです。",
+  "コーヒー一杯で、世界は救えません。でも、開発者一人なら、わりと救えます。",
+  "投げ銭は、開発者にとっての回復魔法です。HPではなく、心が回復します。",
+  "このゲーム、いつか有料の続編を…とは、考えていません。ずっと無料の予定です。だからこそ、今、ここで。",
+  "かえる『見返りを求めない優しさが、いちばん強いんだよ。…でも、見返りがあると、開発者は泣いて喜ぶよ。』",
+  "あなたの支援は、開発者の机の上の、しおれた観葉植物を、生き返らせるかもしれません。",
+  "ここまでスクロールして全部読んだあなたへ。…もう、十分です。本当にありがとう。リンクは、念のため下に置いておきます。",
+  "最後に一つだけ。このゲームを遊んでくれて、本当にありがとう。それ以上は、何も望みません。…ボタンは、そっと置いておきます。",
+  "開発者の現在、所持金よりも、あなたへの感謝の方が多いです。…比べる対象が、おかしいですね。",
+  "このゲームは、誰かの『ありがとう』で動いています。電気代は、別途かかります。そこだけ、助けてください。",
+];
+const CHANGELOG=[
+  {ver:'1.3.0', date:'2026-06', items:[
+    {type:'add', t:'スピンオフ「交差する光と闇の魂」#1・#2 を追加（主人公・かえる／死後の国が舞台。かえるに宿るもう一つの魂を巡る物語）'},
+    {type:'add', t:'かえるのフォルムチェンジ「闇のかえる」(SSR・アタッカー)を追加。スピンオフ#2クリアで解禁'},
+    {type:'add', t:'タイトルに寄付ボタンを設置。100種のひとことからランダム表示＋PayPay対応'},
+    {type:'fix', t:'必殺技のヒット音を全キャラに追加（連撃ごとに発音）。闇のかえる専用に「凄惨なる血の雨」演出を新設'},
+    {type:'fix', t:'タイトル画面が下までスクロールできない不具合を修正'},
+  ]},
+  {ver:'1.2.0', date:'2026-06', items:[
+    {type:'add', t:'プロローグ「第0話 ― 前作ダイジェスト」を追加（バトルなし・前作「開発者の現在」のあらすじを長編で振り返り）'},
+  ]},
+  {ver:'1.1.0', date:'2026-06', items:[
+    {type:'add', t:'エピローグ2「評議会」を追加（ピエンターズ評議会・ぴえん王・創造の神の謎・かえる復活）'},
+    {type:'add', t:'対戦モード（VS BATTLE）を実装：3タブ構成（ストーリー/オリジナル/伝説の英霊達）'},
+    {type:'add', t:'対戦専用の敵を多数追加（R〜INFINITYの強敵、伝説の英霊達7組）'},
+    {type:'add', t:'チート機能を追加（全話解放・図鑑全開放・全キャラ獲得）'},
+    {type:'fix', t:'設定画面・対戦モードのレイアウト崩れを修正'},
+  ]},
+  {ver:'1.0.0', date:'2026-05', items:[
+    {type:'add', t:'「開発者の現在2 // RESUBA」リリース'},
+    {type:'add', t:'本編ストーリー 第1話〜第11話（エピローグ）を実装'},
+    {type:'add', t:'バトルシステム・キャラクター図鑑・ガチャを実装'},
+    {type:'add', t:'絶！フォルム・開発者GXなどの特殊フォルムを実装'},
+  ]},
+];
+function showChangelog(){
+  const body=document.getElementById('clBody');
+  body.innerHTML=CHANGELOG.map((e,i)=>{
+    const latest=i===0;
+    const lis=e.items.map(it=>`<li class="${it.type||''}">${it.t}</li>`).join('');
+    return `<div class="cl-entry">
+      <div class="cl-ver"><span class="cl-vnum ${latest?'latest':''}">v${e.ver}</span>${latest?'<span class="cl-vtag">LATEST</span>':''}<span class="cl-vdate">${e.date}</span></div>
+      <ul class="cl-list">${lis}</ul></div>`;
+  }).join('');
+  document.getElementById('changelog').classList.add('show');
+}
+// ===== 寄付モーダル =====
+function pickDonateJoke(){
+  const el=document.getElementById('dnJoke');
+  let j=DONATE_JOKES[Math.floor(Math.random()*DONATE_JOKES.length)];
+  if(j===el._last&&DONATE_JOKES.length>1){return pickDonateJoke();}
+  el._last=j;el.textContent=j;
+}
+function showDonate(){
+  pickDonateJoke();
+  document.getElementById('donate').classList.add('show');
+}
+
+const VS_OPPONENTS=[
+  // ===== ストーリータブ（tab:'story'）=====
+  {id:'oni',   tab:'story', vsTitle:'家賃の悪魔',     name:'鬼大家',                 face:'👹', cat:'boss',    bossId:5,  unlockEp:1, desc:'家賃の取り立てに現れる、ゾンビ化した大家。最初の試練。'},
+  {id:'kaeru', tab:'story', vsTitle:'変わり果てた友', name:'かつて友だった者',        face:'🐸', cat:'boss',    bossId:11, unlockEp:2, desc:'親友だった、かえる。変わり果てた姿で牙をむく。'},
+  {id:'chiwa', tab:'story', vsTitle:'地獄の番犬',     name:'チワワ',                  face:'🐺', cat:'boss',    bossId:13, unlockEp:4, desc:'博士の血を浴び、巨大な地獄の番犬と化したチワワ。'},
+  {id:'king',  tab:'story', vsTitle:'異星の王',       name:'UFO THE KING',           face:'👽', cat:'boss',    bossId:15, unlockEp:5, desc:'異星の王。圧倒的なスケールで地球を見下ろす。'},
+  {id:'aphro', tab:'story', vsTitle:'美と愛の女神',   name:'アフロディーテ',          face:'🧝‍♀️', cat:'boss', bossId:19, unlockEp:6, desc:'地球の神。美と愛、そして圧倒的な力を司る。'},
+  {id:'eternity',tab:'story', vsTitle:'永遠と無限',   name:'エターニティ',          face:'👼', cat:'boss',    bossId:21, unlockEp:7, desc:'宇宙の頂点に立つ、永遠と無限の体現者。'},
+  {id:'tamura',tab:'story', vsTitle:'全生命の原点',   name:'田村くん（組織者）',      face:'🧑', cat:'boss',    bossId:25, unlockEp:8, desc:'宇宙すべてを統べる組織者。地球と融合した真の姿。'},
+  {id:'earth', tab:'story', vsTitle:'紅き星',         name:'紅き星 地球',             face:'🌋', cat:'boss',    bossId:26, unlockEp:9, desc:'地球の核より顕現せし災厄。生命を吸収し無限に強化される。'},
+  {id:'mvm',   tab:'story', vsTitle:'概念の化身',     name:'マルチバーサルエターニティ',face:'👁️',cat:'special', bossId:33, unlockEp:10,desc:'現実を書き換える、概念の化身。HPは100本に及ぶ。', mobs:[34,34,34,34]},
+  // ===== オリジナルバトルタブ（tab:'original'）エピローグクリアで全解放 =====
+  {id:'bug',     tab:'original', vsTitle:'暴走バグ',        name:'暴走バグ',        face:'🐛', cat:'boss',    bossId:400, unlockEp:11, desc:'プログラムの隙間に湧いた小さなバグ。手始めにちょうどいい。'},
+  {id:'spam',    tab:'original', vsTitle:'スパムの群れ',    name:'スパムの群れ',    face:'📧', cat:'boss',    bossId:401, unlockEp:11, desc:'無限に湧く迷惑メッセージの集合体。数で押してくる。'},
+  {id:'stray',   tab:'original', vsTitle:'野良コード',      name:'野良コード',      face:'📟', cat:'boss',    bossId:402, unlockEp:11, desc:'管理者を失った野良のプログラム。無秩序に暴走する。'},
+  {id:'cwolf',   tab:'original', vsTitle:'電脳狼',          name:'電脳狼',          face:'🐺', cat:'boss',    bossId:403, unlockEp:11, desc:'電子の荒野を駆ける狼。素早く鋭い牙で襲う。'},
+  {id:'guardian',tab:'original', vsTitle:'機械仕掛けの番人',name:'機械仕掛けの番人',face:'🤖', cat:'boss',    bossId:404, unlockEp:11, desc:'施設を守る自動人形。硬い装甲と自己修復を持つ。'},
+  {id:'dancer',  tab:'original', vsTitle:'幻影の舞姫',      name:'幻影の舞姫',      face:'💃', cat:'boss',    bossId:405, unlockEp:11, desc:'幻惑の舞でこちらの判断を狂わせる踊り手。'},
+  {id:'knight',  tab:'original', vsTitle:'鋼鉄の騎士',      name:'鋼鉄の騎士',      face:'🛡️', cat:'boss',   bossId:406, unlockEp:11, desc:'鉄壁の重装騎士。並の火力では削りきれない。'},
+  {id:'mage',    tab:'original', vsTitle:'紅蓮の魔術師',    name:'紅蓮の魔術師',    face:'🧙', cat:'boss',    bossId:407, unlockEp:11, desc:'灼熱の魔法を操る賢者。全体を焼き払う。'},
+  {id:'twin',    tab:'original', vsTitle:'双頭の獣',        name:'双頭の獣',        face:'🐲', cat:'boss',    bossId:408, unlockEp:11, desc:'二つの頭でそれぞれ攻撃する魔獣。手数が多い。'},
+  {id:'stormd',  tab:'original', vsTitle:'嵐竜',            name:'嵐竜',            face:'🐉', cat:'boss',    bossId:409, unlockEp:11, desc:'嵐を纏う古竜。咆哮は天候すら変える。'},
+  {id:'golem',   tab:'original', vsTitle:'巨人ゴーレム',    name:'巨人ゴーレム',    face:'🗿', cat:'boss',    bossId:410, unlockEp:11, desc:'山のごとき石の巨人。圧倒的な耐久を誇る。'},
+  {id:'fallen',  tab:'original', vsTitle:'堕天使',          name:'堕天使',          face:'😇', cat:'boss',    bossId:411, unlockEp:11, desc:'堕ちた天使。聖と邪の力を併せ持ち、何度も蘇る。'},
+  {id:'demonk',  tab:'original', vsTitle:'深淵の魔王',      name:'深淵の魔王',      face:'😈', cat:'special', bossId:412, unlockEp:11, desc:'深淵より顕現せし魔王。絶望を振りまく超強敵。'},
+  {id:'doomd',   tab:'original', vsTitle:'古の災厄龍',      name:'古の災厄龍',      face:'🦖', cat:'special', bossId:413, unlockEp:11, desc:'目覚めれば文明が滅ぶ災厄の龍。ターンと共に際限なく強化される。'},
+  {id:'void',    tab:'original', vsTitle:'虚無の使徒',      name:'虚無の使徒',      face:'👻', cat:'special', bossId:414, unlockEp:11, desc:'触れたものを存在ごと消す使徒。即死攻撃に注意。'},
+  {id:'queen',   tab:'original', vsTitle:'終焉の女王',      name:'終焉の女王',      face:'👸', cat:'special', bossId:415, unlockEp:11, desc:'終わりを統べる女王。君臨し続け、無限に強くなる。'},
+  {id:'creator', tab:'original', vsTitle:'創造神',          name:'創造神',          face:'🌌', cat:'special', bossId:416, unlockEp:11, desc:'宇宙を創りし神。INFINITY/PREDで挑め。'},
+  {id:'zero',    tab:'original', vsTitle:'絶対零度の支配者',name:'絶対零度の支配者',face:'❄️', cat:'special',  bossId:417, unlockEp:11, desc:'全てを凍てつかせる絶対者。行動不可に注意。'},
+  {id:'devour',  tab:'original', vsTitle:'次元喰らい',      name:'次元喰らい',      face:'🕳️', cat:'special', bossId:418, unlockEp:11, desc:'次元ごと喰らう怪物。バフ消去とHP吸収を持つ。'},
+  {id:'omni',    tab:'original', vsTitle:'全知全能',        name:'全知全能',        face:'☀️', cat:'special',  bossId:419, unlockEp:11, desc:'対戦モードの頂点。INFINITY/PREDのみで編成し、死力を尽くせ。'},
+  // ===== 伝説の英霊達タブ（tab:'legend'）エピローグクリアで全解放 =====
+  // パーティ戦：party=[味方として出す敵編成]、bossIndex=ボス枠の位置（演出用）
+  {id:'earth10003', tab:'legend', type:'party', vsTitle:'アース10003', face:'🦸‍♂️', cat:'legend', unlockEp:11,
+    party:[28,27,425,29], bossId:27, partyLabels:['絶！ねこ','絶！開発者','絶！かえる','絶！UFO'],
+    desc:'並行世界の英雄たち。絶！開発者を筆頭に、絶！フォルムの仲間が立ちはだかる。'},
+  {id:'gods', tab:'legend', type:'party', vsTitle:'降臨せし神々', face:'⚡', cat:'legend', unlockEp:11,
+    party:[23,420,19,24], bossId:420, partyLabels:['ポセイドン','真 ゼウス','アフロディーテ','ハデス'],
+    desc:'神々の軍勢。全能神・真ゼウスを中心に、海・愛・死を司る神が降臨する。'},
+  {id:'watchers', tab:'legend', type:'party', vsTitle:'監視する者', face:'🧝', cat:'legend', unlockEp:11,
+    party:[35,421,35,35], bossId:421, partyLabels:['ウォッチャー','マルチ\nウォッチャー','ウォッチャー','ウォッチャー'],
+    desc:'全宇宙を監視する観測者の軍団。マルチバーサルウォッチャーが統べる、難攻不落の壁。'},
+  {id:'heaven', tab:'legend', type:'party', vsTitle:'天国からの歌声', face:'🐸', cat:'legend', unlockEp:11,
+    party:[423,11,11,11], bossId:423, partyLabels:['かえる','かつての友','かつての友','かつての友'],
+    desc:'天国から響くかえるの歌声。HP2億の悲しき執念。仲間を犠牲に歌い続ける。'},
+  {id:'mvinf', tab:'legend', type:'solo', vsTitle:'無限を体現せし者', face:'👁️', cat:'special', unlockEp:11,
+    bossId:422, desc:'無限を体現せし存在。時間と共に際限なく強くなり続ける。開発者GXの力の、その先にあるもの。'},
+  {id:'pienters', tab:'legend', type:'solo', vsTitle:'現実世界の歪み', face:'🧍', cat:'special', unlockEp:11,
+    bossId:424, desc:'現実世界とデバイスの狭間に存在する、全生命の想いの具現化。HP100億。対戦モードの真の頂点。'},
+  {id:'devsolo', tab:'legend', type:'solo', vsTitle:'開発者', face:'👨‍💻', cat:'special', unlockEp:11,
+    bossId:1, soloHP:10000000000, desc:'最後の壁。HP10億。すべての始まりにして、最強の守り手。'},
+];
+// 難易度定義。lv=敵レベル、tk=初回チケット報酬、mul=ダメージ難度の目安
+const VS_DIFFS=[
+  {key:'easy',     name:'EASY',     stars:'⭐',         lv:50, tk:30,  bonus:''},
+  {key:'normal',   name:'NORMAL',   stars:'⭐⭐',       lv:80, tk:60,  bonus:''},
+  {key:'hard',     name:'HARD',     stars:'⭐⭐⭐',     lv:120,tk:100, bonus:'🎴 キャラ報酬は今後実装'},
+  {key:'nightmare',name:'NIGHTMARE',stars:'💀💀💀💀', lv:200,tk:200, bonus:'🎴 限定報酬は今後実装'},
+];
 const STAGE_BOSS={
   1:[5], 2:[11], 3:[11], 4:[13], 5:[15],
-  6:[19], 7:[21], 8:[25], 9:[26], 10:[33]
+  6:[19], 7:[21], 8:[25], 9:[26], 10:[33],
+  101:[13]
 };
 // 雑魚を出さないステージ（1対1のボス戦）
-const STAGE_NO_MOBS={ 1:true, 2:true, 6:true, 8:true, 9:true };
+const STAGE_NO_MOBS={ 1:true, 2:true, 6:true, 8:true, 9:true, 101:true, 103:true, 104:true, 108:true };
 // 1話ボスは体力を激低に（チュートリアル的に）
-const STAGE_BOSS_HPMUL={ 1:0.25 };
+const STAGE_BOSS_HPMUL={ 1:0.25, 101:0.05 };
 // ボス表示タイプ：'big'=見上げ巨大(A) / 'half'=画面端半身(D)。未指定はbig。
 const STAGE_BOSS_VIEW={ };
 // 雑魚レア度（指定なしはR）
@@ -3852,15 +5728,95 @@ function startBattle(ep,onWin){
   if(ep===9){partyIds=[27,28,30,29];}
   // 10話：強制パーティ（開発者GX・アフロディーテ・ゼウス・ハデス）
   if(ep===10){partyIds=[32,19,22,24];}
+  // スピンオフ#1：かえる(id3)単体の特殊戦。死亡フラグの除外をここで上書き
+  if(ep===101){partyIds=[3];}
+  // スピンオフ#2：闇のかえる(id36)単体 vs 警官隊
+  if(ep===102){partyIds=[36];}
+  // スピンオフ#3：かえる(ぼく/id3)単体 vs 絶！ねこ
+  if(ep===103){partyIds=[3];}
+  // スピンオフ#4：かえる(3)+絶！ねこ(28)+絶！サーモン握り(30) vs 星1レビュー
+  if(ep===104){partyIds=[3,28,30];}
+  // スピンオフ#5：かえる(3)+絶！ねこ(28)+緋焔の剣士・クソバカ(37) vs 吸血鬼天使＋堕天使
+  if(ep===105){partyIds=[3,28,37];}
+  // スピンオフ#6：絶！UFOきんぐ(29)単騎 vs 吸血鬼天使＋鬼の王（敵HP激低）
+  if(ep===106){partyIds=[29];}
+  // スピンオフ#7：かえる(3)+絶！ねこ(28)+絶！サーモン握り(30)+クソバカ(37) vs 天使＋メタトロン
+  if(ep===107){partyIds=[3,28,30,37];}
+  // スピンオフ#8（最終話）：かえる(3)単体 vs 開発者（闇の側面）
+  if(ep===108){partyIds=[3];}
   if(!partyIds.length)partyIds=[1];
   // 7〜10話はMAXレベルでバトル
-  const allyLv=(ep===7||ep===8||ep===9||ep===10)?100:lv;
+  const allyLv=(ep===7||ep===8||ep===9||ep===10)?100:(ep===101||ep===102||ep===103||ep===104||ep===105||ep===106||ep===107||ep===108?60:lv);
   // 強制パーティの話（7,8,9,10）は指定idをそのまま使う（effIdでフォルム解決しない）
-  const forcedPartyEp=(ep===7||ep===8||ep===9||ep===10);
+  const forcedPartyEp=(ep===7||ep===8||ep===9||ep===10||ep===101||ep===102||ep===103||ep===104||ep===105||ep===106||ep===107||ep===108);
   const allies=partyIds.map(id=>makeUnit(forcedPartyEp?id:effId(id),allyLv,false));
-  const bl=bossLevel(ep);
+  const bl=(ep===101)?3:(ep===102)?25:(ep===103)?5:(ep===104)?55:(ep===105)?45:(ep===106)?30:(ep===107)?58:(ep===108)?50:bossLevel(ep);
   // ボス（巨大・禍々しい）
-  const bosses=(STAGE_BOSS[ep]||[5]).map(id=>makeUnit(id,bl,true));
+  let bosses;
+  if(ep===102){
+    // 熟練警官（ボス）：makeMobベースの自作敵。CHARS/図鑑には登録しない
+    const boss=makeMob('👮‍♂️','熟練警官',bl,'SSR');
+    boss.isBoss=true;boss.isMob=false;
+    boss.maxHP=Math.round(boss.maxHP*1.4);boss.hp=boss.maxHP;
+    boss.skills=[{n:'警棒',d:'ATK110%',pow:1.1,mp:0,tgt:'one'},{n:'制圧射撃',d:'ATK130%',pow:1.3,mp:0,tgt:'one'}];
+    bosses=[boss];
+  } else if(ep===103){
+    // 絶！ねこ（ボス）：このバトルのみ HP・攻撃・防御を激低に。開幕必殺(治療の神)は撃つ
+    const z=makeUnit(28,bl,true);
+    z.maxHP=120;z.hp=120;
+    z.base.ATK=12;z.base.DEF=15;z.base.SPD=80;
+    z.skills=[{n:'じゃれつき',d:'軽い猫パンチ ATK60%',pow:0.6,mp:0,tgt:'one'}]; // 無敵スキル等を除去し詰み防止
+    bosses=[z];
+  } else if(ep===104){
+    // 死亡した星1レビュー（自作ボス・前作の敵の亡霊）。図鑑には載せない。開幕必殺あり
+    const boss=makeMob('🙎','死亡した星1レビュー',bl,'SSR');
+    boss.isBoss=true;boss.isMob=false;
+    boss.maxHP=Math.round(boss.maxHP*3.0);boss.hp=boss.maxHP; // 3人パーティ相手に持ちこたえる量
+    boss.base.ATK=Math.round(boss.base.ATK*0.85);
+    boss.skills=[
+      {n:'☆1の呪詛',d:'単体ATK120%',pow:1.2,mp:0,tgt:'one'},
+      {n:'低評価爆撃',d:'全体ATK85%',pow:0.85,mp:0,tgt:'all'},
+    ];
+    boss.ults=[{n:'アンインストール',d:'全体に痛烈な一撃＋萎え(ATKダウン3T)',pow:1.8,tgt:'all',deb:{ATK:-0.25,t:3},ultfx:'rent'}];
+    bosses=[boss];
+  } else if(ep===105){
+    // 堕天使（自作ボス・開幕必殺あり）。吸血鬼天使の親玉
+    const boss=makeMob('😈','堕天使',bl,'PRED');
+    boss.isBoss=true;boss.isMob=false;
+    boss.maxHP=Math.round(boss.maxHP*2.2);boss.hp=boss.maxHP;
+    boss.skills=[{n:'堕翼の爪',d:'単体ATK120%',pow:1.2,mp:0,tgt:'one'},{n:'吸血の宴',d:'全体ATK80%',pow:0.8,mp:0,tgt:'all'}];
+    boss.ults=[{n:'堕天の呪詛',d:'敵全体に攻撃力40%×6回＋ATKダウン(3T)',pow:0.4,tgt:'all',hits:6,deb:{ATK:-0.25,t:3},ultfx:'rent'}];
+    bosses=[boss];
+  } else if(ep===106){
+    // 鬼の王（自作ボス・開幕必殺あり）。このバトルのみHP激低（UFOの超技術で瞬殺される演出）
+    const boss=makeMob('👹','鬼の王',bl,'PRED');
+    boss.isBoss=true;boss.isMob=false;
+    boss.maxHP=220;boss.hp=220;
+    boss.base.ATK=22;boss.base.DEF=20;
+    boss.skills=[{n:'鬼の威',d:'単体ATK100%',pow:1.0,mp:0,tgt:'one'}];
+    boss.ults=[{n:'血鬼術・終焉',d:'敵全体に攻撃力40%×4回',pow:0.4,tgt:'all',hits:4,ultfx:'rent'}];
+    bosses=[boss];
+  } else if(ep===107){
+    // メタトロン（自作ボス・開幕必殺あり）。天国最高位の天使
+    const boss=makeMob('👼','メタトロン',bl,'PRED');
+    boss.isBoss=true;boss.isMob=false;
+    boss.maxHP=Math.round(boss.maxHP*3.0);boss.hp=boss.maxHP;
+    boss.skills=[{n:'聖なる裁き',d:'単体ATK130%',pow:1.3,mp:0,tgt:'one'},{n:'光の劫罰',d:'全体ATK85%',pow:0.85,mp:0,tgt:'all'}];
+    boss.ults=[{n:'天使の羽',d:'敵全体に攻撃力35%×8回＋ATKダウン(3T)',pow:0.35,tgt:'all',hits:8,deb:{ATK:-0.25,t:3},ultfx:'thunder'}];
+    bosses=[boss];
+  } else if(ep===108){
+    // 開発者（闇の側面）＝ラスボス。INFINITY・闇のオーラ。かえるに無敵(cantDamage)。HP激低。開幕必殺あり
+    const boss=makeMob('🐸','開発者（闇の側面）',bl,'INFINITY');
+    boss.isBoss=true;boss.isMob=false;
+    boss.maxHP=300;boss.hp=300;
+    boss.cantDamage=true; // かえるにダメージを与えられない（殺されることを望んでいる）
+    boss.darkAura=true;
+    boss.skills=[{n:'虚無の囁き',d:'単体ATK100%',pow:1.0,mp:0,tgt:'one'}];
+    boss.ults=[{n:'超高次元 真の現実改変',d:'敵全体に攻撃力50%×6回（現実を書き換える）',pow:0.5,tgt:'all',hits:6,ultfx:'true_dev'}];
+    bosses=[boss];
+  } else {
+    bosses=(STAGE_BOSS[ep]||[5]).map(id=>makeUnit(id,bl,true));
+  }
   // マルチバーサルエターニティ(cid33)はHP100本ギミック
   bosses.forEach(b=>{if(b.cid===33)b.hpBars=100;});
   // ボスHP倍率（チュートリアル等で激低化）
@@ -3876,12 +5832,13 @@ function startBattle(ep,onWin){
     } else {
       const mobTheme=STAGE_MOBS[ep]||STAGE_MOBS[1];
       const mobRare=STAGE_MOB_RARE[ep]||'R';
-      mobs=mobTheme.faces.map((f,i)=>makeMob(f,mobTheme.name+(i+1),mobLv,mobRare));
+      mobs=mobTheme.faces.map((f,i)=>{const m=makeMob(f,mobTheme.name+(i+1),mobLv,mobRare);if(ep===105)m.oniBody=true;return m;});
     }
   }
   const enemies=[...bosses,...mobs];
   const bossView=STAGE_BOSS_VIEW[ep]||'big';
-  B={ep,lv,allies,enemies,turn:1,order:[],oi:0,onWin,acting:null,bossOpened:false,over:false,bossView,forceClear:(ep===8)};
+  allies.forEach(a=>{if(a.cid===37)a.tension=100;}); // クソバカ：闘気充填（開幕テンション100%）
+  B={ep,lv,allies,enemies,turn:1,order:[],oi:0,onWin,acting:null,bossOpened:false,over:false,bossView,forceClear:(ep===8||ep===103)};
   scr('battle');
   // 10話はラスボス専用BGM＋3D六芒星背景
   if(ep===10)Audio.playBGM('lastboss');
@@ -3902,6 +5859,64 @@ function bossOpening(){
   playUlt(boss,ult,()=>{ resolveUlt(boss,openUlt,0.1); B.bossOpened=true; setTimeout(startTurn,600); });
 }
 
+/* ---- 対戦モード専用バトル ---- */
+function startVsBattle(opp,diff){
+  const lv=getUserLevel();
+  // プレイヤーは現在の編成（フォルム解決あり）
+  let partyIds=(S.party.length?S.party:[1]).slice();
+  if(S.kaeruDead)partyIds=partyIds.filter(id=>id!==3);
+  if(!partyIds.length)partyIds=[1];
+  const allies=partyIds.map(id=>makeUnit(effId(id),lv,false));
+  const bl=diff.lv;
+  let bosses=[], mobs=[];
+  if(opp.type==='party'){
+    // パーティ戦：4体すべてを敵として配置。ボス枠は大きく、他は雑魚（mob）扱いで上段に
+    opp.party.forEach((id,i)=>{
+      const isBoss=(id===opp.bossId && i===opp.party.indexOf(opp.bossId));
+      const u=makeUnit(id,bl,true);
+      if(isBoss){u.isBoss=true;u.isMob=false;bosses.push(u);}
+      else{u.isMob=true;u.isBoss=false;mobs.push(u);}
+    });
+  } else {
+    // 単体ボス / 通常ボス
+    const boss=makeUnit(opp.bossId,bl,true);
+    if(boss.cid===33)boss.hpBars=100;
+    // 単体ボスでHP指定がある場合（VS開発者=10億 等）：内部HPを上書き（×0.5補正後の値に合わせdmul維持）
+    if(opp.soloHP){boss.maxHP=Math.round(opp.soloHP*0.5);boss.hp=boss.maxHP;}
+    bosses.push(boss);
+    if(opp.mobs&&opp.mobs.length){
+      const mobLv=Math.max(1,bl-5);
+      mobs=opp.mobs.map(id=>{const u=makeUnit(id,mobLv,true);u.isMob=true;u.isBoss=false;return u;});
+    }
+  }
+  const enemies=[...bosses,...mobs];
+  B={ep:'vs',lv,allies,enemies,turn:1,order:[],oi:0,acting:null,bossOpened:false,over:false,bossView:'big',
+     forceClear:false, vs:{opp,diff}};
+  scr('battle');
+  // マルチバーサル系・ピエンターズはラスボスBGM＋六芒星
+  const epicBoss=bosses.some(b=>b.cid===33||b.cid===422||b.cid===424);
+  if(epicBoss)Audio.playBGM('lastboss');
+  else Audio.playBGM('battle');
+  setupBossHex(bosses.some(b=>b.cid===33||b.cid===422));
+  renderBattle();
+  setTimeout(bossOpening,500);
+}
+// 対戦勝利時の報酬処理
+function vsBattleWin(){
+  const vs=B.vs; if(!vs)return;
+  const {opp,diff}=vs;
+  const firstClear=!vsHasCleared(opp.id,diff.key);
+  const reward=firstClear?diff.tk:Math.round(diff.tk*0.3);
+  S.tickets=Math.min(999,(S.tickets||0)+reward);
+  S.vsCleared=S.vsCleared||{};
+  S.vsCleared[vsClearKey(opp.id,diff.key)]=true;
+  // VS図鑑登録：撃破した相手キャラ（と専用モブ）を図鑑のみ(dexOnly)へ
+  S.dexOnly=S.dexOnly||[];
+  [opp.bossId].concat(opp.mobs||[]).forEach(id=>{ if(byId(id)&&!S.owned.includes(id)&&!S.dexOnly.includes(id))S.dexOnly.push(id); });
+  save();
+  return {firstClear,reward,opp,diff};
+}
+
 /* ---- ターン管理 ---- */
 function startTurn(){
   if(checkEnd())return;
@@ -3919,6 +5934,8 @@ function startTurn(){
     if(newWorldDone){u.buffs.push({absoluteGuard:true,t:2,icon:'🌐絶対防御'});setMsg(u.name+' ▸ 新世界 発動――絶対防御シールド！');}
     // 生存ターン数カウント（開発者の「残業」パッシブ等で使用）
     u.turnsAlive=(u.turnsAlive||0)+1;
+    u._dimMoveUsedThisTurn=false; // 次元間の移動：ターンごとにリセット
+    if(u.cid===36)u._madCount=0;  // 闇のかえる「狂気」：再行動カウンターをリセット
     // ターン開始MP回復系パッシブ
     if(u.cid===1)u.tension=Math.min(100,u.tension+50);                         // 開発者：開発者の閃き テンション+50
     if(u.cid===2)B.allies.forEach(a=>{if(a.alive){a.mp=Math.min(a.maxMP,a.mp+Math.round(a.maxMP*0.08));a.tension=Math.min(100,a.tension+10);}}); // ねこ：味方MP8%回復＆テンション+10
@@ -4026,6 +6043,13 @@ function startTurn(){
         const isDebuff=bf.silence||bf.neckRip||bf.stun||bf.virus||(bf.s&&Object.values(bf.s).some(v=>v<0));
         return !isDebuff;
       });}});
+    }
+    if(u.cid===425){
+      // 絶！かえる：深い絆（毎T HP20%回復＋味方全体DEF+40%）＋友を守る者（常時挑発）
+      u.hp=Math.min(u.maxHP,u.hp+Math.round(u.maxHP*0.20));
+      u.taunt=true;
+      const allySide425=u.isEnemy?B.enemies:B.allies;
+      allySide425.forEach(a=>{if(a.alive)a.buffs.push({s:{DEF:0.4},t:2,icon:'🐸絆'});});
     }
     const pa=(u.passives||[]).join('|');
     if(pa.includes('再生'))u.hp=Math.min(u.maxHP,u.hp+Math.round(u.maxHP*0.08));   // ガチャ産：再生
@@ -4208,6 +6232,7 @@ function applyDmg(src,tgt,raw,opt={}){
   if(tgt.cid===11&&tgt.hp/tgt.maxHP<=0.5)d=Math.round(d*0.70);           // ボス：変わり果てた身体 HP50%以下で被ダメ-30%
   if(tgt.cid===25)d=Math.round(d*0.60);                                  // 真の田村くん：地球と融合 被ダメ-40%
   if(tgt.cid===35)d=Math.round(d*0.10);                                  // 観測者ウォッチャー：全知の観測 被ダメ-90%
+  if(tgt.cid===425)d=Math.round(d*0.40);                                 // 絶！かえる：絶対の盾 被ダメ-60%
   if((tgt.passives||[]).join('').includes('鉄壁'))d=Math.round(d*0.80);  // ガチャ産：鉄壁 被ダメ-20%
   if((tgt.passives||[]).join('').includes('原初の護り'))d=Math.round(d*0.70); // 伝説かえる：被ダメ-30%
   if(tgt.guard)d=Math.round(d*0.5);
@@ -4249,6 +6274,10 @@ function applyDmg(src,tgt,raw,opt={}){
     tgt.shield-=absorbed;
     d-=absorbed;
   }
+  // 闇の側面（ラスボス）：かえるに対してダメージを与えられない
+  if(src && src.cantDamage){ d=0; }
+  // 鬼の体：緋焔の剣士・クソバカ(cid37)以外の攻撃では、HPが必ず1残る
+  if(tgt.oniBody && (!src || src.cid!==37) && (tgt.hp-d)<=0){ d=Math.max(0,tgt.hp-1); }
   tgt.hp=Math.max(0,tgt.hp-d);
   // ボス「啓示」：開発者GX(cid32)のHPは0にできず必ず1残す（ボス33生存時のみ）／HP1の時インフィニティのパワー(2T行動不可)を付与
   if(tgt.cid===32 && B&&B.enemies&&B.enemies.some(e=>e.alive&&e.cid===33)){
@@ -4293,6 +6322,8 @@ function killUnit(u,src){
   if(u.cid===9&&!u.revived){u.revived=true;u.hp=Math.round(u.maxHP*0.3);setMsg(u.name+' は不滅の力で復活した！');return;}
   // 観測者ウォッチャー：次元の壁（HP0でも1度だけHP全回復で復活）
   if(u.cid===35&&!u.wallRevived){u.wallRevived=true;u.hp=u.maxHP;setMsg(u.name+' ▸ 次元の壁――プログラムは、消えない。');return;}
+  // 絶！かえる：不屈の友情（HP0でも2回まで全回復で復活）
+  if(u.cid===425){u._kaeruRevive=(u._kaeruRevive||0);if(u._kaeruRevive<2){u._kaeruRevive++;u.hp=u.maxHP;setMsg(u.name+' ▸ 不屈の友情――まだ、みんなを守れる…！');return;}}
   u.alive=false;
   // ボス版MVM(cid33)が倒れたら、その分身（田村くんJr cid34）も全て消滅（分身体は本体あってこそ）
   if(u.cid===33&&B&&B.enemies){
@@ -4300,8 +6331,16 @@ function killUnit(u,src){
   }
 }
 function doNormal(u,t){
+  // 天国の歌（cid423）：攻撃時、自身以外の味方全員のHPを20%減らし、自身のDEF+1000%
+  if((u.passives||[]).join('|').includes('天国の歌')){
+    const allySide=u.isEnemy?B.enemies:B.allies;
+    allySide.forEach(a=>{if(a.alive&&a!==u){a.hp=Math.max(1,a.hp-Math.round(a.maxHP*0.20));}});
+    u.buffs.push({s:{DEF:10.0},t:2,icon:'🎵天国'});
+  }
   const neckRipped=u.buffs.some(b=>b.neckRip);
   let powMul=neckRipped?0.5:1.0;
+  // 闇のかえる「狂気」：通常攻撃の威力+500%
+  if(u.cid===36)powMul=6.0;
   // 田村くん「創造」：通常攻撃時20%で一撃必殺
   const tamuraKill=(u.cid===20&&t&&t.alive&&Math.random()<0.20);
   setMsg(u.name+' の通常口撃！'+(neckRipped?'（首もぎ取り中…威力減）':'')+(tamuraKill?' ✦創造✦':''));
@@ -4328,7 +6367,10 @@ function doNormal(u,t){
   });
   // 田村くん「無限」テンション100常時固定、それ以外は通常+15
   if(u.cid===20)u.tension=100;
+  else if(u.cid===36)u.tension=100;                 // 闇のかえる「闇の心」：通常攻撃後テンション100%
   else u.tension=Math.min(100,u.tension+15);
+  // 闇のかえる「狂気」：通常攻撃の度に再行動（各ターン4回まで）
+  if(u.cid===36){u._madCount=(u._madCount||0);if(u._madCount<4){u._madCount++;u._extraAct=true;}}
   // 絶！開発者の追撃は時間がかかるので演出時間を延長
   const normalDelay=(u.cid===27)?1300:700;
   setTimeout(()=>{renderBattle();endAct();},normalDelay);
@@ -4435,7 +6477,7 @@ function addBuff(u,bf){
   // PRED級キャラ：被デバフ完全無効
   // 19:アフロディーテ、20:田村くん青年、21:エターニティ、25:真田村くん
   // 26:紅き星地球、27-30:絶！フォルム、31:マルチバーサルエターニティ
-  if([19,20,21,25,26,27,28,29,30,31].includes(u.cid)){
+  if([19,20,21,25,26,27,28,29,30,31,425].includes(u.cid)){
     const neg=bf.silence||bf.neckRip||(bf.s&&Object.values(bf.s).some(v=>v<0));
     if(neg)return;
   }
@@ -4455,13 +6497,20 @@ function castUlt(u,ul){
       foe.buffs.push({healLock:true,t:10,icon:'💢回復不可'});
     }
   }
-  playUlt(u,ul,()=>{resolveUlt(u,ul,1);renderBattle();endAct();});
+  playUlt(u,ul,()=>{resolveUlt(u,ul,1);renderBattle();
+    // 次元間の移動：必殺技使用後、追加で1回だけ行動（各ターン1度のみ）
+    const pas=(u.passives||[]).join('|');
+    if(pas.includes('次元間の移動')&&!u._dimMoveUsedThisTurn){
+      u._dimMoveUsedThisTurn=true;u._extraAct=true;
+      setMsg(u.name+' ▸ 次元間の移動――更にもう一度動く！');
+    }
+    endAct();});
 }
 function playUlt(u,ul,done){
   const fx=document.getElementById('ultFX');
   const col={thunder:'#00f0ff',fire_heal:'#ff7a18',rain_heal:'#3a7bff',alien:'#a855f7',rent:'#ff2d55',
-    salmon_fist:'#faff00',mercy_rain:'#c81e2e',true_dev:'#ffe98a',
-    legend_dev:'#ffe98a',legend_neko:'#00ff9d',legend_kaeru:'#3a7bff',watcher:'#a855f7',legend_ufo:'#a855f7',pienters:'#ffffff',cerberus:'#ff3050',king_ray:'#a855f7',king_ray_inherit:'#00f0ff',aphrodite:'#ffb0e6',tamura_collapse:'#ff0030',eternity:'#ffd700',redearth:'#ff0030',zetsu_dev:'#00f0ff',zetsu_neko:'#ffe98a',zetsu_ufo:'#00ff9d',zetsu_salmon:'#ff7eb6',mvm_eternity:'#ff0030'}[ul.ultfx]||'#faff00';
+    salmon_fist:'#faff00',mercy_rain:'#c81e2e',blood_rain:'#c81e2e',true_dev:'#ffe98a',
+    legend_dev:'#ffe98a',legend_neko:'#00ff9d',legend_kaeru:'#3a7bff',watcher:'#a855f7',legend_ufo:'#a855f7',pienters:'#ffffff',cerberus:'#ff3050',king_ray:'#a855f7',king_ray_inherit:'#00f0ff',aphrodite:'#ffb0e6',tamura_collapse:'#ff0030',eternity:'#ffd700',redearth:'#ff0030',zetsu_dev:'#00f0ff',zetsu_neko:'#ffe98a',zetsu_ufo:'#00ff9d',zetsu_salmon:'#ff7eb6',mvm_eternity:'#ff0030',all_delete:'#ff2a4d'}[ul.ultfx]||'#faff00';
   fx.style.setProperty('--ucol',col);
   // リセット
   ['ultFlash','ultChar','ultName','ultFinal','ultHealwave','ultCineT','ultCineB'].forEach(id=>{const e=document.getElementById(id);if(e)e.className=e.className.replace(/\b(go|in|lunge|float)\b/g,'').trim();});
@@ -4485,7 +6534,8 @@ function uFlash(col){const f=document.getElementById('ultFlash');f.className='ul
 function uShake(hard){const fx=document.getElementById('ultFX');fx.classList.add(hard?'shakehard':'shake');setTimeout(()=>fx.classList.remove('shake','shakehard'),400);}
 function uDmg(x,y,opt){opt=opt||{};const d=document.createElement('div');d.className='udn '+(opt.cls||'pop')+(opt.heal?' heal':'');
   d.textContent=opt.text||kanjiNum(Math.floor(uRnd(800000,9900000))*DISP);d.style.left=x+'%';d.style.top=y+'%';d.style.fontSize=(opt.size||(26+Math.random()*16))+'px';
-  document.getElementById('ultDmgL').appendChild(d);setTimeout(()=>d.remove(),1000);}
+  document.getElementById('ultDmgL').appendChild(d);setTimeout(()=>d.remove(),1000);
+  if(!opt.heal){Audio.SE.hit&&Audio.SE.hit();}}
 function uSpark(x,y,emo){const s=document.createElement('div');s.className='uspk';s.textContent=emo||'💥';s.style.left=x+'%';s.style.top=y+'%';document.getElementById('ultFxL').appendChild(s);requestAnimationFrame(()=>s.classList.add('go'));setTimeout(()=>s.remove(),420);}
 function uEl(cls,styleText){const e=document.createElement('div');e.className=cls;if(styleText)e.style.cssText+=styleText;document.getElementById('ultFxL').appendChild(e);return e;}
 function uSetupAllies(){const box=document.getElementById('ultAllies');box.innerHTML='';
@@ -4499,7 +6549,7 @@ function uHealAllies(){const box=document.getElementById('ultAllies');[...box.ch
 function runUltFx(u,ul,col,done){
   let type=ul.ultfx||'default';
   // 固有演出は本人(cid)のみ。流用は不可（不一致ならデフォルトに落とす）
-  const OWNER={thunder:1,fire_heal:2,rain_heal:3,alien:4,rent:5,salmon_fist:10,mercy_rain:11,true_dev:12,cerberus:13,king_ray:15,king_ray_inherit:16,aphrodite:19,tamura_collapse:20,
+  const OWNER={thunder:1,fire_heal:2,rain_heal:3,alien:4,rent:5,salmon_fist:10,mercy_rain:11,blood_rain:36,true_dev:12,cerberus:13,king_ray:15,king_ray_inherit:16,aphrodite:19,tamura_collapse:20,
     redearth:26,zetsu_dev:27,zetsu_neko:28,zetsu_ufo:29,zetsu_salmon:30,mvm_eternity:31,
     legend_dev:101,legend_neko:102,legend_kaeru:103,watcher:104,legend_ufo:105,pienters:106};
   // eternity演出はid:21と25の両方が使える
@@ -4536,6 +6586,24 @@ function runUltFx(u,ul,col,done){
     const iv=setInterval(()=>{const v=Math.floor(uRnd(60000,400000));total+=v;n++;uDmg(uRnd(20,75),uRnd(46,64),{size:24,text:'+'+v.toLocaleString()+'円'});uSpark(uRnd(25,70),uRnd(40,60),'💢');f.innerHTML=total.toLocaleString()+'円<small>延滞金 加算中…</small>';
       if(n>=16){clearInterval(iv);f.style.animation='';f.className='ult-final go';f.innerHTML=total.toLocaleString()+'円<small>耳をそろえて払えェ！</small>';uFlash(col);uShake(true);}},90);
     setTimeout(END,2900);
+  } else if(type==='all_delete'){ // ピエンターズ ALL DELETE：4演出を合体（カーソル→グリッチ→虚無→消灯）
+    const W=document.getElementById('ultFX');
+    const f=document.getElementById('ultFinal');
+    // ── フェーズ1：CURSOR ERASE（範囲選択→✕連打）
+    const mq=uEl('u-ad-marquee','left:10%;top:18%;width:0;height:0;');
+    requestAnimationFrame(()=>{mq.style.width='80%';mq.style.height='60%';});
+    let n=0;const p1=setInterval(()=>{uSpark(uRnd(18,82),uRnd(24,66),'✕');uDmg(uRnd(20,78),uRnd(28,62),{size:18,text:'1%'});n++;if(n%4===0)uShake();},70);
+    setTimeout(()=>{clearInterval(p1);mq.remove();},640);
+    // ── フェーズ2：DATAMOSH（グリッチ）
+    setTimeout(()=>{W.classList.add('ad-glitch');let g=0;const p2=setInterval(()=>{uEl('u-ad-gbar',`top:${uRnd(10,86)}%;`);uFlash(g%2?'#00f0ff':'#ff00d4');uDmg(uRnd(20,78),uRnd(30,60),{size:18,text:'1%'});uShake();g++;if(g>=7)clearInterval(p2);},70);},650);
+    setTimeout(()=>W.classList.remove('ad-glitch'),1190);
+    // ── フェーズ3：VOID COLLAPSE（虚無の穴が開き光が吸われる）
+    setTimeout(()=>{const v=uEl('u-ad-void');requestAnimationFrame(()=>v.classList.add('go'));let s=0;const p3=setInterval(()=>{uSpark(uRnd(15,85),uRnd(30,70),'·');s++;if(s>=8)clearInterval(p3);},55);setTimeout(()=>v.remove(),760);},1200);
+    // ── フェーズ4：SCREEN OFF（ブラウン管消灯）＋finale
+    setTimeout(()=>{const crt=uEl('u-ad-crt');requestAnimationFrame(()=>crt.classList.add('go'));uFlash('#ffffff');
+      f.innerHTML='ALL DELETE<small>全データ削除 ／ HP → 1</small>';f.className='ult-final go';f.style.fontSize='40px';f.style.color='#fff';
+      setTimeout(()=>crt.remove(),720);},1920);
+    setTimeout(END,3000);
   } else if(type==='legend_dev'){ // 伝説の開発者：金色の超巨大一撃＋再行動
     const e=uEl('u-elec');e.style.borderColor='#ffe98a';requestAnimationFrame(()=>e.classList.add('go'));setTimeout(()=>e.remove(),900);
     let n=0;const iv=setInterval(()=>{uDmg(uRnd(20,75),uRnd(26,60),{size:32});uSpark(uRnd(25,70),uRnd(30,58),'✨');uShake();n++;
@@ -4905,6 +6973,19 @@ function runUltFx(u,ul,col,done){
     },70);
     setTimeout(()=>document.getElementById('ultChar').classList.add('lunge'),700);
     setTimeout(END,3300);
+  } else if(type==='blood_rain'){ // 闇のかえる：凄惨なる血の雨（赤い雨＋滅多刺し30連＋ヒット音）
+    document.getElementById('ultFX').classList.add('blood');
+    Audio.SE.flash&&Audio.SE.flash();
+    let rc=0;const rain=setInterval(()=>{for(let k=0;k<4;k++){const r=uEl('u-brain',`left:${uRnd(2,96)}%;animation-duration:${uRnd(.4,.9)}s;`);requestAnimationFrame(()=>r.classList.add('go'));setTimeout(()=>r.remove(),1000);}rc++;if(rc>34)clearInterval(rain);},50);
+    let n=0;const total=30;const iv=setInterval(()=>{
+      uDmg(uRnd(12,86),uRnd(20,66),{size:20+Math.random()*14,cls:'pop'});
+      uSpark(uRnd(15,85),uRnd(22,64),(n%2?'🔪':'🩸'));
+      uShake(n%3===0);
+      n++;
+      if(n>=total){clearInterval(iv);setTimeout(()=>{const f=document.getElementById('ultFinal');f.innerHTML='凄惨なる血の雨<small>ATK30% × 30 HITS</small>';f.className='ult-final go';f.style.fontSize='34px';f.style.color='#ff3050';uFlash('#c81e2e');uShake(true);Audio.SE.hitHeavy&&Audio.SE.hitHeavy();},150);}
+    },70);
+    setTimeout(()=>document.getElementById('ultFX').classList.remove('blood'),3000);
+    setTimeout(END,3300);
   } else {
     // デフォルト：従来のシンプル演出
     let n=0;const iv=setInterval(()=>{uDmg(uRnd(22,72),uRnd(28,60),{size:30});uSpark(uRnd(25,70),uRnd(30,58));uShake();n++;
@@ -4918,6 +6999,11 @@ function resolveUlt(u,ul,mult){
   // --- 開発者GX(cid:32) インフィニティブレード：自身ATK+100%(永続)＋テンション全回復（ダメージ前に付与）---
   if(ul.gxBladeBuff){
     u.buffs.push({s:{ATK:1.0},t:999,icon:'⚡∞'});
+    u.tension=100;
+  }
+  // --- マルチバーサルインフィニティ「無限のパワーソース」：自ATK/DEF永久+200%＋テンション全回復 ---
+  if(ul.infPowerSource){
+    u.buffs.push({s:{ATK:2.0,DEF:2.0},t:999,icon:'♾️力'});
     u.tension=100;
   }
   // --- 真の田村くん(cid:25)：必殺技使用回数カウント。2回目の発動で味方を全滅させる演出 ---
@@ -5032,6 +7118,32 @@ function resolveUlt(u,ul,mult){
     });
     // 自身ATKに付与数分の倍率(4T)
     if(cnt>0)u.buffs.push({s:{ATK:cnt},t:4,icon:`⚔️↑×${cnt}`});
+    return;
+  }
+  // --- ピエンターズ ALL DELETE：敵全体にATK1%×30回 → その後、全体HPを1にする ---
+  if(ul.allDelete){
+    const targets=foeSide.filter(e=>e.alive);
+    if(!targets.length)return;
+    const totalHits=ul.hits||30;
+    let h=0;
+    const tick=()=>{
+      if(h>=totalHits){
+        // 全体HPを1に（最低1）
+        foeSide.filter(t=>t.alive).forEach(t=>{ if(t.hp>1)t.hp=1; });
+        uShake&&uShake(true);
+        renderHP();
+        return;
+      }
+      foeSide.filter(t=>t.alive).forEach(t=>{
+        const d=Math.max(1,calcDmg(eff(u,'ATK'),eff(t,'DEF'),ul.pow*mult));
+        applyDmg(u,t,d,{crit:true});
+      });
+      h++;
+      if(h%6===0)uShake&&uShake();
+      renderHP();
+      setTimeout(tick,42);
+    };
+    tick();
     return;
   }
   // --- 田村くん：崩壊輪廻（敵全体ATK1%×80回・各ヒットでHP半減・最低1） ---
@@ -5173,6 +7285,27 @@ function checkEnd(){
 }
 function battleResult(win){
   const box=document.getElementById('btrBox');
+  // 対戦モードのバトル
+  const isVs=B&&B.vs;
+  if(isVs){
+    box.className='btr-box '+(win?'win':'lose');
+    if(win){
+      const r=vsBattleWin();
+      const charTxt='';
+      box.innerHTML=`<div class="res-ttl">WIN</div>
+        <p>${r.opp.name} を撃破した！<br>${r.firstClear?'<span style="color:#ffd700">初クリア報酬！</span>':'<span style="color:#9ad">周回報酬（30%）</span>'}</p>
+        <div style="font-family:'Teko';font-size:34px;color:#ffd700;text-shadow:0 0 16px #ffd700;margin:10px 0">🎟️ +${r.reward}</div>
+        <div class="nbtn ylw" id="btrOk">対戦モードに戻る ▶</div>`;
+      scr('btResult');Audio.SE.unlock&&Audio.SE.unlock();
+    } else {
+      box.innerHTML=`<div class="res-ttl">LOSE</div>
+        <p>敗北した…<br>編成や難易度を見直そう。</p>
+        <div class="nbtn mag" id="btrOk">対戦モードに戻る</div>`;
+      scr('btResult');Audio.SE.error&&Audio.SE.error();
+    }
+    document.getElementById('btrOk').onclick=()=>{Audio.SE.confirm&&Audio.SE.confirm();buildVsMode();scr('vsmode');refresh();};
+    return;
+  }
   // 負けイベント（B.forceClear=true）の場合、負けても勝ち扱いで物語続行
   const forceClear=B&&B.forceClear;
   const effWin=win||forceClear;
@@ -5191,7 +7324,9 @@ function battleResult(win){
     if(effWin&&B.onWin)B.onWin(); else {scr('main');refresh();}};
 }
 document.getElementById('btFlee').onclick=()=>{Audio.SE.back();
-  ask('撤退','バトルから撤退しますか？<br>進行状況は保存されません。',()=>{scr('main');refresh();});};
+  const backToVs=B&&B.vs;
+  ask('撤退','バトルから撤退しますか？<br>進行状況は保存されません。',()=>{
+    if(backToVs){buildVsMode();scr('vsmode');}else{scr('main');}refresh();});};
 
 /* ---- 描画 ---- */
 function setMsg(t){const m=document.getElementById('btMid');m.innerHTML=`<div class="bt-msg">${t}</div>`;}
