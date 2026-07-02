@@ -25,6 +25,13 @@ h1 b{color:var(--cy)}
 .chip.gray{color:var(--mut);border-color:var(--line2)}
 .chip:active{transform:scale(.96)}
 .sec{background:var(--panel);border:1px solid var(--line2);border-radius:14px;padding:14px;margin-bottom:12px}
+.tabbar{position:sticky;top:0;z-index:20;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:8px 2px;margin:0 0 12px;background:linear-gradient(180deg,var(--bg) 72%,rgba(5,7,12,0));scrollbar-width:none}
+.tabbar::-webkit-scrollbar{display:none}
+.dtab{flex:0 0 auto;white-space:nowrap;border:1px solid var(--line2);background:var(--panel);color:var(--mut);border-radius:999px;padding:8px 15px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:background .15s,color .15s,border-color .15s}
+.dtab.on{background:var(--cy);border-color:var(--cy);color:#04121a}
+.tabpane{display:none}
+.tabpane.active{display:block;animation:dfade .2s ease}
+@keyframes dfade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .sec h2{font-family:var(--mono);font-size:11.5px;color:var(--cy);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:11px;display:flex;gap:8px;align-items:center}
 .sec h2 .bdg{background:var(--panel2);border:1px solid var(--line2);border-radius:999px;font-size:10px;color:var(--mut);padding:1px 8px;font-family:var(--mono)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -160,6 +167,13 @@ function barList(items,unit){
     return '<div class="bar"><div class="bl"><span class="rk">'+(i+1)+'</span>'+esc(x.k)+'</div><div class="bt"><i style="width:'+w+'%"></i></div><div class="bv">'+nf(x.c)+(unit||'')+'</div></div>';
   }).join('')+'</div>';
 }
+var ACTIVE_PANE='overview';
+function switchPane(name){
+  ACTIVE_PANE=name;
+  document.querySelectorAll('.dtab').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-pane')===name); });
+  document.querySelectorAll('.tabpane').forEach(function(pn){ pn.classList.toggle('active', pn.getAttribute('data-pane')===name); });
+  try{ window.scrollTo(0,0); }catch(e){}
+}
 function renderAll(){
   const d=DATA, k=d.kpi||{}, r=d.rev||{}, t=d.tops||{}, e=d.env||{}, h=d.health||{};
   $g('alertbox').innerHTML = (k.totalSessions===0)
@@ -167,8 +181,8 @@ function renderAll(){
     : '';
   const newRate = k.todayVisits>0 ? Math.round((k.todayNew||0)/k.todayVisits*100) : 0;
 
-  let html='';
-  html+='<div class="sec"><h2>今日 / ユーザー</h2><div class="kpis">'
+  // ---- 各セクションを部品化（既存ロジックそのまま） ----
+  const secKPI='<div class="sec"><h2>今日 / ユーザー</h2><div class="kpis">'
     + kpiCard('今日の訪問', nf(k.todayVisits), '昨日 '+nf(k.ydayVisits)+' ・ 直近7日 '+nf(k.last7Visits), true)
     + kpiCard('今日のユニーク', nf(k.todayUniq), '新規 '+nf(k.todayNew)+'（'+newRate+'%）')
     + kpiCard('平均滞在（今日）', fmtDur(k.avgDurTodaySec), '全期間 '+ (k.avgDurAllSec||0) +'秒')
@@ -178,12 +192,12 @@ function renderAll(){
     +'</div></div>';
 
   const fb=d.feedback||[];
-  html+='<div class="sec"><h2>🐞 不具合・ご意見 <span class="bdg">最新'+fb.length+'件</span></h2>'
+  const secFeedback='<div class="sec"><h2>🐞 不具合・ご意見 <span class="bdg">最新'+fb.length+'件</span></h2>'
     + (fb.length ? '<div class="fblist">'+fb.map(x=>'<div class="fbitem"><div class="fbmeta">'+esc(x.ts)+'</div><div class="fbmsg">'+esc(x.v)+'</div></div>').join('')+'</div>' : '<div class="empty">まだ報告はありません</div>')
     +'</div>';
 
   const rows=[['視聴（フィード表示）','view'],['💰 購入クリック','buy'],['見放題 バナー表示','sub_view'],['💰 見放題 クリック','sub_click'],['一覧からの再生','grid_play'],['検索','search']];
-  html+='<div class="sec"><h2>収益アクション <span class="bdg">今日 / 累計</span></h2>'
+  const secRev='<div class="sec"><h2>収益アクション <span class="bdg">今日 / 累計</span></h2>'
     +'<table class="rev"><tr><th>アクション</th><th>今日</th><th>累計</th></tr>'
     + rows.map(x=>{ const o=r[x[1]]||{t:0,a:0}; return '<tr><td>'+x[0]+' <span class="tag">'+x[1]+'</span></td><td>'+nf(o.t)+'</td><td>'+nf(o.a)+'</td></tr>'; }).join('')
     +'</table>'
@@ -191,40 +205,47 @@ function renderAll(){
     +'<div class="ctr"><div class="l">視聴→購入率（buy÷view・累計）</div><div class="v">'+(r.buyPerViewAll||0)+'%</div></div></div></div>';
 
   const tr=d.trend||[]; const tmax=Math.max.apply(null,[1].concat(tr.map(x=>x.v)));
-  html+='<div class="sec"><h2>14日トレンド <span class="bdg">訪問数</span></h2><div class="trend">'
+  const secTrend='<div class="sec"><h2>14日トレンド <span class="bdg">訪問数</span></h2><div class="trend">'
     + tr.map((x,i)=>{ const hgt=Math.round(x.v/tmax*100);
         return '<div class="col'+(i===tr.length-1?' today':'')+'" title="'+esc(x.date)+'：'+nf(x.v)+'訪問 / '+nf(x.u)+'人"><div class="bt" style="height:'+Math.max(2,hgt)+'%">'+(x.v>0?'<span class="n">'+nf(x.v)+'</span>':'')+'</div><div class="dl">'+(i%2===(tr.length-1)%2?esc(x.date.slice(5).replace('-','/')):'')+'</div></div>';
       }).join('')
     +'</div></div>';
 
   const hr=d.hourly||[]; const hmax=Math.max.apply(null,[1].concat(hr));
-  html+='<div class="sec"><h2>時間帯 <span class="bdg">全期間・投稿時間の参考</span></h2><div class="hour">'
+  const secHour='<div class="sec"><h2>時間帯 <span class="bdg">全期間・投稿時間の参考</span></h2><div class="hour">'
     + hr.map((v,i)=>'<div class="hb'+(v>0?' on':'')+'" style="height:'+Math.max(3,Math.round(v/hmax*100))+'%" title="'+i+'時：'+nf(v)+'"></div>').join('')
     +'</div><div class="hlbl"><span>0時</span><span>6時</span><span>12時</span><span>18時</span><span>23時</span></div></div>';
 
-  html+='<div class="grid2">'
-    +'<div class="sec"><h2>検索語 TOP10</h2>'+barList(t.search)+'</div>'
-    +'<div class="sec"><h2>人気ジャンル TOP10 <span class="bdg">趣向タップ</span></h2>'+barList(t.genre)+'</div>'
-    +'<div class="sec"><h2>よく見られた品番 TOP10</h2>'+barList(t.view)+'</div>'
-    +'<div class="sec"><h2>💰 購入クリック品番 TOP10</h2>'+barList(t.buy)+'</div>'
-    +'</div>';
-
   function chips(arr){ return (arr&&arr.length)? '<div class="chips">'+arr.map(x=>'<span class="envc">'+esc(x.k)+'<b>'+nf(x.c)+'</b></span>').join('')+'</div>' : '<div class="empty">—</div>'; }
-  html+='<div class="grid2">'
-    +'<div class="sec"><h2>環境</h2>'
+  const secEnv='<div class="sec"><h2>環境</h2>'
       +'<div class="note" style="margin:0 0 5px">端末</div>'+chips(e.dev)
       +'<div class="note" style="margin:9px 0 5px">OS</div>'+chips(e.os)
       +'<div class="note" style="margin:9px 0 5px">ブラウザ</div>'+chips(e.br)
-    +'</div>'
-    +'<div class="sec"><h2>流入元 TOP10</h2>'+barList(d.referrers)+'</div>'
     +'</div>';
-
-  html+='<div class="sec"><h2>ヘルス</h2><div class="health">'
+  const secRef='<div class="sec"><h2>流入元 TOP10</h2>'+barList(d.referrers)+'</div>';
+  const secHealth='<div class="sec"><h2>ヘルス</h2><div class="health">'
     +'sessions行数: <b>'+nf(h.sessions)+'</b> ／ events行数: <b>'+nf(h.events)+'</b><br>'
     +'最終受信: <b>'+esc(h.lastTs)+'</b> ／ 表示キャッシュ: '+ (h.cacheSec||60) +'秒'+(d.cached?'（キャッシュ表示中）':'')
     +'</div><div class="note">・アプリからの送信は「閉じた / 裏に回した」タイミングで1セッション1回。<br>・行が溜まりすぎたら events シートの古い行を削除してOK（このダッシュは直近'+nf(30000)+'行で集計）。<br>・アクセス増加時は index.html の SAMPLE_RATE を下げる（1.0 → 0.3 等）。</div></div>';
 
-  $g('main').innerHTML=html;
+  const topSearch='<div class="sec"><h2>検索語 TOP10</h2>'+barList(t.search)+'</div>';
+  const topGenre='<div class="sec"><h2>人気ジャンル TOP10 <span class="bdg">趣向タップ</span></h2>'+barList(t.genre)+'</div>';
+  const topView='<div class="sec"><h2>よく見られた品番 TOP10</h2>'+barList(t.view)+'</div>';
+  const topBuy='<div class="sec"><h2>💰 購入クリック品番 TOP10</h2>'+barList(t.buy)+'</div>';
+
+  // ---- タブへ配分 ----
+  const TABS=[
+    ['overview','📊 概要', secKPI + secTrend + secHour],
+    ['revenue','💰 収益', secRev + topBuy],
+    ['popular','🔥 人気', '<div class="grid2">'+topSearch+topGenre+topView+'</div>'],
+    ['feedback','🐞 不具合'+(fb.length?' ('+fb.length+')':''), secFeedback],
+    ['env','⚙️ 環境', '<div class="grid2">'+secEnv+secRef+'</div>'+secHealth]
+  ];
+  if(TABS.map(x=>x[0]).indexOf(ACTIVE_PANE)<0) ACTIVE_PANE='overview';
+  const bar='<div class="tabbar">'+TABS.map(x=>'<button class="dtab'+(x[0]===ACTIVE_PANE?' on':'')+'" data-pane="'+x[0]+'" onclick="switchPane(\''+x[0]+'\')">'+x[1]+'</button>').join('')+'</div>';
+  const panes=TABS.map(x=>'<div class="tabpane'+(x[0]===ACTIVE_PANE?' active':'')+'" data-pane="'+x[0]+'">'+x[2]+'</div>').join('');
+
+  $g('main').innerHTML=bar+panes;
   $g('upd').textContent='最終更新 '+esc(d.generated||'')+(d.cached?'（cache）':'');
 }
 
