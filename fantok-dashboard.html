@@ -74,6 +74,10 @@ table.rev td .tag{font-size:10px;color:var(--faint);font-family:var(--mono)}
 .note{font-size:11px;color:var(--faint);line-height:1.7;margin-top:9px}
 .health{font-family:var(--mono);font-size:11.5px;color:var(--mut);line-height:2}
 .health b{color:var(--tx)}
+.fblist{display:flex;flex-direction:column;gap:8px}
+.fbitem{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-left:3px solid var(--accent,#2ee6e6);border-radius:8px;padding:9px 11px}
+.fbmeta{font-family:var(--mono);font-size:10.5px;color:var(--mut);margin-bottom:3px}
+.fbmsg{font-size:13px;color:var(--tx);line-height:1.5;white-space:pre-wrap;word-break:break-word}
 .skel{color:var(--faint);font-size:13px;padding:30px 0;text-align:center;font-family:var(--mono)}
 a{color:var(--cy)}
 </style>
@@ -172,6 +176,11 @@ function renderAll(){
     + kpiCard('WAU（7日）', nf(k.wau))
     + kpiCard('MAU（30日）', nf(k.mau))
     +'</div></div>';
+
+  const fb=d.feedback||[];
+  html+='<div class="sec"><h2>🐞 不具合・ご意見 <span class="bdg">最新'+fb.length+'件</span></h2>'
+    + (fb.length ? '<div class="fblist">'+fb.map(x=>'<div class="fbitem"><div class="fbmeta">'+esc(x.ts)+'</div><div class="fbmsg">'+esc(x.v)+'</div></div>').join('')+'</div>' : '<div class="empty">まだ報告はありません</div>')
+    +'</div>';
 
   const rows=[['視聴（フィード表示）','view'],['💰 購入クリック','buy'],['見放題 バナー表示','sub_view'],['💰 見放題 クリック','sub_click'],['一覧からの再生','grid_play'],['検索','search']];
   html+='<div class="sec"><h2>収益アクション <span class="bdg">今日 / 累計</span></h2>'
