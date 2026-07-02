@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ja"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#05070c">
+<title>FANTOK 解析ダッシュ</title>
+<!--
+  FANTOK アナリティクス ダッシュボード（管理者用・単一ファイル）
+  ・データ元: fantok-analytics.gs v2 の  GET ?action=dashboard  （60秒キャッシュ）
+  ・取得は fetch → 失敗時 JSONP に自動フォールバック
+  ・外部CDN/フォント不使用＝このファイルだけで動く（ローカルで開いてもOK）
+  ・公開サーバーに置く場合は推測されないファイル名にすること（数字は誰でも見える状態になるため）
+-->
+<style>
+:root{--bg:#05070c;--panel:#0b121d;--panel2:#0e1726;--line:rgba(46,230,230,.14);--line2:#16202f;--cy:#2ee6e6;--mg:#ff2e88;--tx:#e8f2f5;--mut:#7d93a6;--faint:#4b5c6b;--ok:#22e3a0;--bad:#ff4d6a;--mono:ui-monospace,SFMono-Regular,Menlo,monospace;--sans:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:radial-gradient(120% 70% at 50% 0%,#0a1322,#05070c 70%);color:var(--tx);font-family:var(--sans);font-size:14px;max-width:1060px;margin:0 auto;padding:12px 12px calc(30px + env(safe-area-inset-bottom))}
+.hdr{position:sticky;top:0;z-index:10;background:rgba(5,7,12,.92);backdrop-filter:blur(8px);padding:10px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line2);margin-bottom:12px}
+h1{font-family:var(--mono);font-size:17px;letter-spacing:1px}
+h1 b{color:var(--cy)}
+.hsub{font-size:11px;color:var(--mut);font-family:var(--mono)}
+.hbtns{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap}
+.chip{background:var(--panel2);border:1px solid var(--line);color:var(--cy);border-radius:999px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;min-height:32px}
+.chip.gray{color:var(--mut);border-color:var(--line2)}
+.chip:active{transform:scale(.96)}
+.sec{background:var(--panel);border:1px solid var(--line2);border-radius:14px;padding:14px;margin-bottom:12px}
+.sec h2{font-family:var(--mono);font-size:11.5px;color:var(--cy);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:11px;display:flex;gap:8px;align-items:center}
+.sec h2 .bdg{background:var(--panel2);border:1px solid var(--line2);border-radius:999px;font-size:10px;color:var(--mut);padding:1px 8px;font-family:var(--mono)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:680px){.grid2{grid-template-columns:1fr}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:9px}
+.kpi{background:var(--panel2);border:1px solid var(--line2);border-radius:12px;padding:11px 12px}
+.kpi .l{font-size:11px;color:var(--mut);margin-bottom:5px}
+.kpi .v{font-family:var(--mono);font-weight:700;font-size:24px;font-variant-numeric:tabular-nums}
+.kpi .v .u{font-size:11px;color:var(--mut);font-weight:500;margin-left:4px}
+.kpi .s2{font-size:10.5px;color:var(--faint);margin-top:4px}
+.kpi.hero{border-color:rgba(46,230,230,.35);box-shadow:0 0 18px rgba(46,230,230,.06) inset}
+table.rev{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+table.rev th{font-size:11px;color:var(--mut);font-weight:600;text-align:right;padding:6px 8px;border-bottom:1px solid var(--line2)}
+table.rev th:first-child{text-align:left}
+table.rev td{padding:8px;font-family:var(--mono);font-size:14px;text-align:right;border-bottom:1px solid #0d1522}
+table.rev td:first-child{font-family:var(--sans);font-size:12.5px;text-align:left;color:var(--tx)}
+table.rev td .tag{font-size:10px;color:var(--faint);font-family:var(--mono)}
+.ctrrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:11px}
+.ctr{flex:1;min-width:150px;background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:9px 11px}
+.ctr .l{font-size:10.5px;color:var(--mut)}
+.ctr .v{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--cy)}
+.trend{display:flex;align-items:flex-end;gap:3px;height:130px;padding-top:16px}
+.trend .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.trend .bt{width:100%;max-width:26px;background:linear-gradient(180deg,var(--cy),#0f8ea3);border-radius:4px 4px 0 0;min-height:2px;position:relative}
+.trend .col.today .bt{background:linear-gradient(180deg,var(--mg),#a31257)}
+.trend .bt .n{position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9.5px;color:var(--mut)}
+.trend .dl{font-family:var(--mono);font-size:9px;color:var(--faint);white-space:nowrap}
+.hour{display:flex;align-items:flex-end;gap:2px;height:76px;padding-top:12px}
+.hour .hb{flex:1;background:var(--panel2);border:1px solid var(--line2);border-bottom:none;border-radius:3px 3px 0 0;min-height:2px;position:relative}
+.hour .hb.on{background:linear-gradient(180deg,var(--cy),#0f8ea3);border-color:transparent}
+.hlbl{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--faint);margin-top:4px}
+.bars{display:flex;flex-direction:column;gap:6px}
+.bar{display:grid;grid-template-columns:minmax(84px,150px) 1fr 46px;align-items:center;gap:8px;min-height:23px}
+.bar .bl{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .bl .rk{font-family:var(--mono);font-size:10px;color:var(--faint);margin-right:5px}
+.bar .bt{height:12px;border-radius:6px;background:var(--panel2);border:1px solid var(--line2);overflow:hidden}
+.bar .bt i{display:block;height:100%;background:linear-gradient(90deg,var(--cy),var(--mg));border-radius:6px}
+.bar .bv{font-family:var(--mono);font-size:12px;color:var(--mut);text-align:right;font-variant-numeric:tabular-nums}
+.empty{font-size:12px;color:var(--faint);padding:6px 2px}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.envc{background:var(--panel2);border:1px solid var(--line2);border-radius:999px;padding:5px 11px;font-size:11.5px;color:var(--mut)}
+.envc b{color:var(--tx);font-family:var(--mono);margin-left:5px}
+.alert{border:1px solid;border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;line-height:1.7}
+.alert.bad{border-color:var(--bad);background:rgba(255,77,106,.07)}
+.alert.info{border-color:rgba(46,230,230,.4);background:rgba(46,230,230,.05)}
+.alert .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.note{font-size:11px;color:var(--faint);line-height:1.7;margin-top:9px}
+.health{font-family:var(--mono);font-size:11.5px;color:var(--mut);line-height:2}
+.health b{color:var(--tx)}
+.skel{color:var(--faint);font-size:13px;padding:30px 0;text-align:center;font-family:var(--mono)}
+a{color:var(--cy)}
+</style>
+</head><body>
+
+<div class="hdr">
+  <div>
+    <h1>FANTOK <b>解析ダッシュ</b></h1>
+    <div class="hsub" id="upd">読み込み中…</div>
+  </div>
+  <div class="hbtns">
+    <button class="chip" onclick="loadData(true)">🔄 更新</button>
+    <button class="chip gray" onclick="window.open(SHEET_URL,'_blank')">📄 生データ</button>
+    <button class="chip gray" onclick="pingGas()">📶 接続テスト</button>
+  </div>
+</div>
+
+<div id="alertbox"></div>
+<div id="main"><div class="skel">LOADING…</div></div>
+
+<script>
+/* ====== 設定 ====== */
+const AURL = 'https://script.google.com/macros/s/AKfycbyZvWa0mruzE3A6He68Ych7mq2xsJCx_EhFbv3PyweASz0QP_xBVNtNYW2E_viHNZRPmw/exec';
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1YudvVpLseJcub_gn-LvviIEN_VISIW_3ZeW-RY3Qa-E/edit';
+const AUTO_MIN = 5;   // 自動更新（分）
+
+/* ====== ユーティリティ ====== */
+const $g = id => document.getElementById(id);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf = n => (Number(n)||0).toLocaleString('ja-JP');
+function fmtDur(sec){ sec=Number(sec)||0; if(sec<60) return sec+'<span class="u">秒</span>'; const m=Math.floor(sec/60), s=sec%60; return m+'<span class="u">分</span>'+s+'<span class="u">秒</span>'; }
+
+/* ====== データ取得（fetch → JSONPフォールバック） ====== */
+let DATA=null, _timer=null;
+function loadData(manual){
+  if(manual) $g('upd').textContent='更新中…';
+  const url = AURL + (AURL.indexOf('?')>=0?'&':'?') + 'action=dashboard&_t=' + Date.now();
+  fetch(url, {cache:'no-store'})
+    .then(r => { if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(d => { if(!d || d.ok!==true) throw new Error('okでない応答'); DATA=d; renderAll(); })
+    .catch(() => loadJSONP());
+}
+function loadJSONP(){
+  const cb='__ftk_'+Date.now();
+  const sc=document.createElement('script');
+  let done=false;
+  const tm=setTimeout(()=>{ if(done) return; done=true; cleanup(); loadFail(); }, 13000);
+  function cleanup(){ try{ delete window[cb]; }catch(e){} if(sc.parentNode) sc.parentNode.removeChild(sc); clearTimeout(tm); }
+  window[cb]=d=>{ if(done) return; done=true; cleanup(); if(d && d.ok===true){ DATA=d; renderAll(); } else loadFail(); };
+  sc.onerror=()=>{ if(done) return; done=true; cleanup(); loadFail(); };
+  sc.src = AURL + (AURL.indexOf('?')>=0?'&':'?') + 'action=dashboard&callback=' + cb + '&_t=' + Date.now();
+  document.body.appendChild(sc);
+}
+function loadFail(){
+  $g('upd').textContent='接続エラー';
+  $g('alertbox').innerHTML =
+    '<div class="alert bad">⚠️ データを取得できませんでした。' +
+    '<div class="btnrow"><button class="chip" onclick="loadData(true)">🔄 再試行</button>' +
+    '<button class="chip gray" onclick="window.open(AURL+\'?action=dashboard\',\'_blank\')">🔗 GASを直接開いて確認</button></div>' +
+    '<div class="note">直接開いて {"ok":true,…} が出れば接続はOK（このページ側の問題）。Googleのログイン画面や「承認が必要」が出る場合は、GASのデプロイ設定「アクセスできるユーザー」を<b>全員</b>にして、デプロイを管理から新しいバージョンで更新してください。</div></div>';
+}
+function pingGas(){
+  const t0=performance.now(); $g('upd').textContent='接続テスト中…';
+  const cb='__ping_'+Date.now(); const sc=document.createElement('script'); let done=false;
+  const tm=setTimeout(()=>{ if(done)return; done=true; cl(); $g('upd').textContent='❌ 応答なし（13秒）— アクセス権限「全員」を確認'; },13000);
+  function cl(){ try{delete window[cb];}catch(e){} if(sc.parentNode)sc.parentNode.removeChild(sc); clearTimeout(tm); }
+  window[cb]=d=>{ if(done)return; done=true; cl(); $g('upd').textContent=(d&&d.ok)?('✅ 接続OK ('+Math.round(performance.now()-t0)+'ms) sessions='+nf(d.sessions)+' events='+nf(d.events)):'⚠️ 応答はあるがokではない'; };
+  sc.onerror=()=>{ if(done)return; done=true; cl(); $g('upd').textContent='❌ 読み込み失敗 — アクセス権限「全員」を確認'; };
+  sc.src=AURL+(AURL.indexOf('?')>=0?'&':'?')+'callback='+cb+'&_t='+Date.now();
+  document.body.appendChild(sc);
+}
+
+/* ====== 描画 ====== */
+function kpiCard(l,v,s2,hero){ return '<div class="kpi'+(hero?' hero':'')+'"><div class="l">'+l+'</div><div class="v">'+v+'</div>'+(s2?'<div class="s2">'+s2+'</div>':'')+'</div>'; }
+function barList(items,unit){
+  if(!items || !items.length) return '<div class="empty">まだデータがありません</div>';
+  const max=Math.max.apply(null, items.map(x=>x.c));
+  return '<div class="bars">'+items.map((x,i)=>{
+    const w=max>0?Math.max(3,Math.round(x.c/max*100)):0;
+    return '<div class="bar"><div class="bl"><span class="rk">'+(i+1)+'</span>'+esc(x.k)+'</div><div class="bt"><i style="width:'+w+'%"></i></div><div class="bv">'+nf(x.c)+(unit||'')+'</div></div>';
+  }).join('')+'</div>';
+}
+function renderAll(){
+  const d=DATA, k=d.kpi||{}, r=d.rev||{}, t=d.tops||{}, e=d.env||{}, h=d.health||{};
+  $g('alertbox').innerHTML = (k.totalSessions===0)
+    ? '<div class="alert info">📭 まだデータがありません。アプリを開いて数本見て<b>閉じる</b>と、数十秒後にここに反映されます（送信は閉じた時に1回・表示は最大'+(h.cacheSec||60)+'秒キャッシュ）。</div>'
+    : '';
+  const newRate = k.todayVisits>0 ? Math.round((k.todayNew||0)/k.todayVisits*100) : 0;
+
+  let html='';
+  html+='<div class="sec"><h2>今日 / ユーザー</h2><div class="kpis">'
+    + kpiCard('今日の訪問', nf(k.todayVisits), '昨日 '+nf(k.ydayVisits)+' ・ 直近7日 '+nf(k.last7Visits), true)
+    + kpiCard('今日のユニーク', nf(k.todayUniq), '新規 '+nf(k.todayNew)+'（'+newRate+'%）')
+    + kpiCard('平均滞在（今日）', fmtDur(k.avgDurTodaySec), '全期間 '+ (k.avgDurAllSec||0) +'秒')
+    + kpiCard('累計ユーザー', nf(k.totalUsers), '累計セッション '+nf(k.totalSessions))
+    + kpiCard('WAU（7日）', nf(k.wau))
+    + kpiCard('MAU（30日）', nf(k.mau))
+    +'</div></div>';
+
+  const rows=[['視聴（フィード表示）','view'],['💰 購入クリック','buy'],['見放題 バナー表示','sub_view'],['💰 見放題 クリック','sub_click'],['一覧からの再生','grid_play'],['検索','search']];
+  html+='<div class="sec"><h2>収益アクション <span class="bdg">今日 / 累計</span></h2>'
+    +'<table class="rev"><tr><th>アクション</th><th>今日</th><th>累計</th></tr>'
+    + rows.map(x=>{ const o=r[x[1]]||{t:0,a:0}; return '<tr><td>'+x[0]+' <span class="tag">'+x[1]+'</span></td><td>'+nf(o.t)+'</td><td>'+nf(o.a)+'</td></tr>'; }).join('')
+    +'</table>'
+    +'<div class="ctrrow"><div class="ctr"><div class="l">見放題CTR（クリック÷表示・累計）</div><div class="v">'+(r.subCtrAll||0)+'%</div></div>'
+    +'<div class="ctr"><div class="l">視聴→購入率（buy÷view・累計）</div><div class="v">'+(r.buyPerViewAll||0)+'%</div></div></div></div>';
+
+  const tr=d.trend||[]; const tmax=Math.max.apply(null,[1].concat(tr.map(x=>x.v)));
+  html+='<div class="sec"><h2>14日トレンド <span class="bdg">訪問数</span></h2><div class="trend">'
+    + tr.map((x,i)=>{ const hgt=Math.round(x.v/tmax*100);
+        return '<div class="col'+(i===tr.length-1?' today':'')+'" title="'+esc(x.date)+'：'+nf(x.v)+'訪問 / '+nf(x.u)+'人"><div class="bt" style="height:'+Math.max(2,hgt)+'%">'+(x.v>0?'<span class="n">'+nf(x.v)+'</span>':'')+'</div><div class="dl">'+(i%2===(tr.length-1)%2?esc(x.date.slice(5).replace('-','/')):'')+'</div></div>';
+      }).join('')
+    +'</div></div>';
+
+  const hr=d.hourly||[]; const hmax=Math.max.apply(null,[1].concat(hr));
+  html+='<div class="sec"><h2>時間帯 <span class="bdg">全期間・投稿時間の参考</span></h2><div class="hour">'
+    + hr.map((v,i)=>'<div class="hb'+(v>0?' on':'')+'" style="height:'+Math.max(3,Math.round(v/hmax*100))+'%" title="'+i+'時：'+nf(v)+'"></div>').join('')
+    +'</div><div class="hlbl"><span>0時</span><span>6時</span><span>12時</span><span>18時</span><span>23時</span></div></div>';
+
+  html+='<div class="grid2">'
+    +'<div class="sec"><h2>検索語 TOP10</h2>'+barList(t.search)+'</div>'
+    +'<div class="sec"><h2>人気ジャンル TOP10 <span class="bdg">趣向タップ</span></h2>'+barList(t.genre)+'</div>'
+    +'<div class="sec"><h2>よく見られた品番 TOP10</h2>'+barList(t.view)+'</div>'
+    +'<div class="sec"><h2>💰 購入クリック品番 TOP10</h2>'+barList(t.buy)+'</div>'
+    +'</div>';
+
+  function chips(arr){ return (arr&&arr.length)? '<div class="chips">'+arr.map(x=>'<span class="envc">'+esc(x.k)+'<b>'+nf(x.c)+'</b></span>').join('')+'</div>' : '<div class="empty">—</div>'; }
+  html+='<div class="grid2">'
+    +'<div class="sec"><h2>環境</h2>'
+      +'<div class="note" style="margin:0 0 5px">端末</div>'+chips(e.dev)
+      +'<div class="note" style="margin:9px 0 5px">OS</div>'+chips(e.os)
+      +'<div class="note" style="margin:9px 0 5px">ブラウザ</div>'+chips(e.br)
+    +'</div>'
+    +'<div class="sec"><h2>流入元 TOP10</h2>'+barList(d.referrers)+'</div>'
+    +'</div>';
+
+  html+='<div class="sec"><h2>ヘルス</h2><div class="health">'
+    +'sessions行数: <b>'+nf(h.sessions)+'</b> ／ events行数: <b>'+nf(h.events)+'</b><br>'
+    +'最終受信: <b>'+esc(h.lastTs)+'</b> ／ 表示キャッシュ: '+ (h.cacheSec||60) +'秒'+(d.cached?'（キャッシュ表示中）':'')
+    +'</div><div class="note">・アプリからの送信は「閉じた / 裏に回した」タイミングで1セッション1回。<br>・行が溜まりすぎたら events シートの古い行を削除してOK（このダッシュは直近'+nf(30000)+'行で集計）。<br>・アクセス増加時は index.html の SAMPLE_RATE を下げる（1.0 → 0.3 等）。</div></div>';
+
+  $g('main').innerHTML=html;
+  $g('upd').textContent='最終更新 '+esc(d.generated||'')+(d.cached?'（cache）':'');
+}
+
+/* ====== 起動 ====== */
+loadData();
+_timer=setInterval(()=>loadData(false), AUTO_MIN*60*1000);
+</script>
+</body></html>
