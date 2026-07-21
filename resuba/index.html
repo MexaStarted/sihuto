@@ -1261,6 +1261,34 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);ove
   </div>
 </div>
 <script>
+
+/* ===== アクセス解析（RESUBA・匿名・1訪問1送信）===== */
+window.ANALYTICS_URL="https://script.google.com/macros/s/AKfycbwSF3v0hCeZb4KpynjfXITY-FGL7lOZSj7vdkIQU85WGswdpnAzaROXV_jyVFXHYn78/exec";
+(function(){
+ var AURL=window.ANALYTICS_URL||'';
+ function uid(){try{var u=localStorage.getItem('apexUid');if(!u){u=Date.now().toString(36)+Math.random().toString(36).slice(2,10);localStorage.setItem('apexUid',u);}return u;}catch(e){return 'anon';}}
+ var AN={id:uid(),t0:new Date().toISOString(),start:Date.now(),ev:[],sent:false};
+ function push(t,v){try{if(AN.ev.length<80)AN.ev.push({t:t,v:(v==null?'':String(v))});}catch(e){}}
+ window.track=push;
+ function ua(){var u=navigator.userAgent||'';return {dev:/iPad|Tablet/.test(u)?'tablet':/Mobi|Android|iPhone/.test(u)?'mobile':'desktop',os:/iPhone|iPad|iPod|iOS/.test(u)?'iOS':/Android/.test(u)?'Android':/Windows/.test(u)?'Windows':/Mac/.test(u)?'Mac':/Linux/.test(u)?'Linux':'other',br:/CriOS/.test(u)?'Chrome':/FxiOS|Firefox/.test(u)?'Firefox':/Edg/.test(u)?'Edge':/Chrome/.test(u)?'Chrome':/Safari/.test(u)?'Safari':'other'};}
+ function wrap(name,fn){if(typeof window[name]==='function'){var _o=window[name];window[name]=function(){try{fn.apply(null,arguments);}catch(e){}return _o.apply(this,arguments);};}}
+ wrap('open_',function(s){push('view',s);});
+ wrap('openDiag',function(c){push('diag',c);});
+ wrap('dxShare',function(){push('share','diag');});
+ wrap('share',function(){push('share','x');});
+ wrap('lfgOpenX',function(){push('recruit','post');});
+ wrap('btStart',function(){push('battle',(window.BT&&BT.mode===3)?'3v3':'1v1');});
+ wrap('budgetRun',function(i){push('gear','budget'+i);});
+ wrap('guideRender',function(){push('gear','guide');});
+ document.addEventListener('click',function(e){try{var a=e.target&&e.target.closest?e.target.closest('a.pbtn,a[rel~="sponsored"]'):null;if(a){var card=a.closest?a.closest('.pcard'):null;var nm=card&&card.querySelector('.pname')?card.querySelector('.pname').textContent:'';var cat=card&&card.querySelector('.pcat')?card.querySelector('.pcat').textContent:'';var href=(a.getAttribute&&a.getAttribute('href'))||'';var host=href.replace(/^https?:\/\//,'').split('/')[0];push('product',(cat?cat+' / ':'')+(nm||host||'link'));try{mpProdClick(nm||host||'link',cat);}catch(e){}}}catch(err){}},true);
+ /* 将来ノーメンテ：新パネル/ボタンも自動計測。新要素は data-ev を付けるだけ（無くても.tile/.btnは自動でラベル取得） */
+ document.addEventListener('click',function(e){try{var t=e.target&&e.target.closest?e.target.closest('[data-ev],.tile,.btn,.botnav button'):null;if(!t)return;var lbl=t.getAttribute&&t.getAttribute('data-ev');if(!lbl){var nm=t.querySelector&&t.querySelector('.nm');lbl=((nm?nm.textContent:t.textContent)||'').replace(/\s+/g,' ').trim().slice(0,38);}if(lbl)push('tap',lbl);}catch(x){}},true);
+ function param(k){try{return new URLSearchParams(location.search).get(k)||'';}catch(e){return '';}}
+ function send(){if(AN.sent||!AURL)return;AN.sent=true;var e=ua();var p={id:AN.id,site:'resuba',t0:AN.t0,dur:Date.now()-AN.start,ref:document.referrer||'',utm:param('utm'),lang:(window.LANG||'ja'),dev:e.dev,os:e.os,br:e.br,sw:screen.width,sh:screen.height,ev:AN.ev};try{var blob=new Blob([JSON.stringify(p)],{type:'text/plain'});if(navigator.sendBeacon){navigator.sendBeacon(AURL,blob);}else{fetch(AURL,{method:'POST',body:JSON.stringify(p),keepalive:true,mode:'no-cors'});}}catch(e2){}}
+ window.addEventListener('pagehide',send);
+ document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')send();});
+})();
+
 /* ============================================================
    開発者の現在2 — ゲームロジック＋疑似BGM/SE（Web Audio合成）
 ============================================================ */
@@ -3487,6 +3515,15 @@ function effId(id){ const b=baseOf(id); return FORMS[b]?curForm(b):id; }
 const BGM_OF={title:'title',main:'main',party:'main',gacha:'gacha',gachaResult:'gacha',
   zukan:'zukan',settings:'main',adv:'adv',battle:'battle',story:'adv',btResult:'main'};
 function scr(id){
+  try{RT('resuba_screen',id);
+    if(id==='zukan')rtZukanSnap();
+    if(id==='party')rtPartySnap();
+    if(id==='vsmode')RT('resuba_vs','open');
+    if(id==='settings')RT('resuba_ui','settings');
+    if(id==='gacha')RT('resuba_gacha','screen');
+    if(id==='title')RT('resuba_title','1');
+    if(id==='main'&&RTonce('rtstart'))RT('resuba_start','1');
+  }catch(e){}
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show'));
   document.getElementById(id).classList.add('show');
   // 開いている詳細モーダルを閉じる
@@ -3528,6 +3565,7 @@ function grannyPop(msg,got){
   if(got>0&&Audio&&Audio.SE&&Audio.SE.equip)Audio.SE.equip();
 }
 function showGachaLineup(){
+  try{RT('resuba_gacha','open');}catch(e){}
   const pool=gachaPool();
   const order=['PRED','UR','SSR','SR','R'];
   const list=document.getElementById('lineupList');
@@ -3742,6 +3780,7 @@ function buildEps(){const box=document.getElementById('epList');box.innerHTML=''
 /* ===================== アドベンチャー進行 ===================== */
 let advQueue=[],advIdx=0,advTyping=false,advTimer=null,curEp=1,advPhase='pre',curSc=null;
 function startEpisode(ep){
+  try{RT('resuba_ep',ep);if(ep>=101)RT('resuba_spinoff',ep-100);if(ep===0)RT('resuba_ep0','1');}catch(e){}
   // 9話覚醒モーダルフラグをリセット
   window._ep9Awakened=false;
   // 3話：開発者が覚醒（真・開発者へフォルムチェンジ解禁＆選択）
@@ -3750,6 +3789,7 @@ function startEpisode(ep){
   scr('adv');showLine();}
 // 第0話プロローグ（前作ダイジェスト）：バトルなし・台本のみ
 function startPrologue(){
+  try{RT('resuba_prologue_start','1');}catch(e){}
   advPhase='prologue';advQueue=PROLOGUE_EP.pre;advIdx=0;
   scr('adv');showLine();}
 // スピンオフ：内部ep=100+n（#1→101）。pre→バトル→post。本編進行(S.story)には非干渉
@@ -3851,7 +3891,7 @@ function showChoiceReal(){
   const box=document.getElementById('advChoices');box.innerHTML='';box.style.display='flex';
   c.options.forEach((o,i)=>{const b=document.createElement('div');b.className='nbtn'+(i===1?' mag':'');
     b.textContent='▶ '+o.label;
-    b.onclick=()=>{Audio.SE.select();toast(o.res);toBattle();};
+    b.onclick=()=>{try{if(window.track)track('resuba_choice',curEp+'-'+i);}catch(e){}Audio.SE.select();toast(o.res);toBattle();};
     box.appendChild(b);});
 }
 function showAwakeningModal(done){
@@ -4002,6 +4042,7 @@ function endEpisode(){
 
 /* ===================== 機能解放モーダル ===================== */
 function showUnlock(ep,gachaUnlocked,gained){
+  try{RT('resuba_ui','unlock');}catch(e){}
   const items=[];
   if(gachaUnlocked)items.push({ic:'🍣',t:'マルチバース召喚',d:'サーモン握りの力で仲間を呼べる',badge:'NEW'});
   // 10話：開発者GX解禁を強調
@@ -4029,6 +4070,7 @@ function showUnlock(ep,gachaUnlocked,gained){
   };
 }
 function showGameClear(){
+  try{RT('resuba_clear','1');RT('resuba_ending','1');rtZukanSnap();}catch(e){}
   const m=document.createElement('div');
   m.id='gameClearModal';
   m.style.cssText='position:fixed;inset:0;background:radial-gradient(circle at 50% 40%,rgba(255,215,0,.18),#000e 65%);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;animation:gcFade 1s ease';
@@ -4070,6 +4112,7 @@ const RARE_OF=id=>{const c=byId(id);return c?c.rare:'R';};
 
 // タブ切り替え
 function setVsTab(tab){
+  try{RT('resuba_vs','tab');}catch(e){}
   vsCurrentTab=tab;
   document.querySelectorAll('#vsTabs .vs-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
   // ボーダーラインの色をタブで変える
@@ -4224,6 +4267,7 @@ function buildVsDiff(){
 
 // バトル開始
 function vsStartBattle(){
+  try{RT('resuba_vs','start');RT('resuba_battle_type','vs');}catch(e){}
   const opp=vsSelectedOpp, d=vsSelectedDiff;
   if(!opp){return;}
   if(!d){toast('難易度を選んでください');return;}
@@ -4279,6 +4323,7 @@ function buildParty(){
   drawSlots();drawBench();
 }
 function toggleForm(baseId){
+  try{RT('resuba_form','change');RT('resuba_form_char',baseId);if(typeof S!=='undefined'&&S.forms&&S.forms[baseId])RT('resuba_form_to',S.forms[baseId]);}catch(e){}
   if(!FORMS[baseId]||!(S.formUnlocked&&S.formUnlocked[baseId]))return;
   const list=FORMS[baseId];const cur=curForm(baseId);
   const idx=list.indexOf(cur);
@@ -4311,6 +4356,7 @@ function bindCardLongPress(card,id){
 }
 // CHARS idから詳細モーダル（編成・図鑑共用）。基準レベルの疑似ユニットを生成してshowCharDetailへ
 function openCharDetailById(id){
+  try{RT('resuba_char_view',id);RT('resuba_char_view_rare',_rtRare(id));}catch(e){}
   const u=makeUnit(id,getUserLevel(),false);
   showCharDetail(u);
 }
@@ -4448,6 +4494,12 @@ function rollByRare(forceRare){
 }
 let pendingNew=[]; // 同一ガチャ内での重複防止（天井式：同キャラ排出なし）
 function doPull(n){
+  try{n=n||1;RT('resuba_gacha',n>=10?'pull10':'pull1');RT('resuba_gacha_count',n);
+    if(typeof S!=='undefined'&&S.gachaTotal!=null){var g=S.gachaTotal;
+      if(g>=100&&RTonce('g100'))RT('resuba_gacha_milestone','100');
+      else if(g>=50&&RTonce('g50'))RT('resuba_gacha_milestone','50');
+      else if(g>=10&&RTonce('g10'))RT('resuba_gacha_milestone','10');}
+  }catch(e){}
   pendingNew=[];
   const results=[];
   // 初回10連はUR確定（1体目をURに）
@@ -4646,6 +4698,9 @@ function playSummonQueue(results,allDone){
 }
 function rareCls(r){return r==='PRED'?'rare-PRED':r==='UR'?'rare-UR':r==='SSR'?'rare-SSR':r==='SR'?'rare-SR':'rare-R';}
 function showResult(results){
+  try{if(results&&results.length){RT('resuba_gacha_result_n',results.length);
+    results.forEach(function(rr){var id=(rr&&rr.id)?rr.id:rr;RT('resuba_gacha_char',id);RT('resuba_gacha_rare',_rtRare(id));});}
+  }catch(e){}
   results.forEach(c=>{if(!S.owned.includes(c.id))S.owned.push(c.id);});save();
   const g=document.getElementById('grGrid');g.innerHTML='';
   results.forEach((c,i)=>{const d=document.createElement('div');d.className='g2-card '+rareCls(c.rare);
@@ -4699,7 +4754,8 @@ document.querySelectorAll('.z-sort').forEach(s=>s.onclick=()=>{
   document.querySelectorAll('.z-sort').forEach(x=>x.classList.remove('on'));s.classList.add('on');
   zukanSort=s.dataset.sort;Audio.SE.tap();buildZukan();
 });
-function openDetail(c){document.getElementById('zdFace').textContent=c.face;
+function openDetail(c){
+  try{if(c&&c.id){RT('resuba_char_view',c.id);RT('resuba_char_view_rare',_rtRare(c.id));}}catch(e){}document.getElementById('zdFace').textContent=c.face;
   document.getElementById('zdName').textContent=c.name;
   document.getElementById('zdTag').textContent=(c.rare!=='R'||c.gacha?c.rare+' / ':'')+c.role;
   document.getElementById('zdStats').innerHTML=`<span>年齢 ${c.age}</span><span>身長 ${c.h}</span><span>体重 ${c.w}</span><span>出身 ${c.from}</span>`;
@@ -5532,6 +5588,7 @@ const CHANGELOG=[
   ]},
 ];
 function showChangelog(){
+  try{RT('resuba_ui','changelog');}catch(e){}
   const body=document.getElementById('clBody');
   body.innerHTML=CHANGELOG.map((e,i)=>{
     const latest=i===0;
@@ -5550,6 +5607,7 @@ function pickDonateJoke(){
   el._last=j;el.textContent=j;
 }
 function showDonate(){
+  try{RT('resuba_ui','donate');}catch(e){}
   pickDonateJoke();
   document.getElementById('donate').classList.add('show');
 }
@@ -5716,6 +5774,7 @@ function eff(u,key){
 /* ---- バトル状態 ---- */
 let B=null;
 function startBattle(ep,onWin){
+  try{RT('resuba_battle_start',ep);RT('resuba_battle_type','story');}catch(e){}
   const lv=getUserLevel();
   // 2話：かえる(id3)は強制離脱。それ以降は死亡扱いでパーティから除外
   let partyIds=(S.party.length?S.party:[1]).slice();
@@ -5903,6 +5962,7 @@ function startVsBattle(opp,diff){
 }
 // 対戦勝利時の報酬処理
 function vsBattleWin(){
+  try{RT('resuba_vs','win');}catch(e){}
   const vs=B.vs; if(!vs)return;
   const {opp,diff}=vs;
   const firstClear=!vsHasCleared(opp.id,diff.key);
@@ -5919,6 +5979,7 @@ function vsBattleWin(){
 
 /* ---- ターン管理 ---- */
 function startTurn(){
+  try{RT('resuba_turn','1');}catch(e){}
   if(checkEnd())return;
   document.getElementById('btTurn').textContent='TURN '+B.turn;
   // バフ残ターン減算 & パッシブ
@@ -6149,6 +6210,7 @@ function hideSub(){document.getElementById('btSub').style.display='none';
 /* ---- ターゲット選択 ---- */
 let targetCb=null;
 function selectTarget(u,cb){
+  try{RT('resuba_action','target');}catch(e){}
   const foes=B.enemies.filter(e=>e.alive);
   if(foes.length===1){cb(foes[0]);return;}
   // 挑発チェック
@@ -6161,6 +6223,7 @@ function selectTarget(u,cb){
 }
 function clearTargetSel(){document.querySelectorAll('.unit').forEach(el=>{el.classList.remove('target-sel');});targetCb=null;bindLongPress();}
 function selectAlly(u,cb){
+  try{RT('resuba_action','ally');}catch(e){}
   const mates=B.allies.filter(a=>a.alive);
   if(mates.length===1){cb(mates[0]);return;}
   setMsg('回復する味方を選べ（味方をタップ）');
@@ -6197,6 +6260,7 @@ function impactAt(tgt,crit){const p=centerOf(tgt);
   const ev=uavEl(tgt);if(ev){ev.classList.add('uhit');setTimeout(()=>ev.classList.remove('uhit'),300);}}
 // 突進: srcがtgtへ寄って体当たり、ヒット時にcb、戻る。timesで連続。
 function lungeAttack(src,tgt,times,crit,cb){
+  try{RT('resuba_action','attack');}catch(e){}
   const sEl=uavEl(src);if(!sEl){for(let i=0;i<times;i++)cb&&cb();return;}
   const sp=centerOf(src),tp=centerOf(tgt);
   const dx=tp.x-sp.x, dy=tp.y-sp.y+ (src.isEnemy?40:-40);
@@ -7284,6 +7348,7 @@ function checkEnd(){
   return false;
 }
 function battleResult(win){
+  try{if(typeof curEp!=='undefined'){if(win){RT('resuba_ep_clear',curEp);RT('resuba_battle_win',curEp);}else{RT('resuba_battle_lose',curEp);}}RT('resuba_battle_result',win?'win':'lose');}catch(e){}
   const box=document.getElementById('btrBox');
   // 対戦モードのバトル
   const isVs=B&&B.vs;
@@ -7535,6 +7600,59 @@ function showCharDetail(u){
   cdRoot.onclick=(e)=>{if(e.target===cdRoot){Audio.SE.back();cdRoot.classList.remove('on');}};
 }
 
+
+
+
+
+
+
+/* ================================================================
+ * ★RESUBA 詳細計測（収集RPG・300項目）ヘルパー＋起動時計測
+ *   各ゲーム関数には直接 RT(...) 呼び出しを埋め込み済み。
+ *   RT(type,value) は track を呼ぶ薄いラッパー（未定義でも安全）。
+ * ================================================================ */
+function RT(t,v){try{if(window.track)track(t,(v==null?'':String(v)));}catch(e){}}
+var _rtOnce={};
+function RTonce(k){if(_rtOnce[k])return false;_rtOnce[k]=1;return true;}
+function _rtChar(id){try{for(var i=0;i<CHARS.length;i++)if(CHARS[i].id===id)return CHARS[i];}catch(e){}return null;}
+function _rtRare(id){var c=_rtChar(id);return c?c.rare:'?';}
+/* 図鑑・収集スナップショット */
+function rtZukanSnap(){try{
+  if(typeof S==='undefined'||!S.owned)return;
+  var owned=S.owned||[];
+  RT('resuba_owned_total',owned.length);
+  var byR={};owned.forEach(function(id){var r=_rtRare(id);byR[r]=(byR[r]||0)+1;});
+  for(var r in byR)RT('resuba_owned_'+r,byR[r]);
+  var dex=(S.dexOnly||[]).length;
+  var tot=(typeof CHARS!=='undefined')?CHARS.length:70;
+  RT('resuba_dex_pct',Math.round((owned.length+dex)/tot*100));
+}catch(e){}}
+/* パーティスナップショット */
+function rtPartySnap(){try{
+  if(typeof S==='undefined'||!S.party)return;
+  var p=S.party||[];
+  RT('resuba_party_change','1');
+  p.forEach(function(id){if(id)RT('resuba_party_member',id);});
+  RT('resuba_party_rares',p.map(function(id){return _rtRare(id);}).join('/'));
+}catch(e){}}
+/* 起動時計測 */
+(function(){
+  RT('resuba_visit','1');
+  var raw=null;try{raw=localStorage.getItem('kaihatsu2_save_v2');}catch(e){}
+  if(raw){
+    RT('resuba_has_save','1');
+    var st=null;try{st=JSON.parse(raw);}catch(e){}
+    if(st){
+      RT('resuba_save_story',st.story||1);
+      RT('resuba_save_owned',(st.owned||[]).length);
+      RT('resuba_save_gacha',st.gachaTotal||0);
+      if(st.zetsuUnlocked)RT('resuba_has_zetsu','1');
+      if(st.gxUnlocked)RT('resuba_has_gx','1');
+      RT('resuba_returning','1');
+    }
+  }else{RT('resuba_new_player','1');}
+  try{var lv=getUserLevel();RT('resuba_userlv',lv);RT('resuba_userlv_band',lv>=50?'50+':lv>=30?'30-49':lv>=10?'10-29':'1-9');}catch(e){}
+})();
 </script>
 </body>
 </html>
