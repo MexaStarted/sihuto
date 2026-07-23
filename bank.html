@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>手紙バンク · 追加コンソール</title>
+<style>
+/* ============================================================
+   手紙バンク 追加コンソール — 校正卓(proofreading desk)
+   外装は技術コンソール(サンセリフ+等幅)、選別対象の手紙は明朝。
+   ============================================================ */
+:root{
+  --paper:#FAF9F6;
+  --panel:#FFFFFF;
+  --ink:#23201C;
+  --ink-2:#5B554C;
+  --ink-3:#918A7E;
+  --rule:#E7E2D8;
+  --rule-2:#F0ECE3;
+  --field:#FDFDFB;
+
+  --pine:#2E6F5E;      /* single functional accent */
+  --pine-press:#255A4C;
+  --pine-soft:#E7F0EC;
+
+  --new:#3E8E5A;       --new-soft:#E8F3EB;
+  --dup:#9A9388;       --dup-soft:#F1EEE8;
+  --sim:#B7852A;       --sim-soft:#F7EFDD;
+  --danger:#B4534B;    --danger-soft:#F7E9E7;
+
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI','Hiragino Sans','Noto Sans JP',sans-serif;
+  --mono:ui-monospace,'SF Mono','Menlo','Consolas','Roboto Mono',monospace;
+  --mincho:'Hiragino Mincho ProN','Yu Mincho',YuMincho,'Noto Serif JP','Times New Roman',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  font-size:14px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;font-size:inherit}
+textarea,input{font-family:inherit;font-size:inherit;color:inherit}
+::selection{background:var(--pine-soft)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ---------- shell ---------- */
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px 64px}
+header.top{
+  position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--paper) 90%, transparent);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule);
+  display:flex;align-items:baseline;gap:14px;padding:16px 0 13px;margin-bottom:22px;
+}
+.brand{display:flex;align-items:baseline;gap:11px;flex:1;min-width:0}
+.brand__mark{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--pine);
+  border:1px solid var(--pine);border-radius:4px;padding:3px 7px;text-transform:uppercase;flex:0 0 auto;
+}
+.brand__title{font-size:15.5px;font-weight:650;letter-spacing:.01em}
+.brand__sub{font-size:12px;color:var(--ink-3);letter-spacing:.02em}
+.count-chip{
+  font-family:var(--mono);font-size:12px;color:var(--ink-2);
+  background:var(--panel);border:1px solid var(--rule);border-radius:999px;
+  padding:5px 13px;white-space:nowrap;flex:0 0 auto;
+}
+.count-chip b{color:var(--pine);font-weight:700}
+
+/* 3-step flow strip */
+.steps3{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--pine-soft);border:1px solid #D3E4DD;border-radius:10px;padding:11px 15px;margin-bottom:20px;font-size:12.5px;color:var(--ink-2)}
+.s3{display:inline-flex;align-items:center;gap:7px}
+.s3 b{font-family:var(--mono);background:var(--pine);color:#fff;width:19px;height:19px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:0 0 auto}
+.s3sep{color:var(--pine);font-weight:700}
+@media (max-width:620px){ .s3sep{display:none} .steps3{gap:8px} }
+
+/* ---------- layout ---------- */
+.grid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:860px){ .grid{grid-template-columns:1fr} }
+
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:12px}
+.panel + .panel{margin-top:18px}
+.panel__hd{
+  display:flex;align-items:center;gap:8px;padding:13px 16px;border-bottom:1px solid var(--rule-2);
+}
+.panel__hd h2{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.panel__hd .eyebrow{font-family:var(--mono);font-size:10px;color:var(--ink-3)}
+.panel__bd{padding:16px}
+
+/* left: input */
+.ta{
+  width:100%;min-height:300px;resize:vertical;
+  background:var(--field);border:1px solid var(--rule);border-radius:8px;padding:13px 14px;
+  font-family:var(--mincho);font-size:14px;line-height:1.85;color:var(--ink);
+}
+.ta:focus{outline:none;border-color:var(--pine);box-shadow:0 0 0 3px var(--pine-soft)}
+.ta::placeholder{color:var(--ink-3);font-family:var(--mincho)}
+.hintline{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:9px;font-size:11.5px;color:var(--ink-3)}
+.hintline code{font-family:var(--mono);background:var(--rule-2);border-radius:4px;padding:1px 6px;color:var(--ink-2)}
+
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+.opt{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-2)}
+.opt input[type=number]{width:52px;background:var(--field);border:1px solid var(--rule);border-radius:6px;padding:4px 6px;font-family:var(--mono);text-align:center}
+.switch{display:inline-flex;align-items:center;gap:7px;cursor:pointer;user-select:none}
+.switch input{position:absolute;opacity:0;width:0;height:0}
+.switch .track{width:34px;height:19px;border-radius:999px;background:#D8D2C6;position:relative;transition:background .18s;flex:0 0 auto}
+.switch .track::after{content:"";position:absolute;top:2.5px;left:2.5px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .18s}
+.switch input:checked + .track{background:var(--pine)}
+.switch input:checked + .track::after{transform:translateX(15px)}
+.switch input:focus-visible + .track{outline:2px solid var(--pine);outline-offset:2px}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:10px 16px;border-radius:8px;font-weight:600;font-size:13px;letter-spacing:.01em;
+  transition:background .15s,border-color .15s,transform .06s,opacity .15s;white-space:nowrap;
+}
+.btn:active{transform:translateY(1px)}
+.btn--primary{background:var(--pine);color:#fff}
+.btn--primary:hover{background:var(--pine-press)}
+.btn--primary:disabled{background:#C7CFC9;cursor:not-allowed}
+.btn--ghost{border:1px solid var(--rule);background:var(--panel);color:var(--ink)}
+.btn--ghost:hover{border-color:var(--pine);color:var(--pine)}
+.btn--ghost:disabled{opacity:.5;cursor:not-allowed}
+.btn--danger{border:1px solid var(--danger-soft);color:var(--danger);background:var(--panel)}
+.btn--danger:hover{background:var(--danger-soft)}
+.btn .ic{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule-2);border-radius:8px;overflow:hidden;border:1px solid var(--rule-2)}
+.stat{background:var(--panel);padding:12px 8px;text-align:center}
+.stat__n{font-family:var(--mono);font-size:19px;font-weight:700;line-height:1}
+.stat__l{font-size:10.5px;color:var(--ink-3);margin-top:5px;letter-spacing:.02em}
+.stat--new .stat__n{color:var(--new)} .stat--dup .stat__n{color:var(--dup)}
+.stat--sim .stat__n{color:var(--sim)} .stat--tot .stat__n{color:var(--pine)}
+
+.genrebars{margin-top:14px;display:flex;flex-direction:column;gap:7px}
+.gbar{display:grid;grid-template-columns:74px 1fr 34px;align-items:center;gap:9px;font-size:11.5px}
+.gbar__l{color:var(--ink-2)}
+.gbar__track{height:7px;background:var(--rule-2);border-radius:999px;overflow:hidden}
+.gbar__fill{height:100%;background:var(--pine);opacity:.7;border-radius:999px;transition:width .3s}
+.gbar__v{font-family:var(--mono);color:var(--ink-3);text-align:right}
+
+/* right: preview */
+.previewhd{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.legend{display:flex;gap:12px;font-size:11px;color:var(--ink-3)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:8px;height:8px;border-radius:2px;display:inline-block}
+.lg-new{background:var(--new)} .lg-dup{background:var(--dup)} .lg-sim{background:var(--sim)}
+
+.cards{margin-top:2px;max-height:60vh;overflow-y:auto;padding-right:2px}
+.cards::-webkit-scrollbar{width:8px}
+.cards::-webkit-scrollbar-thumb{background:var(--rule);border-radius:4px}
+
+.lc{display:grid;grid-template-columns:5px 1fr;gap:0;border:1px solid var(--rule);border-radius:9px;overflow:hidden;margin-bottom:10px;background:var(--panel)}
+.lc__rail{width:5px}
+.lc--new .lc__rail{background:var(--new)} .lc--dup .lc__rail{background:var(--dup)} .lc--sim .lc__rail{background:var(--sim)}
+.lc--dup{opacity:.72}
+.lc__main{padding:12px 14px;min-width:0}
+.lc__meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.tag{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;font-family:var(--mono)}
+.tag--new{background:var(--new-soft);color:var(--new)}
+.tag--dup{background:var(--dup-soft);color:var(--dup)}
+.tag--sim{background:var(--sim-soft);color:var(--sim)}
+.genre-tag{font-size:11px;color:var(--ink-2);background:var(--rule-2);border-radius:999px;padding:2px 10px}
+.metanum{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.lc__body{font-family:var(--mincho);font-size:14.5px;line-height:1.9;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+.lc__note{margin-top:8px;font-size:11.5px;color:var(--sim);display:flex;align-items:flex-start;gap:6px}
+.lc__note .simbody{color:var(--ink-3);font-family:var(--mincho)}
+.lc__actions{margin-top:9px;display:flex;gap:8px}
+.mini{font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:6px;border:1px solid var(--rule)}
+.mini:hover{border-color:var(--pine);color:var(--pine)}
+.mini.on{background:var(--pine);color:#fff;border-color:var(--pine)}
+
+.footer-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--rule-2)}
+.spring{flex:1}
+
+/* empty */
+.empty{text-align:center;padding:48px 20px;color:var(--ink-3)}
+.empty__mark{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--rule);border:1px dashed var(--rule);display:inline-block;padding:22px 26px;border-radius:10px;margin-bottom:16px}
+.empty__t{font-size:13.5px;color:var(--ink-2);font-weight:600;margin-bottom:6px}
+.empty__d{font-size:12.5px;line-height:1.7}
+
+/* gas row */
+.gasrow{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.gasrow input[type=url],.gasrow input[type=text]{flex:1;min-width:200px;background:var(--field);border:1px solid var(--rule);border-radius:7px;padding:9px 11px;font-family:var(--mono);font-size:12px}
+.gasrow input[type=url]:focus,.gasrow input[type=text]:focus{outline:none;border-color:var(--pine);box-shadow:0 0 0 3px var(--pine-soft)}
+.pill-note{font-size:11px;color:var(--ink-3);font-family:var(--mono)}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(14px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:8px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:100;opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;max-width:88%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--danger)}
+
+.sr-file{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+:focus-visible{outline:2px solid var(--pine);outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="brand__mark">bank</span>
+      <div style="min-width:0">
+        <div class="brand__title">手紙バンク 追加コンソール</div>
+        <div class="brand__sub">ChatGPTの出力を貼って、重複を除いて蓄える</div>
+      </div>
+    </div>
+    <div class="count-chip">蓄積 <b id="totalCount">0</b> 通</div>
+  </header>
+
+  <div class="steps3" aria-label="使い方3ステップ">
+    <span class="s3"><b>1</b> プロンプトを生成 → コピー</span>
+    <span class="s3sep">→</span>
+    <span class="s3"><b>2</b> ChatGPTの返信を貼り付け</span>
+    <span class="s3sep">→</span>
+    <span class="s3"><b>3</b> 「取り込む」で完了（重複・類似は自動スキップ）</span>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT -->
+    <div>
+      <section class="panel">
+        <div class="panel__hd"><h2>手紙生成プロンプト</h2><span class="eyebrow">step 1</span></div>
+        <div class="panel__bd">
+          <div class="controls" style="margin-top:0">
+            <button class="btn btn--primary" id="genPromptBtn">
+              <svg class="ic" viewBox="0 0 24 24"><path d="M4 4h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg>プロンプトを生成
+            </button>
+            <span class="opt">生成数 <input type="number" id="promptCount" min="10" max="80" step="5" value="40"></span>
+          </div>
+          <div class="pill-note" id="promptEmphasis" style="margin-top:11px;line-height:1.65">重心は生成ごとに自動で切り替わります。既存の手紙があれば「被らせない」指示も自動で入ります。</div>
+          <div id="promptBlock" hidden style="margin-top:12px">
+            <textarea id="promptOut" class="ta" readonly style="min-height:150px;font-family:var(--mono);font-size:12px;line-height:1.6"></textarea>
+            <div class="controls" style="margin-top:9px">
+              <button class="btn btn--ghost" id="copyPromptBtn">
+                <svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>プロンプトをコピー
+              </button>
+              <span class="pill-note">コピー→ChatGPTに貼付→返ってきた手紙を下に貼る</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__hd"><h2>貼り付け → 取り込む</h2><span class="eyebrow">step 2 / 3</span></div>
+        <div class="panel__bd">
+          <textarea id="input" class="ta" placeholder="ここに ChatGPT の出力を貼り付け。&#10;手紙どうしは、単独行の --- で区切る。&#10;各手紙の1行目に任意で #感謝 などのジャンル。"></textarea>
+          <div class="hintline">
+            <span>区切り: <code>---</code>（単独行）・ジャンル行: <code>#感謝</code></span>
+            <span class="mono" id="rawLines">0行</span>
+          </div>
+          <div class="controls">
+            <button class="btn btn--primary" id="parseBtn">
+              <svg class="ic" viewBox="0 0 24 24"><path d="M12 4v10M8 11l4 4 4-4M5 20h14"/></svg>取り込む
+            </button>
+            <label class="switch" title="似た手紙を検出して自動でスキップします">
+              <input type="checkbox" id="simOn" checked><span class="track"></span>
+              <span>類似チェック</span>
+            </label>
+            <span class="opt">閾値 <input type="number" id="simTh" min="50" max="99" step="1" value="82">%</span>
+          </div>
+          <div class="pill-note" style="margin-top:10px">押すと<b>新規だけ自動で追加</b>。重複・類似は自動でスキップします（類似は結果から個別に追加も可）。</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__hd"><h2>この取り込み</h2><span class="eyebrow">result</span></div>
+        <div class="panel__bd">
+          <div class="stats">
+            <div class="stat stat--new"><div class="stat__n mono" id="sNew">0</div><div class="stat__l">新規</div></div>
+            <div class="stat stat--dup"><div class="stat__n mono" id="sDup">0</div><div class="stat__l">重複</div></div>
+            <div class="stat stat--sim"><div class="stat__n mono" id="sSim">0</div><div class="stat__l">類似</div></div>
+            <div class="stat stat--tot"><div class="stat__n mono" id="sParsed">0</div><div class="stat__l">解析数</div></div>
+          </div>
+          <div class="genrebars" id="genreBars"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__hd"><h2>バンクGASへ送信</h2><span class="eyebrow">任意</span></div>
+        <div class="panel__bd">
+          <div class="gasrow">
+            <input type="url" id="gasUrl" placeholder="https://script.google.com/…/exec" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="gasrow" style="margin-top:8px">
+            <input type="text" id="gasKey" placeholder="合言葉（GASの ADMIN_KEY と同じ文字列）" autocomplete="off" spellcheck="false">
+            <button class="btn btn--ghost" id="pushBtn">送信</button>
+          </div>
+          <div class="pill-note" style="margin-top:9px">※ URLを入れておくと「取り込む」時に新規分を<b>自動送信</b>します（②のバンクGAS作成後）。空欄なら書き出しでOK。</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <section class="panel">
+        <div class="panel__hd" style="justify-content:space-between">
+          <div class="previewhd" style="flex:1">
+            <h2>取り込み結果</h2>
+            <div class="legend">
+              <span><i class="lg-new"></i>追加</span>
+              <span><i class="lg-sim"></i>類似</span>
+              <span><i class="lg-dup"></i>重複</span>
+            </div>
+          </div>
+        </div>
+        <div class="panel__bd">
+          <div id="cards" class="cards" aria-live="polite">
+            <div class="empty" id="emptyState">
+              <div class="empty__mark">- - -</div>
+              <div class="empty__t">まだ取り込んでいません</div>
+              <div class="empty__d">左に貼り付けて「取り込む」を押すと、<br>新規だけ蓄積し、重複・類似は自動でスキップします。</div>
+            </div>
+          </div>
+
+          <div class="footer-actions">
+            <span class="pill-note" style="margin:0">バックアップ / 管理</span>
+            <span class="spring"></span>
+            <button class="btn btn--ghost" id="exportBtn">
+              <svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4M5 21h14"/></svg>JSONを書き出し
+            </button>
+            <button class="btn btn--ghost" id="importBtn">
+              <svg class="ic" viewBox="0 0 24 24"><path d="M12 15V3M8 7l4-4 4 4M5 21h14"/></svg>読み込み
+            </button>
+            <button class="btn btn--danger" id="clearBtn">全消去</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" class="sr-file" accept="application/json,.json">
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+(function(){
+/* ============================================================
+   手紙バンク 追加コンソール — logic
+   ============================================================ */
+
+/* ---------- genres ---------- */
+const GENRES=[
+  {id:'soudan',label:'悩み相談'},{id:'kansha',label:'感謝'},{id:'tsubuyaki',label:'つぶやき'},
+  {id:'renai',label:'恋愛'},{id:'hitokoto',label:'ひとこと'},{id:'ouen',label:'応援'},
+  {id:'shigoto',label:'仕事・学校'},{id:'other',label:'その他'},
+];
+const BY_LABEL=Object.fromEntries(GENRES.map(g=>[g.label,g.id]));
+const BY_ID=Object.fromEntries(GENRES.map(g=>[g.id,g]));
+const ALIAS={ '仕事':'shigoto','学校':'shigoto','仕事学校':'shigoto','つぶやき':'tsubuyaki',
+  'ひとりごと':'tsubuyaki','応援':'ouen','恋愛':'renai','恋':'renai','感謝':'kansha',
+  'ありがとう':'kansha','悩み':'soudan','相談':'soudan','悩み相談':'soudan','ひとこと':'hitokoto',
+  'その他':'other','other':'other' };
+function genreLabel(id){ return BY_ID[id]?BY_ID[id].label:'その他'; }
+function resolveGenreTag(raw){
+  const t=raw.replace(/^#/,'').replace(/[\s:：・]/g,'').trim();
+  if(BY_ID[t]) return t;
+  if(BY_LABEL[t]) return BY_LABEL[t];
+  if(ALIAS[t]) return ALIAS[t];
+  return null;
+}
+function autoGenre(body){
+  const b=body;
+  if(/ありがと|感謝|お礼/.test(b)) return 'kansha';
+  if(/好き|恋|片想い|片思い|会いたい/.test(b)) return 'renai';
+  if(/仕事|職場|学校|バイト|会社|授業|上司/.test(b)) return 'shigoto';
+  if(/大丈夫|がんば|きっと|応援|負けないで|大丈夫だよ/.test(b)) return 'ouen';
+  if(/悩|つら|苦し|不安|わからない|どうしたら/.test(b)) return 'soudan';
+  return 'other';
+}
+
+/* ---------- prompt generator (脱Claude依存・自動ローテーション) ---------- */
+const P_SEASON=['春の陽気','初夏の風','梅雨のしっとりした空気','真夏の昼','夏の夜','秋のはじまり','秋の夜長','冬の澄んだ空気','年の瀬','新生活の季節'];
+const P_TIME=['早朝','朝の通勤・通学の時間','昼下がり','夕暮れどき','夜','眠れない深夜'];
+const P_MOOD=['感謝をやわらかく伝える','そっと背中を押す','静かな寂しさをすくう','前を向く気持ち','くすっと笑える軽さ','淡々とした日常の実感'];
+const P_STYLE=['です・ます調を中心に','だ・である調を混ぜる','話し言葉で','短い一文を多めに','語りかけるように','あえてそっけなく'];
+const P_LEN=['1行だけの短いものを多めに','短め〜中くらいをバランスよく','4〜5行の少し長めも混ぜて'];
+function pick(arr,i){ return arr[((i%arr.length)+arr.length)%arr.length]; }
+function emphasisFor(seed){
+  seed=seed|0;
+  const gA=pick(GENRES,seed), gB=pick(GENRES,seed*3+2), gL=pick(GENRES,seed*5+4);
+  const emph=[gA.label]; if(gB.label!==gA.label) emph.push(gB.label);
+  let light=gL.label;
+  if(emph.includes(light)) light=pick(GENRES,seed*5+5).label;
+  if(emph.includes(light)) light=pick(GENRES,seed+1).label;
+  return {season:pick(P_SEASON,seed),time:pick(P_TIME,seed*3+1),mood:pick(P_MOOD,seed*2+2),
+    style:pick(P_STYLE,seed*5+3),lengthMix:pick(P_LEN,seed*7),emphasize:emph,light:light};
+}
+function emphasisSummary(e){
+  return '重心：'+e.season+'・'+e.time+'・'+e.mood+'／'+e.emphasize.join('と')+'を厚め・'+e.light+'は控えめ／'+e.lengthMix;
+}
+function sampleLetters(k){
+  const a=LIB.letters.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i];a[i]=a[j];a[j]=t; }
+  return a.slice(0,Math.max(0,k)).map(l=>{ const one=l.body.replace(/\s+/g,' ').trim(); return one.length>80?one.slice(0,80)+'…':one; });
+}
+function buildPrompt(opts){
+  opts=opts||{};
+  const count=opts.count||40;
+  const e=opts.emphasis||emphasisFor(0);
+  const samples=opts.samples||[];
+  const avoid = samples.length
+    ? '\n# 既出（これらと似せない・言い回しや発想を避ける）\n'+samples.map(function(s,i){return (i+1)+'. '+s;}).join('\n')+'\n'
+    : '';
+  return `あなたは「知らない誰かへ届く匿名の手紙」を書く作者です。
+以下の条件で、互いに重複しない手紙を${count}通つくってください。
+
+# 世界観
+・やさしく、素直で、あたたかい。誰かの心をそっと軽くする短い手紙。
+・説教くさくない。ポエムすぎない。生活の実感がある。
+
+# 今回の重心（この方向に寄せる）
+・季節や情景：${e.season}
+・時間帯：${e.time}
+・気持ちのトーン：${e.mood}
+・文体：${e.style}
+・長さ：${e.lengthMix}
+・ジャンル配分：${e.emphasize.join('と')}を厚めに、${e.light}は控えめに。
+
+# 多様性（最重要・機械っぽさを絶対に出さない）
+・題材をばらけさせる：日常のふとした瞬間／感謝／悩みの吐露／恋の気持ち／ひとこと応援／仕事や学校／季節や天気／夜ふけの独り言 など。
+・${count}通どうしが似ないように。同じ比喩・同じ言い回し・同じ書き出しの再利用は禁止。
+・「今日は」で始めない、「ありがとう」で締めない手紙も多めに。
+・語尾・一人称・視点も振る。
+${avoid}
+# 禁止
+・電話番号/メール/URL/住所などの個人情報、実在の人物名、SNSのアカウント名を入れない。
+・誹謗中傷・過度にネガティブな断定・自傷を連想させる表現を入れない。
+・特定の商品やブランドの宣伝にしない。
+
+# 出力形式（これ以外の説明文は一切書かない）
+・1通ごとに、任意で1行目へ「#ジャンル」（悩み相談/感謝/つぶやき/恋愛/ひとこと/応援/仕事・学校/その他 のいずれか）。
+・手紙どうしは、単独行の --- で区切る。`;
+}
+
+/* ---------- hashing / similarity ---------- */
+function normForHash(s){ return String(s||'').replace(/\s+/g,''); }
+// cyrb53 — 53-bit string hash, returns hex string
+function cyrb53(str,seed){
+  seed=seed||0;
+  let h1=0xdeadbeef^seed, h2=0x41c6ce57^seed;
+  for(let i=0;i<str.length;i++){
+    const ch=str.charCodeAt(i);
+    h1=Math.imul(h1^ch,2654435761);
+    h2=Math.imul(h2^ch,1597334677);
+  }
+  h1=Math.imul(h1^(h1>>>16),2246822507); h1^=Math.imul(h2^(h2>>>13),3266489909);
+  h2=Math.imul(h2^(h2>>>16),2246822507); h2^=Math.imul(h1^(h1>>>13),3266489909);
+  const n=4294967296*(2097151&h2)+(h1>>>0);
+  return n.toString(16).padStart(14,'0');
+}
+function hashOf(body){ return cyrb53(normForHash(body)); }
+function trigrams(s){
+  const t=normForHash(s);
+  const set=new Set();
+  if(t.length<3){ if(t) set.add(t); return set; }
+  for(let i=0;i<=t.length-3;i++) set.add(t.slice(i,i+3));
+  return set;
+}
+function jaccard(a,b){
+  if(a.size===0&&b.size===0) return 1;
+  if(a.size===0||b.size===0) return 0;
+  let inter=0; const small=a.size<b.size?a:b, big=a.size<b.size?b:a;
+  small.forEach(x=>{ if(big.has(x)) inter++; });
+  return inter/(a.size+b.size-inter);
+}
+
+/* ---------- parsing ---------- */
+// Split on lines that contain only --- (>=3 dashes ok), tolerant of surrounding spaces.
+function splitEntries(text){
+  const lines=String(text||'').replace(/\r\n?/g,'\n').split('\n');
+  const out=[]; let buf=[];
+  const isSep=(ln)=>/^[ \t　]*-{3,}[ \t　]*$/.test(ln);
+  for(const ln of lines){
+    if(isSep(ln)){ out.push(buf.join('\n')); buf=[]; }
+    else buf.push(ln);
+  }
+  out.push(buf.join('\n'));
+  return out.map(s=>s.trim()).filter(s=>s.length>0);
+}
+function parseEntry(entry){
+  const lines=entry.split('\n');
+  // find first non-empty line
+  let idx=0; while(idx<lines.length && lines[idx].trim()==='') idx++;
+  let genre=null, start=idx;
+  if(idx<lines.length){
+    const first=lines[idx].trim();
+    if(/^#\S/.test(first)){
+      const g=resolveGenreTag(first);
+      if(g){ genre=g; start=idx+1; }   // consume as genre only if recognized
+    }
+  }
+  let body=lines.slice(start).join('\n').trim();
+  if(!body){ body=entry.trim(); genre=genre||null; } // guard: don't lose content
+  if(!genre) genre=autoGenre(body);
+  return {genre,body};
+}
+
+/* ---------- state ---------- */
+const KEY='tegami_letterbank_v1';
+let LIB;               // {v, letters:[{id,genre,body,hash}]}
+let libHashes;         // Set of hashes for O(1) dup
+let trigramCache;      // Map hash -> Set(trigrams), rebuilt with library
+let current=[];        // last parsed result items
+
+function load(){
+  try{ const raw=localStorage.getItem(KEY); LIB=raw?JSON.parse(raw):{v:1,letters:[]}; }
+  catch(e){ LIB={v:1,letters:[]}; }
+  if(!LIB || !Array.isArray(LIB.letters)) LIB={v:1,letters:[]};
+  reindex();
+}
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(LIB)); }catch(e){} }
+function reindex(){
+  libHashes=new Set(LIB.letters.map(l=>l.hash));
+  trigramCache=new Map();
+}
+function libTrigrams(l){
+  let s=trigramCache.get(l.hash);
+  if(!s){ s=trigrams(l.body); trigramCache.set(l.hash,s); }
+  return s;
+}
+
+/* ---------- classify ---------- */
+function classify(entries,{checkSim,threshold}={}){
+  const seen=new Set();        // hashes within this batch
+  const accepted=[];           // {hash,tri} accepted-as-new in this batch (for intra-batch sim)
+  const items=[];
+  for(const e of entries){
+    const {genre,body}=e;
+    const hash=hashOf(body);
+    const item={genre,body,hash,chars:[...body].length,status:'new',sim:0,matchId:null,matchBody:null,keep:true};
+    if(libHashes.has(hash) || seen.has(hash)){
+      item.status='dup'; item.keep=false;
+    } else if(checkSim){
+      const tri=trigrams(body);
+      let best=0,bestL=null;
+      for(const l of LIB.letters){
+        const s=jaccard(tri,libTrigrams(l));
+        if(s>best){ best=s; bestL=l; if(best>=0.999) break; }
+      }
+      for(const a of accepted){
+        const s=jaccard(tri,a.tri);
+        if(s>best){ best=s; bestL={id:a.id,body:a.body}; }
+      }
+      if(best>=threshold){
+        item.status='sim'; item.sim=best; item.keep=false;
+        item.matchId=bestL?bestL.id:null; item.matchBody=bestL?bestL.body:null;
+      } else {
+        accepted.push({hash,tri,id:'(new)',body});
+      }
+    } else {
+      accepted.push({hash,tri:null,id:'(new)',body});
+    }
+    seen.add(hash);
+    items.push(item);
+  }
+  return items;
+}
+
+/* ---------- commit ---------- */
+function addSelected(){
+  let added=0;
+  for(const it of current){
+    if(!it.keep) continue;
+    if(libHashes.has(it.hash)) continue;   // safety
+    const id='L'+it.hash.slice(0,12);
+    LIB.letters.push({id,genre:it.genre,body:it.body,hash:it.hash});
+    libHashes.add(it.hash);
+    added++;
+  }
+  if(added) save();
+  return added;
+}
+
+/* ---------- import / export ---------- */
+function exportJSON(){
+  return JSON.stringify(LIB.letters.map(l=>({id:l.id,genre:l.genre,body:l.body})),null,2);
+}
+function importJSON(text){
+  let arr;
+  try{ arr=JSON.parse(text); }catch(e){ return {ok:false,error:'JSONとして読めませんでした'}; }
+  if(!Array.isArray(arr)) return {ok:false,error:'配列ではありません'};
+  let added=0,skipped=0;
+  for(const raw of arr){
+    const body=(raw && typeof raw.body==='string')?raw.body:(typeof raw==='string'?raw:null);
+    if(!body || !body.trim()){ skipped++; continue; }
+    const hash=hashOf(body);
+    if(libHashes.has(hash)){ skipped++; continue; }
+    let genre=raw&&raw.genre?resolveGenreTag(String(raw.genre))||raw.genre:autoGenre(body);
+    if(!BY_ID[genre]) genre=autoGenre(body);
+    LIB.letters.push({id:'L'+hash.slice(0,12),genre,body:body.trim(),hash});
+    libHashes.add(hash); added++;
+  }
+  if(added) save();
+  return {ok:true,added,skipped};
+}
+
+/* ---------- stats ---------- */
+function genreCounts(){
+  const c={}; GENRES.forEach(g=>c[g.id]=0);
+  LIB.letters.forEach(l=>{ c[l.genre]=(c[l.genre]||0)+1; });
+  return c;
+}
+
+/* ============================================================ DOM */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function renderTotal(){ $('totalCount').textContent=LIB.letters.length.toLocaleString(); }
+function renderGenreBars(){
+  const c=genreCounts(); const max=Math.max(1,...Object.values(c));
+  $('genreBars').innerHTML=GENRES.map(g=>{
+    const v=c[g.id]||0; const w=Math.round(v/max*100);
+    return '<div class="gbar"><span class="gbar__l">'+g.label+'</span>'
+      +'<span class="gbar__track"><span class="gbar__fill" style="width:'+w+'%"></span></span>'
+      +'<span class="gbar__v">'+v+'</span></div>';
+  }).join('');
+}
+function renderStats(items){
+  const n=items.filter(i=>i.status==='new'||i.status==='added').length;
+  const d=items.filter(i=>i.status==='dup').length;
+  const s=items.filter(i=>i.status==='sim').length;
+  $('sNew').textContent=n; $('sDup').textContent=d; $('sSim').textContent=s; $('sParsed').textContent=items.length;
+}
+let lastAdded=[];
+function addOne(it){
+  if(!it || libHashes.has(it.hash)) return null;
+  const id='L'+it.hash.slice(0,12);
+  const rec={id:id,genre:it.genre,body:it.body,hash:it.hash};
+  LIB.letters.push(rec); libHashes.add(it.hash);
+  it.status='added'; it.id=id;
+  return rec;
+}
+function statusTag(st){
+  if(st==='added') return '<span class="tag tag--new">追加済み ✓</span>';
+  if(st==='new') return '<span class="tag tag--new">新規</span>';
+  if(st==='dup') return '<span class="tag tag--dup">重複（スキップ）</span>';
+  return '<span class="tag tag--sim">類似（スキップ）</span>';
+}
+function renderCards(items){
+  if(!items.length){
+    $('cards').innerHTML='<div class="empty"><div class="empty__mark">0</div><div class="empty__t">手紙が見つかりませんでした</div><div class="empty__d">区切りは単独行の <code>---</code> です。<br>本文が入っているか確認してください。</div></div>';
+    return;
+  }
+  $('cards').innerHTML=items.map((it,i)=>{
+    const cls=(it.status==='new'||it.status==='added')?'lc--new':it.status==='dup'?'lc--dup':'lc--sim';
+    let note='';
+    if(it.status==='sim'){
+      const pct=Math.round(it.sim*100);
+      const snip=it.matchBody?esc(it.matchBody.replace(/\n/g,' ').slice(0,40))+(it.matchBody.length>40?'…':''):'既存の手紙';
+      note='<div class="lc__note"><span>類似度 '+pct+'%</span>—<span class="simbody">「'+snip+'」</span></div>';
+    }
+    const actions=it.status==='sim'
+      ? '<div class="lc__actions"><button class="mini" data-addsim="'+i+'">類似だが追加する</button></div>'
+      : '';
+    return '<div class="lc '+cls+'"><div class="lc__rail"></div><div class="lc__main">'
+      +'<div class="lc__meta">'+statusTag(it.status)
+        +'<span class="genre-tag">'+genreLabel(it.genre)+'</span>'
+        +'<span class="metanum">'+it.chars+'字</span>'
+        +'<span class="metanum" style="opacity:.6">'+it.hash.slice(0,6)+'</span>'
+      +'</div>'
+      +'<div class="lc__body">'+esc(it.body)+'</div>'
+      +note+actions
+      +'</div></div>';
+  }).join('');
+}
+
+/* ---------- actions ---------- */
+function doParse(){
+  const entries=splitEntries($('input').value).map(parseEntry);
+  const checkSim=$('simOn').checked;
+  const threshold=Math.min(0.99,Math.max(0.5,(parseInt($('simTh').value,10)||82)/100));
+  current=classify(entries,{checkSim,threshold});
+  lastAdded=[];
+  current.forEach(it=>{ if(it.status==='new'){ const r=addOne(it); if(r) lastAdded.push(r); } });
+  if(lastAdded.length) save();
+  renderCards(current); renderStats(current); renderTotal(); renderGenreBars();
+  if(current.length===0){ toast('手紙が見つかりませんでした（区切りは --- ）',true); return; }
+  const dup=current.filter(i=>i.status==='dup').length;
+  const sim=current.filter(i=>i.status==='sim').length;
+  const parts=[lastAdded.length+'通を追加'];
+  if(dup) parts.push('重複'+dup+'をスキップ');
+  if(sim) parts.push('類似'+sim+'をスキップ');
+  toast(parts.join(' ／ ')+(lastAdded.length?'（合計 '+LIB.letters.length.toLocaleString()+'）':''));
+  const url=$('gasUrl').value.trim();
+  if(url && lastAdded.length) pushToGas(url,lastAdded);
+}
+function pushToGas(url,list){
+  const payload=list.map(l=>({id:l.id,genre:l.genre,body:l.body,hash:l.hash}));
+  if(!payload.length) return;
+  const key=$('gasKey')?$('gasKey').value.trim():'';
+  saveGasSettings();
+  $('pushBtn').disabled=true; const prev=$('pushBtn').textContent; $('pushBtn').textContent='送信中…';
+  fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'add',key:key,letters:payload})})
+    .then(r=>r.json().catch(()=>null))
+    .then(res=>{
+      if(res && res.ok) toast('バンクGASへ送信：追加 '+res.added+' / 重複 '+(res.skipped||0)+'（バンク合計 '+res.total+'）');
+      else if(res && res.error==='unauthorized') toast('合言葉が違います（GASの ADMIN_KEY と一致させてください）',true);
+      else if(res && res.error) toast('バンクGASがエラーを返しました：'+res.error,true);
+      else toast(payload.length+'通を送信しました（応答は確認できませんでした）');
+    })
+    .catch(()=>toast('バンクGASへの送信に失敗（URL/公開設定を確認）',true))
+    .then(()=>{ $('pushBtn').disabled=false; $('pushBtn').textContent=prev; });
+}
+function saveGasSettings(){
+  LIB.gasUrl=$('gasUrl')?$('gasUrl').value.trim():'';
+  LIB.gasKey=$('gasKey')?$('gasKey').value.trim():'';
+  save();
+}
+function updateRawLines(){
+  const v=$('input').value;
+  const n=v.trim()===''?0:v.split(/\r\n?|\n/).length;
+  $('rawLines').textContent=n+'行';
+}
+function doGenPrompt(){
+  const count=Math.min(80,Math.max(10,parseInt($('promptCount').value,10)||40));
+  const seed=(LIB.promptSeed|0);
+  const e=emphasisFor(seed);
+  LIB.promptSeed=seed+1; save();
+  const samples=sampleLetters(15);
+  $('promptOut').value=buildPrompt({count:count,emphasis:e,samples:samples});
+  $('promptEmphasis').textContent=emphasisSummary(e)+(samples.length?('／既存'+samples.length+'通を回避指示に同梱'):'／既存なし');
+  $('promptBlock').hidden=false;
+}
+async function doCopyPrompt(){
+  const v=$('promptOut').value; if(!v) return;
+  let ok=false;
+  try{ if(navigator.clipboard&&navigator.clipboard.writeText){ await navigator.clipboard.writeText(v); ok=true; } }catch(e){}
+  if(!ok){ try{ $('promptOut').removeAttribute('readonly'); $('promptOut').select(); ok=!!(document.execCommand&&document.execCommand('copy')); $('promptOut').setAttribute('readonly','readonly'); }catch(e){} }
+  toast(ok?'プロンプトをコピーしました':'コピーできませんでした。手動で選択してください',!ok);
+}
+
+let toastT;
+function toast(msg,isErr){
+  const t=$('toast'); t.textContent=msg; t.className='toast show'+(isErr?' err':'');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.className='toast',2200);
+}
+
+function download(name,text){
+  try{
+    const blob=new Blob([text],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },100);
+    return true;
+  }catch(e){ return false; }
+}
+
+/* ---------- wire ---------- */
+$('parseBtn').addEventListener('click',doParse);
+$('input').addEventListener('input',updateRawLines);
+$('genPromptBtn').addEventListener('click',doGenPrompt);
+$('copyPromptBtn').addEventListener('click',doCopyPrompt);
+$('cards').addEventListener('click',e=>{
+  const b=e.target.closest('[data-addsim]'); if(!b) return;
+  const i=+b.dataset.addsim; const it=current[i]; if(!it||it.status!=='sim') return;
+  const rec=addOne(it); if(!rec) return;
+  save(); lastAdded.push(rec);
+  renderCards(current); renderStats(current); renderTotal(); renderGenreBars();
+  toast('類似の1通を追加しました（合計 '+LIB.letters.length.toLocaleString()+'）');
+});
+$('exportBtn').addEventListener('click',()=>{
+  if(LIB.letters.length===0){ toast('まだ手紙がありません',true); return; }
+  const ok=download('letterbank_'+LIB.letters.length+'.json',exportJSON());
+  toast(ok?'JSONを書き出しました（'+LIB.letters.length+'通）':'書き出しに失敗しました',!ok);
+});
+$('importBtn').addEventListener('click',()=>$('fileInput').click());
+$('fileInput').addEventListener('change',e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ const res=importJSON(String(r.target.result)); if(res.ok){ renderTotal(); renderGenreBars(); toast('読み込み完了：追加 '+res.added+' / 重複 '+res.skipped); } else { toast(res.error,true); } };
+  r.onerror=()=>toast('ファイルを読めませんでした',true);
+  r.readAsText(f); e.target.value='';
+});
+$('clearBtn').addEventListener('click',()=>{
+  if(LIB.letters.length===0){ toast('すでに空です'); return; }
+  if(confirm('蓄積した '+LIB.letters.length+' 通をすべて消去します。よろしいですか？（書き出しでバックアップ推奨）')){
+    LIB={v:1,letters:[]}; reindex(); save(); renderTotal(); renderGenreBars(); toast('全消去しました');
+  }
+});
+$('pushBtn').addEventListener('click',()=>{
+  const url=$('gasUrl').value.trim();
+  if(!url){ toast('バンクGASのURLを入れてください（②で作成）',true); return; }
+  if(!lastAdded.length){ toast('先に「取り込む」で新規を追加してください',true); return; }
+  pushToGas(url,lastAdded);
+});
+
+/* ---------- boot ---------- */
+function boot(){
+  load();
+  if($('gasUrl')) $('gasUrl').value=LIB.gasUrl||'';
+  if($('gasKey')) $('gasKey').value=LIB.gasKey||'';
+  if($('gasUrl')) $('gasUrl').addEventListener('change',saveGasSettings);
+  if($('gasKey')) $('gasKey').addEventListener('change',saveGasSettings);
+  renderTotal(); renderGenreBars(); updateRawLines();
+}
+
+/* expose for tests */
+window.__bank={
+  GENRES, resolveGenreTag, autoGenre,
+  normForHash, cyrb53, hashOf, trigrams, jaccard,
+  splitEntries, parseEntry, classify,
+  get LIB(){return LIB;}, load, save, reindex, addSelected, exportJSON, importJSON, genreCounts,
+  get current(){return current;}, set current(v){current=v;},
+  doParse, boot, KEY,
+  emphasisFor, emphasisSummary, sampleLetters, buildPrompt, doGenPrompt,
+  pushToGas, saveGasSettings, get lastAdded(){return lastAdded;},
+};
+boot();
+})();
+</script>
+</body>
+</html>
